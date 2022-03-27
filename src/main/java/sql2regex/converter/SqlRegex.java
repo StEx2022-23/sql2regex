@@ -45,6 +45,7 @@ public class SqlRegex {
             //TODO: some converting stuff here
             this.setRegex("test - converting coming soon");
         } catch(Exception e){
+            this.setRegex("Something went wrong. Try again!");
             logger.severe(e.toString());
         }
     }

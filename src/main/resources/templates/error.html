@@ -10,10 +10,16 @@
 
 <div class="container mt-3">
     <div class="card">
-        <img th:src="${imgsrc}" class="img-fluid m-6" alt="Errorimage">
+        <div class="card-body">
+            <h1 class="pb-2 border-bottom">Ooooooooops! An error occurred!</h1>
+            <img th:src="${imgsrc}" class="rounded mx-auto d-block" alt="Errorimage">
+            <div class="d-grid gap-2">
+                <button onclick="location.href='/';" id="backToStartPage" class="btn btn-primary btn-lg mb-2 mt-2 display-6">back to start</button>
+            </div>
+        </div>
     </div>
 </div>
 </body>
 <footer lang="en" th:replace="assets/footer :: footer"></footer>
-<scriptcollection lang="en" th:replace="assets/jsscripts :: jsscripts">> </scriptcollection>
+<div lang="en" th:replace="assets/jsscripts :: jsscripts"></div>
 </html>
