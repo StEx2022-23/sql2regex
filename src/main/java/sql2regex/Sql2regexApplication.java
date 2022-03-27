@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 @SpringBootApplication
 public class Sql2regexApplication {
 
-	public static void main(String[] args) {
+	public static void main(String[] args){
 		SpringApplication.run(Sql2regexApplication.class, args);
 	}
 
