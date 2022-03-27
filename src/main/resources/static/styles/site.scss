@@ -1,0 +1,95 @@
+
+.jumbotronbackgroundimage{
+    background-repeat: no-repeat;
+    background-position: bottom;
+    background-size: cover;
+}
+
+.jumbotronshadow{
+    text-shadow: -1.5px 0 black, 0 1.5px black, 1.5px 0 black, 0 -1.5px black;
+}
+
+.btn-tert{
+    background-color: #f8dec2 !important;
+}
+
+.inputHeight{
+    height: 200px;
+}
+
+#scrolltotop{
+    display: none;
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    z-index: 99;
+}
+
+#copyFeedack, #copyFeedackFailed, #jsonFeedback, #jsonFeedbackFailed, #jsonFeedbackHistory, #jsonFeedbackHistoryFailed{
+    display: none;
+}
+
+.examplesfeedback{
+    display: none;
+}
+
+.nondecoration{
+    text-decoration:none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+$white: #fff;
+$gray-100: #eceff4;
+$gray-200: #e5e9f0;
+$gray-300: #e5e9f0;
+$gray-400: #d8dee9;
+$gray-500: #d8dee9;
+$gray-600: #4c566a;
+$gray-700: #434c5e;
+$gray-800: #3b4252;
+$gray-900: #2e3440;
+
+$blue:    #88c0d0;
+$indigo:  #81a1c1;
+$purple:  #5e81ac;
+$pink:    #bf616a;
+$red:     #bf616a;
+$orange:  #d08770;
+$yellow:  #ebcb8b;
+$green:   #a3be8c;
+$teal:    #88c0d0;
+$cyan:    #88c0d0;
+
+$accordion-button-active-bg: #f8dec2;
+$accordion-button-active-color: #000000;
+$accordion-button-bg: #eceff4;
+
+$input-disabled-bg: #FFFFFF;
+
+
+$secondary: $gray-400;
+
+$text-muted: $gray-300;
+
+$font-family-sans-serif: 'Source Code Pro', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
+
+@import url('https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap');
+@import "../../../../../node_modules/bootstrap/scss/bootstrap";
+

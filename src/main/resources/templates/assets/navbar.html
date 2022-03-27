@@ -1,0 +1,21 @@
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-light bg-success" >
+    <div class="container">
+        <a href="/" class="navbar-brand align-items-center">
+            <img width="60" alt="sgl2regex logo" th:src="@{/img/logo_sql2regex.svg}">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav me-auto" id="navbarlinks">
+                <a th:class="${activeConverter}? 'nav-item nav-link fw-bolder active' : 'nav-item nav-link fw-bolder'" href="/">converter</a>
+                <a th:class="${activeExamples}? 'nav-item nav-link fw-bolder active' : 'nav-item nav-link fw-bolder'" href="examples">examples</a>
+                <a th:class="${activeAbout}? 'nav-item nav-link fw-bolder active' : 'nav-item nav-link fw-bolder'" href="about">about</a>
+            </div>
+            <div class="navbar-nav">
+                <button type="button" onclick="location.href='https://github.com/binkertpat/sql2regex';" class="btn btn-info m-1">Sourcecode @GitHub</button>
+                <button type="button" onclick="location.href='https://tu-dresden.de/ing/informatik/smt/ddi';" class="btn btn-secondary m-1">Didaktik der Informatik @TUD</button>
+            </div>
+        </div>
+    </div>
+</nav>

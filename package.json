@@ -1,0 +1,26 @@
+{
+  "name": "sasscompileinspring",
+  "version": "1.0.0",
+  "description": "compile scss to css",
+  "main": "home.html",
+  "license": "MIT",
+  "scripts": {
+    "scss": "node-sass src/main/resources/static/styles -o src/main/resources/static/styles",
+    "watch": "node-sass --watch src/main/resources/static/styles -o src/main/resources/static/styles"
+  },
+  "author": "",
+  "repository": {
+    "private": true
+  },
+  "dependencies": {
+    "bootstrap": "5.1.0",
+    "copyfiles": "2.4.1",
+    "jquery": "3.6.0",
+    "@popperjs/core": "2.9.3"
+  },
+  "devDependencies": {
+    "node-sass": "7.0.1",
+    "sass-loader": "12.6.0",
+    "webpack": "5.69.1"
+  }
+}

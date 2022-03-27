@@ -1,0 +1,67 @@
+<head th:fragment="header">
+    <title th:text="${title}">template titel</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link th:href="@{/styles/site.css}" rel="stylesheet" />
+    <meta name="description" content="Converting tool from sql to regular expressions.">
+    <meta name="keywords" content="sql, regex">
+    <meta name="robots" content="INDEX,FOLLOW" />
+    <meta name="author" content="Patrick Binkert, Maximilian Förster">
+    <meta name="publisher" content="Patrick Binkert, Maximilian Förster"/>
+    <meta name="copyright" content="Patrick Binkert, Maximilian Förster"/>
+    <meta name="audience" content="alle"/>
+    <meta name="page-type" content="converter" />
+    <meta name="page-topic" content="SQL2REGEX" />
+    <meta name="revisit-after" content="2 days" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="sql2regex">
+    <meta property="og:site_name" content="sql2regex">
+    <meta property="og:url" content="https://sql2regex.herokuapp.com">
+    <meta property="og:description" content="A converter to translate SQL statements into regular expressions. The purpose is to validate variable student results based on a sample solution in digital exam scenarios.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://github.com/binkertpat/sql2regex/blob/5a95bff969fa31758be27b3a0491974b71795c4a/src/main/resources/static/img/favicons/android-chrome-512x512.png">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="application-name" content="sql2regex">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="sql2regex">
+    <meta name="msapplication-TileColor" content="#000">
+    <meta name="theme-color" content="#000">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#000">
+    <meta name="msapplication-config" content="browserconfig.xml?v=220228080207">
+    <link rel="apple-touch-icon" sizes="57x57" th:href="@{/img/favicons/apple-touch-icon-57x57.png?v=220228080207}">
+    <link rel="apple-touch-icon" sizes="60x60" th:href="@{/img/favicons/apple-touch-icon-60x60.png?v=220228080207}">
+    <link rel="apple-touch-icon" sizes="72x72" th:href="@{/img/favicons/apple-touch-icon-72x72.png?v=220228080207}">
+    <link rel="apple-touch-icon" sizes="76x76" th:href="@{/img/favicons/apple-touch-icon-76x76.png?v=220228080207}">
+    <link rel="apple-touch-icon" sizes="114x114" th:href="@{/img/favicons/apple-touch-icon-114x114.png?v=220228080207}">
+    <link rel="apple-touch-icon" sizes="120x120" th:href="@{/img/favicons/apple-touch-icon-120x120.png?v=220228080207}">
+    <link rel="apple-touch-icon" sizes="144x144" th:href="@{/img/favicons/apple-touch-icon-144x144.png?v=220228080207}">
+    <link rel="apple-touch-icon" sizes="152x152" th:href="@{/img/favicons/apple-touch-icon-152x152.png?v=220228080207}">
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/img/favicons/apple-touch-icon-180x180.png?v=220228080207}">
+    <link rel="icon" type="image/png" th:href="@{/img/favicons/android-chrome-36x36.png?v=220228080207}" sizes="36x36">
+    <link rel="icon" type="image/png" th:href="@{/img/favicons/android-chrome-48x48.png?v=220228080207}" sizes="48x48">
+    <link rel="icon" type="image/png" th:href="@{/img/favicons/android-chrome-72x72.png?v=220228080207}" sizes="72x72">
+    <link rel="icon" type="image/png" th:href="@{/img/favicons/android-chrome-96x96.png?v=220228080207}" sizes="96x96">
+    <link rel="icon" type="image/png" th:href="@{/img/favicons/android-chrome-144x144.png?v=220228080207}" sizes="144x144">
+    <link rel="icon" type="image/png" th:href="@{/img/favicons/android-chrome-192x192.png?v=220228080207}" sizes="192x192">
+    <link rel="icon" type="image/png" th:href="@{/img/favicons/favicon-16x16.png?v=220228080207}" sizes="16x16">
+    <link rel="icon" type="image/png" th:href="@{/img/favicons/favicon-32x32.png?v=220228080207}" sizes="32x32">
+    <link rel="icon" type="image/png" th:href="@{/img/favicons/favicon-96x96.png?v=220228080207}" sizes="96x96">
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/img/favicons/favicon.ico?v=220228080207}">
+    <meta name="msapplication-TileImage" content="favicons/mstile-150x150.png?v=220228080207">
+    <meta name="msapplication-square70x70logo" content="favicons/mstile-70x70.png?v=220228080207">
+    <meta name="msapplication-square150x150logo" content="favicons/mstile-150x150.png?v=220228080207">
+    <meta name="msapplication-wide310x150logo" content="favicons/mstile-310x150.png?v=220228080207">
+    <meta name="msapplication-square310x310logo" content="favicons/mstile-310x310.png?v=220228080207">
+    <link th:href="@{/img/favicons/apple-touch-startup-image-320x460.png?v=220228080207}" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 1)" rel="apple-touch-startup-image">
+    <link th:href="@{/img/favicons/apple-touch-startup-image-640x920.png?v=220228080207}" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+    <link th:href="@{/img/favicons/apple-touch-startup-image-640x1096.png?v=220228080207}" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+    <link th:href="@{/img/favicons/apple-touch-startup-image-748x1024.png?v=220228080207}" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 1) and (orientation: landscape)" rel="apple-touch-startup-image">
+    <link th:href="@{/img/favicons/apple-touch-startup-image-750x1024.png?v=220228080207}" media="" rel="apple-touch-startup-image">
+    <link th:href="@{/img/favicons/apple-touch-startup-image-750x1294.png?v=220228080207}" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+    <link th:href="@{/img/favicons/apple-touch-startup-image-768x1004.png?v=220228080207}" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 1) and (orientation: portrait)" rel="apple-touch-startup-image">
+    <link th:href="@{/img/favicons/apple-touch-startup-image-1182x2208.png?v=220228080207}" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" rel="apple-touch-startup-image">
+    <link th:href="@{/img/favicons/apple-touch-startup-image-1242x2148.png?v=220228080207}" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" rel="apple-touch-startup-image">
+    <link th:href="@{/img/favicons/apple-touch-startup-image-1496x2048.png?v=220228080207}" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" rel="apple-touch-startup-image">
+    <link th:href="@{/img/favicons/apple-touch-startup-image-1536x2008.png?v=220228080207}" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" rel="apple-touch-startup-image">
+    <link rel="manifest" th:href="@{/img/favicons/manifest.json?v=220228080207}" />
+</head>
