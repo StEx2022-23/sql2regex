@@ -4,11 +4,11 @@
 
 <div align="center">
   
-  [![LICENCE](https://img.shields.io/github/license/binkertpat/sql2regex.svg)](https://github.com/binkertpat/sql2regex)
-  [![ISSUES](https://img.shields.io/github/issues/binkertpat/sql2regex.svg)](https://github.com/binkertpat/sql2regex)
-  [![ISSUES](https://img.shields.io/github/issues-closed/binkertpat/sql2regex.svg)](https://github.com/binkertpat/sql2regex)
-  [![PULL REQUESTS](https://img.shields.io/github/issues-pr/binkertpat/sql2regex.svg)](https://github.com/binkertpat/sql2regex)
-  [![PULL REQUESTS](https://img.shields.io/github/issues-pr-closed/binkertpat/sql2regex.svg)](https://github.com/binkertpat/sql2regex)
+  [![LICENCE](https://img.shields.io/github/license/StEx2022-23/sql2regex.svg)](https://github.com/binkertpat/sql2regex)
+  [![ISSUES](https://img.shields.io/github/issues/StEx2022-23/sql2regex.svg)](https://github.com/binkertpat/sql2regex)
+  [![ISSUES](https://img.shields.io/github/issues-closed/StEx2022-23/sql2regex.svg)](https://github.com/binkertpat/sql2regex)
+  [![PULL REQUESTS](https://img.shields.io/github/issues-pr/StEx2022-23/sql2regex.svg)](https://github.com/binkertpat/sql2regex)
+  [![PULL REQUESTS](https://img.shields.io/github/issues-pr-closed/StEx2022-23/sql2regex.svg)](https://github.com/binkertpat/sql2regex)
   [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=StEx2022-23_sql2regex&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=StEx2022-23_sql2regex)
   [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=StEx2022-23_sql2regex&metric=bugs)](https://sonarcloud.io/summary/new_code?id=StEx2022-23_sql2regex)
   [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=StEx2022-23_sql2regex&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=StEx2022-23_sql2regex)
