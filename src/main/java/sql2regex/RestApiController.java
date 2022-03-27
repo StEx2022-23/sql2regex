@@ -7,7 +7,7 @@ import sql2regex.converter.SqlRegex;
 @RestController
 public class RestApiController {
 
-    private final sql2regex.converter.SqlRegex sqlregex = new SqlRegex();
+    private final SqlRegex sqlregex = new SqlRegex();
 
     public SqlRegex getSqlRegex() {
         return sqlregex;
