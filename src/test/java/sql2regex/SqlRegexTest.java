@@ -10,7 +10,7 @@ class SqlRegexTest {
     @Test
     void setStatementNotNull(){
         SqlRegex sqlregex = new SqlRegex("SELECT * FROM table");
-        assertEquals(sqlregex.getSql(), "SELECT * FROM table");
+        assertEquals("SELECT * FROM table", sqlregex.getSql());
     }
 
     @Test
@@ -23,14 +23,14 @@ class SqlRegexTest {
     void setEmptySQL(){
         SqlRegex sqlregex = new SqlRegex();
         Exception exception = assertThrows(NullPointerException.class, () -> sqlregex.setSql(""));
-        assertEquals(exception.getMessage(), "SQL-Input-String should have more characters than null.");
+        assertEquals("SQL-Input-String should have more characters than null.", exception.getMessage());
     }
 
     @Test
     void setEmptyRegex(){
         SqlRegex sqlregex = new SqlRegex();
         Exception exception = assertThrows(NullPointerException.class, () -> sqlregex.setRegex(""));
-        assertEquals(exception.getMessage(), "REGEX-Output-String should have more characters than null.");
+        assertEquals("REGEX-Output-String should have more characters than null.", exception.getMessage());
     }
 
     @Test

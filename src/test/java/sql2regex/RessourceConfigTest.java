@@ -12,12 +12,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class ErrorControllerTest {
+public class RessourceConfigTest {
     @Autowired
     MockMvc mvc;
 
     @Test
-    void testErrorPage() throws Exception {
+    void testRobotsTxt() throws Exception {
+        mvc.perform(get("/robots.txt").contentType(MediaType.TEXT_HTML)).andExpect(status().isOk());
+    }
 
+    @Test
+    void testSitemap() throws Exception {
+        mvc.perform(get("/sitemap.xml").contentType(MediaType.TEXT_XML)).andExpect(status().isOk());
     }
 }
+
+
