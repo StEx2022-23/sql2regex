@@ -243,14 +243,14 @@ class SqlRegExHistory {
 }
 
 async function handleSubmitForm(inputId, outputId) {
-    let input = document.getElementById(inputId).value;
+    let input = {"sql":document.getElementById(inputId).value};
     let domain = window.location.href + "convert";
 
     if (input.length !== 0) {
         const response = await fetch(domain, {
             method: 'POST', headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json'
-            }, body: input,
+            }, body: JSON.stringify(input),
         });
 
         response.json().then(data => {

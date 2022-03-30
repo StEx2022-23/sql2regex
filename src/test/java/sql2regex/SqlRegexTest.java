@@ -1,9 +1,7 @@
 package sql2regex;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.matchers.Null;
 import sql2regex.converter.SqlRegex;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class SqlRegexTest {
@@ -24,13 +22,6 @@ class SqlRegexTest {
         SqlRegex sqlregex = new SqlRegex();
         Exception exception = assertThrows(NullPointerException.class, () -> sqlregex.setSql(""));
         assertEquals("SQL-Input-String should have more characters than null.", exception.getMessage());
-    }
-
-    @Test
-    void setEmptyRegex(){
-        SqlRegex sqlregex = new SqlRegex();
-        Exception exception = assertThrows(NullPointerException.class, () -> sqlregex.setRegex(""));
-        assertEquals("REGEX-Output-String should have more characters than null.", exception.getMessage());
     }
 
     @Test

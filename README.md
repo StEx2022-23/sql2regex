@@ -42,6 +42,41 @@ compile changes on runtime:
   <img src="https://cdn.worldvectorlogo.com/logos/heroku-1.svg" height="30">
 </a>
 
+## REST-Api
+
+### single request with command line
+
+```cmd
+curl -X POST http://localhost:8080/convert -H "Content-Type: application/json" -d "{\"sql\":\"SELECT * FROM table\"}"
+```
+
+### single request with python
+
+```python
+import requests
+
+headers = {'Content-Type': 'application/json'}
+r = requests.post('http://localhost:8080/convert', headers=headers, json={"sql":"SELECT * "})
+print(r.json())
+```
+
+### multiple statements with python
+
+```python
+import requests
+import json
+
+headers = {'Content-Type': 'application/json'}
+statementlist = [
+    {"sql":"SELECT * FROM table"},
+    {"sql":"SELECT * FROM table"},
+    {"sql":"SELECT * FROM table"},
+    {"sql":"SELECT * FROM table"},
+    {"sql":"SELECT * FROM table"}
+]
+r = requests.post('http://localhost:8080/multiconvert', headers=headers, json=statementlist)
+print(r.json())
+```
 ## contributers
 - Patrick Binkert, Technische Universität Dresden, Student teacher, 10th semester (physics and computer science)
 - Maximilian Förster, Technische Universität Dresden, Student teacher, 10th semester (physics and computer science)

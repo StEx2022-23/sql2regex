@@ -26,7 +26,7 @@ public class SqlRegex {
     public void setRegex(String regex) {
         if(regex.length() != 0){
             this.regex = regex;
-        } else throw new NullPointerException("REGEX-Output-String should have more characters than null.");
+        } //else throw new NullPointerException("REGEX-Output-String should have more characters than null.");
     }
 
     public void setSql(String sql) {
