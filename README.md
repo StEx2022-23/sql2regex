@@ -78,8 +78,8 @@ r = requests.post('http://localhost:8080/multiconvert', headers=headers, json=st
 print(r.json())
 ```
 ## contributers
-- Patrick Binkert, Technische Universität Dresden, Student teacher, 10th semester (physics and computer science)
-- Maximilian Förster, Technische Universität Dresden, Student teacher, 10th semester (physics and computer science)
+- Patrick Binkert, Technische Universität Dresden, student of teaching, 10th semester (physics and computer science)
+- Maximilian Förster, Technische Universität Dresden, student of teaching, 10th semester (physics and computer science)
 
 <br> 
 
