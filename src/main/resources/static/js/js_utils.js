@@ -227,7 +227,7 @@ class SqlRegExHistory {
 
             let filename = "sql2regex_convertinghistory_" + formattedCurrentTimestamp().replaceAll(" @ ", "").replaceAll("/", "").replaceAll(":", "") + ".json";
             let element = document.createElement('a');
-            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(ConvertingHistory)));
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(ConvertingHistory, null, "\t")));
             element.setAttribute('download', filename);
             element.style.display = 'none';
             document.body.appendChild(element);
@@ -250,7 +250,7 @@ async function handleSubmitForm(inputId, outputId) {
         const response = await fetch(domain, {
             method: 'POST', headers: {
                 'Accept': 'application/json', 'Content-Type': 'application/json'
-            }, body: JSON.stringify(input),
+            }, body: JSON.stringify(input, null, "\t"),
         });
 
         response.json().then(data => {
