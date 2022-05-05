@@ -28,7 +28,6 @@ import java.util.NoSuchElementException;
  * @param <S> class of search objects
  */
 
-//TODO: add common präfix and suffix for the or concatenation to make something like: \s*|\s*
 abstract class SynonymManager<A, S> {
     //due to: Edges undirected (synonyms apply in both directions); Self-loops: no; Multiple edges: no; weighted: yes
     protected SimpleWeightedGraph<A, DefaultWeightedEdge> synonymsGraph;
@@ -115,9 +114,6 @@ abstract class SynonymManager<A, S> {
         this.suffix = suffix;
     }
 }
-
-
-//TODO: extract Date, Time and Datetime into a seperate class, since there are separate Expressions for it.
 
 /**
  * Generate Synonym goes through all saved formats and tries to parse. If it parses successfully it will generate

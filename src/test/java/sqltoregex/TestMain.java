@@ -15,7 +15,7 @@ class TestMain {
     private ResourceConfig resourceConfig;
 
     @Autowired
-    private sql2RegexController sql2RegexController;
+    private Sql2RegexController sql2RegexController;
 
     @Autowired
     private RestApiController restApiController;

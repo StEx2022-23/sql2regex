@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class sql2RegexControllerTest {
+class Sql2RegexControllerTest {
     @Autowired
     MockMvc mvc;
 
