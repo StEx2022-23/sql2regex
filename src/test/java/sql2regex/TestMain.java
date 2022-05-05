@@ -15,7 +15,7 @@ class TestMain {
     private ResourceConfig resourceConfig;
 
     @Autowired
-    private WebController webController;
+    private sql2RegexController sql2RegexController;
 
     @Autowired
     private RestApiController restApiController;
@@ -29,7 +29,7 @@ class TestMain {
     void contextLoads() {
         assertNotNull(myErrorController);
         assertNotNull(resourceConfig);
-        assertNotNull(webController);
+        assertNotNull(sql2RegexController);
         assertNotNull(restApiController);
     }
 }

@@ -5,7 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class WebController {
+public class sql2RegexController {
     private String pageTitelAttributeName = "title";
 
     public String getPageTitelAttributeName(){
