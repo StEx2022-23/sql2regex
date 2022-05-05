@@ -1,4 +1,4 @@
-package sql2regex;
+package sqltoregex;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,8 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import sql2regex.converter.MultiSqlRegex;
-import sql2regex.converter.SqlRegex;
+import sqltoregex.converter.MultiSqlRegex;
+import sqltoregex.converter.SqlRegex;
 import java.util.LinkedList;
 import java.util.List;
 import static org.hamcrest.Matchers.containsString;

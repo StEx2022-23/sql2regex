@@ -1,4 +1,4 @@
-package sql2regex.property;
+package sqltoregex.property;
 
 import net.sf.jsqlparser.expression.DateValue;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -35,7 +35,7 @@ abstract class SynonymManager<A, S> {
     private String prefix = "";
     private String suffix = "";
 
-    public SynonymManager() {
+    protected SynonymManager() {
         this.synonymsGraph = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
     }
 

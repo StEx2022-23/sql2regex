@@ -1,4 +1,4 @@
-package sql2regex;
+package sqltoregex;
 
 import java.util.Arrays;
 import org.springframework.boot.CommandLineRunner;

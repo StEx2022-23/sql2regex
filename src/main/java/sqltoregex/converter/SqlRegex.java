@@ -1,4 +1,4 @@
-package sql2regex.converter;
+package sqltoregex.converter;
 
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;

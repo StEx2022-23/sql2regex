@@ -1,8 +1,8 @@
-package sql2regex;
+package sqltoregex;
 
 import org.springframework.web.bind.annotation.*;
-import sql2regex.converter.SqlRegex;
-import sql2regex.converter.MultiSqlRegex;
+import sqltoregex.converter.SqlRegex;
+import sqltoregex.converter.MultiSqlRegex;
 import java.util.List;
 
 @RestController
