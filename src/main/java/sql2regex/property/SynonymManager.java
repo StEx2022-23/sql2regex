@@ -83,7 +83,7 @@ abstract class SynonymManager<A, S> {
      * @param syn
      * @return
      */
-    abstract protected A prepareSynonymForAdd(A syn);
+    protected abstract A prepareSynonymForAdd(A syn);
 
     /**
      * Preprocesses input for search.
@@ -91,9 +91,9 @@ abstract class SynonymManager<A, S> {
      * @param wordToFindSynonyms
      * @return
      */
-    abstract protected A prepareSynonymForSearch(S wordToFindSynonyms);
+    protected abstract A prepareSynonymForSearch(S wordToFindSynonyms);
 
-    abstract protected String prepareVertexForRegEx(A syn, S wordToFindSynonyms);
+    protected abstract String prepareVertexForRegEx(A syn, S wordToFindSynonyms);
 
     public boolean removeSynonym(A syn) {
         return synonymsGraph.removeVertex(this.prepareSynonymForAdd(syn));
