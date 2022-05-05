@@ -11,7 +11,7 @@
 	<groupId>org</groupId>
 	<artifactId>sql2regex</artifactId>
 	<version>0.0.1a</version>
-	<name>sql2regex</name>
+	<name>sqltoregex</name>
 	<description>Convert SQL-Statements into RegEx</description>
 	<properties>
 		<sonar.organization>stex2022-23</sonar.organization>
@@ -24,6 +24,11 @@
 		</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>org.jgrapht</groupId>
+			<artifactId>jgrapht-core</artifactId>
+			<version>1.5.1</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>

@@ -1,4 +1,4 @@
-package sql2regex.converter;
+package sqltoregex.converter;
 
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
@@ -26,7 +26,7 @@ public class SqlRegex {
     public void setRegex(String regex) {
         if(regex.length() != 0){
             this.regex = regex;
-        } //else throw new NullPointerException("REGEX-Output-String should have more characters than null.");
+        }
     }
 
     public void setSql(String sql) {
@@ -37,9 +37,9 @@ public class SqlRegex {
 
     public void convert(){
         Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-        logger.setLevel(Level.ALL);
+        logger.setLevel(Level.INFO);
         Handler handler = new ConsoleHandler();
-        handler.setLevel(Level.ALL);
+        handler.setLevel(Level.INFO);
         logger.addHandler(handler);
         try{
             //TODO: some converting stuff here

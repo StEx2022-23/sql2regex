@@ -1,4 +1,4 @@
-package sql2regex;
+package sqltoregex;
 
 import java.util.Arrays;
 import org.springframework.boot.CommandLineRunner;
@@ -22,9 +22,9 @@ public class Sql2regexApplication {
 	@Bean
 	public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
 		Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-		logger.setLevel(Level.ALL);
+		logger.setLevel(Level.INFO);
 		Handler handler = new ConsoleHandler();
-		handler.setLevel(Level.ALL);
+		handler.setLevel(Level.INFO);
 		logger.addHandler(handler);
 
 		return args -> {

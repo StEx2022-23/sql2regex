@@ -1,5 +1,5 @@
 <h1 align="center">
-    sql2regex
+    sqltoregex
 </h1>
 
 <div align="center">

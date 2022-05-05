@@ -1,11 +1,11 @@
-package sql2regex;
+package sqltoregex;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class sql2RegexController {
+public class Sql2RegexController {
     private String pageTitelAttributeName = "title";
 
     public String getPageTitelAttributeName(){
@@ -14,7 +14,7 @@ public class sql2RegexController {
 
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute(this.getPageTitelAttributeName(), "sql2regex");
+        model.addAttribute(this.getPageTitelAttributeName(), "sqltoregex");
         model.addAttribute("activeConverter", true);
         return "home";
     }

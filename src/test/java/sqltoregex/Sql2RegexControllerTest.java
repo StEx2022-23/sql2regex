@@ -1,4 +1,4 @@
-package sql2regex;
+package sqltoregex;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class sql2RegexControllerTest {
+class Sql2RegexControllerTest {
     @Autowired
     MockMvc mvc;
 

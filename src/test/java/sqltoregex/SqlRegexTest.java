@@ -1,7 +1,7 @@
-package sql2regex;
+package sqltoregex;
 
 import org.junit.jupiter.api.Test;
-import sql2regex.converter.SqlRegex;
+import sqltoregex.converter.SqlRegex;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SqlRegexTest {

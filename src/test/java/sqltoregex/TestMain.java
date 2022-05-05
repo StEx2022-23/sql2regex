@@ -1,4 +1,4 @@
-package sql2regex;
+package sqltoregex;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +15,7 @@ class TestMain {
     private ResourceConfig resourceConfig;
 
     @Autowired
-    private sql2RegexController sql2RegexController;
+    private Sql2RegexController sql2RegexController;
 
     @Autowired
     private RestApiController restApiController;
