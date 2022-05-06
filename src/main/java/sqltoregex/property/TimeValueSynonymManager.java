@@ -52,4 +52,9 @@ class TimeValueSynonymManager extends SynonymManager<DateFormat, TimeValue> {
         }
         throw new NoSuchElementException("There are no synonym formats for the entered date format");
     }
+
+    @Override
+    public String searchSynonymToString(TimeValue wordToFindSynonyms) {
+        return wordToFindSynonyms.getValue().toString();
+    }
 }

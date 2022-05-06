@@ -46,4 +46,9 @@ public class DateValueSynonymManager extends SynonymManager<DateFormat, DateValu
         }
         throw new NoSuchElementException("There are no synonym formats for the entered date format");
     }
+
+    @Override
+    public String searchSynonymToString(DateValue wordToFindSynonyms) {
+        return wordToFindSynonyms.getValue().toString();
+    }
 }
