@@ -1,10 +1,10 @@
 package sqltoregex.property;
 
 /**
- * Default implementation of {@link SynonymManager}. Saves Strings and searches with exact representation of them.
+ * Default implementation of {@link SynonymGenerator}. Saves Strings and searches with exact representation of them.
  * e.g. used for: Data-Type synonyms
  */
-class DefaultSynonymManager extends SynonymManager<String, String> {
+class DefaultSynonymGenerator extends SynonymGenerator<String, String> {
 
     @Override
     protected String prepareSynonymForAdd(String syn) {

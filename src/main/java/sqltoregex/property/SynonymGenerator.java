@@ -1,13 +1,9 @@
 package sqltoregex.property;
 
-import net.sf.jsqlparser.expression.DateValue;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -28,13 +24,13 @@ import java.util.NoSuchElementException;
  * @param <S> class of search objects
  */
 
-abstract class SynonymManager<A, S> {
+abstract class SynonymGenerator<A, S> {
     //due to: Edges undirected (synonyms apply in both directions); Self-loops: no; Multiple edges: no; weighted: yes
     protected SimpleWeightedGraph<A, DefaultWeightedEdge> synonymsGraph;
     private String prefix = "";
     private String suffix = "";
 
-    protected SynonymManager() {
+    protected SynonymGenerator() {
         this.synonymsGraph = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
     }
 
@@ -55,13 +51,38 @@ abstract class SynonymManager<A, S> {
         return false;
     }
 
+//    private Iterator<A> getIteratorStartingFrom(S wordToFindSynonyms){
+//        A vertexToSearch = this.prepareSynonymForSearch(wordToFindSynonyms);
+//        A start = this.synonymsGraph.vertexSet().stream()
+//                .filter(syn -> syn.equals(vertexToSearch)).findAny().get();
+//        return new DepthFirstIterator<>(synonymsGraph, start);
+//    }
+//
+//    public Collection<A> getSynonymsCollectionFor(S wordToFindSynonyms){
+//        Collection<A> synonymsCollection = new HashSet<>();
+//        try {
+//            Iterator<A> iterator = getIteratorStartingFrom(wordToFindSynonyms);
+//            while (iterator.hasNext()) {
+//                synonymsCollection.add(iterator.next());
+//            }
+//        } catch (NoSuchElementException e) {
+//            synonymsCollection.add(this.prepareSynonymForSearch(wordToFindSynonyms));
+//        }
+//        return synonymsCollection;
+//    }
+
+    /**
+     * Generates a regular expression part String with the pre-/ and suffixes set <b>including</b> the param.
+     * @param wordToFindSynonyms
+     * @return
+     */
     public String generateSynonymRegexFor(S wordToFindSynonyms) {
         try {
             A vertexToSearch = this.prepareSynonymForSearch(wordToFindSynonyms);
             A start = this.synonymsGraph.vertexSet().stream()
                     .filter(syn -> syn.equals(vertexToSearch)).findAny().get();
-            Iterator<A> iterator = new DepthFirstIterator<>(synonymsGraph, start);
 
+            Iterator<A> iterator = new DepthFirstIterator<>(synonymsGraph, start);
             StringBuilder strRegEx = new StringBuilder();
             while (iterator.hasNext()) {
                 strRegEx.append(prefix);
@@ -72,7 +93,7 @@ abstract class SynonymManager<A, S> {
             strRegEx.deleteCharAt(strRegEx.length() - 1);
             return strRegEx.toString();
         } catch (NoSuchElementException e) {
-            return wordToFindSynonyms.toString();
+            return searchSynonymToString(wordToFindSynonyms);
         }
     }
 
@@ -100,17 +121,28 @@ abstract class SynonymManager<A, S> {
 
     /**
      * Sets a common prefix for all concatenations of {@link #generateSynonymRegexFor}
+     *
      * @param prefix prefix to add
      */
-    public void setPrefix(String prefix){
+    public void setPrefix(String prefix) {
         this.prefix = prefix;
     }
 
     /**
      * Sets a common suffix for all concatenations of {@link #generateSynonymRegexFor}
+     *
      * @param suffix suffix to add
      */
-    public void setSuffix(String suffix){
+    public void setSuffix(String suffix) {
         this.suffix = suffix;
+    }
+
+    /**
+     * Converts the search synonym to a string.
+     * @param wordToFindSynonyms
+     * @return
+     */
+    public String searchSynonymToString(S wordToFindSynonyms){
+        return wordToFindSynonyms.toString();
     }
 }
