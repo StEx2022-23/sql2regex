@@ -88,9 +88,9 @@ public class ConverterManagement {
         StringBuilder outputRegex = new StringBuilder();
         outputRegex.append("^");
 
-        if(checkOfDistinctElements(regexList)){
+        if(!checkOfDistinctElements(regexList)){
             outputRegex.append(regexList.get(0));
-        } else if(!checkOfDistinctElements(regexList)){
+        } else if(checkOfDistinctElements(regexList)){
             for(String str : regexList){
                 outputRegex.append("(");
                 outputRegex.append(str);
