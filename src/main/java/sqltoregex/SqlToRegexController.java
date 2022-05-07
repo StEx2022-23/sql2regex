@@ -6,41 +6,38 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class SqlToRegexController {
-
-    public String getPageTitelAttributeName(){
-        return "title";
-    }
+    private final String title = "title";
 
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute(this.getPageTitelAttributeName(), "sqltoregex");
+        model.addAttribute(this.title, "sqltoregex");
         model.addAttribute("activeConverter", true);
         return "home";
     }
 
     @GetMapping("/examples")
     public String examples(Model model) {
-        model.addAttribute(this.getPageTitelAttributeName(), "sql2regex - examples");
+        model.addAttribute(this.title, "sql2regex - examples");
         model.addAttribute("activeExamples", true);
         return "examples";
     }
 
     @GetMapping("/about")
     public String aboutus(Model model) {
-        model.addAttribute(this.getPageTitelAttributeName(), "sql2regex - about us");
+        model.addAttribute(this.title, "sql2regex - about us");
         model.addAttribute("activeAbout", true);
         return "about";
     }
 
     @GetMapping("/privacy")
     public String privacy(Model model) {
-        model.addAttribute(this.getPageTitelAttributeName(), "sql2regex - privacy");
+        model.addAttribute(this.title, "sql2regex - privacy");
         return "privacy";
     }
 
     @GetMapping("/impressum")
     public String impressum(Model model) {
-        model.addAttribute(this.getPageTitelAttributeName(), "sql2regex - impressum");
+        model.addAttribute(this.title, "sql2regex - impressum");
         return "impressum";
     }
 }

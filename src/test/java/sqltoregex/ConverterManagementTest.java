@@ -10,7 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ConverterManagementTest {
+class ConverterManagementTest {
     @Autowired
     MockMvc mvc;
 
@@ -18,15 +18,15 @@ public class ConverterManagementTest {
 
     @Test
     void testValidation(){
-        Assertions.assertEquals(converterManagement.validate("SELECT col1, col2 FROM table"), true);
-        Assertions.assertEquals(converterManagement.validate("col2 FROM table"), false);
+        Assertions.assertEquals(true, converterManagement.validate("SELECT col1, col2 FROM table"));
+        Assertions.assertEquals(false, converterManagement.validate("col2 FROM table"));
     }
 
     @Test
     void testDeparse() throws JSQLParserException {
         Assertions.assertEquals(
-                converterManagement.deparse("SELECT col1, col2 FROM table"),
-                "^SELECT col1, col2 FROM table$"
+                "^SELECT col1, col2 FROM table$",
+                converterManagement.deparse("SELECT col1, col2 FROM table")
         );
     }
 }

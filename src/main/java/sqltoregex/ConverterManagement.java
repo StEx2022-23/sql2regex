@@ -23,6 +23,10 @@ import java.util.logging.Logger;
  */
 @Service
 public class ConverterManagement {
+
+    /**
+     * service constructor
+     */
     public ConverterManagement(){}
 
     /**
@@ -46,10 +50,10 @@ public class ConverterManagement {
 
         Validation validation = new Validation(supportedDBMS, sqlstatement);
         List<ValidationError> validationerrors = validation.validate();
-        if(validationerrors.size() == 0) { return true;}
+        if(validationerrors.isEmpty()) { return true;}
         else{
             for(ValidationError va : validationerrors){
-                logger.warning(va.toString());
+                logger.log(Level.WARNING, () -> "Something went wrong: " + va.toString());
             }
             return false;
         }
@@ -88,9 +92,9 @@ public class ConverterManagement {
         StringBuilder outputRegex = new StringBuilder();
         outputRegex.append("^");
 
-        if(!checkOfDistinctElements(regexList)){
+        if(Boolean.FALSE.equals(checkOfDistinctElements(regexList))){
             outputRegex.append(regexList.get(0));
-        } else if(checkOfDistinctElements(regexList)){
+        } else if(Boolean.TRUE.equals(checkOfDistinctElements(regexList))){
             for(String str : regexList){
                 outputRegex.append("(");
                 outputRegex.append(str);
