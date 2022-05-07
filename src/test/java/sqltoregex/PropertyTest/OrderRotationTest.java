@@ -17,7 +17,7 @@ class OrderRotationTest {
     void testOrderRotationWithoutAlternativeWritingStyles(){
         Assertions.assertEquals(
                 "(?:table1\\s*,\\s*table2|table2\\s*,\\s*table1)",
-                orderRotation.CalculateDifferentTableNameOrders(testList, false)
+                orderRotation.calculateDifferentTableNameOrders(testList, false)
         );
     }
 
@@ -25,7 +25,7 @@ class OrderRotationTest {
     void testOrderRotationWithAlternativeWritingStyles(){
         Assertions.assertEquals(
                 "(?:(?:table1|able1|tble1|tale1|tabe1|tabl1|table)\\s*,\\s*(?:table2|able2|tble2|tale2|tabe2|tabl2|table)|(?:table2|able2|tble2|tale2|tabe2|tabl2|table)\\s*,\\s*(?:table1|able1|tble1|tale1|tabe1|tabl1|table))",
-                orderRotation.CalculateDifferentTableNameOrders(testList, true)
+                orderRotation.calculateDifferentTableNameOrders(testList, true)
         );
     }
 }

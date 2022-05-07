@@ -6,38 +6,38 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class SqlToRegexController {
-    private static final String title = "title";
+    private static final String TITLE = "title";
 
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute(title, "sqltoregex");
+        model.addAttribute(TITLE, "sqltoregex");
         model.addAttribute("activeConverter", true);
         return "home";
     }
 
     @GetMapping("/examples")
     public String examples(Model model) {
-        model.addAttribute(title, "sql2regex - examples");
+        model.addAttribute(TITLE, "sql2regex - examples");
         model.addAttribute("activeExamples", true);
         return "examples";
     }
 
     @GetMapping("/about")
     public String aboutus(Model model) {
-        model.addAttribute(title, "sql2regex - about us");
+        model.addAttribute(TITLE, "sql2regex - about us");
         model.addAttribute("activeAbout", true);
         return "about";
     }
 
     @GetMapping("/privacy")
     public String privacy(Model model) {
-        model.addAttribute(title, "sql2regex - privacy");
+        model.addAttribute(TITLE, "sql2regex - privacy");
         return "privacy";
     }
 
     @GetMapping("/impressum")
     public String impressum(Model model) {
-        model.addAttribute(title, "sql2regex - impressum");
+        model.addAttribute(TITLE, "sql2regex - impressum");
         return "impressum";
     }
 }
