@@ -23,12 +23,6 @@ import java.util.logging.Logger;
  */
 @Service
 public class ConverterManagement {
-
-    /**
-     * service constructor
-     */
-    public ConverterManagement(){}
-
     /**
      * Validate inserted SQL-statements for oracle, mysql, sqlserver, mariadb
      * return true or false, with a console output about the error messages
