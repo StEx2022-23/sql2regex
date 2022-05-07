@@ -10,7 +10,7 @@ import java.util.List;
  * SELECT (?:table1\s*,\s*table2|table2\s*,\s*table1)
  */
 public class OrderRotation implements Property{
-    private final StringBuilder TableNameOrderRegEx = new StringBuilder();
+    private final StringBuilder tableNameOrderRegEx = new StringBuilder();
     private final SpellingMistake spellingMistake = new SpellingMistake();
 
     @Override
@@ -37,7 +37,7 @@ public class OrderRotation implements Property{
             }
             tableNameOrderRegExSingleElement.replace(tableNameOrderRegExSingleElement.length()-7, tableNameOrderRegExSingleElement.length(), "");
             tableNameOrderRegExSingleElement.append("|");
-            TableNameOrderRegEx.append(tableNameOrderRegExSingleElement);
+            tableNameOrderRegEx.append(tableNameOrderRegExSingleElement);
         } else {
             rekTableNameOrder(amount-1, tablenames, alternativeSpelling);
             for(int i = 0; i < amount-1;i++){
@@ -64,12 +64,12 @@ public class OrderRotation implements Property{
      * @return Regex (non-capturing group)
      */
     public String calculateDifferentTableNameOrders(List<String> tableNameList, Boolean alternativeSpelling){
-        TableNameOrderRegEx.append("(?:");
+        tableNameOrderRegEx.append("(?:");
         Integer amountOfTables = tableNameList.size();
         rekTableNameOrder(amountOfTables, tableNameList, alternativeSpelling);
-        TableNameOrderRegEx.replace(TableNameOrderRegEx.length()-1, TableNameOrderRegEx.length(), "");
-        TableNameOrderRegEx.append(")");
-        return TableNameOrderRegEx.toString();
+        tableNameOrderRegEx.replace(tableNameOrderRegEx.length()-1, tableNameOrderRegEx.length(), "");
+        tableNameOrderRegEx.append(")");
+        return tableNameOrderRegEx.toString();
     }
 
 }
