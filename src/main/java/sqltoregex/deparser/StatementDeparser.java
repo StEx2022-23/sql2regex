@@ -14,7 +14,7 @@ public class StatementDeparser extends StatementDeParser {
     }
 
     public StatementDeparser(ExpressionDeParser expressionDeParser, StringBuilder buffer) {
-        super(expressionDeParser, new SelectDeParser(), buffer);
+        super(expressionDeParser, new SelectDeparser(), buffer);
     }
 
 }
