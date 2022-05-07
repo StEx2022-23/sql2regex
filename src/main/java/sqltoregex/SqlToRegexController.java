@@ -5,11 +5,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class Sql2RegexController {
-    private String pageTitelAttributeName = "title";
+public class SqlToRegexController {
 
     public String getPageTitelAttributeName(){
-        return this.pageTitelAttributeName;
+        return "title";
     }
 
     @GetMapping("/")
