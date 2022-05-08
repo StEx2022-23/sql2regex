@@ -64,6 +64,9 @@ public class OrderRotation implements Property{
      * @return Regex (non-capturing group)
      */
     public String calculateDifferentTableNameOrders(List<String> tableNameList, Boolean alternativeSpelling){
+        if(tableNameList == null || alternativeSpelling == null){
+            throw new IllegalArgumentException("Arguments should not be null.");
+        }
         tableNameOrderRegEx.append("(?:");
         Integer amountOfTables = tableNameList.size();
         rekTableNameOrder(amountOfTables, tableNameList, alternativeSpelling);

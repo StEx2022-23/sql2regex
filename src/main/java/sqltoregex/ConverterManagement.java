@@ -9,7 +9,6 @@ import net.sf.jsqlparser.util.validation.Validation;
 import net.sf.jsqlparser.util.validation.ValidationError;
 import net.sf.jsqlparser.util.validation.feature.DatabaseType;
 import org.springframework.stereotype.Service;
-import sqltoregex.deparser.StatementDeparser;
 
 import java.util.*;
 import java.util.logging.ConsoleHandler;
@@ -62,7 +61,7 @@ public class ConverterManagement {
      * @param list List<String>
      * @return boolean
      */
-    private Boolean checkOfDistinctElements(List<String> list){
+    private Boolean isDistinctList(List<String> list){
         if(list.isEmpty()) throw new IllegalArgumentException("List should not be empty. One element is required.");
         Set<String> set = new HashSet<>(list);
         return (set.size() == list.size());
@@ -86,9 +85,9 @@ public class ConverterManagement {
         StringBuilder outputRegex = new StringBuilder();
         outputRegex.append("^");
 
-        if(Boolean.FALSE.equals(checkOfDistinctElements(regexList))){
+        if(regexList.size() == 1 || Boolean.FALSE.equals(isDistinctList(regexList))){
             outputRegex.append(regexList.get(0));
-        } else if(Boolean.TRUE.equals(checkOfDistinctElements(regexList))){
+        } else if(Boolean.TRUE.equals(isDistinctList(regexList))){
             for(String str : regexList){
                 outputRegex.append("(");
                 outputRegex.append(str);
@@ -115,7 +114,7 @@ public class ConverterManagement {
         String regExOne = toMaskedStrings(defaultStatementDeparser);
 
         ExpressionDeParser expressionDeParser = new ExpressionDeParser();
-        StatementDeParser joinWhereStatementDeparser = new StatementDeparser(expressionDeParser, buffer);
+        StatementDeParser joinWhereStatementDeparser = new sqltoregex.deparser.StatementDeParser(expressionDeParser, buffer);
         String regExTwo = toMaskedStrings(joinWhereStatementDeparser);
 
         return this.buildOutputRegex(Arrays.asList(regExOne, regExTwo));

@@ -21,6 +21,9 @@ public class SpellingMistake implements Property{
      * @return creates a regex non-capturing group with all calculated options
      */
     public String calculateAlternativeWritingStyles(String tablename){
+        if(tablename.isEmpty()){
+            throw new IllegalArgumentException("Tablename should not be empty.");
+        }
         StringBuilder alternativeWritingStyles = new StringBuilder();
         alternativeWritingStyles.append("(?:").append(tablename).append("|");
         for(int i = 0; i<tablename.length(); i++){
