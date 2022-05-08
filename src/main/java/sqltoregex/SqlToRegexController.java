@@ -10,7 +10,7 @@ public class SqlToRegexController {
 
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute(TITLE, "sqltoregex");
+        model.addAttribute(TITLE, "sql2regex");
         model.addAttribute("activeConverter", true);
         return "home";
     }
@@ -20,6 +20,13 @@ public class SqlToRegexController {
         model.addAttribute(TITLE, "sql2regex - examples");
         model.addAttribute("activeExamples", true);
         return "examples";
+    }
+
+    @GetMapping("/visualization")
+    public String visualization(Model model) {
+        model.addAttribute(TITLE, "sql2regex - visualization");
+        model.addAttribute("activeVisualization", true);
+        return "visualization";
     }
 
     @GetMapping("/about")
