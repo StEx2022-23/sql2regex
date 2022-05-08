@@ -9,6 +9,7 @@ import net.sf.jsqlparser.util.validation.Validation;
 import net.sf.jsqlparser.util.validation.ValidationError;
 import net.sf.jsqlparser.util.validation.feature.DatabaseType;
 import org.springframework.stereotype.Service;
+import sqltoregex.deparser.StatementDeParserForRegEx;
 
 import java.util.*;
 import java.util.logging.ConsoleHandler;
@@ -114,7 +115,7 @@ public class ConverterManagement {
         String regExOne = toMaskedStrings(defaultStatementDeparser);
 
         ExpressionDeParser expressionDeParser = new ExpressionDeParser();
-        StatementDeParser joinWhereStatementDeparser = new sqltoregex.deparser.StatementDeParser(expressionDeParser, buffer);
+        StatementDeParser joinWhereStatementDeparser = new StatementDeParserForRegEx(expressionDeParser, buffer);
         String regExTwo = toMaskedStrings(joinWhereStatementDeparser);
 
         return this.buildOutputRegex(Arrays.asList(regExOne, regExTwo));
