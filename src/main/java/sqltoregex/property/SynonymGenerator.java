@@ -26,7 +26,7 @@ import java.util.NoSuchElementException;
  * @param <S> class of search objects
  */
 
-abstract class SynonymGenerator<A, S> implements Property{
+abstract class SynonymGenerator<A, S> implements Property {
     //due to: Edges undirected (synonyms apply in both directions); Self-loops: no; Multiple edges: no; weighted: yes
     protected SimpleWeightedGraph<A, DefaultWeightedEdge> synonymsGraph;
     private String prefix = "";
@@ -36,17 +36,23 @@ abstract class SynonymGenerator<A, S> implements Property{
         this.synonymsGraph = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
     }
 
-    @Override
-    public List<String> getSettings() {
-        List<String> vertexStrings = new ArrayList<>();
-        synonymsGraph.vertexSet().forEach(vertex -> vertexStrings.add(vertex.toString()));
-        return vertexStrings;
-    }
-
+    /**
+     * Add a synonym with default weight.
+     *
+     * @param syn
+     * @return
+     */
     public boolean addSynonym(A syn) {
         return addSynonym(syn, 1L);
     }
 
+    /**
+     * Add a synonym with custom weight after {@link #prepareSynonymForAdd}
+     *
+     * @param syn
+     * @param weight
+     * @return
+     */
     public boolean addSynonym(A syn, Long weight) {
         if (synonymsGraph.addVertex(this.prepareSynonymForAdd(syn))) {
             for (A next : this.synonymsGraph.vertexSet()) {
@@ -60,28 +66,9 @@ abstract class SynonymGenerator<A, S> implements Property{
         return false;
     }
 
-//    private Iterator<A> getIteratorStartingFrom(S wordToFindSynonyms){
-//        A vertexToSearch = this.prepareSynonymForSearch(wordToFindSynonyms);
-//        A start = this.synonymsGraph.vertexSet().stream()
-//                .filter(syn -> syn.equals(vertexToSearch)).findAny().get();
-//        return new DepthFirstIterator<>(synonymsGraph, start);
-//    }
-//
-//    public Collection<A> getSynonymsCollectionFor(S wordToFindSynonyms){
-//        Collection<A> synonymsCollection = new HashSet<>();
-//        try {
-//            Iterator<A> iterator = getIteratorStartingFrom(wordToFindSynonyms);
-//            while (iterator.hasNext()) {
-//                synonymsCollection.add(iterator.next());
-//            }
-//        } catch (NoSuchElementException e) {
-//            synonymsCollection.add(this.prepareSynonymForSearch(wordToFindSynonyms));
-//        }
-//        return synonymsCollection;
-//    }
-
     /**
      * Generates a regular expression part String with the pre-/ and suffixes set <b>including</b> the param.
+     *
      * @param wordToFindSynonyms
      * @return
      */
@@ -106,6 +93,33 @@ abstract class SynonymGenerator<A, S> implements Property{
         }
     }
 
+//    private Iterator<A> getIteratorStartingFrom(S wordToFindSynonyms){
+//        A vertexToSearch = this.prepareSynonymForSearch(wordToFindSynonyms);
+//        A start = this.synonymsGraph.vertexSet().stream()
+//                .filter(syn -> syn.equals(vertexToSearch)).findAny().get();
+//        return new DepthFirstIterator<>(synonymsGraph, start);
+//    }
+//
+//    public Collection<A> getSynonymsCollectionFor(S wordToFindSynonyms){
+//        Collection<A> synonymsCollection = new HashSet<>();
+//        try {
+//            Iterator<A> iterator = getIteratorStartingFrom(wordToFindSynonyms);
+//            while (iterator.hasNext()) {
+//                synonymsCollection.add(iterator.next());
+//            }
+//        } catch (NoSuchElementException e) {
+//            synonymsCollection.add(this.prepareSynonymForSearch(wordToFindSynonyms));
+//        }
+//        return synonymsCollection;
+//    }
+
+    @Override
+    public List<String> getSettings() {
+        List<String> vertexStrings = new ArrayList<>();
+        synonymsGraph.vertexSet().forEach(vertex -> vertexStrings.add(vertex.toString()));
+        return vertexStrings;
+    }
+
     /**
      * Preprocessed input into a String that will be stored in the graph.
      *
@@ -115,17 +129,40 @@ abstract class SynonymGenerator<A, S> implements Property{
     protected abstract A prepareSynonymForAdd(A syn);
 
     /**
-     * Preprocesses input for search.
+     * Preprocesses input for search. Changing the search class into the vertex class.
      *
      * @param wordToFindSynonyms
      * @return
      */
     protected abstract A prepareSynonymForSearch(S wordToFindSynonyms);
 
+    /**
+     * Makes it possible to manipulate the way a synonym class is converted into a {@literal String} for RegEx usage
+     * without changing {@link Object#toString}. Especially useful when A and S generics are different.
+     *
+     * @param syn
+     * @param wordToFindSynonyms
+     * @return
+     */
     protected abstract String prepareVertexForRegEx(A syn, S wordToFindSynonyms);
 
+    /**
+     * Removes a synonym from the graph.
+     * @param syn
+     * @return
+     */
     public boolean removeSynonym(A syn) {
         return synonymsGraph.removeVertex(this.prepareSynonymForAdd(syn));
+    }
+
+    /**
+     * Converts the search synonym to a string.
+     *
+     * @param wordToFindSynonyms
+     * @return
+     */
+    public String searchSynonymToString(S wordToFindSynonyms) {
+        return wordToFindSynonyms.toString();
     }
 
     /**
@@ -144,14 +181,5 @@ abstract class SynonymGenerator<A, S> implements Property{
      */
     public void setSuffix(String suffix) {
         this.suffix = suffix;
-    }
-
-    /**
-     * Converts the search synonym to a string.
-     * @param wordToFindSynonyms
-     * @return
-     */
-    public String searchSynonymToString(S wordToFindSynonyms){
-        return wordToFindSynonyms.toString();
     }
 }
