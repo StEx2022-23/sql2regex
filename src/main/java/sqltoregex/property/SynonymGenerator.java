@@ -4,7 +4,9 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -24,7 +26,7 @@ import java.util.NoSuchElementException;
  * @param <S> class of search objects
  */
 
-abstract class SynonymGenerator<A, S> {
+abstract class SynonymGenerator<A, S> implements Property{
     //due to: Edges undirected (synonyms apply in both directions); Self-loops: no; Multiple edges: no; weighted: yes
     protected SimpleWeightedGraph<A, DefaultWeightedEdge> synonymsGraph;
     private String prefix = "";
@@ -32,6 +34,13 @@ abstract class SynonymGenerator<A, S> {
 
     protected SynonymGenerator() {
         this.synonymsGraph = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
+    }
+
+    @Override
+    public List<String> getSettings() {
+        List<String> vertexStrings = new ArrayList<>();
+        synonymsGraph.vertexSet().forEach(vertex -> vertexStrings.add(vertex.toString()));
+        return vertexStrings;
     }
 
     public boolean addSynonym(A syn) {
