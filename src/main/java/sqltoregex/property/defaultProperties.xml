@@ -1,32 +1,24 @@
 <properties>
     <spelling>
         <keywordspelling>
-            <values>
                 <value>true</value>
-                <class>SpellingMistake</class>
-            </values>
         </keywordspelling>
         <tablenameorder>
-            <values>
                 <value>true</value>
-                <class>OrderRotation</class>
-            </values>
         </tablenameorder>
         <columnnameorder>
-            <values>
                 <value>true</value>
-                <class>OrderRotation</class>
-            </values>
         </columnnameorder>
     </spelling>
-    <synonyme>
-        <date>
-            <values>
-                <value>YYYY-MM-DD</value>
-                <class> </class>
-                <value>YY-MM-DD</value>
-                <class> </class>
-            </values>
-        </date>
-    </synonyme>
+    <synonyms>
+        <datesynonyms>
+            <value>YYYY-MM-DD</value>
+            <value>YY-MM-DD</value>
+            <value>yyyy-MM-dd</value>
+            <value>yyyy-M-d</value>
+            <value>yyyyMMdd</value>
+        </datesynonyms>
+    </synonyms>
 </properties>
+
+<!-- check the enum class after changing -->
