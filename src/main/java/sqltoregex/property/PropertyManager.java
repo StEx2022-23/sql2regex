@@ -18,6 +18,10 @@ import java.util.*;
 public class PropertyManager {
     private final Map<PropertyOptions, Property> propertyMap = new HashMap<>();
 
+    public PropertyManager() throws ParserConfigurationException, IOException, ClassNotFoundException, InvocationTargetException, SAXException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        this.parseProperties();
+    }
+
     public Set<PropertyOptions> readPropertyOptions(){
         return this.propertyMap.keySet();
     }
@@ -44,7 +48,7 @@ public class PropertyManager {
         }
     }
 
-    public void parseProperties() throws ParserConfigurationException, IOException, SAXException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    private void parseProperties() throws ParserConfigurationException, IOException, SAXException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         String relatedOption;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -68,10 +72,6 @@ public class PropertyManager {
                 this.addPropertyToMap(valueList, relatedOption);
             }
         }
-    }
-
-    public Map<String, Property> calculateUserDefinedPropertyList(Map<PropertyOptions, List<String>> userDefinitions){
-        return null;
     }
 
     public  Map<PropertyOptions, Property> getPropertyMap() {

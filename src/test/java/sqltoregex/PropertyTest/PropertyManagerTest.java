@@ -16,9 +16,9 @@ class PropertyManagerTest {
     @Test
     void testLoadDefaultProperties() throws ParserConfigurationException, IOException, ClassNotFoundException, InvocationTargetException, SAXException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         PropertyManager propertyManager = new PropertyManager();
-        propertyManager.parseProperties();
         Set<PropertyOptions> propertyOptionSet = propertyManager.readPropertyOptions();
         List<String> propertyOptionWhichHaveBeenSet = List.of("tablenameorder","keywordspelling","columnnameorder","datesynonyms");
+        System.out.println(propertyOptionSet.toString());
         for(String str : propertyOptionWhichHaveBeenSet){
             Assertions.assertTrue(propertyOptionSet.toString().contains(str));
         }
