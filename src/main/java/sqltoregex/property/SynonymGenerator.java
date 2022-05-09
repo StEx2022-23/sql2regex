@@ -1,14 +1,12 @@
 package sqltoregex.property;
 
-import net.sf.jsqlparser.expression.DateValue;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -28,20 +26,33 @@ import java.util.NoSuchElementException;
  * @param <S> class of search objects
  */
 
-abstract class SynonymManager<A, S> {
+abstract class SynonymGenerator<A, S> implements Property {
     //due to: Edges undirected (synonyms apply in both directions); Self-loops: no; Multiple edges: no; weighted: yes
     protected SimpleWeightedGraph<A, DefaultWeightedEdge> synonymsGraph;
     private String prefix = "";
     private String suffix = "";
 
-    protected SynonymManager() {
+    protected SynonymGenerator() {
         this.synonymsGraph = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
     }
 
+    /**
+     * Add a synonym with default weight.
+     *
+     * @param syn
+     * @return
+     */
     public boolean addSynonym(A syn) {
         return addSynonym(syn, 1L);
     }
 
+    /**
+     * Add a synonym with custom weight after {@link #prepareSynonymForAdd}
+     *
+     * @param syn
+     * @param weight
+     * @return
+     */
     public boolean addSynonym(A syn, Long weight) {
         if (synonymsGraph.addVertex(this.prepareSynonymForAdd(syn))) {
             for (A next : this.synonymsGraph.vertexSet()) {
@@ -55,13 +66,19 @@ abstract class SynonymManager<A, S> {
         return false;
     }
 
+    /**
+     * Generates a regular expression part String with the pre-/ and suffixes set <b>including</b> the param.
+     *
+     * @param wordToFindSynonyms
+     * @return
+     */
     public String generateSynonymRegexFor(S wordToFindSynonyms) {
         try {
             A vertexToSearch = this.prepareSynonymForSearch(wordToFindSynonyms);
             A start = this.synonymsGraph.vertexSet().stream()
                     .filter(syn -> syn.equals(vertexToSearch)).findAny().get();
-            Iterator<A> iterator = new DepthFirstIterator<>(synonymsGraph, start);
 
+            Iterator<A> iterator = new DepthFirstIterator<>(synonymsGraph, start);
             StringBuilder strRegEx = new StringBuilder();
             while (iterator.hasNext()) {
                 strRegEx.append(prefix);
@@ -72,8 +89,35 @@ abstract class SynonymManager<A, S> {
             strRegEx.deleteCharAt(strRegEx.length() - 1);
             return strRegEx.toString();
         } catch (NoSuchElementException e) {
-            return wordToFindSynonyms.toString();
+            return searchSynonymToString(wordToFindSynonyms);
         }
+    }
+
+//    private Iterator<A> getIteratorStartingFrom(S wordToFindSynonyms){
+//        A vertexToSearch = this.prepareSynonymForSearch(wordToFindSynonyms);
+//        A start = this.synonymsGraph.vertexSet().stream()
+//                .filter(syn -> syn.equals(vertexToSearch)).findAny().get();
+//        return new DepthFirstIterator<>(synonymsGraph, start);
+//    }
+//
+//    public Collection<A> getSynonymsCollectionFor(S wordToFindSynonyms){
+//        Collection<A> synonymsCollection = new HashSet<>();
+//        try {
+//            Iterator<A> iterator = getIteratorStartingFrom(wordToFindSynonyms);
+//            while (iterator.hasNext()) {
+//                synonymsCollection.add(iterator.next());
+//            }
+//        } catch (NoSuchElementException e) {
+//            synonymsCollection.add(this.prepareSynonymForSearch(wordToFindSynonyms));
+//        }
+//        return synonymsCollection;
+//    }
+
+    @Override
+    public List<String> getSettings() {
+        List<String> vertexStrings = new ArrayList<>();
+        synonymsGraph.vertexSet().forEach(vertex -> vertexStrings.add(vertex.toString()));
+        return vertexStrings;
     }
 
     /**
@@ -85,100 +129,57 @@ abstract class SynonymManager<A, S> {
     protected abstract A prepareSynonymForAdd(A syn);
 
     /**
-     * Preprocesses input for search.
+     * Preprocesses input for search. Changing the search class into the vertex class.
      *
      * @param wordToFindSynonyms
      * @return
      */
     protected abstract A prepareSynonymForSearch(S wordToFindSynonyms);
 
+    /**
+     * Makes it possible to manipulate the way a synonym class is converted into a {@literal String} for RegEx usage
+     * without changing {@link Object#toString}. Especially useful when A and S generics are different.
+     *
+     * @param syn
+     * @param wordToFindSynonyms
+     * @return
+     */
     protected abstract String prepareVertexForRegEx(A syn, S wordToFindSynonyms);
 
+    /**
+     * Removes a synonym from the graph.
+     * @param syn
+     * @return
+     */
     public boolean removeSynonym(A syn) {
         return synonymsGraph.removeVertex(this.prepareSynonymForAdd(syn));
     }
 
     /**
+     * Converts the search synonym to a string.
+     *
+     * @param wordToFindSynonyms
+     * @return
+     */
+    public String searchSynonymToString(S wordToFindSynonyms) {
+        return wordToFindSynonyms.toString();
+    }
+
+    /**
      * Sets a common prefix for all concatenations of {@link #generateSynonymRegexFor}
+     *
      * @param prefix prefix to add
      */
-    public void setPrefix(String prefix){
+    public void setPrefix(String prefix) {
         this.prefix = prefix;
     }
 
     /**
      * Sets a common suffix for all concatenations of {@link #generateSynonymRegexFor}
+     *
      * @param suffix suffix to add
      */
-    public void setSuffix(String suffix){
+    public void setSuffix(String suffix) {
         this.suffix = suffix;
-    }
-}
-
-/**
- * Generate Synonym goes through all saved formats and tries to parse. If it parses successfully it will generate
- * Dates with all Formats the matched Vertex pointed to.
- */
-class DateSynonymManager extends SynonymManager<DateFormat, DateValue> {
-    /**
-     * check against allowed patterns and throw IllegalArgumentException if not
-     *
-     * @param syn
-     * @return
-     */
-    @Override
-    protected DateFormat prepareSynonymForAdd(DateFormat syn) {
-        return syn;
-    }
-
-    @Override
-    protected DateFormat prepareSynonymForSearch(DateValue wordToFindSynonyms) {
-        for (DateFormat vertexSyn : this.synonymsGraph.vertexSet()) {
-            try {
-                vertexSyn.parse(wordToFindSynonyms.getValue().toString());
-                return vertexSyn;
-            } catch (ParseException e) {
-                //continue to search for other possible patterns without throwing error.
-            }
-        }
-        throw new NoSuchElementException("There are no synonym formats for the entered date format");
-    }
-
-    @Override
-    protected String prepareVertexForRegEx(DateFormat syn, DateValue wordToFindSynonyms) {
-        Date date;
-
-        //O(n^2) is okay, cause elements will be <<100 for dateFormats
-        for (DateFormat vertexSyn : this.synonymsGraph.vertexSet()) {
-            try {
-                date = vertexSyn.parse(wordToFindSynonyms.getValue().toString());
-                return syn.format(date);
-            } catch (ParseException e) {
-                //continue to search for other possible patterns without throwing error.
-            }
-        }
-        throw new NoSuchElementException("There are no synonym formats for the entered date format");
-    }
-}
-
-/**
- * Default implementation of {@link SynonymManager}. Saves Strings and searches with exact representation of them.
- * e.g. used for: Data-Type synonyms
- */
-class DefaultSynonymManager extends SynonymManager<String, String> {
-
-    @Override
-    protected String prepareSynonymForAdd(String syn) {
-        return syn;
-    }
-
-    @Override
-    protected String prepareSynonymForSearch(String wordToFindSynonyms) {
-        return wordToFindSynonyms;
-    }
-
-    @Override
-    protected String prepareVertexForRegEx(String syn, String wordToFindSynonyms) {
-        return syn;
     }
 }
