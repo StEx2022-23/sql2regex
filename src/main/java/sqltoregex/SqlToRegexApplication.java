@@ -13,10 +13,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @SpringBootApplication
-public class Sql2regexApplication {
+public class SqlToRegexApplication {
 
 	public static void main(String[] args){
-		SpringApplication.run(Sql2regexApplication.class, args);
+		SpringApplication.run(SqlToRegexApplication.class, args);
 	}
 
 	@Bean

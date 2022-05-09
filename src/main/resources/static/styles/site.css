@@ -20,6 +20,13 @@
   right: 15px;
   z-index: 99; }
 
+#copyHistory {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+  z-index: 99; }
+
 #copyFeedack, #copyFeedackFailed, #jsonFeedback, #jsonFeedbackFailed, #jsonFeedbackHistory, #jsonFeedbackHistoryFailed {
   display: none; }
 
