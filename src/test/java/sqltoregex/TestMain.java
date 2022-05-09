@@ -15,14 +15,14 @@ class TestMain {
     private ResourceConfig resourceConfig;
 
     @Autowired
-    private Sql2RegexController sql2RegexController;
+    private SqlToRegexController sql2RegexController;
 
     @Autowired
     private RestApiController restApiController;
 
     @Test
     void main(){
-        assertDoesNotThrow(() -> Sql2regexApplication.main(new String[] {}));
+        assertDoesNotThrow(() -> SqlToRegexApplication.main(new String[] {}));
     }
 
     @Test

@@ -156,45 +156,71 @@ class SqlRegExHistory {
             body.removeChild(body.lastChild);
         }
 
-        let table = document.createElement('table');
-        table.classList.add("table");
-        table.classList.add("table-hover");
-        let thead = document.createElement('thead');
-        let tbody = document.createElement('tbody');
-        let row1 = document.createElement('tr');
-        let heading1 = document.createElement('th');
-        heading1.setAttribute("width", "6%");
-        heading1.innerHTML = "Id";
-        let heading2 = document.createElement('th');
-        heading2.setAttribute("width", "47%");
-        heading2.innerHTML = "SQL-Input";
-        let heading3 = document.createElement('th');
-        heading3.setAttribute("width", "47%");
-        heading3.innerHTML = "RegEx-Output";
-        row1.appendChild(heading1);
-        row1.appendChild(heading2);
-        row1.appendChild(heading3);
-        thead.appendChild(row1);
+        let outerDiv = document.createElement('div');
+        outerDiv.classList.add("accordion","mb-3");
+        outerDiv.setAttribute("id","historyAccordion")
 
         if (arrayOfSqlAndArrayOfRegex[0] !== -1) {
             for (var i = 0; i < this.sql.length; i++) {
-                let row_data = document.createElement('tr');
-                let row_data_1 = document.createElement('td');
-                row_data_1.innerHTML = i;
-                let row_data_2 = document.createElement('td');
-                row_data_2.innerHTML = arrayOfSqlAndArrayOfRegex[0][i];
-                let row_data_3 = document.createElement('td');
-                row_data_3.innerHTML = arrayOfSqlAndArrayOfRegex[1][i];
-                row_data.appendChild(row_data_1);
-                row_data.appendChild(row_data_2);
-                row_data.appendChild(row_data_3);
-                tbody.appendChild(row_data);
+                let tempAccordionDiv = document.createElement('div');
+                tempAccordionDiv.classList.add("accordion-item");
+                tempAccordionDiv.setAttribute("id", "#"+String(i));
+
+                let topHeading = document.createElement('div');
+                topHeading.classList.add("accordion-header");
+                topHeading.setAttribute("id", "heading-"+String(i));
+
+                let button = document.createElement('button');
+                button.classList.add("accordion-button", "collapsed");
+                button.setAttribute("type", "button");
+                button.setAttribute("data-bs-toggle", "collapse");
+                button.setAttribute("data-bs-target", "#collapse-"+String(i));
+                button.setAttribute("aria-expanded", "false");
+                button.setAttribute("aria-controls", "collapse-"+String(i));
+                button.innerHTML = arrayOfSqlAndArrayOfRegex[0][i];
+                topHeading.append(button);
+
+                let innerInnerDiv = document.createElement('div');
+                innerInnerDiv.setAttribute("id", "collapse-"+String(i));
+                innerInnerDiv.setAttribute("aria-labelledby", "heading-"+String(i));
+                innerInnerDiv.setAttribute("data-bs-parent", "#historyAccordion");
+                innerInnerDiv.classList.add("accordion-collapse","collapse");
+                innerInnerDiv.style.position = "relative";
+
+                let innerInnerInnerDiv = document.createElement('div');
+                innerInnerInnerDiv.classList.add("accordion-body");
+
+                let codeTag = document.createElement("code");
+                codeTag.setAttribute("id", "copyHistoryCodeId-"+String(i))
+                codeTag.innerHTML = arrayOfSqlAndArrayOfRegex[1][i];
+                innerInnerInnerDiv.append(codeTag);
+                innerInnerDiv.append(innerInnerInnerDiv);
+
+                let copyDiv = document.createElement("div");
+                copyDiv.setAttribute("id","copyHistory");
+                copyDiv.setAttribute("onclick", "copyHistoryEntry("+String(i)+")");
+                innerInnerDiv.append(copyDiv);
+                let copyIcon = document.createElementNS('http://www.w3.org/2000/svg', "svg");
+                copyIcon.setAttribute("width", "30");
+                copyIcon.setAttribute("height", "30");
+                copyIcon.setAttribute("fill", "currentColor");
+                copyIcon.setAttribute("viewBox", "0 0 16 16");
+                let copyIconPathEins = document.createElementNS('http://www.w3.org/2000/svg', "path");
+                copyIconPathEins.setAttribute("d", "M9.5 0a.5.5 0 0 1 .5.5.5.5 0 0 0 .5.5.5.5 0 0 1 .5.5V2a.5.5 0 0 1-.5.5h-5A.5.5 0 0 1 5 2v-.5a.5.5 0 0 1 .5-.5.5.5 0 0 0 .5-.5.5.5 0 0 1 .5-.5h3Z");
+                copyIcon.append(copyIconPathEins);
+                let copyIconPathZwei = document.createElementNS('http://www.w3.org/2000/svg', "path");
+                copyIconPathZwei.setAttribute("d", "M3 2.5a.5.5 0 0 1 .5-.5H4a.5.5 0 0 0 0-1h-.5A1.5 1.5 0 0 0 2 2.5v12A1.5 1.5 0 0 0 3.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-12A1.5 1.5 0 0 0 12.5 1H12a.5.5 0 0 0 0 1h.5a.5.5 0 0 1 .5.5v12a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-12Z");
+                copyIcon.append(copyIconPathZwei);
+                let copyIconPathDrei = document.createElementNS('http://www.w3.org/2000/svg', "path");
+                copyIconPathDrei.setAttribute("d", "M10.854 7.854a.5.5 0 0 0-.708-.708L7.5 9.793 6.354 8.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3Z");
+                copyIcon.append(copyIconPathDrei);
+                copyDiv.append(copyIcon);
+                tempAccordionDiv.append(topHeading);
+                tempAccordionDiv.append(innerInnerDiv);
+                outerDiv.append(tempAccordionDiv);
             }
         }
-
-        table.appendChild(thead);
-        table.appendChild(tbody);
-        body.appendChild(table);
+        body.appendChild(outerDiv);
     }
 
     clearLocalStorage(clearStorageFeedbackId) {
@@ -261,6 +287,33 @@ async function handleSubmitForm(inputId, outputId) {
     }
     return false;
 }
+
+function languageChange(){
+    let langOption = window.location.href.split("?")[1];
+    if(langOption.length !== 0){
+        if(langOption === "lang=de"){
+            localStorage.setItem("defaultLanguage", "eng");
+            window.location.replace(window.location.href.split("?")[0] + '?lang=eng');
+        } else {
+            localStorage.setItem("defaultLanguage", "de");
+            window.location.replace(window.location.href.split("?")[0] + '?lang=de');
+        }
+    } else {
+        window.location.replace(window.location.href.split("?")[0] + '?lang=eng');
+    }
+}
+
+function loadDefaultLanguageSettings(){
+    let defaultSettings = localStorage.getItem("defaultLanguage");
+    if(window.location.href.includes("lang")) return;
+    if(defaultSettings !== null){
+        window.location.replace(window.location.href.split("?")[0] + '?lang=' + defaultSettings);
+    } else {
+        window.location.replace(window.location.href.split("?")[0] + '?lang=eng');
+    }
+}
+
+loadDefaultLanguageSettings();
 
 let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
 SqlRegExHis.checkUpdatedConverting();
