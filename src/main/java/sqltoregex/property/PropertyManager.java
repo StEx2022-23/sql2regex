@@ -20,7 +20,8 @@ import java.util.*;
 
 @Service
 public class PropertyManager {
-    private final Map<PropertyOption, Property> propertyMap = new HashMap<>();
+    private final Map<PropertyOption, Property> propertyMap = new EnumMap<PropertyOption, Property>(PropertyOption.class);
+    private static final String PROPERTY_DEACTIVATED = "false";
 
     public PropertyManager() throws ParserConfigurationException, IOException, ClassNotFoundException, InvocationTargetException, SAXException, NoSuchMethodException, InstantiationException, IllegalAccessException, XPathExpressionException {
         this.parseProperties();
@@ -33,16 +34,16 @@ public class PropertyManager {
     private void addPropertyToMap(List<String> valueList, PropertyOption relatedOption){
         switch (relatedOption) {
             case KEYWORDSPELLING -> {
-                if(valueList.get(0).equals("false")){break;}
+                if(valueList.get(0).equals(PROPERTY_DEACTIVATED)){break;}
                 propertyMap.put(PropertyOption.KEYWORDSPELLING, new SpellingMistake());
             } case TABLENAMEORDER -> {
-                if (valueList.get(0).equals("false")) {break;}
+                if (valueList.get(0).equals(PROPERTY_DEACTIVATED)) {break;}
                 propertyMap.put(PropertyOption.TABLENAMEORDER, new OrderRotation());
             } case COLUMNNAMEORDER -> {
-                if(valueList.get(0).equals("false")){break;}
+                if(valueList.get(0).equals(PROPERTY_DEACTIVATED)){break;}
                 propertyMap.put(PropertyOption.COLUMNNAMEORDER, new OrderRotation());
             } case DATESYNONYMS -> {
-                if(valueList.get(0).equals("false")){break;}
+                if(valueList.get(0).equals(PROPERTY_DEACTIVATED)){break;}
                 DateAndTimeFormatSynonymGenerator dateSynonymManager = new DateAndTimeFormatSynonymGenerator();
                 for(String dateformat : valueList){
                     dateSynonymManager.addSynonym(new SimpleDateFormat(dateformat));
@@ -52,7 +53,7 @@ public class PropertyManager {
         }
     }
 
-    private void parseProperties() throws ParserConfigurationException, IOException, SAXException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, XPathExpressionException {
+    private void parseProperties() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
         PropertyOption relatedOption;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setFeature("http://xml.org/sax/features/external-general-entities", false);

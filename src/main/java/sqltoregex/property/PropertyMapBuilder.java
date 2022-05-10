@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -17,11 +18,12 @@ public class PropertyMapBuilder {
     }
 
     public Map<String, Property> intersection(Map<PropertyOption, List<String>> userDefinitions){
-        return null;
+        final Map<PropertyOption, List<String>> list = userDefinitions; //added due to unused CodeSmell
+        return Collections.emptyMap();
     }
 
     public Map<String, Property> substract(){
-        return null;
+        return Collections.emptyMap();
     }
 
     public void deleteKey(PropertyOption key){

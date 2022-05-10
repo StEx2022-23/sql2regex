@@ -21,6 +21,7 @@ public class UserPropertyTest {
         Map<PropertyOption, Property> map = new HashMap<>();
         UserProperty userProperty1 =  UserProperty.getInstance(map);
         Assertions.assertThrows(UnsupportedOperationException.class, () -> userProperty1.propertyMap.putAll(map));
-        Assertions.assertThrows(UnsupportedOperationException.class, () -> userProperty1.propertyMap.put(PropertyOption.COLUMNNAMEORDER, new OrderRotation()));
+        OrderRotation orderRotation = new OrderRotation();
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> userProperty1.propertyMap.put(PropertyOption.COLUMNNAMEORDER, orderRotation));
     }
 }

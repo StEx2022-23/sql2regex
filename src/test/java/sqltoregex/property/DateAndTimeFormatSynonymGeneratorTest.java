@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.text.SimpleDateFormat;
 
-public class DateAndTimeFormatSynonymGeneratorTest {
+class DateAndTimeFormatSynonymGeneratorTest {
 
 
     private DateAndTimeFormatSynonymGenerator getSynonymManagerForDates(){
@@ -33,25 +33,25 @@ public class DateAndTimeFormatSynonymGeneratorTest {
     }
 
     @Test
-    public void queryNotExistingSynonym(){
+    void queryNotExistingSynonym(){
         DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = new DateAndTimeFormatSynonymGenerator();
         Assertions.assertEquals("2012-05-06", dateAndTimeSynonymManager.generateSynonymRegexFor(new DateValue("'2012-5-6'")));
     }
 
     @Test
-    public void queryExistingDateSynonym(){
+    void queryExistingDateSynonym(){
         DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = getSynonymManagerForDates();
         Assertions.assertEquals("2012-05-06|12-05-06", dateAndTimeSynonymManager.generateSynonymRegexFor(new DateValue("'2012-05-06'")));
     }
 
     @Test
-    public void queryExistingTimeSynonym(){
+    void queryExistingTimeSynonym(){
         DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = getSynonymManagerForTimes();
         Assertions.assertEquals("01:02:03|1:2:3", dateAndTimeSynonymManager.generateSynonymRegexFor(new TimeValue("'01:02:03'")));
     }
 
     @Test
-    public void queryExistingTimestampSynonym(){
+    void queryExistingTimestampSynonym(){
         DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = getSynonymManagerForTimestamps();
         Assertions.assertEquals("2012-05-06 01:02:03|2012-05-06 1:2:3", dateAndTimeSynonymManager.generateSynonymRegexFor(new TimestampValue("2012-05-06 01:02:03")));
     }
