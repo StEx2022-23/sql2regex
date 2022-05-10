@@ -23,9 +23,12 @@
                 <div class="card-body">
                     <h1 th:text="#{conv.heading}" class="pb-2 border-bottom"></h1>
                     <div class="mb-3">
-                        <label th:text="#{conv.headingsql}" for="sqlinput" class="form-label"></label>
+                        <label for="sqlinput" class="form-label"><strong>SQL-Input</strong></label>
                         <textarea class="form-control inputHeight" id="sqlinput" rows="3" placeholder="Insert your SQL-Statement here!"></textarea>
                     </div>
+                    <form th:replace="assets/propertyform :: propertyform" action="#" th:action="@{/convert}" th:object="${propertyForm}" method="post">
+                        hier wurde nichts eingefügt
+                    </form>
                     <div class="d-grid gap-2">
                         <button th:text="#{conv.convert}" onclick="handleSubmitForm('sqlinput', 'regexoutput')" id="onSubmitConvertForm" class="btn btn-primary btn-lg mb-2 mt-2 display-6"></button>
                     </div>

@@ -1,0 +1,18 @@
+<form th:fragment="propertyform" action="#" th:action="@{/convert}" th:object="${propertyForm}" method="post" >
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="dateFormats1" name="dateFormats" value="yyyy-MM-dd">
+                    <label class="form-check-label" for="dateFormats1">Enable format: "yyyy-MM-dd"</label>
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="dateFormats2" name="dateFormats" value="yy-MM-dd">
+                    <label class="form-check-label" for="dateFormats2">Enable format: "yy-MM-dd"</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
