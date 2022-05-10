@@ -6,13 +6,13 @@ import net.sf.jsqlparser.expression.TimeValue;
 import net.sf.jsqlparser.expression.TimestampValue;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import org.springframework.stereotype.Service;
-import sqltoregex.property.DateAndTimeSynonymGenerator;
+import sqltoregex.property.DateAndTimeFormatSynonymGenerator;
 
 @Service
 public class SynonymManager {
-    private DateAndTimeSynonymGenerator dateSynonymGenerator;
-    private DateAndTimeSynonymGenerator timeSynonymGenerator;
-    private DateAndTimeSynonymGenerator timestampSynonymGenerator;
+    private DateAndTimeFormatSynonymGenerator dateSynonymGenerator;
+    private DateAndTimeFormatSynonymGenerator timeSynonymGenerator;
+    private DateAndTimeFormatSynonymGenerator timestampSynonymGenerator;
 
     public SynonymManager() {
         //TODO: should be set to default all Options from XML and further be manipulated over the setter methods at
@@ -25,15 +25,15 @@ public class SynonymManager {
         return synonymExpressionDeParser.getBuffer().toString();
     }
 
-    public void setDateSynonymGenerator(DateAndTimeSynonymGenerator dateSynonymGenerator) {
+    public void setDateSynonymGenerator(DateAndTimeFormatSynonymGenerator dateSynonymGenerator) {
         this.dateSynonymGenerator = dateSynonymGenerator;
     }
 
-    public void setTimeSynonymGenerator(DateAndTimeSynonymGenerator timeSynonymGenerator) {
+    public void setTimeSynonymGenerator(DateAndTimeFormatSynonymGenerator timeSynonymGenerator) {
         this.timeSynonymGenerator = timeSynonymGenerator;
     }
 
-    public void setTimestampSynonymGenerator(DateAndTimeSynonymGenerator timestampSynonymGenerator) {
+    public void setTimestampSynonymGenerator(DateAndTimeFormatSynonymGenerator timestampSynonymGenerator) {
         this.timestampSynonymGenerator = timestampSynonymGenerator;
     }
 

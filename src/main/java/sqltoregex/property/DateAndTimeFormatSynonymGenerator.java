@@ -8,7 +8,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.NoSuchElementException;
 
-public class DateAndTimeSynonymGenerator extends SynonymGenerator<DateFormat, Expression> {
+public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<DateFormat, Expression> {
     @Override
     protected DateFormat prepareSynonymForAdd(DateFormat syn) {
         return syn;
