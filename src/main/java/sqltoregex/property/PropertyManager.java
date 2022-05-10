@@ -55,8 +55,10 @@ public class PropertyManager {
     private void parseProperties() throws ParserConfigurationException, IOException, SAXException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, XPathExpressionException {
         PropertyOption relatedOption;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse("src/main/java/sqltoregex/property/defaultProperties.xml");
+        Document document = builder.parse("src/main/resources/static/config/defaultProperties.xml");
         document.getDocumentElement().normalize();
 
         stripWhitespaces(document);
