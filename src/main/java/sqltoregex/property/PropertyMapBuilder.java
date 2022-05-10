@@ -9,14 +9,14 @@ import java.util.Map;
 
 @Component
 public class PropertyMapBuilder {
-    private final Map<PropertyOptions, Property> propertyMap;
+    private final Map<PropertyOption, Property> propertyMap;
 
     @Autowired
     public PropertyMapBuilder(PropertyManager propertyManager){
         this.propertyMap = propertyManager.getPropertyMap();
     }
 
-    public Map<String, Property> intersection(Map<PropertyOptions, List<String>> userDefinitions){
+    public Map<String, Property> intersection(Map<PropertyOption, List<String>> userDefinitions){
         return null;
     }
 
@@ -24,11 +24,11 @@ public class PropertyMapBuilder {
         return null;
     }
 
-    public void deleteKey(PropertyOptions key){
+    public void deleteKey(PropertyOption key){
         this.propertyMap.remove(key);
     }
 
-    public void deleteSynonym(DateSynonymManager o, SimpleDateFormat sdf){
+    public void deleteSynonym(DateAndTimeFormatSynonymGenerator o, SimpleDateFormat sdf){
         o.removeSynonym(sdf);
     }
 }

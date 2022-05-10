@@ -9,6 +9,10 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
@@ -16,53 +20,55 @@ import java.util.*;
 
 @Service
 public class PropertyManager {
-    private final Map<PropertyOptions, Property> propertyMap = new HashMap<>();
+    private final Map<PropertyOption, Property> propertyMap = new HashMap<>();
 
-    public PropertyManager() throws ParserConfigurationException, IOException, ClassNotFoundException, InvocationTargetException, SAXException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public PropertyManager() throws ParserConfigurationException, IOException, ClassNotFoundException, InvocationTargetException, SAXException, NoSuchMethodException, InstantiationException, IllegalAccessException, XPathExpressionException {
         this.parseProperties();
     }
 
-    public Set<PropertyOptions> readPropertyOptions(){
+    public Set<PropertyOption> readPropertyOptions(){
         return this.propertyMap.keySet();
     }
 
-    private void addPropertyToMap(List<String> valueList, String relatedOption){
+    private void addPropertyToMap(List<String> valueList, PropertyOption relatedOption){
         switch (relatedOption) {
-            case "keywordspelling" -> {
+            case KEYWORDSPELLING -> {
                 if(valueList.get(0).equals("false")){break;}
-                propertyMap.put(PropertyOptions.keywordspelling, new SpellingMistake());
-            } case "tablenameorder" -> {
+                propertyMap.put(PropertyOption.KEYWORDSPELLING, new SpellingMistake());
+            } case TABLENAMEORDER -> {
                 if (valueList.get(0).equals("false")) {break;}
-                propertyMap.put(PropertyOptions.tablenameorder, new OrderRotation());
-            } case "columnnameorder" -> {
+                propertyMap.put(PropertyOption.TABLENAMEORDER, new OrderRotation());
+            } case COLUMNNAMEORDER -> {
                 if(valueList.get(0).equals("false")){break;}
-                propertyMap.put(PropertyOptions.columnnameorder, new OrderRotation());
-            } case "datesynonyms" -> {
+                propertyMap.put(PropertyOption.COLUMNNAMEORDER, new OrderRotation());
+            } case DATESYNONYMS -> {
                 if(valueList.get(0).equals("false")){break;}
-                DateSynonymManager dateSynonymManager = new DateSynonymManager();
+                DateAndTimeFormatSynonymGenerator dateSynonymManager = new DateAndTimeFormatSynonymGenerator();
                 for(String dateformat : valueList){
                     dateSynonymManager.addSynonym(new SimpleDateFormat(dateformat));
                 }
-                propertyMap.put(PropertyOptions.datesynonyms, dateSynonymManager);
+                propertyMap.put(PropertyOption.DATESYNONYMS, dateSynonymManager);
             }
         }
     }
 
-    private void parseProperties() throws ParserConfigurationException, IOException, SAXException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        String relatedOption;
+    private void parseProperties() throws ParserConfigurationException, IOException, SAXException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, XPathExpressionException {
+        PropertyOption relatedOption;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.parse("src/main/java/sqltoregex/property/defaultProperties.xml");
         document.getDocumentElement().normalize();
 
+        stripWhitespaces(document);
+
         Node root = document.getElementsByTagName("properties").item(0);
         NodeList properties = root.getChildNodes();
         PropertyNodeListIterator rootElementIterator = new PropertyNodeListIterator(properties);
-        for(Node rootNodes : rootElementIterator) {
-            NodeList propertyCategory = rootNodes.getChildNodes();
+        for(Node rootNode : rootElementIterator) {
+            NodeList propertyCategory = rootNode.getChildNodes();
             PropertyNodeListIterator propertyCategoryIterator = new PropertyNodeListIterator(propertyCategory);
             for (Node categoryNode : propertyCategoryIterator) {
-                relatedOption = categoryNode.getNodeName();
+                relatedOption = PropertyOption.valueOf(categoryNode.getNodeName().toUpperCase());
                 NodeList innerNodes = categoryNode.getChildNodes();
                 PropertyNodeListIterator innerNodesIterator = new PropertyNodeListIterator(innerNodes);
                 List<String> valueList = new ArrayList<>();
@@ -74,7 +80,21 @@ public class PropertyManager {
         }
     }
 
-    public  Map<PropertyOptions, Property> getPropertyMap() {
+    public  Map<PropertyOption, Property> getPropertyMap() {
         return this.propertyMap;
+    }
+
+    /**
+     * Removes insignificant whitespaces from an XML DOM tree.
+     * @param doc
+     * @throws XPathExpressionException
+     */
+    private void stripWhitespaces(Document doc) throws XPathExpressionException {
+        XPath xp = XPathFactory.newInstance().newXPath();
+        NodeList nl = (NodeList) xp.evaluate("//text()[normalize-space(.)='']", doc, XPathConstants.NODESET);
+        for (int i=0; i < nl.getLength(); ++i) {
+            Node node = nl.item(i);
+            node.getParentNode().removeChild(node);
+        }
     }
 }
