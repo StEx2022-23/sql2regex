@@ -6,13 +6,13 @@ import java.util.Map;
 
 class UserProperty{
     private static UserProperty instance;
-    public ImmutableMap<Class<Property>, Property> propertyMap;
+    public final ImmutableMap<PropertyOption, Property> propertyMap;
 
-    private UserProperty(Map<Class<Property>, Property> map){
-        this.propertyMap = new ImmutableMap.Builder<Class<Property>, Property>().putAll(map).build();
+    private UserProperty(Map<PropertyOption, Property> map){
+        this.propertyMap = new ImmutableMap.Builder<PropertyOption, Property>().putAll(map).build();
     }
 
-    public static UserProperty getInstance(Map<Class<Property>, Property> map) {
+    public static UserProperty getInstance(Map<PropertyOption, Property> map) {
         if (instance == null){
             instance = new UserProperty(map);
         }
