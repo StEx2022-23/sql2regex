@@ -20,7 +20,7 @@ import java.util.*;
 
 @Service
 public class PropertyManager {
-    private final Map<PropertyOption, Property> propertyMap = new EnumMap<PropertyOption, Property>(PropertyOption.class);
+    private final Map<PropertyOption, Property> propertyMap = new EnumMap<>(PropertyOption.class);
     private static final String PROPERTY_DEACTIVATED = "false";
 
     public PropertyManager() throws ParserConfigurationException, IOException, ClassNotFoundException, InvocationTargetException, SAXException, NoSuchMethodException, InstantiationException, IllegalAccessException, XPathExpressionException {

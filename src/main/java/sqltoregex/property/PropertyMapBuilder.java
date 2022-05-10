@@ -10,6 +10,7 @@ import java.util.Map;
 
 @Component
 public class PropertyMapBuilder {
+    //Tipp for later use EnumMap for initialisation, more efficient and otherwise a codesmell
     private final Map<PropertyOption, Property> propertyMap;
 
     @Autowired
@@ -18,7 +19,6 @@ public class PropertyMapBuilder {
     }
 
     public Map<String, Property> intersection(Map<PropertyOption, List<String>> userDefinitions){
-        final Map<PropertyOption, List<String>> list = userDefinitions; //added due to unused CodeSmell
         return Collections.emptyMap();
     }
 
