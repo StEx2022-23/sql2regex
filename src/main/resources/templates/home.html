@@ -22,16 +22,29 @@
             <div class="card">
                 <div class="card-body">
                     <h1 th:text="#{conv.heading}" class="pb-2 border-bottom"></h1>
-                    <div class="mb-3">
-                        <label for="sqlinput" class="form-label"><strong>SQL-Input</strong></label>
-                        <textarea class="form-control inputHeight" id="sqlinput" rows="3" placeholder="Insert your SQL-Statement here!"></textarea>
-                    </div>
-                    <form th:replace="assets/propertyform :: propertyform" action="#" th:action="@{/convert}" th:object="${propertyForm}" method="post">
-                        hier wurde nichts eingefügt
+<!--                    <form th:replace="assets/propertyform :: propertyform" action="#" th:action="@{/convert}" th:object="${propertyForm}" method="post">-->
+<!--                        hier wurde nichts eingefügt-->
+<!--                    </form>-->
+                    <form th:fragment="propertyform" action="#" th:action="@{/convert}" th:object="${propertyForm}" method="POST">
+                        <div class="mb-3">
+                            <label for="sqlinput" class="form-label"><strong>SQL-Input</strong></label>
+                            <textarea th:field="*{sql}" class="form-control inputHeight" id="sqlinput" rows="3" placeholder="Insert your SQL-Statement here!"></textarea>
+                        </div>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-sm"
+                                     th:each="format : *{dateFormats}">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="dateFormats1" value="yyyy-MM-dd" th:field="*{dateFormats}">
+                                        <label class="form-check-label" for="dateFormats1" th:text="${format.toPattern()}">Enable format: "yyyy-MM-dd"</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button th:text="#{conv.convert}" type="submit" id="onSubmitConvertForm" class="btn btn-primary btn-lg mb-2 mt-2 display-6"></button>
+                        </div>
                     </form>
-                    <div class="d-grid gap-2">
-                        <button th:text="#{conv.convert}" onclick="handleSubmitForm('sqlinput', 'regexoutput')" id="onSubmitConvertForm" class="btn btn-primary btn-lg mb-2 mt-2 display-6"></button>
-                    </div>
                     <div class="mb-3">
                         <label th:text="#{conv.headingregex}" for="regexoutput" class="form-label"></label>
                         <textarea class="form-control inputHeight" readonly="readonly" id="regexoutput" rows="3" placeholder="Copy your generated RegEx here!"></textarea>

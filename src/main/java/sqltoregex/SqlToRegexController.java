@@ -2,12 +2,13 @@ package sqltoregex;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import sqltoregex.property.PropertyForm;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @Controller
 public class SqlToRegexController {
@@ -16,14 +17,17 @@ public class SqlToRegexController {
     @GetMapping("/")
     public String home(Model model) {
         model.addAttribute(TITLE, "sql2regex");
-        model.addAttribute("propertyForm", new PropertyForm(Collections.emptyList()));
+        Set<SimpleDateFormat> dateFormats = new HashSet<SimpleDateFormat>();
+        dateFormats.add(new SimpleDateFormat("yyyy-MM-dd"));
+        dateFormats.add(new SimpleDateFormat("yy-MM-dd"));
+        model.addAttribute("propertyForm", new PropertyForm(dateFormats, "SELECT *"));
         model.addAttribute("activeConverter", true);
         return "home";
     }
 
     @PostMapping("/convert")
-    public String convert(Model model, @RequestParam PropertyForm propertyForm){
-        return "form";
+    public String convert(Model model, @ModelAttribute PropertyForm propertyForm){
+        return "assets/propertyform";
     }
 
     @GetMapping("/examples")
