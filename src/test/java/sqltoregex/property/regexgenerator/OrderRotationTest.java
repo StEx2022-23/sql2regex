@@ -36,6 +36,7 @@ class OrderRotationTest {
 
     @Test
     void testOrderRotationWithAlternativeWritingStyles(){
+        orderRotation.setSpellingMistake(new SpellingMistake(PropertyOption.DEFAULT));
         Assertions.assertEquals(
                 "(?:(?:table1|able1|tble1|tale1|tabe1|tabl1|table)\\s*,\\s*(?:table2|able2|tble2|tale2|tabe2|tabl2|table)|(?:table2|able2|tble2|tale2|tabe2|tabl2|table)\\s*,\\s*(?:table1|able1|tble1|tale1|tabe1|tabl1|table))",
                 orderRotation.generateRegExFor(testListOne)

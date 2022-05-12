@@ -80,7 +80,7 @@ public class PropertyManager {
                 return castProperty(propertyMap.get(mapPropOption), clazz);
             }
         }
-        throw new NoSuchElementException("There is no property with this property option");
+        throw new NoSuchElementException("There is no property with this property option:" + propertyOption);
     }
 
     public Map<PropertyOption, Property<?>> getPropertyMap() {

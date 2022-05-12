@@ -218,6 +218,11 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
         this.suffix = suffix;
     }
 
+    /**
+     * Not using graph equals method cause wrong implementation in JGraphT
+     * @param o
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

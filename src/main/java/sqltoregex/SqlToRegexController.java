@@ -11,6 +11,7 @@ import sqltoregex.property.regexgenerator.synonymgenerator.DateAndTimeFormatSyno
 import sqltoregex.property.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -50,10 +51,11 @@ public class SqlToRegexController {
         Property<SimpleDateFormat> dateTimeFormats = propertyManager.getPropertyByPropOption(PropertyOption.DATETIMESYNONYMS, DateAndTimeFormatSynonymGenerator.class);
         model.addAttribute("dateTimeFormats", dateTimeFormats.getSettings());
 
-        Property<String> aggregateFuncLang = propertyManager.getPropertyByPropOption(PropertyOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class);
-        model.addAttribute("aggregateFuncLang", aggregateFuncLang.getSettings());
+//        Property<String> aggregateFuncLang = propertyManager.getPropertyByPropOption(PropertyOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class);
+        model.addAttribute("aggregateFuncLang",
+                           Collections.emptySet()); //aggregateFuncLang.getSettings());
 
-        model.addAttribute("propertyForm", new PropertyForm(spellings, orders, dateFormats.getSettings(), timeFormats.getSettings(), dateTimeFormats.getSettings(), aggregateFuncLang.getSettings(), "SELECT *"));
+        model.addAttribute("propertyForm", new PropertyForm(spellings, orders, dateFormats.getSettings(), timeFormats.getSettings(), dateTimeFormats.getSettings(), Collections.emptySet(), "SELECT *"));
         model.addAttribute("activeConverter", true);
         return "home";
     }
