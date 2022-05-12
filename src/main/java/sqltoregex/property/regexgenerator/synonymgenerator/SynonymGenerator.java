@@ -1,13 +1,14 @@
-package sqltoregex.property;
+package sqltoregex.property.regexgenerator.synonymgenerator;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
+import org.springframework.util.Assert;
+import sqltoregex.property.Property;
+import sqltoregex.property.PropertyOption;
+import sqltoregex.property.regexgenerator.RegExGenerator;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * Common Interface for all synonym managers. Provides functionality for adding, removing synonyms of a generic Type T.
@@ -26,28 +27,32 @@ import java.util.NoSuchElementException;
  * @param <S> class of search objects
  */
 
-abstract class SynonymGenerator<A, S> implements Property {
+abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> {
+    public static final long DEFAULT_WEIGHT = 1L;
     //due to: Edges undirected (synonyms apply in both directions); Self-loops: no; Multiple edges: no; weighted: yes
     protected SimpleWeightedGraph<A, DefaultWeightedEdge> synonymsGraph;
     private String prefix = "";
     private String suffix = "";
+    private PropertyOption propertyOption;
 
-    protected SynonymGenerator() {
+    protected SynonymGenerator(PropertyOption propertyOption) {
+        Assert.notNull(propertyOption, "PropertyOption must not be null");
         this.synonymsGraph = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
+        this.propertyOption = propertyOption;
     }
 
     /**
-     * Add a synonym with default weight.
+     * Add a synonym to all prior existing synonyms with default weight after {@link #prepareSynonymForAdd}
      *
      * @param syn
      * @return
      */
     public boolean addSynonym(A syn) {
-        return addSynonym(syn, 1L);
+        return addSynonym(syn, DEFAULT_WEIGHT);
     }
 
     /**
-     * Add a synonym with custom weight after {@link #prepareSynonymForAdd}
+     * Add a synonym to all prior existing synonyms with custom weight after {@link #prepareSynonymForAdd}
      *
      * @param syn
      * @param weight
@@ -67,12 +72,44 @@ abstract class SynonymGenerator<A, S> implements Property {
     }
 
     /**
+     * Add a synonym to a second given synonym with default weight after {@link #prepareSynonymForAdd}
+     *
+     * @param syn
+     * @return
+     */
+    public boolean addSynonymFor(A syn, A synFor){
+        return addSynonymFor(syn, synFor, DEFAULT_WEIGHT);
+    }
+
+    /**
+     * Add a synonym to a second given synonym with custom weight after {@link #prepareSynonymForAdd}
+     *
+     * @param syn
+     * @return
+     */
+    public boolean addSynonymFor(A syn, A synFor, Long weight){
+        boolean addResult = false;
+        if (!synonymsGraph.containsVertex(syn)){
+            addResult = synonymsGraph.addVertex(this.prepareSynonymForAdd(syn));
+        }
+        if (!synonymsGraph.containsVertex(synFor)){
+            addResult = synonymsGraph.addVertex(this.prepareSynonymForAdd(synFor)) || addResult;
+        }
+        if (addResult){
+            DefaultWeightedEdge e1 = synonymsGraph.addEdge(this.prepareSynonymForAdd(syn), this.prepareSynonymForAdd(synFor));
+            synonymsGraph.setEdgeWeight(e1, weight);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Generates a regular expression part String with the pre-/ and suffixes set <b>including</b> the param.
      *
      * @param wordToFindSynonyms
      * @return
      */
-    public String generateSynonymRegexFor(S wordToFindSynonyms) {
+    public String generateRegExFor(S wordToFindSynonyms) {
         try {
             A vertexToSearch = this.prepareSynonymForSearch(wordToFindSynonyms);
             A start = this.synonymsGraph.vertexSet().stream()
@@ -93,31 +130,9 @@ abstract class SynonymGenerator<A, S> implements Property {
         }
     }
 
-//    private Iterator<A> getIteratorStartingFrom(S wordToFindSynonyms){
-//        A vertexToSearch = this.prepareSynonymForSearch(wordToFindSynonyms);
-//        A start = this.synonymsGraph.vertexSet().stream()
-//                .filter(syn -> syn.equals(vertexToSearch)).findAny().get();
-//        return new DepthFirstIterator<>(synonymsGraph, start);
-//    }
-//
-//    public Collection<A> getSynonymsCollectionFor(S wordToFindSynonyms){
-//        Collection<A> synonymsCollection = new HashSet<>();
-//        try {
-//            Iterator<A> iterator = getIteratorStartingFrom(wordToFindSynonyms);
-//            while (iterator.hasNext()) {
-//                synonymsCollection.add(iterator.next());
-//            }
-//        } catch (NoSuchElementException e) {
-//            synonymsCollection.add(this.prepareSynonymForSearch(wordToFindSynonyms));
-//        }
-//        return synonymsCollection;
-//    }
-
     @Override
-    public List<String> getSettings() {
-        List<String> vertexStrings = new ArrayList<>();
-        synonymsGraph.vertexSet().forEach(vertex -> vertexStrings.add(vertex.toString()));
-        return vertexStrings;
+    public Set<A> getSettings() {
+        return synonymsGraph.vertexSet();
     }
 
     /**
@@ -166,7 +181,7 @@ abstract class SynonymGenerator<A, S> implements Property {
     }
 
     /**
-     * Sets a common prefix for all concatenations of {@link #generateSynonymRegexFor}
+     * Sets a common prefix for all concatenations of {@link #generateRegExFor}
      *
      * @param prefix prefix to add
      */
@@ -175,11 +190,28 @@ abstract class SynonymGenerator<A, S> implements Property {
     }
 
     /**
-     * Sets a common suffix for all concatenations of {@link #generateSynonymRegexFor}
+     * Sets a common suffix for all concatenations of {@link #generateRegExFor}
      *
      * @param suffix suffix to add
      */
     public void setSuffix(String suffix) {
         this.suffix = suffix;
+    }
+
+    /**
+     * Not using graph equals method cause wrong implementation in JGraphT
+     * @param o
+     * @return
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SynonymGenerator<?, ?> that)) return false;
+        return synonymsGraph.vertexSet().equals(that.synonymsGraph.vertexSet()) && synonymsGraph.edgeSet().size() == that.synonymsGraph.edgeSet().size() && prefix.equals(that.prefix) && suffix.equals(that.suffix) && propertyOption == that.propertyOption;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(synonymsGraph, prefix, suffix, propertyOption);
     }
 }

@@ -15,10 +15,11 @@ import java.util.Set;
 
 class PropertyManagerTest {
     @Test
-    void testLoadDefaultProperties() throws ParserConfigurationException, IOException, ClassNotFoundException, InvocationTargetException, SAXException, NoSuchMethodException, InstantiationException, IllegalAccessException, XPathExpressionException {
+    void testLoadDefaultProperties() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
         PropertyManager propertyManager = new PropertyManager();
         Set<PropertyOption> propertyOptionSet = propertyManager.readPropertyOptions();
-        List<String> propertyOptionWhichHaveBeenSet = List.of("TABLENAMEORDER","KEYWORDSPELLING","COLUMNNAMEORDER","DATESYNONYMS");
+        List<String> propertyOptionWhichHaveBeenSet = List.of("TABLENAMEORDER","KEYWORDSPELLING","COLUMNNAMEORDER","DATESYNONYMS", "TIMESYNONYMS", "DATETIMESYNONYMS");
+        System.out.println(propertyOptionSet);
         for(String str : propertyOptionWhichHaveBeenSet){
             Assertions.assertTrue(propertyOptionSet.toString().contains(str));
         }

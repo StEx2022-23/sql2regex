@@ -2,6 +2,7 @@ package sqltoregex.property;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import sqltoregex.property.regexgenerator.OrderRotation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,7 @@ class UserPropertyTest {
         Map<PropertyOption, Property> map = new HashMap<>();
         UserProperty userProperty1 =  UserProperty.getInstance(map);
         Assertions.assertThrows(UnsupportedOperationException.class, () -> userProperty1.propertyMap.putAll(map));
-        OrderRotation orderRotation = new OrderRotation();
+        OrderRotation orderRotation = new OrderRotation(PropertyOption.DEFAULT);
         Assertions.assertThrows(UnsupportedOperationException.class, () -> userProperty1.propertyMap.put(PropertyOption.COLUMNNAMEORDER, orderRotation));
     }
 }

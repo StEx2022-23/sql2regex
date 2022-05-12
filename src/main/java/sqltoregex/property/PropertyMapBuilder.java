@@ -1,36 +1,79 @@
 package sqltoregex.property;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.apache.commons.lang3.tuple.Pair;
+import sqltoregex.property.regexgenerator.OrderRotation;
+import sqltoregex.property.regexgenerator.SpellingMistake;
+import sqltoregex.property.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
+import sqltoregex.property.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.List;
+import java.util.EnumMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
-@Component
+
 public class PropertyMapBuilder {
-    //Tipp for later use EnumMap for initialisation, more efficient and otherwise a codesmell
-    private final Map<PropertyOption, Property> propertyMap;
+    private final Set<OrderRotation> orderRotations;
+    private final Map<PropertyOption, Property<?>> propertyMap;
+    private final Set<SpellingMistake> spellingMistakes;
 
-    @Autowired
-    public PropertyMapBuilder(PropertyManager propertyManager){
-        this.propertyMap = propertyManager.getPropertyMap();
+    public PropertyMapBuilder() {
+        this.propertyMap = new EnumMap<>(PropertyOption.class);
+        this.orderRotations = new LinkedHashSet<>();
+        this.spellingMistakes = new LinkedHashSet<>();
     }
 
-    public Map<String, Property> intersection(Map<PropertyOption, List<String>> userDefinitions){
-        return Collections.emptyMap();
+    public Map<PropertyOption, Property<?>> build() {
+        for (OrderRotation orderRotation : orderRotations) {
+            for (PropertyOption propertyOption : orderRotation.getSettings()){
+                SpellingMistake spellingMistake = new SpellingMistake(PropertyOption.valueOf(propertyOption.toString().substring(0, propertyOption.toString().length()-5) + "SPELLING"));
+                if (spellingMistakes.contains(spellingMistake)){
+                    orderRotation.setSpellingMistake(spellingMistake);
+                }
+            }
+        }
+        return this.propertyMap;
     }
 
-    public Map<String, Property> substract(){
-        return Collections.emptyMap();
+    public PropertyMapBuilder with(Set<String> synonyms, PropertyOption propertyOption) {
+        switch (propertyOption) {
+            case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
+                DateAndTimeFormatSynonymGenerator synonymGenerator = new DateAndTimeFormatSynonymGenerator(propertyOption);
+                for (String format : synonyms) {
+                    synonymGenerator.addSynonym(new SimpleDateFormat(format));
+                }
+                this.propertyMap.put(propertyOption, synonymGenerator);
+            }
+            default -> {
+                throw new IllegalArgumentException("Unsupported build with:" + propertyOption);
+            }
+        }
+        return this;
     }
 
-    public void deleteKey(PropertyOption key){
-        this.propertyMap.remove(key);
+    public PropertyMapBuilder with(Pair<String, String> singleSynonym, PropertyOption propertyOption) {
+        StringSynonymGenerator aggregateFunctionSynonymGenerator = new StringSynonymGenerator(propertyOption);
+        aggregateFunctionSynonymGenerator.addSynonymFor(singleSynonym.getLeft(), singleSynonym.getRight());
+        this.propertyMap.put(propertyOption, aggregateFunctionSynonymGenerator);
+        return this;
     }
 
-    public void deleteSynonym(DateAndTimeFormatSynonymGenerator o, SimpleDateFormat sdf){
-        o.removeSynonym(sdf);
+    public PropertyMapBuilder with(PropertyOption propertyOption) {
+        switch (propertyOption) {
+            case KEYWORDSPELLING, COLUMNNAMESPELLING, TABLENAMESPELLING -> {
+                SpellingMistake spellingMistake = new SpellingMistake(propertyOption);
+                this.propertyMap.put(propertyOption, spellingMistake);
+                spellingMistakes.add(spellingMistake);
+            }
+            case TABLENAMEORDER, COLUMNNAMEORDER -> {
+                OrderRotation orderRotation = new OrderRotation(propertyOption);
+                this.propertyMap.put(propertyOption, orderRotation);
+                orderRotations.add(orderRotation);
+            }default -> {
+                throw new IllegalArgumentException("Unsupported build with:" + propertyOption);
+            }
+        }
+        return this;
     }
 }

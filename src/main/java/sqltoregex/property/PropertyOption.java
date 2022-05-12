@@ -6,8 +6,14 @@ package sqltoregex.property;
 public enum PropertyOption {
     KEYWORDSPELLING,
     TABLENAMEORDER,
+    TABLENAMESPELLING,
     COLUMNNAMEORDER,
-    DATESYNONYMS;
+    COLUMNNAMESPELLING,
+    DATESYNONYMS,
+    TIMESYNONYMS,
+    DATETIMESYNONYMS,
+    AGGREGATEFUNCTIONLANG,
+    DEFAULT;
     //When extending this class keep the naming of the enums and the xml tags the same. That they can easily be
     // transformed in each other.
 }
