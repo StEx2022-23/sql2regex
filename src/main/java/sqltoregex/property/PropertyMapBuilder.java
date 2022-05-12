@@ -1,36 +1,53 @@
 package sqltoregex.property;
 
+import org.apache.commons.lang3.tuple.Pair;
+import sqltoregex.property.regexgenerator.OrderRotation;
+import sqltoregex.property.regexgenerator.SpellingMistake;
+import sqltoregex.property.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
+import sqltoregex.property.regexgenerator.synonymgenerator.StringSynonymGenerator;
+
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.EnumMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 
 public class PropertyMapBuilder {
+    private final Set<OrderRotation> orderRotations;
     private final Map<PropertyOption, Property<?>> propertyMap;
+    private final Set<SpellingMistake> spellingMistakes;
 
     public PropertyMapBuilder() {
         this.propertyMap = new EnumMap<>(PropertyOption.class);
+        this.orderRotations = new LinkedHashSet<>();
+        this.spellingMistakes = new LinkedHashSet<>();
     }
 
-    public PropertyMapBuilder with(PropertyOption propertyOption) {
-        switch (propertyOption){
-            case KEYWORDSPELLING -> this.propertyMap.put(propertyOption, new SpellingMistake(propertyOption));
-            case TABLENAMEORDER, COLUMNNAMEORDER -> this.propertyMap.put(propertyOption, new OrderRotation(propertyOption));
+    public Map<PropertyOption, Property<?>> build() {
+        for (OrderRotation orderRotation : orderRotations) {
+            for (PropertyOption propertyOption : orderRotation.getSettings()){
+                SpellingMistake spellingMistake = new SpellingMistake(PropertyOption.valueOf(propertyOption.toString().substring(0, propertyOption.toString().length()-5) + "SPELLING"));
+                if (spellingMistakes.contains(spellingMistake)){
+                    orderRotation.setSpellingMistake(spellingMistake);
+                }
+            }
         }
-        return this;
+        return this.propertyMap;
     }
 
-    public PropertyMapBuilder with(Set<String> formats, PropertyOption propertyOption) {
-        switch (propertyOption){
+    public PropertyMapBuilder with(Set<String> synonyms, PropertyOption propertyOption) {
+        switch (propertyOption) {
             case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
-                DateAndTimeFormatSynonymGenerator synonymGenerator = new DateAndTimeFormatSynonymGenerator();
-                for (String format : formats) {
+                DateAndTimeFormatSynonymGenerator synonymGenerator = new DateAndTimeFormatSynonymGenerator(propertyOption);
+                for (String format : synonyms) {
                     synonymGenerator.addSynonym(new SimpleDateFormat(format));
                 }
                 this.propertyMap.put(propertyOption, synonymGenerator);
             }
             default -> {
-                DefaultSynonymGenerator synonymGenerator = new DefaultSynonymGenerator();
-                for (String format : formats) {
+                StringSynonymGenerator synonymGenerator = new StringSynonymGenerator(propertyOption);
+                for (String format : synonyms) {
                     synonymGenerator.addSynonym(format);
                 }
                 this.propertyMap.put(propertyOption, synonymGenerator);
@@ -39,7 +56,29 @@ public class PropertyMapBuilder {
         return this;
     }
 
-    public Map<PropertyOption, Property<?>> build() {
-        return this.propertyMap;
+    public PropertyMapBuilder with(Pair<String, String> singleSynonym, PropertyOption propertyOption) {
+        StringSynonymGenerator aggregateFunctionSynonymGenerator = new StringSynonymGenerator(propertyOption);
+        aggregateFunctionSynonymGenerator.addSynonymFor(singleSynonym.getLeft(), singleSynonym.getRight());
+        this.propertyMap.put(propertyOption, aggregateFunctionSynonymGenerator);
+        return this;
+    }
+
+    public PropertyMapBuilder with(PropertyOption propertyOption) {
+        if(propertyOption.toString().contains("synonym")){
+            throw new IllegalArgumentException("Synonyms must be build with List of Synonyms");
+        }
+        switch (propertyOption) {
+            case KEYWORDSPELLING, COLUMNNAMESPELLING, TABLENAMESPELLING -> {
+                SpellingMistake spellingMistake = new SpellingMistake(propertyOption);
+                this.propertyMap.put(propertyOption, spellingMistake);
+                spellingMistakes.add(spellingMistake);
+            }
+            case TABLENAMEORDER, COLUMNNAMEORDER -> {
+                OrderRotation orderRotation = new OrderRotation(propertyOption);
+                this.propertyMap.put(propertyOption, orderRotation);
+                orderRotations.add(orderRotation);
+            }
+        }
+        return this;
     }
 }

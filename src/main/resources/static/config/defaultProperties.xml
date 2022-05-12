@@ -6,9 +6,15 @@
         <tablenameorder>
                 <value>true</value>
         </tablenameorder>
+        <tablenamespelling>
+            <value>true</value>
+        </tablenamespelling>
         <columnnameorder>
                 <value>true</value>
         </columnnameorder>
+        <columnnamespelling>
+            <value>true</value>
+        </columnnamespelling>
     </spelling>
     <synonyms>
         <datesynonyms>

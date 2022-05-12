@@ -6,7 +6,7 @@ import net.sf.jsqlparser.expression.TimeValue;
 import net.sf.jsqlparser.expression.TimestampValue;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import org.springframework.stereotype.Service;
-import sqltoregex.property.DateAndTimeFormatSynonymGenerator;
+import sqltoregex.property.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 
 @Service
 public class SynonymManager {
@@ -40,17 +40,17 @@ public class SynonymManager {
     private class SynonymExpressionDeParser extends ExpressionDeParser {
         @Override
         public void visit(DateValue dateValue) {
-            getBuffer().append(dateSynonymGenerator.generateSynonymRegexFor(dateValue));
+            getBuffer().append(dateSynonymGenerator.generateRegExFor(dateValue));
         }
 
         @Override
         public void visit(TimeValue timeValue) {
-            getBuffer().append(timeSynonymGenerator.generateSynonymRegexFor(timeValue));
+            getBuffer().append(timeSynonymGenerator.generateRegExFor(timeValue));
         }
 
         @Override
         public void visit(TimestampValue timestampValue) {
-            getBuffer().append(timestampSynonymGenerator.generateSynonymRegexFor(timestampValue));
+            getBuffer().append(timestampSynonymGenerator.generateRegExFor(timestampValue));
         }
     }
 }

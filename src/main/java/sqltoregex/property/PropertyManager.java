@@ -5,7 +5,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -14,13 +13,13 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
 public class PropertyManager {
     private static final String PROPERTY_DEACTIVATED = "false";
     private final Map<PropertyOption, Property<?>> propertyMap = new EnumMap<>(PropertyOption.class);
+
 
     public PropertyManager() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
         this.parseProperties();
@@ -39,29 +38,26 @@ public class PropertyManager {
 
     }
 
-    private void addPropertyToMap(List<String> valueList, PropertyOption relatedOption) {
-        if (valueList.get(0).equals(PROPERTY_DEACTIVATED)) {
-            return;
-        }
-        switch (relatedOption) {
-            case KEYWORDSPELLING -> {propertyMap.put(relatedOption, new SpellingMistake(PropertyOption.KEYWORDSPELLING));}
-            case TABLENAMEORDER -> {propertyMap.put(relatedOption, new OrderRotation(PropertyOption.TABLENAMEORDER));}
-            case COLUMNNAMEORDER -> {propertyMap.put(relatedOption, new OrderRotation(PropertyOption.COLUMNNAMEORDER));}
-            case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
-                DateAndTimeFormatSynonymGenerator dateSynonymManager = new DateAndTimeFormatSynonymGenerator();
-                for (String dateformat : valueList) {
-                    dateSynonymManager.addSynonym(new SimpleDateFormat(dateformat));
-                }
-                propertyMap.put(relatedOption, dateSynonymManager);
+    private PropertyMapBuilder addPropertyToMap(Map<PropertyOption, NodeList> parsedValues) {
+        PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
+        for(PropertyOption prop : PropertyOption.values()){
+            if (parsedValues.containsKey(prop) && parsedValues.get(prop).item(0).getTextContent().equals(PROPERTY_DEACTIVATED)) {
+                return propertyMapBuilder;
             }
-            case AGGREGATEFUNCTIONLANG -> {
-                DefaultSynonymGenerator aggregateFunctionSynonyms = new DefaultSynonymGenerator();
-                for (String synonym : valueList) {
-                    aggregateFunctionSynonyms.addSynonym(synonym);
+            switch (prop) {
+                case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER -> {propertyMapBuilder.with(prop);}
+                case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
+                    Set<String> valueList = new HashSet<>();
+                    PropertyNodeListIterator propertyNodeListIterator = new PropertyNodeListIterator(parsedValues.get(prop));
+                    for(Node node : propertyNodeListIterator){
+                        valueList.add(node.getTextContent());
+                    }
+                    propertyMapBuilder.with(valueList, prop);
                 }
-                propertyMap.put(relatedOption, aggregateFunctionSynonyms);
+                //case for aggregate function is currently missing, bc the related directed graph doesnt exist
             }
         }
+        return propertyMapBuilder;
     }
 
     /**
@@ -91,8 +87,7 @@ public class PropertyManager {
         return this.propertyMap;
     }
 
-    private void parseProperties() throws ParserConfigurationException, IOException, SAXException,
-            XPathExpressionException {
+    private void parseProperties() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
         PropertyOption relatedOption;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
@@ -103,6 +98,7 @@ public class PropertyManager {
 
         stripWhitespaces(document);
 
+        Map<PropertyOption, NodeList> parsedValues = new EnumMap<>(PropertyOption.class);
         Node root = document.getElementsByTagName("properties").item(0);
         NodeList properties = root.getChildNodes();
         PropertyNodeListIterator rootElementIterator = new PropertyNodeListIterator(properties);
@@ -111,16 +107,11 @@ public class PropertyManager {
             PropertyNodeListIterator propertyCategoryIterator = new PropertyNodeListIterator(propertyCategory);
             for (Node categoryNode : propertyCategoryIterator) {
                 relatedOption = PropertyOption.valueOf(categoryNode.getNodeName().toUpperCase());
-                //hier abbrechen und das in addPropertyToMap(relatedOption)
                 NodeList innerNodes = categoryNode.getChildNodes();
-                PropertyNodeListIterator innerNodesIterator = new PropertyNodeListIterator(innerNodes);
-                List<String> valueList = new ArrayList<>();
-                for (Node innerNode : innerNodesIterator) {
-                    valueList.add(innerNode.getTextContent());
-                }
-                this.addPropertyToMap(valueList, relatedOption);
+                parsedValues.put(relatedOption, innerNodes);
             }
         }
+        this.propertyMap.putAll(this.addPropertyToMap(parsedValues).build());
     }
 
     public Set<PropertyOption> readPropertyOptions() {

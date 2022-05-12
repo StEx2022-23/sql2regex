@@ -1,4 +1,7 @@
-package sqltoregex.property;
+package sqltoregex.property.regexgenerator;
+
+import sqltoregex.property.Property;
+import sqltoregex.property.PropertyOption;
 
 import java.util.*;
 
@@ -8,7 +11,7 @@ import java.util.*;
  * Example:
  * test ↔ (?:test|est|tst|tet|tes)
  */
-public class SpellingMistake implements Property<PropertyOption>{
+public class SpellingMistake implements Property<PropertyOption>, RegExGenerator<String> {
     private final PropertyOption propertyOption;
 
     public SpellingMistake(PropertyOption propertyOption){
@@ -22,20 +25,33 @@ public class SpellingMistake implements Property<PropertyOption>{
 
     /**
      * Iterates through each letter of the word, storing all spelling variations assuming a letter is forgotten
-     * @param tablename String
+     * @param tableName String
      * @return creates a regex non-capturing group with all calculated options
      */
-    public String calculateAlternativeWritingStyles(String tablename){
-        if(tablename.isEmpty()){
+    public String generateRegExFor(String tableName){
+        if(tableName.isEmpty()){
             throw new IllegalArgumentException("Tablename should not be empty.");
         }
         StringBuilder alternativeWritingStyles = new StringBuilder();
-        alternativeWritingStyles.append("(?:").append(tablename).append("|");
-        for(int i = 0; i<tablename.length(); i++){
-            alternativeWritingStyles.append(tablename, 0, i).append(tablename, i+1, tablename.length()).append("|");
+        alternativeWritingStyles.append("(?:").append(tableName).append("|");
+        for(int i = 0; i<tableName.length(); i++){
+            alternativeWritingStyles.append(tableName, 0, i).append(tableName, i+1, tableName.length()).append("|");
         }
         alternativeWritingStyles.replace(alternativeWritingStyles.length()-1, alternativeWritingStyles.length(), "");
         alternativeWritingStyles.append(")");
         return alternativeWritingStyles.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SpellingMistake)) return false;
+        SpellingMistake that = (SpellingMistake) o;
+        return propertyOption == that.propertyOption;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(propertyOption);
     }
 }

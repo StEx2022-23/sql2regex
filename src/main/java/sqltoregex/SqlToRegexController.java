@@ -5,10 +5,12 @@ import org.springframework.ui.Model;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import sqltoregex.property.*;
+import sqltoregex.property.regexgenerator.OrderRotation;
+import sqltoregex.property.regexgenerator.SpellingMistake;
+import sqltoregex.property.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
+import sqltoregex.property.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,7 +50,7 @@ public class SqlToRegexController {
         Property<SimpleDateFormat> dateTimeFormats = propertyManager.getPropertyByPropOption(PropertyOption.DATETIMESYNONYMS, DateAndTimeFormatSynonymGenerator.class);
         model.addAttribute("dateTimeFormats", dateTimeFormats.getSettings());
 
-        Property<String> aggregateFuncLang = propertyManager.getPropertyByPropOption(PropertyOption.AGGREGATEFUNCTIONLANG, DefaultSynonymGenerator.class);
+        Property<String> aggregateFuncLang = propertyManager.getPropertyByPropOption(PropertyOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class);
         model.addAttribute("aggregateFuncLang", aggregateFuncLang.getSettings());
 
         model.addAttribute("propertyForm", new PropertyForm(spellings, orders, dateFormats.getSettings(), timeFormats.getSettings(), dateTimeFormats.getSettings(), aggregateFuncLang.getSettings(), "SELECT *"));

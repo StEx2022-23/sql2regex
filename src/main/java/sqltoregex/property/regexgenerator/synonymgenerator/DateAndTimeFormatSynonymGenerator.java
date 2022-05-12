@@ -1,7 +1,8 @@
-package sqltoregex.property;
+package sqltoregex.property.regexgenerator.synonymgenerator;
 
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
+import sqltoregex.property.PropertyOption;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -10,6 +11,10 @@ import java.util.Date;
 import java.util.NoSuchElementException;
 
 public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDateFormat, Expression> {
+    public DateAndTimeFormatSynonymGenerator(PropertyOption propertyOption) {
+        super(propertyOption);
+    }
+
     @Override
     protected SimpleDateFormat prepareSynonymForAdd(SimpleDateFormat syn) {
         return syn;

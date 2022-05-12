@@ -6,7 +6,9 @@ package sqltoregex.property;
 public enum PropertyOption {
     KEYWORDSPELLING,
     TABLENAMEORDER,
+    TABLENAMESPELLING,
     COLUMNNAMEORDER,
+    COLUMNNAMESPELLING,
     DATESYNONYMS,
     TIMESYNONYMS,
     DATETIMESYNONYMS,
