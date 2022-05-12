@@ -130,26 +130,6 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
         }
     }
 
-//    private Iterator<A> getIteratorStartingFrom(S wordToFindSynonyms){
-//        A vertexToSearch = this.prepareSynonymForSearch(wordToFindSynonyms);
-//        A start = this.synonymsGraph.vertexSet().stream()
-//                .filter(syn -> syn.equals(vertexToSearch)).findAny().get();
-//        return new DepthFirstIterator<>(synonymsGraph, start);
-//    }
-//
-//    public Collection<A> getSynonymsCollectionFor(S wordToFindSynonyms){
-//        Collection<A> synonymsCollection = new HashSet<>();
-//        try {
-//            Iterator<A> iterator = getIteratorStartingFrom(wordToFindSynonyms);
-//            while (iterator.hasNext()) {
-//                synonymsCollection.add(iterator.next());
-//            }
-//        } catch (NoSuchElementException e) {
-//            synonymsCollection.add(this.prepareSynonymForSearch(wordToFindSynonyms));
-//        }
-//        return synonymsCollection;
-//    }
-
     @Override
     public Set<A> getSettings() {
         return synonymsGraph.vertexSet();

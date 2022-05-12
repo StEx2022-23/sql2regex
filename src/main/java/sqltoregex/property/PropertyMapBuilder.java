@@ -46,11 +46,7 @@ public class PropertyMapBuilder {
                 this.propertyMap.put(propertyOption, synonymGenerator);
             }
             default -> {
-                StringSynonymGenerator synonymGenerator = new StringSynonymGenerator(propertyOption);
-                for (String format : synonyms) {
-                    synonymGenerator.addSynonym(format);
-                }
-                this.propertyMap.put(propertyOption, synonymGenerator);
+                throw new IllegalArgumentException("Unsupported build with:" + propertyOption);
             }
         }
         return this;
@@ -64,9 +60,6 @@ public class PropertyMapBuilder {
     }
 
     public PropertyMapBuilder with(PropertyOption propertyOption) {
-        if(propertyOption.toString().contains("synonym")){
-            throw new IllegalArgumentException("Synonyms must be build with List of Synonyms");
-        }
         switch (propertyOption) {
             case KEYWORDSPELLING, COLUMNNAMESPELLING, TABLENAMESPELLING -> {
                 SpellingMistake spellingMistake = new SpellingMistake(propertyOption);
@@ -77,6 +70,8 @@ public class PropertyMapBuilder {
                 OrderRotation orderRotation = new OrderRotation(propertyOption);
                 this.propertyMap.put(propertyOption, orderRotation);
                 orderRotations.add(orderRotation);
+            }default -> {
+                throw new IllegalArgumentException("Unsupported build with:" + propertyOption);
             }
         }
         return this;

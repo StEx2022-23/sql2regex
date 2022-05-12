@@ -34,8 +34,9 @@ public class PropertyManager {
         return null;
     }
 
-    public void parseUserOptionsInput(PropertyForm form){
 
+    public void parseUserOptionsInput(PropertyForm form){
+        //will be added in later iteration
     }
 
     private PropertyMapBuilder addPropertyToMap(Map<PropertyOption, NodeList> parsedValues) {
@@ -45,7 +46,7 @@ public class PropertyManager {
                 return propertyMapBuilder;
             }
             switch (prop) {
-                case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER -> {propertyMapBuilder.with(prop);}
+                case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER -> propertyMapBuilder.with(prop);
                 case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
                     Set<String> valueList = new HashSet<>();
                     PropertyNodeListIterator propertyNodeListIterator = new PropertyNodeListIterator(parsedValues.get(prop));
@@ -54,7 +55,9 @@ public class PropertyManager {
                     }
                     propertyMapBuilder.with(valueList, prop);
                 }
-                //case for aggregate function is currently missing, bc the related directed graph doesnt exist
+                case AGGREGATEFUNCTIONLANG -> {
+                    //case for aggregate function is currently missing will be added in next iteration
+                }
             }
         }
         return propertyMapBuilder;
@@ -75,9 +78,9 @@ public class PropertyManager {
     }
 
     public <T> Property<T> getPropertyByPropOption(PropertyOption propertyOption, Class<? extends Property<T>> clazz) {
-        for (PropertyOption mapPropOption : this.propertyMap.keySet()) {
-            if (mapPropOption.equals(propertyOption)) {
-                return castProperty(propertyMap.get(mapPropOption), clazz);
+        for (Map.Entry<PropertyOption, Property<?>> entry : this.propertyMap.entrySet()) {
+            if (entry.getKey().equals(propertyOption)) {
+                return castProperty(propertyMap.get(entry.getKey()), clazz);
             }
         }
         throw new NoSuchElementException("There is no property with this property option:" + propertyOption);

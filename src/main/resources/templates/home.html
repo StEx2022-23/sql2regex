@@ -26,7 +26,7 @@
 <!--                        hier wurde nichts eingefügt-->
 <!--                    </form>-->
                     <div id="form_response_body">
-                        <form action="#" th:action="@{/convert}" th:object="${propertyForm}" method="POST">
+                        <form th:replace="assets/propertyform :: propertyform" action="#" th:action="@{/convert}" th:object="${propertyForm}" method="POST">
                             <div class="mb-3">
                                 <label for="sqlinput" class="form-label"><strong>SQL-Input</strong></label>
                                 <textarea th:field="*{sql}" class="form-control inputHeight" id="sqlinput" rows="3" placeholder="Insert your SQL-Statement here!"></textarea>
