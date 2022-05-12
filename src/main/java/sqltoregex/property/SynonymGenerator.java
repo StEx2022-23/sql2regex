@@ -4,10 +4,7 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * Common Interface for all synonym managers. Provides functionality for adding, removing synonyms of a generic Type T.
@@ -26,7 +23,12 @@ import java.util.NoSuchElementException;
  * @param <S> class of search objects
  */
 
-abstract class SynonymGenerator<A, S> implements Property {
+//SimpleSynonymGenerator 1 abstrakte Klasse added synonym für alle in einem ungerichteten graphen
+//directedSynonym Generator 1 abstrakte Klasse added Synonym für spezielle Wörter in dem Graphen
+//beide implementieren das Interface RegExSynonymGenerator → das hat nur die Methode generateSynonymRegexFor und prepareSynonymForSearch und prepareSynonymForAdd
+
+
+abstract class SynonymGenerator<A, S> implements Property<A> {
     //due to: Edges undirected (synonyms apply in both directions); Self-loops: no; Multiple edges: no; weighted: yes
     protected SimpleWeightedGraph<A, DefaultWeightedEdge> synonymsGraph;
     private String prefix = "";
@@ -114,10 +116,8 @@ abstract class SynonymGenerator<A, S> implements Property {
 //    }
 
     @Override
-    public List<String> getSettings() {
-        List<String> vertexStrings = new ArrayList<>();
-        synonymsGraph.vertexSet().forEach(vertex -> vertexStrings.add(vertex.toString()));
-        return vertexStrings;
+    public Set<A> getSettings() {
+        return synonymsGraph.vertexSet();
     }
 
     /**

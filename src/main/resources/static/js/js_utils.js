@@ -268,15 +268,12 @@ class SqlRegExHistory {
     }
 }
 
-document.addEventListener('submit', async (e) => {
+document.addEventListener('submit',  (e) => {
     // Store reference to form to make later code easier to read
     const form = e.target;
 
-    console.log(e.target);
-    console.log(e.target.method);
-
     // Post data using the Fetch API
-    fetch(form.action, {
+    const response = fetch(form.action, {
         method: form.method,
         body: new FormData(form),
     })
@@ -296,11 +293,12 @@ document.addEventListener('submit', async (e) => {
             result.tabIndex = -1;
 
             // And replace the form with the response children
-            form.parentNode.replaceChild(result, form);
+            form.parentNode.parentNode.replaceChild(result, form.parentNode);
 
             // Move focus to the status message
             result.focus();
-        });
+        })
+        .then( () => SqlRegExHis.checkUpdatedConverting());
 
     // Prevent the default form submit
     e.preventDefault();

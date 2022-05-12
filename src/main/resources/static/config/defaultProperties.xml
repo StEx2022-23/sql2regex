@@ -18,6 +18,17 @@
             <value>yyyy-M-d</value>
             <value>yyyyMMdd</value>
         </datesynonyms>
+        <timesynonyms>
+            <value>HH:MM:SS</value>
+        </timesynonyms>
+        <datetimesynonyms>
+            <value>YYYY-MM-DD HH:MM:SS</value>
+        </datetimesynonyms>
+        <aggregatefunctionlang>
+            <value>SUM</value>
+            <value>SUMME</value>
+            <!--fachlich falsch -->
+        </aggregatefunctionlang>
     </synonyms>
 </properties>
 

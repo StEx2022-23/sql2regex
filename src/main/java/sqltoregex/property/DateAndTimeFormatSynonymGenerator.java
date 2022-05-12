@@ -5,22 +5,23 @@ import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.NoSuchElementException;
 
-public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<DateFormat, Expression> {
+public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDateFormat, Expression> {
     @Override
-    protected DateFormat prepareSynonymForAdd(DateFormat syn) {
+    protected SimpleDateFormat prepareSynonymForAdd(SimpleDateFormat syn) {
         return syn;
     }
 
     @Override
-    protected DateFormat prepareSynonymForSearch(Expression wordToFindSynonyms) {
+    protected SimpleDateFormat prepareSynonymForSearch(Expression wordToFindSynonyms) {
         if(!(wordToFindSynonyms instanceof DateValue) && !(wordToFindSynonyms instanceof TimeValue) && !(wordToFindSynonyms instanceof TimestampValue)){
             throw new IllegalArgumentException("Expression for DateAndTimeSynonymManager must be of type: DateValue, TimeValue or TimestampValue");
         }
 
-        for (DateFormat vertexSyn : this.synonymsGraph.vertexSet()) {
+        for (SimpleDateFormat vertexSyn : this.synonymsGraph.vertexSet()) {
             try {
                 DateAndTimeExpressionDeparser deParser = new DateAndTimeExpressionDeparser();
                 wordToFindSynonyms.accept(deParser);
@@ -34,7 +35,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<DateForm
     }
 
     @Override
-    protected String prepareVertexForRegEx(DateFormat syn, Expression wordToFindSynonyms) {
+    protected String prepareVertexForRegEx(SimpleDateFormat syn, Expression wordToFindSynonyms) {
         Date date;
 
         //O(n^2) is okay, cause elements will be <<100 for dateFormats

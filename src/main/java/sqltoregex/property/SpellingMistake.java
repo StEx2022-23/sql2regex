@@ -1,7 +1,6 @@
 package sqltoregex.property;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * The OrderRotation class allows creating a RegEx expression that takes into account different spelling variants
@@ -9,10 +8,16 @@ import java.util.List;
  * Example:
  * test ↔ (?:test|est|tst|tet|tes)
  */
-public class SpellingMistake implements Property{
+public class SpellingMistake implements Property<PropertyOption>{
+    private final PropertyOption propertyOption;
+
+    public SpellingMistake(PropertyOption propertyOption){
+        this.propertyOption = propertyOption;
+    }
+
     @Override
-    public List<String> getSettings() {
-        return Collections.singletonList("SpellingMistake");
+    public Set<PropertyOption> getSettings() {
+        return new HashSet<>(List.of(propertyOption));
     }
 
     /**

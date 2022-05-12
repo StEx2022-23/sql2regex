@@ -1,7 +1,8 @@
 package sqltoregex.property;
 
-import java.util.Collections;
-import java.util.List;
+import org.springframework.core.annotation.Order;
+
+import java.util.*;
 
 /**
  * The OrderRotation class allows creating a RegEx expression that takes into all possible order possibilities.
@@ -9,13 +10,18 @@ import java.util.List;
  * SELECT table1, table2
  * SELECT (?:table1\s*,\s*table2|table2\s*,\s*table1)
  */
-public class OrderRotation implements Property{
+public class OrderRotation implements Property<PropertyOption>{
     private final StringBuilder tableNameOrderRegEx = new StringBuilder();
-    private final SpellingMistake spellingMistake = new SpellingMistake();
+    private final SpellingMistake spellingMistake = new SpellingMistake(PropertyOption.DEFAULT);
+    private final PropertyOption propertyoption;
+
+    public OrderRotation(PropertyOption propertyOption){
+        this.propertyoption = propertyOption;
+    }
 
     @Override
-    public List<String> getSettings() {
-        return Collections.singletonList("OrderRotation");
+    public Set<PropertyOption> getSettings() {
+        return new HashSet<>(Arrays.asList(propertyoption));
     }
 
     /**

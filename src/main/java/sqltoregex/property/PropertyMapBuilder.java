@@ -1,36 +1,45 @@
 package sqltoregex.property;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-@Component
+
 public class PropertyMapBuilder {
-    //Tipp for later use EnumMap for initialisation, more efficient and otherwise a codesmell
-    private final Map<PropertyOption, Property> propertyMap;
+    private final Map<PropertyOption, Property<?>> propertyMap;
 
-    @Autowired
-    public PropertyMapBuilder(PropertyManager propertyManager){
-        this.propertyMap = propertyManager.getPropertyMap();
+    public PropertyMapBuilder() {
+        this.propertyMap = new EnumMap<>(PropertyOption.class);
     }
 
-    public Map<String, Property> intersection(Map<PropertyOption, List<String>> userDefinitions){
-        return Collections.emptyMap();
+    public PropertyMapBuilder with(PropertyOption propertyOption) {
+        switch (propertyOption){
+            case KEYWORDSPELLING -> this.propertyMap.put(propertyOption, new SpellingMistake(propertyOption));
+            case TABLENAMEORDER, COLUMNNAMEORDER -> this.propertyMap.put(propertyOption, new OrderRotation(propertyOption));
+        }
+        return this;
     }
 
-    public Map<String, Property> substract(){
-        return Collections.emptyMap();
+    public PropertyMapBuilder with(Set<String> formats, PropertyOption propertyOption) {
+        switch (propertyOption){
+            case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
+                DateAndTimeFormatSynonymGenerator synonymGenerator = new DateAndTimeFormatSynonymGenerator();
+                for (String format : formats) {
+                    synonymGenerator.addSynonym(new SimpleDateFormat(format));
+                }
+                this.propertyMap.put(propertyOption, synonymGenerator);
+            }
+            default -> {
+                DefaultSynonymGenerator synonymGenerator = new DefaultSynonymGenerator();
+                for (String format : formats) {
+                    synonymGenerator.addSynonym(format);
+                }
+                this.propertyMap.put(propertyOption, synonymGenerator);
+            }
+        }
+        return this;
     }
 
-    public void deleteKey(PropertyOption key){
-        this.propertyMap.remove(key);
-    }
-
-    public void deleteSynonym(DateAndTimeFormatSynonymGenerator o, SimpleDateFormat sdf){
-        o.removeSynonym(sdf);
+    public Map<PropertyOption, Property<?>> build() {
+        return this.propertyMap;
     }
 }

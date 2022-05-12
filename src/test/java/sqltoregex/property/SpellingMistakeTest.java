@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import sqltoregex.property.SpellingMistake;
 
 class SpellingMistakeTest {
-    public SpellingMistake spellingMistake = new SpellingMistake();
+    public SpellingMistake spellingMistake = new SpellingMistake(PropertyOption.DEFAULT);
 
     @Test
     void testSpellingMistakeOutput(){
@@ -25,6 +25,6 @@ class SpellingMistakeTest {
     @Test
     void testGetProperty(){
         Assertions.assertEquals(1, spellingMistake.getSettings().size());
-        Assertions.assertEquals("SpellingMistake", spellingMistake.getSettings().get(0));
+        Assertions.assertTrue(spellingMistake.getSettings().contains(PropertyOption.DEFAULT));
     }
 }

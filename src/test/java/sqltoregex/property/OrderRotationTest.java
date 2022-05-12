@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 class OrderRotationTest {
-    OrderRotation orderRotation = new OrderRotation();
+    OrderRotation orderRotation = new OrderRotation(PropertyOption.DEFAULT);
     List<String> testListOne = Arrays.asList("table1", "table2");
     List<String> testListTwo = List.of("table1");
 
