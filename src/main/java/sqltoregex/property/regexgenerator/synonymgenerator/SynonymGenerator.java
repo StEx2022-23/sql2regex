@@ -129,7 +129,7 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
             strRegEx.append(')');
             return strRegEx.toString();
         } catch (NoSuchElementException e) {
-            return searchSynonymToString(wordToFindSynonyms);
+            return (isCapturingGroup ? '(' : "(?:") + searchSynonymToString(wordToFindSynonyms) + ')';
         }
     }
 

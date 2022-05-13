@@ -95,7 +95,7 @@ public class SynonymGeneratorTest {
         stringSynonymGenerator.addSynonym("Mittelwert");
         stringSynonymGenerator.addSynonym("AVG");
         stringSynonymGenerator.addSynonym("Average");
-        Assertions.assertEquals("Mittelwert|Average|AVG", stringSynonymGenerator.generateRegExFor("Mittelwert"));
+        Assertions.assertEquals("(?:Mittelwert|Average|AVG)", stringSynonymGenerator.generateRegExFor("Mittelwert"));
     }
 
     @Test
@@ -105,7 +105,7 @@ public class SynonymGeneratorTest {
         stringSynonymGenerator.addSynonym("Average");
         stringSynonymGenerator.setPrefix("%");
         stringSynonymGenerator.setSuffix("#");
-        Assertions.assertEquals("%Mittelwert#|%Average#|%AVG#", stringSynonymGenerator.generateRegExFor("Mittelwert"));
+        Assertions.assertEquals("(?:%Mittelwert#|%Average#|%AVG#)", stringSynonymGenerator.generateRegExFor("Mittelwert"));
     }
 
     @Test
