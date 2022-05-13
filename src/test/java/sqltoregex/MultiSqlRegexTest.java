@@ -11,11 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 class MultiSqlRegexTest {
-    @Autowired
-    MockMvc mvc;
 
     @Test
     void setListNotEmpty(){
