@@ -59,7 +59,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
     @Override
     protected String prepareVertexForRegEx(SimpleDateFormat syn, Expression wordToFindSynonyms) {
         Assert.notNull(syn, "Format must not be null");
-        Assert.notNull(wordToFindSynonyms, "Synonym must not be null");
+        Assert.notNull(wordToFindSynonyms, SYNONYM_MUST_NOT_BE_NULL);
 
         Date date;
         //O(n^2) is okay, cause elements will be <<100 for dateFormats
@@ -81,7 +81,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
         if (wordToFindSynonyms.getClass() != DateValue.class && wordToFindSynonyms.getClass() != TimeValue.class && wordToFindSynonyms.getClass() != TimestampValue.class) {
             throw new IllegalArgumentException("Query Expression must be of type Date-/Time-/TimestampValue");
         }
-        Assert.notNull(wordToFindSynonyms, "Synonym must not be null");
+        Assert.notNull(wordToFindSynonyms, SYNONYM_MUST_NOT_BE_NULL);
         DateAndTimeExpressionDeparser deParser = new DateAndTimeExpressionDeparser();
         wordToFindSynonyms.accept(deParser);
         return deParser.getBuffer().toString();
