@@ -212,6 +212,6 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
 
     @Override
     public int hashCode() {
-        return Objects.hash(synonymsGraph, prefix, suffix, propertyOption);
+        return Objects.hash(synonymsGraph.vertexSet(), synonymsGraph.edgeSet().size(), prefix, suffix, propertyOption);
     }
 }
