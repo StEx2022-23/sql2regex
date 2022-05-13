@@ -1,6 +1,5 @@
 package sqltoregex.property;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
@@ -67,17 +66,17 @@ public class PropertyManager {
         }
 
         Set<SimpleDateFormat> dateFormatFromForm = form.getDateFormats();
-        if(dateFormatFromForm != null && dateFormatFromForm.size() > 0) {
+        if(dateFormatFromForm != null && !dateFormatFromForm.isEmpty()) {
             propertyMapBuilder.with(setOfSimpleDateFormatToSetOfString(dateFormatFromForm), PropertyOption.DATESYNONYMS);
         }
 
         Set<SimpleDateFormat> timeFormatFromForm = form.getTimeFormats();
-        if(timeFormatFromForm != null && timeFormatFromForm.size() > 0) {
+        if(timeFormatFromForm != null && !timeFormatFromForm.isEmpty()) {
             propertyMapBuilder.with(setOfSimpleDateFormatToSetOfString(timeFormatFromForm), PropertyOption.TIMESYNONYMS);
         }
 
         Set<SimpleDateFormat> dateTimeFormatFromForm = form.getDateTimeFormats();
-        if(dateTimeFormatFromForm != null && dateTimeFormatFromForm.size() > 0) {
+        if(dateTimeFormatFromForm != null && !dateTimeFormatFromForm.isEmpty()) {
             propertyMapBuilder.with(setOfSimpleDateFormatToSetOfString(dateTimeFormatFromForm), PropertyOption.DATETIMESYNONYMS);
         }
 
@@ -123,6 +122,9 @@ public class PropertyManager {
                         switch(PropertyOption.valueOf(valueNode.getNodeName().toUpperCase())){
                             case SUMSYNONYM -> propertyMapBuilder.with(pairOfSynonym, PropertyOption.SUMSYNONYM);
                             case AVGSYNONYM -> propertyMapBuilder.with(pairOfSynonym, PropertyOption.AVGSYNONYM);
+                            default -> {
+                                // think about logging ...
+                            }
                         }
                     }
                 }

@@ -16,16 +16,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PropertyManagerTest {
     PropertyManager propertyManager = new PropertyManager();
 
     PropertyManagerTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
     }
 
-
     @Test
-    @Order(1)
     void testLoadDefaultProperties() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
         PropertyManager propertyManager = new PropertyManager();
         Set<PropertyOption> propertyOptionSet = propertyManager.readPropertyOptions();
@@ -37,7 +34,6 @@ class PropertyManagerTest {
     }
 
     @Test
-    @Order(2)
     void testUserConfigurations() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         Set<PropertyOption> spellings = new HashSet<>();
         spellings.add(PropertyOption.KEYWORDSPELLING);
@@ -66,7 +62,6 @@ class PropertyManagerTest {
     }
 
     @Test
-    @Order(3)
     void testUserConfigurationsEverythingDisabeld() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         Set<PropertyOption> spellings = new HashSet<>();
         Set<PropertyOption> orders = new HashSet<>();

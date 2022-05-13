@@ -1,7 +1,6 @@
 package sqltoregex;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,7 +13,6 @@ import sqltoregex.property.regexgenerator.synonymgenerator.DateAndTimeFormatSyno
 import sqltoregex.property.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
