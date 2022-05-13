@@ -117,7 +117,6 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
 
             Iterator<A> iterator = new DepthFirstIterator<>(synonymsGraph, start);
             StringBuilder strRegEx = new StringBuilder();
-            strRegEx.append("(?:");
             while (iterator.hasNext()) {
                 strRegEx.append(prefix);
                 strRegEx.append(prepareVertexForRegEx(iterator.next(), wordToFindSynonyms));
@@ -125,7 +124,6 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
                 strRegEx.append('|');
             }
             strRegEx.deleteCharAt(strRegEx.length() - 1);
-            strRegEx.append(')');
             return strRegEx.toString();
         } catch (NoSuchElementException e) {
             return searchSynonymToString(wordToFindSynonyms);
