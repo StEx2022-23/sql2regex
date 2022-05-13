@@ -46,21 +46,23 @@ public class PropertyManager {
         return simpledDateFormatToString;
     }
 
+    private void builderLoopOverSet(Set<PropertyOption> propertyOptions, PropertyMapBuilder propertyMapBuilder){
+        for(PropertyOption propertyOption : propertyOptions){
+            propertyMapBuilder.with(propertyOption);
+        }
+    }
+
     public Map<PropertyOption, Property<?>> parseUserOptionsInput(PropertyForm form){
         PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
 
         Set<PropertyOption> spellingsFromForm = form.getSpellings();
         if(spellingsFromForm != null && !spellingsFromForm.isEmpty()){
-            for(PropertyOption propertyOption : spellingsFromForm){
-                propertyMapBuilder.with(propertyOption);
-            }
+            this.builderLoopOverSet(spellingsFromForm, propertyMapBuilder);
         }
 
         Set<PropertyOption> ordersFromForm = form.getOrders();
         if(ordersFromForm != null && !ordersFromForm.isEmpty()) {
-            for(PropertyOption propertyOption : ordersFromForm){
-                propertyMapBuilder.with(propertyOption);
-            }
+            this.builderLoopOverSet(ordersFromForm, propertyMapBuilder);
         }
 
         Set<SimpleDateFormat> dateFormatFromForm = form.getDateFormats();
