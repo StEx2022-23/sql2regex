@@ -25,7 +25,7 @@ import java.util.Set;
  *     }
  */
 @TestMethodOrder(MethodOrderer.MethodName.class)
-public class SynonymGeneratorTest {
+class SynonymGeneratorTest {
 
     private StringSynonymGenerator stringSynonymGenerator;
 

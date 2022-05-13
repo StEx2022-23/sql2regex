@@ -15,6 +15,8 @@ import java.util.Date;
 import java.util.NoSuchElementException;
 
 public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDateFormat, Expression> {
+    public static final String SYNONYM_MUST_NOT_BE_NULL = "Synonym must not be null";
+
     public DateAndTimeFormatSynonymGenerator(PropertyOption propertyOption) {
         super(propertyOption);
     }
@@ -35,8 +37,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
 
     @Override
     protected SimpleDateFormat prepareSynonymForSearch(Expression wordToFindSynonyms) {
-        Assert.notNull(wordToFindSynonyms, "Synonym must not be null");
-
+        Assert.notNull(wordToFindSynonyms, SYNONYM_MUST_NOT_BE_NULL);
         if (!(wordToFindSynonyms instanceof DateValue) && !(wordToFindSynonyms instanceof TimeValue) && !(wordToFindSynonyms instanceof TimestampValue)) {
             throw new IllegalArgumentException(
                     "Expression for DateAndTimeSynonymManager must be of type: DateValue, TimeValue or TimestampValue");
@@ -59,8 +60,8 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
     protected String prepareVertexForRegEx(SimpleDateFormat syn, Expression wordToFindSynonyms) {
         Assert.notNull(syn, "Format must not be null");
         Assert.notNull(wordToFindSynonyms, "Synonym must not be null");
-        Date date;
 
+        Date date;
         //O(n^2) is okay, cause elements will be <<100 for dateFormats
         for (DateFormat vertexSyn : this.synonymsGraph.vertexSet()) {
             try {
