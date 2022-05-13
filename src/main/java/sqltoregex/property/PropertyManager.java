@@ -52,36 +52,48 @@ public class PropertyManager {
         }
     }
 
+    private boolean checkSetOfEmptyAndNullSimpleDateFormat(Set<SimpleDateFormat> inputSet){
+        return inputSet != null && !inputSet.isEmpty();
+    }
+
+    private boolean checkSetOfEmptyAndNullProperty(Set<PropertyOption> inputSet){
+        return inputSet != null && !inputSet.isEmpty();
+    }
+
+    private boolean checkSetOfEmptyAndNullString(Set<String> inputSet){
+        return inputSet != null && !inputSet.isEmpty();
+    }
+
     public Map<PropertyOption, Property<?>> parseUserOptionsInput(PropertyForm form){
         PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
 
         Set<PropertyOption> spellingsFromForm = form.getSpellings();
-        if(spellingsFromForm != null && !spellingsFromForm.isEmpty()){
+        if(checkSetOfEmptyAndNullProperty(spellingsFromForm)){
             this.builderLoopOverSet(spellingsFromForm, propertyMapBuilder);
         }
 
         Set<PropertyOption> ordersFromForm = form.getOrders();
-        if(ordersFromForm != null && !ordersFromForm.isEmpty()) {
+        if(checkSetOfEmptyAndNullProperty(ordersFromForm)) {
             this.builderLoopOverSet(ordersFromForm, propertyMapBuilder);
         }
 
         Set<SimpleDateFormat> dateFormatFromForm = form.getDateFormats();
-        if(dateFormatFromForm != null && !dateFormatFromForm.isEmpty()) {
+        if(checkSetOfEmptyAndNullSimpleDateFormat(dateFormatFromForm)) {
             propertyMapBuilder.with(setOfSimpleDateFormatToSetOfString(dateFormatFromForm), PropertyOption.DATESYNONYMS);
         }
 
         Set<SimpleDateFormat> timeFormatFromForm = form.getTimeFormats();
-        if(timeFormatFromForm != null && !timeFormatFromForm.isEmpty()) {
+        if(checkSetOfEmptyAndNullSimpleDateFormat(timeFormatFromForm)) {
             propertyMapBuilder.with(setOfSimpleDateFormatToSetOfString(timeFormatFromForm), PropertyOption.TIMESYNONYMS);
         }
 
         Set<SimpleDateFormat> dateTimeFormatFromForm = form.getDateTimeFormats();
-        if(dateTimeFormatFromForm != null && !dateTimeFormatFromForm.isEmpty()) {
+        if(checkSetOfEmptyAndNullSimpleDateFormat(dateTimeFormatFromForm)) {
             propertyMapBuilder.with(setOfSimpleDateFormatToSetOfString(dateTimeFormatFromForm), PropertyOption.DATETIMESYNONYMS);
         }
 
         Set<String> synonymsListForAggregateFunctionsAsStrings = form.getAggregateFunctionLang();
-        if(synonymsListForAggregateFunctionsAsStrings != null && !synonymsListForAggregateFunctionsAsStrings.isEmpty()) {
+        if(checkSetOfEmptyAndNullString(synonymsListForAggregateFunctionsAsStrings)) {
             propertyMapBuilder.with(synonymsListForAggregateFunctionsAsStrings, PropertyOption.AGGREGATEFUNCTIONLANG);
         }
 
