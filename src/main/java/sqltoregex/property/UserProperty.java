@@ -2,7 +2,6 @@ package sqltoregex.property;
 
 import com.google.common.collect.ImmutableMap;
 
-import java.util.HashMap;
 import java.util.Map;
 
 class UserProperty{

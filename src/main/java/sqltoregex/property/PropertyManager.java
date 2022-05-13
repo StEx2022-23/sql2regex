@@ -52,14 +52,14 @@ public class PropertyManager {
         PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
 
         Set<PropertyOption> spellingsFromForm = form.getSpellings();
-        if(spellingsFromForm != null && spellingsFromForm.size() > 0){
+        if(spellingsFromForm != null && !spellingsFromForm.isEmpty()){
             for(PropertyOption propertyOption : spellingsFromForm){
                 propertyMapBuilder.with(propertyOption);
             }
         }
 
         Set<PropertyOption> ordersFromForm = form.getOrders();
-        if(ordersFromForm != null && ordersFromForm.size() > 0) {
+        if(ordersFromForm != null && !ordersFromForm.isEmpty()) {
             for(PropertyOption propertyOption : ordersFromForm){
                 propertyMapBuilder.with(propertyOption);
             }
