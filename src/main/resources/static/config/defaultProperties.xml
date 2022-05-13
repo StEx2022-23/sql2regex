@@ -31,9 +31,14 @@
             <value>YYYY-MM-DD HH:MM:SS</value>
         </datetimesynonyms>
         <aggregatefunctionlang>
-            <value>SUM</value>
-            <value>SUMME</value>
-            <!--fachlich falsch -->
+            <sumsynonym>
+                <pair>SUM</pair>
+                <pair>SUMME</pair>
+            </sumsynonym>
+            <avgsynonym>
+                <pair>AVG</pair>
+                <pair>MITTELWERT</pair>
+            </avgsynonym>
         </aggregatefunctionlang>
     </synonyms>
 </properties>

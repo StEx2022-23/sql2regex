@@ -1,5 +1,8 @@
 package sqltoregex;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
@@ -13,6 +16,7 @@ import sqltoregex.property.regexgenerator.synonymgenerator.StringSynonymGenerato
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Controller
@@ -51,17 +55,30 @@ public class SqlToRegexController {
         Property<SimpleDateFormat> dateTimeFormats = propertyManager.getPropertyByPropOption(PropertyOption.DATETIMESYNONYMS, DateAndTimeFormatSynonymGenerator.class);
         model.addAttribute("dateTimeFormats", dateTimeFormats.getSettings());
 
-//        Property<String> aggregateFuncLang = propertyManager.getPropertyByPropOption(PropertyOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class);
-        model.addAttribute("aggregateFuncLang",
-                           Collections.emptySet()); //aggregateFuncLang.getSettings());
+        Property<String> sumSynonyms = propertyManager.getPropertyByPropOption(PropertyOption.SUMSYNONYM, StringSynonymGenerator.class);
+        model.addAttribute("sumSynonyms", sumSynonyms.getSettings());
+        Pair<String, String> sumSynonymsPair = setToPairOfString(sumSynonyms.getSettings().stream().toList());
 
-        model.addAttribute("propertyForm", new PropertyForm(spellings, orders, dateFormats.getSettings(), timeFormats.getSettings(), dateTimeFormats.getSettings(), Collections.emptySet(), "SELECT *"));
+        Property<String> avgSynonyms = propertyManager.getPropertyByPropOption(PropertyOption.AVGSYNONYM, StringSynonymGenerator.class);
+        model.addAttribute("avgSynonyms", avgSynonyms.getSettings());
+        Pair<String, String> avgSynonymsPair = setToPairOfString(avgSynonyms.getSettings().stream().toList());
+
+
+        model.addAttribute("propertyForm", new PropertyForm(spellings, orders, dateFormats.getSettings(), timeFormats.getSettings(), dateTimeFormats.getSettings(), sumSynonymsPair, avgSynonymsPair, "SELECT *"));
         model.addAttribute("activeConverter", true);
         return "home";
     }
 
+    private Pair<String, String> setToPairOfString(List<String> listOfString){
+        if(listOfString.size() != 2){
+            throw new IllegalArgumentException("For converting to pair is size of two reqired.");
+        }
+        return new ImmutablePair<>(listOfString.get(0), listOfString.get(1));
+    }
+
     @PostMapping("/convert")
     public String convert(Model model, @ModelAttribute PropertyForm propertyForm){
+        this.propertyManager.parseUserOptionsInput(propertyForm);
         Set<SimpleDateFormat> dateFormats = new HashSet<SimpleDateFormat>();
         dateFormats.add(new SimpleDateFormat("yyyy-MM-dd"));
         dateFormats.add(new SimpleDateFormat("yy-MM-dd"));

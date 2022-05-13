@@ -1,5 +1,8 @@
 package sqltoregex.property;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -13,6 +16,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -34,9 +38,60 @@ public class PropertyManager {
         return null;
     }
 
+    private Set<String> setOfSimpleDateFormatToSetOfString(Set<SimpleDateFormat> simpleDateFormatList){
+        if(simpleDateFormatList.isEmpty()){
+            throw new IllegalArgumentException("Set is not allowed to be empty.");
+        }
+        Set<String> simpledDateFormatToString = new HashSet<>();
+        for(SimpleDateFormat simpleDateFormat : simpleDateFormatList){
+            simpledDateFormatToString.add(simpleDateFormat.toPattern());
+        }
+        return simpledDateFormatToString;
+    }
 
     public void parseUserOptionsInput(PropertyForm form){
-        //will be added in later iteration
+        PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
+
+        Set<PropertyOption> spellingsFromForm = form.getSpellings();
+        if(spellingsFromForm != null && spellingsFromForm.size() > 0){
+            for(PropertyOption propertyOption : spellingsFromForm){
+                propertyMapBuilder.with(propertyOption);
+            }
+        }
+
+        Set<PropertyOption> ordersFromForm = form.getOrders();
+        if(ordersFromForm != null && ordersFromForm.size() > 0) {
+            for(PropertyOption propertyOption : ordersFromForm){
+                propertyMapBuilder.with(propertyOption);
+            }
+        }
+
+        Set<SimpleDateFormat> dateFormatFromForm = form.getDateFormats();
+        if(dateFormatFromForm != null && dateFormatFromForm.size() > 0) {
+            propertyMapBuilder.with(setOfSimpleDateFormatToSetOfString(dateFormatFromForm), PropertyOption.DATESYNONYMS);
+        }
+
+        Set<SimpleDateFormat> timeFormatFromForm = form.getTimeFormats();
+        if(timeFormatFromForm != null && timeFormatFromForm.size() > 0) {
+            propertyMapBuilder.with(setOfSimpleDateFormatToSetOfString(timeFormatFromForm), PropertyOption.TIMESYNONYMS);
+        }
+
+        Set<SimpleDateFormat> dateTimeFormatFromForm = form.getDateTimeFormats();
+        if(dateTimeFormatFromForm != null && dateTimeFormatFromForm.size() > 0) {
+            propertyMapBuilder.with(setOfSimpleDateFormatToSetOfString(dateTimeFormatFromForm), PropertyOption.DATETIMESYNONYMS);
+        }
+
+        Pair<String, String> sumSynonymsFromForm = form.getSumSynonym();
+        if(sumSynonymsFromForm != null && sumSynonymsFromForm.getLeft() != null && sumSynonymsFromForm.getRight() != null) {
+            propertyMapBuilder.with(sumSynonymsFromForm, PropertyOption.SUMSYNONYM);
+        }
+
+        Pair<String, String> avgSynonymsFromForm = form.getSumSynonym();
+        if(avgSynonymsFromForm != null && avgSynonymsFromForm.getLeft() != null && avgSynonymsFromForm.getRight() != null) {
+            propertyMapBuilder.with(avgSynonymsFromForm, PropertyOption.AVGSYNONYM);
+        }
+
+        UserProperty.getInstance(propertyMapBuilder.build());
     }
 
     private PropertyMapBuilder addPropertyToMap(Map<PropertyOption, NodeList> parsedValues) {
@@ -56,7 +111,20 @@ public class PropertyManager {
                     propertyMapBuilder.with(valueList, prop);
                 }
                 case AGGREGATEFUNCTIONLANG -> {
-                    //case for aggregate function is currently missing will be added in next iteration
+                    List<Node> valuePairsForSynonyms = new LinkedList<>();
+                    PropertyNodeListIterator valueTagIterator = new PropertyNodeListIterator(parsedValues.get(prop));
+                    for(Node node : valueTagIterator){
+                        valuePairsForSynonyms.add(node);
+                    }
+                    for(Node valueNode : valuePairsForSynonyms){
+                        String leftPair = valueNode.getChildNodes().item(0).getTextContent();
+                        String rightPair = valueNode.getChildNodes().item(1).getTextContent();
+                        Pair<String, String> pairOfSynonym = new MutablePair<>(leftPair, rightPair);
+                        switch(PropertyOption.valueOf(valueNode.getNodeName().toUpperCase())){
+                            case SUMSYNONYM -> propertyMapBuilder.with(pairOfSynonym, PropertyOption.SUMSYNONYM);
+                            case AVGSYNONYM -> propertyMapBuilder.with(pairOfSynonym, PropertyOption.AVGSYNONYM);
+                        }
+                    }
                 }
             }
         }
