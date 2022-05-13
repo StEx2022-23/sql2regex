@@ -96,15 +96,4 @@ public class PropertyMapBuilderTest {
         OrderRotation orderRotation = (OrderRotation) builder.build().get(PropertyOption.COLUMNNAMEORDER);
         Assertions.assertEquals(new SpellingMistake(PropertyOption.COLUMNNAMESPELLING), orderRotation.getSpellingMistake());
     }
-
-    @Test
-    void AggreateFunctionSynonyms(){
-        Pair<String, String> setOfTwoSynonyms = new ImmutablePair<>("SUM", "SUMME");
-        builder.with(setOfTwoSynonyms, PropertyOption.AGGREGATEFUNCTIONLANG);
-        Map<PropertyOption, Property<?>> map = builder.build();
-        Assertions.assertEquals(1, map.size());
-        StringSynonymGenerator stringSynonymGenerator = new StringSynonymGenerator(PropertyOption.AGGREGATEFUNCTIONLANG);
-        stringSynonymGenerator.addSynonymFor("SUM", "SUMME");
-        Assertions.assertEquals(stringSynonymGenerator, map.get(PropertyOption.AGGREGATEFUNCTIONLANG));
-    }
 }

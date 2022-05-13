@@ -45,17 +45,14 @@ public class PropertyMapBuilder {
                 }
                 this.propertyMap.put(propertyOption, synonymGenerator);
             }
-            default -> {
-                throw new IllegalArgumentException("Unsupported build with:" + propertyOption);
-            }
+            case AGGREGATEFUNCTIONLANG -> {
+                StringSynonymGenerator aggregateFunctionSynonymGenerator = new StringSynonymGenerator(propertyOption);
+                for(String singleSynonym : synonyms){
+                    aggregateFunctionSynonymGenerator.addSynonymFor(singleSynonym.split(",")[0], singleSynonym.split(",")[1]);
+                }
+                this.propertyMap.put(propertyOption, aggregateFunctionSynonymGenerator);
+            } default -> throw new IllegalArgumentException("Unsupported build with:" + propertyOption);
         }
-        return this;
-    }
-
-    public PropertyMapBuilder with(Pair<String, String> singleSynonym, PropertyOption propertyOption) {
-        StringSynonymGenerator aggregateFunctionSynonymGenerator = new StringSynonymGenerator(propertyOption);
-        aggregateFunctionSynonymGenerator.addSynonymFor(singleSynonym.getLeft(), singleSynonym.getRight());
-        this.propertyMap.put(propertyOption, aggregateFunctionSynonymGenerator);
         return this;
     }
 
@@ -70,9 +67,7 @@ public class PropertyMapBuilder {
                 OrderRotation orderRotation = new OrderRotation(propertyOption);
                 this.propertyMap.put(propertyOption, orderRotation);
                 orderRotations.add(orderRotation);
-            }default -> {
-                throw new IllegalArgumentException("Unsupported build with:" + propertyOption);
-            }
+            }default -> throw new IllegalArgumentException("Unsupported build with:" + propertyOption);
         }
         return this;
     }

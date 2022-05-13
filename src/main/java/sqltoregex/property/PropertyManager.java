@@ -80,14 +80,9 @@ public class PropertyManager {
             propertyMapBuilder.with(setOfSimpleDateFormatToSetOfString(dateTimeFormatFromForm), PropertyOption.DATETIMESYNONYMS);
         }
 
-        Pair<String, String> sumSynonymsFromForm = form.getSumSynonym();
-        if(sumSynonymsFromForm != null && sumSynonymsFromForm.getLeft() != null && sumSynonymsFromForm.getRight() != null) {
-            propertyMapBuilder.with(sumSynonymsFromForm, PropertyOption.SUMSYNONYM);
-        }
-
-        Pair<String, String> avgSynonymsFromForm = form.getSumSynonym();
-        if(avgSynonymsFromForm != null && avgSynonymsFromForm.getLeft() != null && avgSynonymsFromForm.getRight() != null) {
-            propertyMapBuilder.with(avgSynonymsFromForm, PropertyOption.AVGSYNONYM);
+        Set<String> synonymsListForAggregateFunctionsAsStrings = form.getAggregateFunctionLang();
+        if(synonymsListForAggregateFunctionsAsStrings != null && !synonymsListForAggregateFunctionsAsStrings.isEmpty()) {
+            propertyMapBuilder.with(synonymsListForAggregateFunctionsAsStrings, PropertyOption.AGGREGATEFUNCTIONLANG);
         }
 
         return propertyMapBuilder.build();
@@ -115,18 +110,12 @@ public class PropertyManager {
                     for(Node node : valueTagIterator){
                         valuePairsForSynonyms.add(node);
                     }
+                    Set<String> pairOfSynonymList = new HashSet<>();
                     for(Node valueNode : valuePairsForSynonyms){
-                        String leftPair = valueNode.getChildNodes().item(0).getTextContent();
-                        String rightPair = valueNode.getChildNodes().item(1).getTextContent();
-                        Pair<String, String> pairOfSynonym = new MutablePair<>(leftPair, rightPair);
-                        switch(PropertyOption.valueOf(valueNode.getNodeName().toUpperCase())){
-                            case SUMSYNONYM -> propertyMapBuilder.with(pairOfSynonym, PropertyOption.SUMSYNONYM);
-                            case AVGSYNONYM -> propertyMapBuilder.with(pairOfSynonym, PropertyOption.AVGSYNONYM);
-                            default -> {
-                                // think about logging ...
-                            }
-                        }
+                        String valuePair = valueNode.getTextContent();
+                        pairOfSynonymList.add(valuePair);
                     }
+                    propertyMapBuilder.with(pairOfSynonymList, PropertyOption.AGGREGATEFUNCTIONLANG);
                 }
             }
         }
@@ -194,8 +183,8 @@ public class PropertyManager {
     /**
      * Removes insignificant whitespaces from an XML DOM tree.
      *
-     * @param doc
-     * @throws XPathExpressionException
+     * @param doc delete whitespace nodes
+     * @throws XPathExpressionException if xp.evaluate("//text()[normalize-space(.)='']" goes wrong
      */
     private void stripWhitespaces(Document doc) throws XPathExpressionException {
         XPath xp = XPathFactory.newInstance().newXPath();

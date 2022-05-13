@@ -26,7 +26,18 @@ class PropertyManagerTest {
     void testLoadDefaultProperties() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
         PropertyManager propertyManager = new PropertyManager();
         Set<PropertyOption> propertyOptionSet = propertyManager.readPropertyOptions();
-        List<String> propertyOptionWhichHaveBeenSet = List.of("KEYWORDSPELLING", "TABLENAMESPELLING", "TABLENAMEORDER","COLUMNNAMESPELLING","KEYWORDSPELLING","COLUMNNAMEORDER","DATESYNONYMS", "TIMESYNONYMS", "DATETIMESYNONYMS", "SUMSYNONYM", "AVGSYNONYM");
+        List<String> propertyOptionWhichHaveBeenSet = List.of(
+                "KEYWORDSPELLING",
+                "TABLENAMESPELLING",
+                "TABLENAMEORDER",
+                "COLUMNNAMESPELLING",
+                "KEYWORDSPELLING",
+                "COLUMNNAMEORDER",
+                "DATESYNONYMS",
+                "TIMESYNONYMS",
+                "DATETIMESYNONYMS",
+                "AGGREGATEFUNCTIONLANG"
+         );
         System.out.println(propertyOptionSet);
         for(String str : propertyOptionWhichHaveBeenSet){
             Assertions.assertTrue(propertyOptionSet.toString().contains(str));
@@ -34,7 +45,7 @@ class PropertyManagerTest {
     }
 
     @Test
-    void testUserConfigurations() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    void testUserConfigurations() {
         Set<PropertyOption> spellings = new HashSet<>();
         spellings.add(PropertyOption.KEYWORDSPELLING);
         Set<PropertyOption> orders = new HashSet<>();
@@ -43,11 +54,11 @@ class PropertyManagerTest {
         dateFormats.add(new SimpleDateFormat("yyyy-MM-dd"));
         Set<SimpleDateFormat> timeFormats = new HashSet<>();
         Set<SimpleDateFormat> dateTimeFormats = new HashSet<>();
-        Pair<String, String> sumSynonyms = new MutablePair<>();
-        Pair<String, String> avgSynonyms = new MutablePair<>();
+        Set<String> aggregateFunctionLang = new HashSet<>();
+        aggregateFunctionLang.add("SUM,SUMME");
         String sql = "Select * From test";
         PropertyForm propertyForm = new PropertyForm(
-                spellings, orders, dateFormats, timeFormats, dateTimeFormats, sumSynonyms, avgSynonyms, sql
+                spellings, orders, dateFormats, timeFormats, dateTimeFormats, aggregateFunctionLang, sql
         );
 
         PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
@@ -57,21 +68,21 @@ class PropertyManagerTest {
         Set<String> dateSynonymsSet = new HashSet<>();
         dateSynonymsSet.add("yyyy-MM-dd");
         propertyMapBuilder.with(dateSynonymsSet, PropertyOption.DATESYNONYMS);
+        propertyMapBuilder.with(aggregateFunctionLang, PropertyOption.AGGREGATEFUNCTIONLANG);
 
         Assertions.assertEquals(propertyMapBuilder.build(), propertyManager.parseUserOptionsInput(propertyForm));
     }
 
     @Test
-    void testUserConfigurationsEverythingDisabeld() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    void testUserConfigurationsEverythingDisabeld() {
         Set<PropertyOption> spellings = new HashSet<>();
         Set<PropertyOption> orders = new HashSet<>();
         Set<SimpleDateFormat> dateFormats = new HashSet<>();
         Set<SimpleDateFormat> timeFormats = new HashSet<>();
         Set<SimpleDateFormat> dateTimeFormats = new HashSet<>();
-        Pair<String, String> sumSynonyms = new MutablePair<>();
-        Pair<String, String> avgSynonyms = new MutablePair<>();
+        Set<String> aggregateFunctionLang = new HashSet<>();
         String sql = "Select * From test";
-        PropertyForm propertyForm = new PropertyForm(spellings, orders, dateFormats, timeFormats, dateTimeFormats, sumSynonyms, avgSynonyms, sql);
+        PropertyForm propertyForm = new PropertyForm(spellings, orders, dateFormats, timeFormats, dateTimeFormats, aggregateFunctionLang, sql);
         PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
         Assertions.assertEquals(propertyMapBuilder.build(), propertyManager.parseUserOptionsInput(propertyForm));
     }

@@ -12,16 +12,11 @@ public record PropertyForm(@NotNull Set<PropertyOption> spellings,
                            @NotNull Set<SimpleDateFormat> dateFormats,
                            @NotNull Set<SimpleDateFormat> timeFormats,
                            @NotNull Set<SimpleDateFormat> dateTimeFormats,
-                           @NotNull Pair<String, String> sumSynonym,
-                           @NotNull Pair<String, String> avgSynonym,
+                           @NotNull Set<String> aggregateFunctionLang,
                            @NotEmpty String sql) {
 
-    public Pair<String, String> getSumSynonym() {
-        return sumSynonym;
-    }
-
-    public Pair<String, String> getAvgSynonym() {
-        return avgSynonym;
+    public Set<String> getAggregateFunctionLang() {
+        return aggregateFunctionLang;
     }
 
     public Set<SimpleDateFormat> getDateFormats() {
