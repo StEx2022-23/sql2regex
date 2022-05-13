@@ -12,7 +12,7 @@ import java.util.*;
  * SELECT table1, table2
  * SELECT (?:table1\s*,\s*table2|table2\s*,\s*table1)
  */
-public class OrderRotation implements Property<PropertyOption> {
+public class OrderRotation implements Property<PropertyOption>, RegExGenerator<List<String>> {
     private final StringBuilder tableNameOrderRegEx = new StringBuilder();
     private SpellingMistake spellingMistake;
     private final PropertyOption propertyoption;
