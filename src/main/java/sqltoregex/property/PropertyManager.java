@@ -49,7 +49,7 @@ public class PropertyManager {
         return simpledDateFormatToString;
     }
 
-    public void parseUserOptionsInput(PropertyForm form){
+    public Map<PropertyOption, Property<?>> parseUserOptionsInput(PropertyForm form){
         PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
 
         Set<PropertyOption> spellingsFromForm = form.getSpellings();
@@ -91,7 +91,7 @@ public class PropertyManager {
             propertyMapBuilder.with(avgSynonymsFromForm, PropertyOption.AVGSYNONYM);
         }
 
-        UserProperty.getInstance(propertyMapBuilder.build());
+        return propertyMapBuilder.build();
     }
 
     private PropertyMapBuilder addPropertyToMap(Map<PropertyOption, NodeList> parsedValues) {

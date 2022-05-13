@@ -2,8 +2,7 @@ package sqltoregex.property;
 
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.xml.sax.SAXException;
 import sqltoregex.property.PropertyManager;
 import sqltoregex.property.PropertyOption;
@@ -17,8 +16,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PropertyManagerTest {
+    PropertyManager propertyManager = new PropertyManager();
+
+    PropertyManagerTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    }
+
+
     @Test
+    @Order(1)
     void testLoadDefaultProperties() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
         PropertyManager propertyManager = new PropertyManager();
         Set<PropertyOption> propertyOptionSet = propertyManager.readPropertyOptions();
@@ -30,6 +37,7 @@ class PropertyManagerTest {
     }
 
     @Test
+    @Order(2)
     void testUserConfigurations() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         Set<PropertyOption> spellings = new HashSet<>();
         spellings.add(PropertyOption.KEYWORDSPELLING);
@@ -46,9 +54,6 @@ class PropertyManagerTest {
                 spellings, orders, dateFormats, timeFormats, dateTimeFormats, sumSynonyms, avgSynonyms, sql
         );
 
-        PropertyManager propertyManager = new PropertyManager();
-        propertyManager.parseUserOptionsInput(propertyForm);
-
         PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
         propertyMapBuilder.with(PropertyOption.KEYWORDSPELLING);
         propertyMapBuilder.with(PropertyOption.COLUMNNAMEORDER);
@@ -57,11 +62,12 @@ class PropertyManagerTest {
         dateSynonymsSet.add("yyyy-MM-dd");
         propertyMapBuilder.with(dateSynonymsSet, PropertyOption.DATESYNONYMS);
 
-        Assertions.assertEquals(propertyMapBuilder.build(), UserProperty.getInstance().getPropertyMap());
+        Assertions.assertEquals(propertyMapBuilder.build(), propertyManager.parseUserOptionsInput(propertyForm));
     }
 
     @Test
-    void testUserConfigurationsEverythinDisabeld() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    @Order(3)
+    void testUserConfigurationsEverythingDisabeld() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         Set<PropertyOption> spellings = new HashSet<>();
         Set<PropertyOption> orders = new HashSet<>();
         Set<SimpleDateFormat> dateFormats = new HashSet<>();
@@ -70,14 +76,8 @@ class PropertyManagerTest {
         Pair<String, String> sumSynonyms = new MutablePair<>();
         Pair<String, String> avgSynonyms = new MutablePair<>();
         String sql = "Select * From test";
-        PropertyForm propertyForm = new PropertyForm(
-                spellings, orders, dateFormats, timeFormats, dateTimeFormats, sumSynonyms, avgSynonyms, sql
-        );
-
-        PropertyManager propertyManager = new PropertyManager();
-        propertyManager.parseUserOptionsInput(propertyForm);
-
+        PropertyForm propertyForm = new PropertyForm(spellings, orders, dateFormats, timeFormats, dateTimeFormats, sumSynonyms, avgSynonyms, sql);
         PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
-        Assertions.assertEquals(propertyMapBuilder.build(), UserProperty.getInstance().getPropertyMap());
+        Assertions.assertEquals(propertyMapBuilder.build(), propertyManager.parseUserOptionsInput(propertyForm));
     }
 }
