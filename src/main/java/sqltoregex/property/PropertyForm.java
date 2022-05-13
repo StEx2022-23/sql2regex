@@ -16,19 +16,6 @@ public record PropertyForm(@NotNull Set<PropertyOption> spellings,
                            @NotNull Pair<String, String> avgSynonym,
                            @NotEmpty String sql) {
 
-    public PropertyForm(Set<PropertyOption> spellings, Set<PropertyOption> orders, Set<SimpleDateFormat> dateFormats,
-                        Set<SimpleDateFormat> timeFormats, Set<SimpleDateFormat> dateTimeFormats,
-                        Pair<String, String> sumSynonym, Pair<String, String> avgSynonym, String sql) {
-        this.spellings = spellings;
-        this.orders = orders;
-        this.dateFormats = dateFormats;
-        this.timeFormats = timeFormats;
-        this.dateTimeFormats = dateTimeFormats;
-        this.sumSynonym = sumSynonym;
-        this.avgSynonym = avgSynonym;
-        this.sql = sql;
-    }
-
     public Pair<String, String> getSumSynonym() {
         return sumSynonym;
     }
