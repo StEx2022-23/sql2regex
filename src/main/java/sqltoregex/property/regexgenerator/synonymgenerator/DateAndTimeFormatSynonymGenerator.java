@@ -16,6 +16,8 @@ import java.util.NoSuchElementException;
 
 public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDateFormat, Expression> {
     public static final String SYNONYM_MUST_NOT_BE_NULL = "Synonym must not be null";
+    public static final String MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE = "Query Expression must be of type " +
+            "Date-/Time-/TimestampValue";
 
     public DateAndTimeFormatSynonymGenerator(PropertyOption propertyOption) {
         super(propertyOption);
@@ -23,8 +25,8 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
 
     @Override
     public String generateRegExFor(Expression wordToFindSynonyms) {
-        if (wordToFindSynonyms.getClass() != DateValue.class && wordToFindSynonyms.getClass() != TimeValue.class && wordToFindSynonyms.getClass() != TimestampValue.class) {
-            throw new IllegalArgumentException("Query Expression must be of type Date-/Time-/TimestampValue");
+        if (!(wordToFindSynonyms instanceof DateValue) && !(wordToFindSynonyms instanceof TimeValue) && !(wordToFindSynonyms instanceof TimestampValue)) {
+            throw new IllegalArgumentException(MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE);
         }
         return super.generateRegExFor(wordToFindSynonyms);
     }
@@ -39,8 +41,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
     protected SimpleDateFormat prepareSynonymForSearch(Expression wordToFindSynonyms) {
         Assert.notNull(wordToFindSynonyms, SYNONYM_MUST_NOT_BE_NULL);
         if (!(wordToFindSynonyms instanceof DateValue) && !(wordToFindSynonyms instanceof TimeValue) && !(wordToFindSynonyms instanceof TimestampValue)) {
-            throw new IllegalArgumentException(
-                    "Expression for DateAndTimeSynonymManager must be of type: DateValue, TimeValue or TimestampValue");
+            throw new IllegalArgumentException(MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE);
         }
 
         for (SimpleDateFormat vertexSyn : this.synonymsGraph.vertexSet()) {
@@ -78,10 +79,10 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
 
     @Override
     public String searchSynonymToString(Expression wordToFindSynonyms) {
-        if (wordToFindSynonyms.getClass() != DateValue.class && wordToFindSynonyms.getClass() != TimeValue.class && wordToFindSynonyms.getClass() != TimestampValue.class) {
-            throw new IllegalArgumentException("Query Expression must be of type Date-/Time-/TimestampValue");
-        }
         Assert.notNull(wordToFindSynonyms, SYNONYM_MUST_NOT_BE_NULL);
+        if (!(wordToFindSynonyms instanceof DateValue) && !(wordToFindSynonyms instanceof TimeValue) && !(wordToFindSynonyms instanceof TimestampValue)) {
+            throw new IllegalArgumentException(MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE);
+        }
         DateAndTimeExpressionDeparser deParser = new DateAndTimeExpressionDeparser();
         wordToFindSynonyms.accept(deParser);
         return deParser.getBuffer().toString();
