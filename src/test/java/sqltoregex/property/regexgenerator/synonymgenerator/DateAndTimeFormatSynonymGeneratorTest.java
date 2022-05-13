@@ -37,7 +37,8 @@ class DateAndTimeFormatSynonymGeneratorTest {
     @Test
     void queryNotExistingSynonym(){
         DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = new DateAndTimeFormatSynonymGenerator(PropertyOption.DEFAULT);
-        Assertions.assertEquals("2012-05-06", dateAndTimeSynonymManager.generateRegExFor(new DateValue("'2012-5-6'")));
+        Assertions.assertEquals("2012-5-6", dateAndTimeSynonymManager.generateRegExFor(new DateValue("'2012-5-6'")));
+        Assertions.assertEquals("2012-05-06", dateAndTimeSynonymManager.generateRegExFor(new DateValue("'2012-05-06'")));
     }
 
     @Test
