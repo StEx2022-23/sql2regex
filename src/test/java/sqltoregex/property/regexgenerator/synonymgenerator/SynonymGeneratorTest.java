@@ -109,6 +109,19 @@ public class SynonymGeneratorTest {
     }
 
     @Test
+    void regExCreationNonCapturing(){
+        stringSynonymGenerator.addSynonym("A");
+        Assertions.assertEquals("(?:A)", stringSynonymGenerator.generateRegExFor("A"));
+    }
+
+    @Test
+    void regExCreationCapturing(){
+        stringSynonymGenerator.addSynonym("A");
+        stringSynonymGenerator.setCapturingGroup(true);
+        Assertions.assertEquals("(A)", stringSynonymGenerator.generateRegExFor("A"));
+    }
+
+    @Test
     void equalsOverride(){
         StringSynonymGenerator stringSynonymGenerator1 = getFullDefaultStringSynonymGenerator();
 

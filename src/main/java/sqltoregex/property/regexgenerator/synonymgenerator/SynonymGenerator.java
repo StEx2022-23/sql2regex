@@ -34,6 +34,7 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
     private String prefix = "";
     private String suffix = "";
     private PropertyOption propertyOption;
+    protected boolean isCapturingGroup = false;
 
     protected SynonymGenerator(PropertyOption propertyOption) {
         Assert.notNull(propertyOption, "PropertyOption must not be null");
@@ -117,6 +118,7 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
 
             Iterator<A> iterator = new DepthFirstIterator<>(synonymsGraph, start);
             StringBuilder strRegEx = new StringBuilder();
+            strRegEx.append(isCapturingGroup ? '(' : "(?:");
             while (iterator.hasNext()) {
                 strRegEx.append(prefix);
                 strRegEx.append(prepareVertexForRegEx(iterator.next(), wordToFindSynonyms));
@@ -124,6 +126,7 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
                 strRegEx.append('|');
             }
             strRegEx.deleteCharAt(strRegEx.length() - 1);
+            strRegEx.append(')');
             return strRegEx.toString();
         } catch (NoSuchElementException e) {
             return searchSynonymToString(wordToFindSynonyms);
@@ -178,6 +181,14 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
      */
     public String searchSynonymToString(S wordToFindSynonyms) {
         return wordToFindSynonyms.toString();
+    }
+
+    /**
+     * Sets whether there will be an enclosing non capturing group (?: ... ) around the generated regEx.
+     * @param capturingGroup
+     */
+    public void setCapturingGroup(boolean capturingGroup) {
+        isCapturingGroup = capturingGroup;
     }
 
     /**
