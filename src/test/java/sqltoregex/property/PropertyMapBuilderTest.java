@@ -13,7 +13,7 @@ import sqltoregex.property.regexgenerator.synonymgenerator.StringSynonymGenerato
 import java.util.Collections;
 import java.util.Map;
 
-public class PropertyMapBuilderTest {
+class PropertyMapBuilderTest {
 
     PropertyMapBuilder builder;
 
@@ -24,7 +24,7 @@ public class PropertyMapBuilderTest {
 
     @Test
     void builderStartsWithEmptyMap(){
-        Assertions.assertEquals(builder.build(), Collections.emptyMap());
+        Assertions.assertEquals(Collections.emptyMap(), builder.build());
     }
 
     @Test

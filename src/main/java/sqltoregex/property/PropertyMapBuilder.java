@@ -67,7 +67,7 @@ public class PropertyMapBuilder {
                 OrderRotation orderRotation = new OrderRotation(propertyOption);
                 this.propertyMap.put(propertyOption, orderRotation);
                 orderRotations.add(orderRotation);
-            }default -> throw new IllegalArgumentException("Unsupported build with:" + propertyOption);
+            } default -> throw new IllegalArgumentException("Unsupported build with:" + propertyOption);
         }
         return this;
     }

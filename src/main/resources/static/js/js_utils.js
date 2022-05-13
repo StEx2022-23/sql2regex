@@ -269,57 +269,23 @@ class SqlRegExHistory {
 }
 
 document.addEventListener('submit',  (e) => {
-    // Store reference to form to make later code easier to read
     const form = e.target;
-
-    // Post data using the Fetch API
-    const response = fetch(form.action, {
+    fetch(form.action, {
         method: form.method,
         body: new FormData(form),
     })
-        // We turn the response into text as we expect HTML
         .then((res) => res.text())
-
-        // Let's turn it into an HTML document
         .then((text) => new DOMParser().parseFromString(text, 'text/html'))
-
-        // Now we have a document to work with let's replace the <form>
         .then((doc) => {
-            // Create result message container and copy HTML from doc
             const result = document.createElement('div');
             result.innerHTML = doc.body.innerHTML;
-
-            // Allow focussing this element with JavaScript
             result.tabIndex = -1;
-
-            // And replace the form with the response children
             form.parentNode.parentNode.replaceChild(result, form.parentNode);
-
-            // Move focus to the status message
             result.focus();
         })
         .then( () => SqlRegExHis.checkUpdatedConverting());
-
-    // Prevent the default form submit
     e.preventDefault();
 })
-
-async function handleSubmitForm(inputId, outputId) {
-    if (input.length !== 0) {
-        const response = await fetch(domain, {
-            method: 'POST', headers: {
-                'Accept': 'application/json', 'Content-Type': 'application/json'
-            }, body: JSON.stringify(input, null, "\t"),
-        });
-
-        response.json().then(data => {
-            let output = document.getElementById(outputId);
-            output.value = data.regex;
-            SqlRegExHis.checkUpdatedConverting();
-        });
-    }
-    return false;
-}
 
 function languageChange(){
     let langOption = window.location.href.split("?")[1];

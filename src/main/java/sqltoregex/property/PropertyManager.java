@@ -117,6 +117,9 @@ public class PropertyManager {
                     }
                     propertyMapBuilder.with(pairOfSynonymList, PropertyOption.AGGREGATEFUNCTIONLANG);
                 }
+                default -> {
+                    // think about logging ...
+                }
             }
         }
         return propertyMapBuilder;

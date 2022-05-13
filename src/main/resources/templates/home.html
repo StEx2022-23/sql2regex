@@ -22,9 +22,6 @@
             <div class="card">
                 <div class="card-body">
                     <h1 th:text="#{conv.heading}" class="pb-2 border-bottom"></h1>
-<!--                    <form th:replace="assets/propertyform :: propertyform" action="#" th:action="@{/convert}" th:object="${propertyForm}" method="post">-->
-<!--                        hier wurde nichts eingefügt-->
-<!--                    </form>-->
                     <div id="form_response_body">
                         <form th:replace="assets/propertyform :: propertyform" action="#" th:action="@{/convert}" th:object="${propertyForm}" method="POST">
                             no form inserted

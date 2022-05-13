@@ -14,24 +14,24 @@ import sqltoregex.visitor.SelectVisitorJoinToWhere;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SelectVisitorJoinToWhereTest {
+class SelectVisitorJoinToWhereTest {
 
     @Test
-    public void emptyWhere() throws JSQLParserException {
+    void emptyWhere() throws JSQLParserException {
         Select select = (Select) CCJSqlParserUtil.parse(
                 "SELECT col1 FROM table1 INNER JOIN table2 ON (col1=col2) AND col3 = col4");
         select.getSelectBody().accept(new SelectVisitorJoinToWhere());
 
-        Assertions.assertEquals(select.toString(), "SELECT col1 FROM table1 INNER JOIN table2 WHERE (col1 = col2) AND col3 = col4");
+        Assertions.assertEquals("SELECT col1 FROM table1 INNER JOIN table2 WHERE (col1 = col2) AND col3 = col4", select.toString());
     }
 
     @Test
-    public void populatedWhere() throws JSQLParserException {
+    void populatedWhere() throws JSQLParserException {
         Select select = (Select) CCJSqlParserUtil.parse(
                 "SELECT col1 FROM table1 INNER JOIN table2 ON (col1=col2) AND col3 = col4 WHERE col1=5");
         select.getSelectBody().accept(new SelectVisitorJoinToWhere());
 
-        Assertions.assertEquals(select.toString(), "SELECT col1 FROM table1 INNER JOIN table2 WHERE col1 = 5 AND (col1 = col2) AND col3 = col4");
+        Assertions.assertEquals("SELECT col1 FROM table1 INNER JOIN table2 WHERE col1 = 5 AND (col1 = col2) AND col3 = col4", select.toString());
     }
 
 }
