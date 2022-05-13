@@ -198,7 +198,7 @@ public class PropertyManager {
     /**
      * Removes insignificant whitespaces from an XML DOM tree.
      *
-     * @param doc delete whitespace nodes
+     * @param doc Document
      * @throws XPathExpressionException if xp.evaluate("//text()[normalize-space(.)='']" goes wrong
      */
     private void stripWhitespaces(Document doc) throws XPathExpressionException {
