@@ -1,41 +1,27 @@
 package sqltoregex.property;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.text.SimpleDateFormat;
 import java.util.Set;
 
-public class PropertyForm {
+public record PropertyForm(@NotNull Set<PropertyOption> spellings,
+                           @NotNull Set<PropertyOption> orders,
+                           @NotNull Set<SimpleDateFormat> dateFormats,
+                           @NotNull Set<SimpleDateFormat> timeFormats,
+                           @NotNull Set<SimpleDateFormat> dateTimeFormats,
+                           @NotNull Pair<String, String> sumSynonym,
+                           @NotNull Pair<String, String> avgSynonym,
+                           @NotEmpty String sql) {
 
-    @NotNull
-    private final Set<String> aggregateFuncLang;
-    @NotNull
-    private final Set<SimpleDateFormat> dateFormats;
-    @NotNull
-    private final Set<SimpleDateFormat> dateTimeFormats;
-    @NotNull
-    private final Set<PropertyOption> orders;
-    @NotNull
-    private final Set<PropertyOption> spellings;
-    @NotEmpty
-    private final String sql;
-    @NotNull
-    private final Set<SimpleDateFormat> timeFormats;
-
-    public PropertyForm(Set<PropertyOption> spellings, Set<PropertyOption> orders, Set<SimpleDateFormat> dateFormats,
-                        Set<SimpleDateFormat> timeFormats, Set<SimpleDateFormat> dateTimeFormats,
-                        Set<String> aggregateFuncLang, String sql) {
-        this.spellings = spellings;
-        this.orders = orders;
-        this.dateFormats = dateFormats;
-        this.timeFormats = timeFormats;
-        this.dateTimeFormats = dateTimeFormats;
-        this.aggregateFuncLang = aggregateFuncLang;
-        this.sql = sql;
+    public Pair<String, String> getSumSynonym() {
+        return sumSynonym;
     }
 
-    public Set<String> getAggregateFuncLang() {
-        return aggregateFuncLang;
+    public Pair<String, String> getAvgSynonym() {
+        return avgSynonym;
     }
 
     public Set<SimpleDateFormat> getDateFormats() {
@@ -61,5 +47,7 @@ public class PropertyForm {
     public Set<SimpleDateFormat> getTimeFormats() {
         return timeFormats;
     }
+
+
 
 }
