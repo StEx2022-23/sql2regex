@@ -34,6 +34,7 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
     private String prefix = "";
     private String suffix = "";
     private PropertyOption propertyOption;
+    protected boolean isCapturingGroup = false;
 
     protected SynonymGenerator(PropertyOption propertyOption) {
         Assert.notNull(propertyOption, "PropertyOption must not be null");
@@ -117,16 +118,18 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
 
             Iterator<A> iterator = new DepthFirstIterator<>(synonymsGraph, start);
             StringBuilder strRegEx = new StringBuilder();
+            strRegEx.append(isCapturingGroup ? '(' : "(?:");
             while (iterator.hasNext()) {
                 strRegEx.append(prefix);
                 strRegEx.append(prepareVertexForRegEx(iterator.next(), wordToFindSynonyms));
                 strRegEx.append(suffix);
-                strRegEx.append("|");
+                strRegEx.append('|');
             }
             strRegEx.deleteCharAt(strRegEx.length() - 1);
+            strRegEx.append(')');
             return strRegEx.toString();
         } catch (NoSuchElementException e) {
-            return searchSynonymToString(wordToFindSynonyms);
+            return (isCapturingGroup ? '(' : "(?:") + searchSynonymToString(wordToFindSynonyms) + ')';
         }
     }
 
@@ -181,6 +184,14 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
     }
 
     /**
+     * Sets whether there will be an enclosing non capturing group (?: ... ) around the generated regEx.
+     * @param capturingGroup
+     */
+    public void setCapturingGroup(boolean capturingGroup) {
+        isCapturingGroup = capturingGroup;
+    }
+
+    /**
      * Sets a common prefix for all concatenations of {@link #generateRegExFor}
      *
      * @param prefix prefix to add
@@ -212,6 +223,6 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
 
     @Override
     public int hashCode() {
-        return Objects.hash(synonymsGraph, prefix, suffix, propertyOption);
+        return Objects.hash(synonymsGraph.vertexSet(), synonymsGraph.edgeSet().size(), prefix, suffix, propertyOption);
     }
 }

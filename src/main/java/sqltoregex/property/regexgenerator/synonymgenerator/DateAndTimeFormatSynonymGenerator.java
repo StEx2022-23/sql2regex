@@ -1,7 +1,11 @@
 package sqltoregex.property.regexgenerator.synonymgenerator;
 
-import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.DateValue;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.TimeValue;
+import net.sf.jsqlparser.expression.TimestampValue;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
+import org.springframework.util.Assert;
 import sqltoregex.property.PropertyOption;
 
 import java.text.DateFormat;
@@ -11,19 +15,33 @@ import java.util.Date;
 import java.util.NoSuchElementException;
 
 public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDateFormat, Expression> {
+    public static final String SYNONYM_MUST_NOT_BE_NULL = "Synonym must not be null";
+    public static final String MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE = "Query Expression must be of type " +
+            "Date-/Time-/TimestampValue";
+
     public DateAndTimeFormatSynonymGenerator(PropertyOption propertyOption) {
         super(propertyOption);
     }
 
     @Override
+    public String generateRegExFor(Expression wordToFindSynonyms) {
+        if (!(wordToFindSynonyms instanceof DateValue) && !(wordToFindSynonyms instanceof TimeValue) && !(wordToFindSynonyms instanceof TimestampValue)) {
+            throw new IllegalArgumentException(MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE);
+        }
+        return super.generateRegExFor(wordToFindSynonyms);
+    }
+
+    @Override
     protected SimpleDateFormat prepareSynonymForAdd(SimpleDateFormat syn) {
+        Assert.notNull(syn, "Format must not be null");
         return syn;
     }
 
     @Override
     protected SimpleDateFormat prepareSynonymForSearch(Expression wordToFindSynonyms) {
-        if(!(wordToFindSynonyms instanceof DateValue) && !(wordToFindSynonyms instanceof TimeValue) && !(wordToFindSynonyms instanceof TimestampValue)){
-            throw new IllegalArgumentException("Expression for DateAndTimeSynonymManager must be of type: DateValue, TimeValue or TimestampValue");
+        Assert.notNull(wordToFindSynonyms, SYNONYM_MUST_NOT_BE_NULL);
+        if (!(wordToFindSynonyms instanceof DateValue) && !(wordToFindSynonyms instanceof TimeValue) && !(wordToFindSynonyms instanceof TimestampValue)) {
+            throw new IllegalArgumentException(MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE);
         }
 
         for (SimpleDateFormat vertexSyn : this.synonymsGraph.vertexSet()) {
@@ -41,8 +59,10 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
 
     @Override
     protected String prepareVertexForRegEx(SimpleDateFormat syn, Expression wordToFindSynonyms) {
-        Date date;
+        Assert.notNull(syn, "Format must not be null");
+        Assert.notNull(wordToFindSynonyms, SYNONYM_MUST_NOT_BE_NULL);
 
+        Date date;
         //O(n^2) is okay, cause elements will be <<100 for dateFormats
         for (DateFormat vertexSyn : this.synonymsGraph.vertexSet()) {
             try {
@@ -59,6 +79,10 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
 
     @Override
     public String searchSynonymToString(Expression wordToFindSynonyms) {
+        Assert.notNull(wordToFindSynonyms, SYNONYM_MUST_NOT_BE_NULL);
+        if (!(wordToFindSynonyms instanceof DateValue) && !(wordToFindSynonyms instanceof TimeValue) && !(wordToFindSynonyms instanceof TimestampValue)) {
+            throw new IllegalArgumentException(MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE);
+        }
         DateAndTimeExpressionDeparser deParser = new DateAndTimeExpressionDeparser();
         wordToFindSynonyms.accept(deParser);
         return deParser.getBuffer().toString();
@@ -67,7 +91,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
     class DateAndTimeExpressionDeparser extends ExpressionDeParser {
         @Override
         public void visit(DateValue value) {
-            getBuffer().append(value.getValue());
+            getBuffer().append(value.getRawValue());
         }
 
         @Override

@@ -16,7 +16,7 @@ class SpellingMistakeTest {
     }
 
     @Test
-    void testSpellingMistakeOutputEmptyTablename(){
+    void testSpellingMistakeOutputEmptyTableName(){
         String input = "";
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             String alternativeStyles = spellingMistake.generateRegExFor(input);

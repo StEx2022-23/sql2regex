@@ -44,6 +44,13 @@ class OrderRotationTest {
     }
 
     @Test
+    void getSetting(){
+        OrderRotation orderRotation = new OrderRotation(PropertyOption.COLUMNNAMEORDER);
+        Assertions.assertEquals(1, orderRotation.getSettings().size());
+        Assertions.assertTrue(orderRotation.getSettings().contains(PropertyOption.COLUMNNAMEORDER));
+    }
+
+    @Test
     void equals(){
         OrderRotation orderRotation1 = new OrderRotation(PropertyOption.DEFAULT);
         OrderRotation orderRotation2 = new OrderRotation(PropertyOption.DEFAULT);

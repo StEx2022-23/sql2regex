@@ -1,5 +1,6 @@
 package sqltoregex.property.regexgenerator.synonymgenerator;
 
+import org.springframework.util.Assert;
 import sqltoregex.property.PropertyOption;
 
 /**
@@ -14,16 +15,20 @@ public class StringSynonymGenerator extends SynonymGenerator<String, String> {
 
     @Override
     protected String prepareSynonymForAdd(String syn) {
+        Assert.notNull(syn, "Added string must be not null");
         return syn;
     }
 
     @Override
     protected String prepareSynonymForSearch(String wordToFindSynonyms) {
+        Assert.notNull(wordToFindSynonyms, "Query string must be not null");
         return wordToFindSynonyms;
     }
 
     @Override
     protected String prepareVertexForRegEx(String syn, String wordToFindSynonyms) {
+        Assert.notNull(syn, "Vertex string must be not null");
+        Assert.notNull(wordToFindSynonyms, "Query string must be not null");
         return syn;
     }
 }
