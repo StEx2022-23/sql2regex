@@ -35,6 +35,7 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
     private String suffix = "";
     private PropertyOption propertyOption;
     protected boolean isCapturingGroup = false;
+    protected boolean graphForSynonymsOfTwoWords = false;
 
     protected SynonymGenerator(PropertyOption propertyOption) {
         Assert.notNull(propertyOption, "PropertyOption must not be null");
@@ -79,6 +80,7 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
      * @return
      */
     public boolean addSynonymFor(A syn, A synFor){
+        this.graphForSynonymsOfTwoWords = true;
         return addSynonymFor(syn, synFor, DEFAULT_WEIGHT);
     }
 
@@ -89,6 +91,7 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
      * @return
      */
     public boolean addSynonymFor(A syn, A synFor, Long weight){
+        this.graphForSynonymsOfTwoWords = true;
         boolean addResult = false;
         if (!synonymsGraph.containsVertex(syn)){
             addResult = synonymsGraph.addVertex(this.prepareSynonymForAdd(syn));
@@ -135,7 +138,22 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
 
     @Override
     public Set<A> getSettings() {
-        return synonymsGraph.vertexSet();
+        if(this.graphForSynonymsOfTwoWords){
+            Set<A> edgeList = new HashSet<>();
+            for(A fixedEdge : synonymsGraph.vertexSet()){
+                String output = synonymsGraph.outgoingEdgesOf(fixedEdge).toString()
+                    .replace("(","")
+                    .replace(")","")
+                    .replace("[","")
+                    .replace("]","")
+                    .replace(" : ", " == ");
+                try {
+                    edgeList.add((A) output);
+                } catch (ClassCastException e){
+                    throw new ClassCastException(e.toString());
+                }
+            } return edgeList;
+        } else return synonymsGraph.vertexSet();
     }
 
     /**

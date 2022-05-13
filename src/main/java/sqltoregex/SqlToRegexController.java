@@ -53,7 +53,7 @@ public class SqlToRegexController {
         model.addAttribute("dateTimeFormats", dateTimeFormats.getSettings());
 
         Property<String> aggregateFunctionSynonyms = propertyManager.getPropertyByPropOption(PropertyOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class);
-        model.addAttribute("aggregateFunctionSynonyms", aggregateFunctionSynonyms.getSettings());
+        model.addAttribute("aggregateFunctionLang", aggregateFunctionSynonyms.getSettings());
 
         model.addAttribute("propertyForm", new PropertyForm(spellings, orders, dateFormats.getSettings(), timeFormats.getSettings(), dateTimeFormats.getSettings(), aggregateFunctionSynonyms.getSettings(), "SELECT *"));
         model.addAttribute("activeConverter", true);
