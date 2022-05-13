@@ -3,9 +3,9 @@ package sqltoregex;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/api")
 public class RestApiController {
-    @PostMapping("/convert")
+    @GetMapping("/convert")
     public String convertSql2RegexMulti() {
         return "API coming soon.";
     }

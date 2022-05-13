@@ -1,7 +1,5 @@
 package sqltoregex.property;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.text.SimpleDateFormat;

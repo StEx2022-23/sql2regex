@@ -1,6 +1,5 @@
 package sqltoregex.property;
 
-import org.apache.commons.lang3.tuple.Pair;
 import sqltoregex.property.regexgenerator.OrderRotation;
 import sqltoregex.property.regexgenerator.SpellingMistake;
 import sqltoregex.property.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
