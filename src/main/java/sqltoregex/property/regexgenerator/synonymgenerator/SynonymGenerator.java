@@ -206,7 +206,7 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
      * @param capturingGroup
      */
     public void setCapturingGroup(boolean capturingGroup) {
-        isCapturingGroup = capturingGroup;
+        this.isCapturingGroup = capturingGroup;
     }
 
     /**

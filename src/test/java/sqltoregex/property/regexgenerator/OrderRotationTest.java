@@ -15,6 +15,16 @@ class OrderRotationTest {
 
     @Test
     void testOrderRotationWithoutAlternativeWritingStyles(){
+        orderRotation.setCapturingGroup(false);
+        Assertions.assertEquals(
+                "(table1\\s*,\\s*table2|table2\\s*,\\s*table1)",
+                orderRotation.generateRegExFor(testListOne)
+        );
+    }
+
+    @Test
+    void testOrderRotationWithoutAlternativeWritingStylesWithCapturingGroup(){
+        orderRotation.setCapturingGroup(true);
         Assertions.assertEquals(
                 "(?:table1\\s*,\\s*table2|table2\\s*,\\s*table1)",
                 orderRotation.generateRegExFor(testListOne)
@@ -23,6 +33,16 @@ class OrderRotationTest {
 
     @Test
     void testOrderRotationWithoutAlternativeWritingStylesOneElement(){
+        orderRotation.setCapturingGroup(false);
+        Assertions.assertEquals(
+                "(table1)",
+                orderRotation.generateRegExFor(testListTwo)
+        );
+    }
+
+    @Test
+    void testOrderRotationWithoutAlternativeWritingStylesOneElementWithCapturingGroup(){
+        orderRotation.setCapturingGroup(true);
         Assertions.assertEquals(
                 "(?:table1)",
                 orderRotation.generateRegExFor(testListTwo)
@@ -37,6 +57,18 @@ class OrderRotationTest {
     @Test
     void testOrderRotationWithAlternativeWritingStyles(){
         orderRotation.setSpellingMistake(new SpellingMistake(PropertyOption.DEFAULT));
+        Assertions.assertEquals(
+                "((table1|able1|tble1|tale1|tabe1|tabl1|table)\\s*,\\s*(table2|able2|tble2|tale2|tabe2|tabl2|table)|(table2|able2|tble2|tale2|tabe2|tabl2|table)\\s*,\\s*(table1|able1|tble1|tale1|tabe1|tabl1|table))",
+                orderRotation.generateRegExFor(testListOne)
+        );
+    }
+
+    @Test
+    void testOrderRotationWithAlternativeWritingStylesWithCapturingGroup(){
+        SpellingMistake spellingMistake = new SpellingMistake(PropertyOption.DEFAULT);
+        spellingMistake.setCapturingGroup(true);
+        orderRotation.setSpellingMistake(spellingMistake);
+        orderRotation.setCapturingGroup(true);
         Assertions.assertEquals(
                 "(?:(?:table1|able1|tble1|tale1|tabe1|tabl1|table)\\s*,\\s*(?:table2|able2|tble2|tale2|tabe2|tabl2|table)|(?:table2|able2|tble2|tale2|tabe2|tabl2|table)\\s*,\\s*(?:table1|able1|tble1|tale1|tabe1|tabl1|table))",
                 orderRotation.generateRegExFor(testListOne)
