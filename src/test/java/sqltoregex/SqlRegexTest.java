@@ -2,31 +2,32 @@ package sqltoregex;
 
 import org.junit.jupiter.api.Test;
 import sqltoregex.converter.SqlRegex;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class SqlRegexTest {
     @Test
-    void setStatementNotNull(){
-        SqlRegex sqlregex = new SqlRegex("SELECT * FROM table");
-        assertEquals("SELECT * FROM table", sqlregex.getSql());
+    void initSqlRegexGetRegex() {
+        SqlRegex sqlregex = new SqlRegex();
+        assertTrue(sqlregex.getRegex().isEmpty());
     }
 
     @Test
-    void initSqlRegexGetSql(){
+    void initSqlRegexGetSql() {
         SqlRegex sqlregex = new SqlRegex();
         assertTrue(sqlregex.getSql().isEmpty());
     }
 
     @Test
-    void setEmptySQL(){
+    void setEmptySQL() {
         SqlRegex sqlregex = new SqlRegex();
         Exception exception = assertThrows(NullPointerException.class, () -> sqlregex.setSql(""));
         assertEquals("SQL-Input-String should have more characters than null.", exception.getMessage());
     }
 
     @Test
-    void initSqlRegexGetRegex(){
-        SqlRegex sqlregex = new SqlRegex();
-        assertTrue(sqlregex.getRegex().isEmpty());
+    void setStatementNotNull() {
+        SqlRegex sqlregex = new SqlRegex("SELECT * FROM table");
+        assertEquals("SELECT * FROM table", sqlregex.getSql());
     }
 }

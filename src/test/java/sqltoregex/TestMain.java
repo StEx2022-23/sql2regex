@@ -1,4 +1,5 @@
 package sqltoregex;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,15 +22,15 @@ class TestMain {
 //    private RestApiController restApiController;
 
     @Test
-    void main(){
-        assertDoesNotThrow(() -> SqlToRegexApplication.main(new String[] {}));
-    }
-
-    @Test
     void contextLoads() {
         assertNotNull(myErrorController);
         assertNotNull(resourceConfig);
         assertNotNull(sql2RegexController);
 //        assertNotNull(restApiController);
+    }
+
+    @Test
+    void main() {
+        assertDoesNotThrow(() -> SqlToRegexApplication.main(new String[]{}));
     }
 }

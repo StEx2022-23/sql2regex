@@ -1,5 +1,8 @@
 package sqltoregex;
 
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -7,6 +10,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import sqltoregex.property.PropertyOption;
+
+import java.util.Arrays;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -18,18 +24,31 @@ class SqlToRegexControllerTest {
     MockMvc mvc;
 
     @Test
-    void testExampleSite() throws Exception {
-        mvc.perform(get("/examples").contentType(MediaType.TEXT_HTML)).andExpect(status().isOk());
-    }
-
-    @Test
     void testAboutSite() throws Exception {
         mvc.perform(get("/about").contentType(MediaType.TEXT_HTML)).andExpect(status().isOk());
     }
 
     @Test
-    void testStartSite() throws Exception {
-        mvc.perform(get("/").contentType(MediaType.TEXT_HTML)).andExpect(status().isOk());
+    void testConvertingAsset() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                            .post("/convert")
+                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                            .content(EntityUtils.toString(new UrlEncodedFormEntity(Arrays.asList(
+                                    new BasicNameValuePair("spellings", PropertyOption.KEYWORDSPELLING.toString()),
+                                    new BasicNameValuePair("orders", PropertyOption.TABLENAMEORDER.toString()),
+                                    new BasicNameValuePair("dateFormats", "yyyy-MM-dd"),
+                                    new BasicNameValuePair("timeFormats", "HH:MM:SS"),
+                                    new BasicNameValuePair("dateTimeFormats", "YYYY-MM-DD HH:MM:SS"),
+                                    new BasicNameValuePair("sql", "SELECT *"),
+                                    new BasicNameValuePair("aggregateFunctionLang", "Mittelwert; AVG")
+                            ))))
+                            .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testExampleSite() throws Exception {
+        mvc.perform(get("/examples").contentType(MediaType.TEXT_HTML)).andExpect(status().isOk());
     }
 
     @Test
@@ -43,11 +62,6 @@ class SqlToRegexControllerTest {
     }
 
     @Test
-    void testVisualizationSite() throws Exception {
-        mvc.perform(get("/visualization").contentType(MediaType.TEXT_HTML)).andExpect(status().isOk());
-    }
-
-    @Test
     void testRobotsSite() throws Exception {
         mvc.perform(get("/robots.txt").contentType(MediaType.TEXT_HTML)).andExpect(status().isOk());
     }
@@ -58,10 +72,12 @@ class SqlToRegexControllerTest {
     }
 
     @Test
-    void testConvertingAsset() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                .post("/convert")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+    void testStartSite() throws Exception {
+        mvc.perform(get("/").contentType(MediaType.TEXT_HTML)).andExpect(status().isOk());
+    }
+
+    @Test
+    void testVisualizationSite() throws Exception {
+        mvc.perform(get("/visualization").contentType(MediaType.TEXT_HTML)).andExpect(status().isOk());
     }
 }
