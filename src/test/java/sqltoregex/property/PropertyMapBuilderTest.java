@@ -79,9 +79,6 @@ class PropertyMapBuilderTest {
         builder.withStringSet(Collections.emptySet(), PropertyOption.AGGREGATEFUNCTIONLANG);
         Map<PropertyOption, Property<?>> map = builder.build();
         Assertions.assertEquals(0, map.size());
-        Assertions.assertTrue(map.containsKey(PropertyOption.AGGREGATEFUNCTIONLANG));
-        Assertions.assertTrue(
-                map.containsValue(new DateAndTimeFormatSynonymGenerator(PropertyOption.AGGREGATEFUNCTIONLANG)));
     }
 
     @Test
