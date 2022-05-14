@@ -2,6 +2,7 @@ package sqltoregex.property;
 
 import org.junit.jupiter.api.*;
 import org.xml.sax.SAXException;
+import sqltoregex.property.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -50,55 +51,8 @@ class PropertyManagerTest {
                 "DATETIMESYNONYMS",
                 "AGGREGATEFUNCTIONLANG"
          );
-        System.out.println(propertyOptionSet);
         for(String str : propertyOptionWhichHaveBeenSet){
             Assertions.assertTrue(propertyOptionSet.toString().contains(str));
         }
-    }
-
-    @Test
-    void testUserConfigurations() {
-        spellings.add(PropertyOption.KEYWORDSPELLING);
-        orders.add(PropertyOption.COLUMNNAMEORDER);
-        dateFormats.add(new SimpleDateFormat("yyyy-MM-dd"));
-        aggregateFunctionLang.add("SUM,SUMME");
-        PropertyForm propertyForm = new PropertyForm(
-                spellings, orders, dateFormats, timeFormats, dateTimeFormats, aggregateFunctionLang, sql
-        );
-
-        PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
-        propertyMapBuilder.withPropertyOption(PropertyOption.KEYWORDSPELLING);
-        propertyMapBuilder.withPropertyOption(PropertyOption.COLUMNNAMEORDER);
-
-        Set<String> dateSynonymsSet = new HashSet<>();
-        dateSynonymsSet.add("yyyy-MM-dd");
-        propertyMapBuilder.withStringSet(dateSynonymsSet, PropertyOption.DATESYNONYMS);
-        propertyMapBuilder.withStringSet(aggregateFunctionLang, PropertyOption.AGGREGATEFUNCTIONLANG);
-
-        Assertions.assertEquals(propertyMapBuilder.build(), propertyManager.parseUserOptionsInput(propertyForm));
-    }
-
-    @Test
-    void testUserConfigurationsWhenEverythingIsDisabeld() {
-        PropertyForm propertyForm = new PropertyForm(spellings, orders, dateFormats, timeFormats, dateTimeFormats, aggregateFunctionLang, sql);
-        PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
-        Assertions.assertEquals(propertyMapBuilder.build(), propertyManager.parseUserOptionsInput(propertyForm));
-    }
-
-    @Test
-    void testAggregateFunctionLangInPropertyManager() {
-        aggregateFunctionLang.add("SUMME,SUM");
-        aggregateFunctionLang.add("MITTELWERT,AVG");
-        PropertyForm propertyForm = new PropertyForm(spellings, orders, dateFormats, timeFormats, dateTimeFormats, aggregateFunctionLang, sql);
-        PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
-        propertyMapBuilder.withStringSet(aggregateFunctionLang, PropertyOption.AGGREGATEFUNCTIONLANG).build();
-        Assertions.assertEquals(propertyMapBuilder.build(), propertyManager.parseUserOptionsInput(propertyForm));
-
-        Set<?> getSettingsSet = propertyManager.parseUserOptionsInput(propertyForm).get(PropertyOption.AGGREGATEFUNCTIONLANG).getSettings();
-        Assertions.assertEquals(2, getSettingsSet.size());
-        Assertions.assertTrue(getSettingsSet.toString().contains("SUMME"));
-        Assertions.assertTrue(getSettingsSet.toString().contains("SUM"));
-        Assertions.assertTrue(getSettingsSet.toString().contains("AVG"));
-        Assertions.assertTrue(getSettingsSet.toString().contains("MITTELWERT"));
     }
 }
