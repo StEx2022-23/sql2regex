@@ -79,12 +79,11 @@ public class OrderRotation implements Property<PropertyOption>, RegExGenerator<L
      */
     public String generateRegExFor(List<String> tableNameList){
         Assert.notNull(tableNameList, "tableNameList must not be null");
-        if(Boolean.TRUE.equals(this.isCapturingGroup)) tableNameOrderRegEx.append("(?:");
-        else tableNameOrderRegEx.append("(");
+        tableNameOrderRegEx.append(isCapturingGroup ? '(' : "(?:");
         Integer amountOfTables = tableNameList.size();
         rekTableNameOrder(amountOfTables, tableNameList);
         tableNameOrderRegEx.replace(tableNameOrderRegEx.length()-1, tableNameOrderRegEx.length(), "");
-        tableNameOrderRegEx.append(")");
+        tableNameOrderRegEx.append(')');
         return tableNameOrderRegEx.toString();
     }
 
