@@ -12,7 +12,6 @@ import sqltoregex.property.regexgenerator.synonymgenerator.StringSynonymGenerato
 
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Controller
