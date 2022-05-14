@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 class DateAndTimeFormatSynonymGeneratorTest {
 
 
-    private DateAndTimeFormatSynonymGenerator getSynonymManagerForDates(){
+    private DateAndTimeFormatSynonymGenerator getSynonymManagerForDates() {
         DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = new DateAndTimeFormatSynonymGenerator(
                 PropertyOption.DEFAULT);
         dateAndTimeSynonymManager.addSynonym(new SimpleDateFormat("yyyy-MM-dd"));
@@ -20,42 +20,50 @@ class DateAndTimeFormatSynonymGeneratorTest {
         return dateAndTimeSynonymManager;
     }
 
-    private DateAndTimeFormatSynonymGenerator getSynonymManagerForTimes(){
-        DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = new DateAndTimeFormatSynonymGenerator(PropertyOption.DEFAULT);
+    private DateAndTimeFormatSynonymGenerator getSynonymManagerForTimes() {
+        DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = new DateAndTimeFormatSynonymGenerator(
+                PropertyOption.DEFAULT);
         dateAndTimeSynonymManager.addSynonym(new SimpleDateFormat("HH:mm:ss"));
         dateAndTimeSynonymManager.addSynonym(new SimpleDateFormat("H:m:s"));
         return dateAndTimeSynonymManager;
     }
 
-    private DateAndTimeFormatSynonymGenerator getSynonymManagerForTimestamps(){
-        DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = new DateAndTimeFormatSynonymGenerator(PropertyOption.DEFAULT);
+    private DateAndTimeFormatSynonymGenerator getSynonymManagerForTimestamps() {
+        DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = new DateAndTimeFormatSynonymGenerator(
+                PropertyOption.DEFAULT);
         dateAndTimeSynonymManager.addSynonym(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         dateAndTimeSynonymManager.addSynonym(new SimpleDateFormat("yyyy-MM-dd H:m:s"));
         return dateAndTimeSynonymManager;
     }
 
     @Test
-    void queryNotExistingSynonym(){
-        DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = new DateAndTimeFormatSynonymGenerator(PropertyOption.DEFAULT);
-        Assertions.assertEquals("(?:2012-5-6)", dateAndTimeSynonymManager.generateRegExFor(new DateValue("'2012-5-6'")));
-        Assertions.assertEquals("(?:2012-05-06)", dateAndTimeSynonymManager.generateRegExFor(new DateValue("'2012-05-06'")));
-    }
-
-    @Test
-    void queryExistingDateSynonym(){
+    void queryExistingDateSynonym() {
         DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = getSynonymManagerForDates();
-        Assertions.assertEquals("(?:2012-05-06|12-05-06)", dateAndTimeSynonymManager.generateRegExFor(new DateValue("'2012-05-06'")));
+        Assertions.assertEquals("(?:2012-05-06|12-05-06)",
+                                dateAndTimeSynonymManager.generateRegExFor(new DateValue("'2012-05-06'")));
     }
 
     @Test
-    void queryExistingTimeSynonym(){
+    void queryExistingTimeSynonym() {
         DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = getSynonymManagerForTimes();
-        Assertions.assertEquals("(?:01:02:03|1:2:3)", dateAndTimeSynonymManager.generateRegExFor(new TimeValue("'01:02:03'")));
+        Assertions.assertEquals("(?:01:02:03|1:2:3)",
+                                dateAndTimeSynonymManager.generateRegExFor(new TimeValue("'01:02:03'")));
     }
 
     @Test
-    void queryExistingTimestampSynonym(){
+    void queryExistingTimestampSynonym() {
         DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = getSynonymManagerForTimestamps();
-        Assertions.assertEquals("(?:2012-05-06 01:02:03|2012-05-06 1:2:3)", dateAndTimeSynonymManager.generateRegExFor(new TimestampValue("2012-05-06 01:02:03")));
+        Assertions.assertEquals("(?:2012-05-06 01:02:03|2012-05-06 1:2:3)",
+                                dateAndTimeSynonymManager.generateRegExFor(new TimestampValue("2012-05-06 01:02:03")));
+    }
+
+    @Test
+    void queryNotExistingSynonym() {
+        DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = new DateAndTimeFormatSynonymGenerator(
+                PropertyOption.DEFAULT);
+        Assertions.assertEquals("(?:2012-5-6)",
+                                dateAndTimeSynonymManager.generateRegExFor(new DateValue("'2012-5-6'")));
+        Assertions.assertEquals("(?:2012-05-06)",
+                                dateAndTimeSynonymManager.generateRegExFor(new DateValue("'2012-05-06'")));
     }
 }

@@ -10,7 +10,7 @@ class StringSynonymGeneratorTest {
     private StringSynonymGenerator defaultSynonymManager;
 
     @BeforeEach
-    void beforeAll(){
+    void beforeAll() {
         this.defaultSynonymManager = new StringSynonymGenerator(PropertyOption.DEFAULT);
         defaultSynonymManager.addSynonym("witzig");
         defaultSynonymManager.addSynonym("komisch");
@@ -19,14 +19,14 @@ class StringSynonymGeneratorTest {
     }
 
     @Test
-    void queryNotExistingSynonym(){
-        Assertions.assertEquals("(traurig)", defaultSynonymManager.generateRegExFor("traurig"));
-    }
-
-    @Test
-    void queryExistingSynonym(){
+    void queryExistingSynonym() {
         Assertions.assertEquals("(witzig|ulkig|komisch)", defaultSynonymManager.generateRegExFor("witzig"));
         Assertions.assertEquals("(ulkig|komisch|witzig)", defaultSynonymManager.generateRegExFor("ulkig"));
         Assertions.assertEquals("(komisch|ulkig|witzig)", defaultSynonymManager.generateRegExFor("komisch"));
+    }
+
+    @Test
+    void queryNotExistingSynonym() {
+        Assertions.assertEquals("(traurig)", defaultSynonymManager.generateRegExFor("traurig"));
     }
 }
