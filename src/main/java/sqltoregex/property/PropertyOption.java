@@ -13,7 +13,7 @@ public enum PropertyOption {
     TIMESYNONYMS,
     DATETIMESYNONYMS,
     AGGREGATEFUNCTIONLANG,
-    DEFAULT;
-    //When extending this class keep the naming of the enums and the xml tags the same. That they can easily be
-    // transformed in each other.
+    DEFAULT
+    // when extending this class keep the naming of the enums and the xml tags the same
+    // that they can easily be transformed in each other
 }

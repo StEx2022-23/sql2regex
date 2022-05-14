@@ -12,11 +12,12 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-
 public class PropertyMapBuilder {
     private final Set<OrderRotation> orderRotations;
     private final Map<PropertyOption, Property<?>> propertyMap;
     private final Set<SpellingMistake> spellingMistakes;
+    private static final String UNSUPPORTED_BUILD_WITH = "Unsupported build with:";
+    private static final String STRING_SYNONYM_DELIMITER = ";";
 
     public PropertyMapBuilder() {
         this.propertyMap = new EnumMap<>(PropertyOption.class);
@@ -37,7 +38,7 @@ public class PropertyMapBuilder {
         return this.propertyMap;
     }
 
-    public PropertyMapBuilder withPropertyOption(PropertyOption propertyOption) {
+    public void withPropertyOption(PropertyOption propertyOption) {
         switch (propertyOption) {
             case KEYWORDSPELLING, COLUMNNAMESPELLING, TABLENAMESPELLING -> {
                 SpellingMistake spellingMistake = new SpellingMistake(propertyOption);
@@ -49,9 +50,8 @@ public class PropertyMapBuilder {
                 this.propertyMap.put(propertyOption, orderRotation);
                 orderRotations.add(orderRotation);
             }
-            default -> throw new IllegalArgumentException("Unsupported build with:" + propertyOption);
+            default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + propertyOption);
         }
-        return this;
     }
 
     public PropertyMapBuilder withPropertyOptionSet(Set<PropertyOption> propertyOptions) {
@@ -73,7 +73,7 @@ public class PropertyMapBuilder {
                 }
                 this.propertyMap.put(propertyOption, synonymGenerator);
             }
-            default -> throw new IllegalArgumentException("Unsupported build with:" + propertyOption);
+            default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + propertyOption);
         }
         return this;
     }
@@ -92,13 +92,13 @@ public class PropertyMapBuilder {
                     if (!synonyms.isEmpty()) {
                         StringSynonymGenerator aggregateFunctionSynonymGenerator = new StringSynonymGenerator(propertyOption);
                         for (String singleSynonym : synonyms) {
-                            aggregateFunctionSynonymGenerator.addSynonymFor(singleSynonym.split(";")[0].strip(),
-                                                                            singleSynonym.split(";")[1].strip());
+                            aggregateFunctionSynonymGenerator.addSynonymFor(singleSynonym.split(STRING_SYNONYM_DELIMITER)[0].strip(),
+                                                                            singleSynonym.split(STRING_SYNONYM_DELIMITER)[1].strip());
                         }
                         this.propertyMap.put(propertyOption, aggregateFunctionSynonymGenerator);
                     }
                 }
-                default -> throw new IllegalArgumentException("Unsupported build with:" + propertyOption);
+                default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + propertyOption);
             }
         return this;
     }

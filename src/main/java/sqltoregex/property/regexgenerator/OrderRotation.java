@@ -13,7 +13,7 @@ import java.util.*;
  * SELECT (?:table1\s*,\s*table2|table2\s*,\s*table1)
  */
 public class OrderRotation implements Property<PropertyOption>, RegExGenerator<List<String>> {
-    private final StringBuilder tableNameOrderRegEx = new StringBuilder();
+    private final StringBuilder orderRotationOfValueList = new StringBuilder();
     private SpellingMistake spellingMistake;
     private final PropertyOption propertyoption;
     protected boolean isCapturingGroup = false;
@@ -31,60 +31,60 @@ public class OrderRotation implements Property<PropertyOption>, RegExGenerator<L
 
     @Override
     public Set<PropertyOption> getSettings() {
-        return new HashSet<>(Arrays.asList(propertyoption));
+        return new HashSet<>(List.of(propertyoption));
     }
 
     /**
      * helper function for recursive tablename order concatenation
      * @param amount Integer
-     * @param tableNames List<String>
+     * @param valueList List<String>
      */
-    private void rekTableNameOrder(Integer amount, List<String> tableNames){
-        StringBuilder tableNameOrderRegExSingleElement = new StringBuilder();
+    private void orderRotationRek(Integer amount, List<String> valueList){
+        StringBuilder singleValue = new StringBuilder();
         if (amount == 1) {
-            for(String el : tableNames){
+            for(String value : valueList){
                 if(spellingMistake != null) {
-                    tableNameOrderRegExSingleElement.append(spellingMistake.generateRegExFor(el));
+                    singleValue.append(spellingMistake.generateRegExFor(value));
                 } else{
-                    tableNameOrderRegExSingleElement.append(el);
+                    singleValue.append(value);
                 }
-                tableNameOrderRegExSingleElement.append("\\s*,\\s*");
+                singleValue.append("\\s*,\\s*");
             }
-            tableNameOrderRegExSingleElement.replace(tableNameOrderRegExSingleElement.length()-7, tableNameOrderRegExSingleElement.length(), "");
-            tableNameOrderRegExSingleElement.append("|");
-            tableNameOrderRegEx.append(tableNameOrderRegExSingleElement);
+            singleValue.replace(singleValue.length()-7, singleValue.length(), "");
+            singleValue.append("|");
+            orderRotationOfValueList.append(singleValue);
         } else {
-            rekTableNameOrder(amount-1, tableNames);
+            orderRotationRek(amount-1, valueList);
             for(int i = 0; i < amount-1;i++){
                 if (amount % 2 == 0){
                     String temp;
-                    temp = tableNames.get(amount-1);
-                    tableNames.set(amount-1, tableNames.get(i));
-                    tableNames.set(i, temp);
+                    temp = valueList.get(amount-1);
+                    valueList.set(amount-1, valueList.get(i));
+                    valueList.set(i, temp);
                 } else {
                     String temp;
-                    temp = tableNames.get(amount-1);
-                    tableNames.set(amount-1, tableNames.get(0));
-                    tableNames.set(0, temp);
+                    temp = valueList.get(amount-1);
+                    valueList.set(amount-1, valueList.get(0));
+                    valueList.set(0, temp);
                 }
-                rekTableNameOrder(amount-1, tableNames);
+                orderRotationRek(amount-1, valueList);
             }
         }
     }
 
     /**
      * combine every possible table name order to a non-capturing regex group, optional with alternative writing styles
-     * @param tableNameList List<String>
+     * @param valueList List<String>
      * @return Regex (non-capturing group)
      */
-    public String generateRegExFor(List<String> tableNameList){
-        Assert.notNull(tableNameList, "tableNameList must not be null");
-        tableNameOrderRegEx.append(isCapturingGroup ? '(' : "(?:");
-        Integer amountOfTables = tableNameList.size();
-        rekTableNameOrder(amountOfTables, tableNameList);
-        tableNameOrderRegEx.replace(tableNameOrderRegEx.length()-1, tableNameOrderRegEx.length(), "");
-        tableNameOrderRegEx.append(')');
-        return tableNameOrderRegEx.toString();
+    public String generateRegExFor(List<String> valueList){
+        Assert.notNull(valueList, "Value list must not be null!");
+        orderRotationOfValueList.append(isCapturingGroup ? '(' : "(?:");
+        Integer amountOfElements = valueList.size();
+        orderRotationRek(amountOfElements, valueList);
+        orderRotationOfValueList.replace(orderRotationOfValueList.length()-1, orderRotationOfValueList.length(), "");
+        orderRotationOfValueList.append(')');
+        return orderRotationOfValueList.toString();
     }
 
     public void setSpellingMistake(SpellingMistake spellingMistake){
