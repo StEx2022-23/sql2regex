@@ -43,7 +43,10 @@ public class SpellingMistake implements Property<PropertyOption>, RegExGenerator
         alternativeWritingStyles.append(')');
         return alternativeWritingStyles.toString();
     }
-
+    /**
+     * Sets whether there will be an enclosing non capturing group (?: ... ) around the generated regEx.
+     * @param capturingGroup true for capturing group false for non-capturing group
+     */
     @Override
     public void setCapturingGroup(boolean capturingGroup) {
         this.isCapturingGroup = capturingGroup;

@@ -9,16 +9,16 @@ class SpellingMistakeTest {
     public SpellingMistake spellingMistake = new SpellingMistake(PropertyOption.DEFAULT);
 
     @Test
-    void testSpellingMistakeOutputWithCapturingGroup(){
+    void testSpellingMistakeOutputWithNonCapturingGroup(){
         String input = "test";
-        spellingMistake.setCapturingGroup(true);
         String alternativeStyles = spellingMistake.generateRegExFor(input);
         Assertions.assertEquals("(?:test|est|tst|tet|tes)", alternativeStyles);
     }
 
     @Test
-    void testSpellingMistakeOutputWithoutCapturingGroup(){
+    void testSpellingMistakeOutputWitCapturingGroup(){
         String input = "test";
+        spellingMistake.setCapturingGroup(true);
         String alternativeStyles = spellingMistake.generateRegExFor(input);
         Assertions.assertEquals("(test|est|tst|tet|tes)", alternativeStyles);
     }

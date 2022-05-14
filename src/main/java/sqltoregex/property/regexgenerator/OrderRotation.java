@@ -96,6 +96,10 @@ public class OrderRotation implements Property<PropertyOption>, RegExGenerator<L
         return spellingMistake;
     }
 
+    /**
+     * Sets whether there will be an enclosing non capturing group (?: ... ) around the generated regEx.
+     * @param capturingGroup true for capturing group false for non-capturing group
+     */
     public void setCapturingGroup(boolean capturingGroup) {
         isCapturingGroup = capturingGroup;
     }
