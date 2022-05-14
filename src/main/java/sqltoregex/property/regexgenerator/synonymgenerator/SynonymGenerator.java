@@ -80,7 +80,6 @@ abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> 
      * @return
      */
     public boolean addSynonymFor(A syn, A synFor){
-        this.graphForSynonymsOfTwoWords = true;
         return addSynonymFor(syn, synFor, DEFAULT_WEIGHT);
     }
 
