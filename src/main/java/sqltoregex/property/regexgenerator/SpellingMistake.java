@@ -13,6 +13,7 @@ import java.util.*;
  */
 public class SpellingMistake implements Property<PropertyOption>, RegExGenerator<String> {
     private final PropertyOption propertyOption;
+    protected boolean isCapturingGroup = false;
 
     public SpellingMistake(PropertyOption propertyOption){
         this.propertyOption = propertyOption;
@@ -33,13 +34,20 @@ public class SpellingMistake implements Property<PropertyOption>, RegExGenerator
             throw new IllegalArgumentException("Tablename should not be empty.");
         }
         StringBuilder alternativeWritingStyles = new StringBuilder();
-        alternativeWritingStyles.append("(?:").append(tableName).append("|");
+        if(Boolean.TRUE.equals(this.isCapturingGroup)) alternativeWritingStyles.append("(?:");
+        else alternativeWritingStyles.append("(");
+        alternativeWritingStyles.append(tableName).append("|");
         for(int i = 0; i<tableName.length(); i++){
             alternativeWritingStyles.append(tableName, 0, i).append(tableName, i+1, tableName.length()).append("|");
         }
         alternativeWritingStyles.replace(alternativeWritingStyles.length()-1, alternativeWritingStyles.length(), "");
         alternativeWritingStyles.append(")");
         return alternativeWritingStyles.toString();
+    }
+
+    @Override
+    public void setCapturingGroup(boolean capturingGroup) {
+        this.isCapturingGroup = capturingGroup;
     }
 
     @Override

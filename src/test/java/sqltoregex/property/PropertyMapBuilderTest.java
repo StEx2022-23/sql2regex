@@ -13,7 +13,7 @@ import sqltoregex.property.regexgenerator.synonymgenerator.StringSynonymGenerato
 import java.util.Collections;
 import java.util.Map;
 
-public class PropertyMapBuilderTest {
+class PropertyMapBuilderTest {
 
     PropertyMapBuilder builder;
 
@@ -24,7 +24,7 @@ public class PropertyMapBuilderTest {
 
     @Test
     void builderStartsWithEmptyMap(){
-        Assertions.assertEquals(builder.build(), Collections.emptyMap());
+        Assertions.assertEquals(Collections.emptyMap(), builder.build());
     }
 
     @Test
@@ -95,16 +95,5 @@ public class PropertyMapBuilderTest {
         builder.with(PropertyOption.COLUMNNAMESPELLING);
         OrderRotation orderRotation = (OrderRotation) builder.build().get(PropertyOption.COLUMNNAMEORDER);
         Assertions.assertEquals(new SpellingMistake(PropertyOption.COLUMNNAMESPELLING), orderRotation.getSpellingMistake());
-    }
-
-    @Test
-    void AggreateFunctionSynonyms(){
-        Pair<String, String> setOfTwoSynonyms = new ImmutablePair<>("SUM", "SUMME");
-        builder.with(setOfTwoSynonyms, PropertyOption.AGGREGATEFUNCTIONLANG);
-        Map<PropertyOption, Property<?>> map = builder.build();
-        Assertions.assertEquals(1, map.size());
-        StringSynonymGenerator stringSynonymGenerator = new StringSynonymGenerator(PropertyOption.AGGREGATEFUNCTIONLANG);
-        stringSynonymGenerator.addSynonymFor("SUM", "SUMME");
-        Assertions.assertEquals(stringSynonymGenerator, map.get(PropertyOption.AGGREGATEFUNCTIONLANG));
     }
 }

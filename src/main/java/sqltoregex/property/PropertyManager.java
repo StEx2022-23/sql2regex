@@ -1,7 +1,5 @@
 package sqltoregex.property;
 
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -48,46 +46,55 @@ public class PropertyManager {
         return simpledDateFormatToString;
     }
 
+    private void builderLoopOverSet(Set<PropertyOption> propertyOptions, PropertyMapBuilder propertyMapBuilder){
+        for(PropertyOption propertyOption : propertyOptions){
+            propertyMapBuilder.with(propertyOption);
+        }
+    }
+
+    private boolean checkSetOfEmptyAndNullSimpleDateFormat(Set<SimpleDateFormat> inputSet){
+        return inputSet != null && !inputSet.isEmpty();
+    }
+
+    private boolean checkSetOfEmptyAndNullProperty(Set<PropertyOption> inputSet){
+        return inputSet != null && !inputSet.isEmpty();
+    }
+
+    private boolean checkSetOfEmptyAndNullString(Set<String> inputSet){
+        return inputSet != null && !inputSet.isEmpty();
+    }
+
     public Map<PropertyOption, Property<?>> parseUserOptionsInput(PropertyForm form){
         PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
 
         Set<PropertyOption> spellingsFromForm = form.getSpellings();
-        if(spellingsFromForm != null && !spellingsFromForm.isEmpty()){
-            for(PropertyOption propertyOption : spellingsFromForm){
-                propertyMapBuilder.with(propertyOption);
-            }
+        if(checkSetOfEmptyAndNullProperty(spellingsFromForm)){
+            this.builderLoopOverSet(spellingsFromForm, propertyMapBuilder);
         }
 
         Set<PropertyOption> ordersFromForm = form.getOrders();
-        if(ordersFromForm != null && !ordersFromForm.isEmpty()) {
-            for(PropertyOption propertyOption : ordersFromForm){
-                propertyMapBuilder.with(propertyOption);
-            }
+        if(checkSetOfEmptyAndNullProperty(ordersFromForm)) {
+            this.builderLoopOverSet(ordersFromForm, propertyMapBuilder);
         }
 
         Set<SimpleDateFormat> dateFormatFromForm = form.getDateFormats();
-        if(dateFormatFromForm != null && !dateFormatFromForm.isEmpty()) {
+        if(checkSetOfEmptyAndNullSimpleDateFormat(dateFormatFromForm)) {
             propertyMapBuilder.with(setOfSimpleDateFormatToSetOfString(dateFormatFromForm), PropertyOption.DATESYNONYMS);
         }
 
         Set<SimpleDateFormat> timeFormatFromForm = form.getTimeFormats();
-        if(timeFormatFromForm != null && !timeFormatFromForm.isEmpty()) {
+        if(checkSetOfEmptyAndNullSimpleDateFormat(timeFormatFromForm)) {
             propertyMapBuilder.with(setOfSimpleDateFormatToSetOfString(timeFormatFromForm), PropertyOption.TIMESYNONYMS);
         }
 
         Set<SimpleDateFormat> dateTimeFormatFromForm = form.getDateTimeFormats();
-        if(dateTimeFormatFromForm != null && !dateTimeFormatFromForm.isEmpty()) {
+        if(checkSetOfEmptyAndNullSimpleDateFormat(dateTimeFormatFromForm)) {
             propertyMapBuilder.with(setOfSimpleDateFormatToSetOfString(dateTimeFormatFromForm), PropertyOption.DATETIMESYNONYMS);
         }
 
-        Pair<String, String> sumSynonymsFromForm = form.getSumSynonym();
-        if(sumSynonymsFromForm != null && sumSynonymsFromForm.getLeft() != null && sumSynonymsFromForm.getRight() != null) {
-            propertyMapBuilder.with(sumSynonymsFromForm, PropertyOption.SUMSYNONYM);
-        }
-
-        Pair<String, String> avgSynonymsFromForm = form.getSumSynonym();
-        if(avgSynonymsFromForm != null && avgSynonymsFromForm.getLeft() != null && avgSynonymsFromForm.getRight() != null) {
-            propertyMapBuilder.with(avgSynonymsFromForm, PropertyOption.AVGSYNONYM);
+        Set<String> synonymsListForAggregateFunctionsAsStrings = form.getAggregateFunctionLang();
+        if(checkSetOfEmptyAndNullString(synonymsListForAggregateFunctionsAsStrings)) {
+            propertyMapBuilder.with(synonymsListForAggregateFunctionsAsStrings, PropertyOption.AGGREGATEFUNCTIONLANG);
         }
 
         return propertyMapBuilder.build();
@@ -115,18 +122,15 @@ public class PropertyManager {
                     for(Node node : valueTagIterator){
                         valuePairsForSynonyms.add(node);
                     }
+                    Set<String> pairOfSynonymList = new HashSet<>();
                     for(Node valueNode : valuePairsForSynonyms){
-                        String leftPair = valueNode.getChildNodes().item(0).getTextContent();
-                        String rightPair = valueNode.getChildNodes().item(1).getTextContent();
-                        Pair<String, String> pairOfSynonym = new MutablePair<>(leftPair, rightPair);
-                        switch(PropertyOption.valueOf(valueNode.getNodeName().toUpperCase())){
-                            case SUMSYNONYM -> propertyMapBuilder.with(pairOfSynonym, PropertyOption.SUMSYNONYM);
-                            case AVGSYNONYM -> propertyMapBuilder.with(pairOfSynonym, PropertyOption.AVGSYNONYM);
-                            default -> {
-                                // think about logging ...
-                            }
-                        }
+                        String valuePair = valueNode.getTextContent();
+                        pairOfSynonymList.add(valuePair);
                     }
+                    propertyMapBuilder.with(pairOfSynonymList, PropertyOption.AGGREGATEFUNCTIONLANG);
+                }
+                default -> {
+                    // think about logging ...
                 }
             }
         }
@@ -194,8 +198,8 @@ public class PropertyManager {
     /**
      * Removes insignificant whitespaces from an XML DOM tree.
      *
-     * @param doc
-     * @throws XPathExpressionException
+     * @param doc Document
+     * @throws XPathExpressionException if xp.evaluate("//text()[normalize-space(.)='']" goes wrong
      */
     private void stripWhitespaces(Document doc) throws XPathExpressionException {
         XPath xp = XPathFactory.newInstance().newXPath();

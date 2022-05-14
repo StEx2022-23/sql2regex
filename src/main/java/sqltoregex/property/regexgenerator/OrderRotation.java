@@ -16,6 +16,7 @@ public class OrderRotation implements Property<PropertyOption>, RegExGenerator<L
     private final StringBuilder tableNameOrderRegEx = new StringBuilder();
     private SpellingMistake spellingMistake;
     private final PropertyOption propertyoption;
+    protected boolean isCapturingGroup = false;
 
     public OrderRotation(PropertyOption propertyOption, SpellingMistake spellingMistake){
         Assert.notNull(spellingMistake, "SpellingMistake must not be null");
@@ -78,8 +79,8 @@ public class OrderRotation implements Property<PropertyOption>, RegExGenerator<L
      */
     public String generateRegExFor(List<String> tableNameList){
         Assert.notNull(tableNameList, "tableNameList must not be null");
-
-        tableNameOrderRegEx.append("(?:");
+        if(Boolean.TRUE.equals(this.isCapturingGroup)) tableNameOrderRegEx.append("(?:");
+        else tableNameOrderRegEx.append("(");
         Integer amountOfTables = tableNameList.size();
         rekTableNameOrder(amountOfTables, tableNameList);
         tableNameOrderRegEx.replace(tableNameOrderRegEx.length()-1, tableNameOrderRegEx.length(), "");
@@ -94,6 +95,10 @@ public class OrderRotation implements Property<PropertyOption>, RegExGenerator<L
 
     public SpellingMistake getSpellingMistake() {
         return spellingMistake;
+    }
+
+    public void setCapturingGroup(boolean capturingGroup) {
+        isCapturingGroup = capturingGroup;
     }
 
     @Override
