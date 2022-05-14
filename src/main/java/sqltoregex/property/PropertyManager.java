@@ -13,7 +13,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -35,69 +34,17 @@ public class PropertyManager {
         return null;
     }
 
-    private Set<String> setOfSimpleDateFormatToSetOfString(Set<SimpleDateFormat> simpleDateFormatList){
-        if(simpleDateFormatList.isEmpty()){
-            throw new IllegalArgumentException("Set is not allowed to be empty.");
-        }
-        Set<String> simpledDateFormatToString = new HashSet<>();
-        for(SimpleDateFormat simpleDateFormat : simpleDateFormatList){
-            simpledDateFormatToString.add(simpleDateFormat.toPattern());
-        }
-        return simpledDateFormatToString;
-    }
-
-    private void builderLoopOverSet(Set<PropertyOption> propertyOptions, PropertyMapBuilder propertyMapBuilder){
-        for(PropertyOption propertyOption : propertyOptions){
-            propertyMapBuilder.with(propertyOption);
-        }
-    }
-
-    private boolean checkSetOfEmptyAndNullSimpleDateFormat(Set<SimpleDateFormat> inputSet){
-        return inputSet != null && !inputSet.isEmpty();
-    }
-
-    private boolean checkSetOfEmptyAndNullProperty(Set<PropertyOption> inputSet){
-        return inputSet != null && !inputSet.isEmpty();
-    }
-
-    private boolean checkSetOfEmptyAndNullString(Set<String> inputSet){
-        return inputSet != null && !inputSet.isEmpty();
-    }
-
     public Map<PropertyOption, Property<?>> parseUserOptionsInput(PropertyForm form){
         PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
 
-        Set<PropertyOption> spellingsFromForm = form.getSpellings();
-        if(checkSetOfEmptyAndNullProperty(spellingsFromForm)){
-            this.builderLoopOverSet(spellingsFromForm, propertyMapBuilder);
-        }
-
-        Set<PropertyOption> ordersFromForm = form.getOrders();
-        if(checkSetOfEmptyAndNullProperty(ordersFromForm)) {
-            this.builderLoopOverSet(ordersFromForm, propertyMapBuilder);
-        }
-
-        Set<SimpleDateFormat> dateFormatFromForm = form.getDateFormats();
-        if(checkSetOfEmptyAndNullSimpleDateFormat(dateFormatFromForm)) {
-            propertyMapBuilder.with(setOfSimpleDateFormatToSetOfString(dateFormatFromForm), PropertyOption.DATESYNONYMS);
-        }
-
-        Set<SimpleDateFormat> timeFormatFromForm = form.getTimeFormats();
-        if(checkSetOfEmptyAndNullSimpleDateFormat(timeFormatFromForm)) {
-            propertyMapBuilder.with(setOfSimpleDateFormatToSetOfString(timeFormatFromForm), PropertyOption.TIMESYNONYMS);
-        }
-
-        Set<SimpleDateFormat> dateTimeFormatFromForm = form.getDateTimeFormats();
-        if(checkSetOfEmptyAndNullSimpleDateFormat(dateTimeFormatFromForm)) {
-            propertyMapBuilder.with(setOfSimpleDateFormatToSetOfString(dateTimeFormatFromForm), PropertyOption.DATETIMESYNONYMS);
-        }
-
-        Set<String> synonymsListForAggregateFunctionsAsStrings = form.getAggregateFunctionLang();
-        if(checkSetOfEmptyAndNullString(synonymsListForAggregateFunctionsAsStrings)) {
-            propertyMapBuilder.with(synonymsListForAggregateFunctionsAsStrings, PropertyOption.AGGREGATEFUNCTIONLANG);
-        }
-
-        return propertyMapBuilder.build();
+        return propertyMapBuilder
+                .withPropertyOptionSet(form.getSpellings())
+                .withPropertyOptionSet(form.getOrders())
+                .withSimpleDateFormatSet(form.getDateFormats(), PropertyOption.DATESYNONYMS)
+                .withSimpleDateFormatSet(form.getTimeFormats(), PropertyOption.TIMESYNONYMS)
+                .withSimpleDateFormatSet(form.getDateTimeFormats(), PropertyOption.DATETIMESYNONYMS)
+                .withStringSet(form.getAggregateFunctionLang(), PropertyOption.AGGREGATEFUNCTIONLANG)
+                .build();
     }
 
     private PropertyMapBuilder addPropertyToMap(Map<PropertyOption, NodeList> parsedValues) {
@@ -107,14 +54,14 @@ public class PropertyManager {
                 return propertyMapBuilder;
             }
             switch (prop) {
-                case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER -> propertyMapBuilder.with(prop);
+                case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER -> propertyMapBuilder.withPropertyOption(prop);
                 case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
                     Set<String> valueList = new HashSet<>();
                     PropertyNodeListIterator propertyNodeListIterator = new PropertyNodeListIterator(parsedValues.get(prop));
                     for(Node node : propertyNodeListIterator){
                         valueList.add(node.getTextContent());
                     }
-                    propertyMapBuilder.with(valueList, prop);
+                    propertyMapBuilder.withStringSet(valueList, prop);
                 }
                 case AGGREGATEFUNCTIONLANG -> {
                     List<Node> valuePairsForSynonyms = new LinkedList<>();
@@ -127,7 +74,7 @@ public class PropertyManager {
                         String valuePair = valueNode.getTextContent();
                         pairOfSynonymList.add(valuePair);
                     }
-                    propertyMapBuilder.with(pairOfSynonymList, PropertyOption.AGGREGATEFUNCTIONLANG);
+                    propertyMapBuilder.withStringSet(pairOfSynonymList, PropertyOption.AGGREGATEFUNCTIONLANG);
                 }
                 default -> {
                     // think about logging ...

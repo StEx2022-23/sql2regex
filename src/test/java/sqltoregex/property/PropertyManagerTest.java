@@ -67,13 +67,13 @@ class PropertyManagerTest {
         );
 
         PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
-        propertyMapBuilder.with(PropertyOption.KEYWORDSPELLING);
-        propertyMapBuilder.with(PropertyOption.COLUMNNAMEORDER);
+        propertyMapBuilder.withPropertyOption(PropertyOption.KEYWORDSPELLING);
+        propertyMapBuilder.withPropertyOption(PropertyOption.COLUMNNAMEORDER);
 
         Set<String> dateSynonymsSet = new HashSet<>();
         dateSynonymsSet.add("yyyy-MM-dd");
-        propertyMapBuilder.with(dateSynonymsSet, PropertyOption.DATESYNONYMS);
-        propertyMapBuilder.with(aggregateFunctionLang, PropertyOption.AGGREGATEFUNCTIONLANG);
+        propertyMapBuilder.withStringSet(dateSynonymsSet, PropertyOption.DATESYNONYMS);
+        propertyMapBuilder.withStringSet(aggregateFunctionLang, PropertyOption.AGGREGATEFUNCTIONLANG);
 
         Assertions.assertEquals(propertyMapBuilder.build(), propertyManager.parseUserOptionsInput(propertyForm));
     }
@@ -91,7 +91,7 @@ class PropertyManagerTest {
         aggregateFunctionLang.add("MITTELWERT,AVG");
         PropertyForm propertyForm = new PropertyForm(spellings, orders, dateFormats, timeFormats, dateTimeFormats, aggregateFunctionLang, sql);
         PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
-        propertyMapBuilder.with(aggregateFunctionLang, PropertyOption.AGGREGATEFUNCTIONLANG).build();
+        propertyMapBuilder.withStringSet(aggregateFunctionLang, PropertyOption.AGGREGATEFUNCTIONLANG).build();
         Assertions.assertEquals(propertyMapBuilder.build(), propertyManager.parseUserOptionsInput(propertyForm));
 
         Set<?> getSettingsSet = propertyManager.parseUserOptionsInput(propertyForm).get(PropertyOption.AGGREGATEFUNCTIONLANG).getSettings();
