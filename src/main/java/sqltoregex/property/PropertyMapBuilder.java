@@ -92,8 +92,8 @@ public class PropertyMapBuilder {
                     if (!synonyms.isEmpty()) {
                         StringSynonymGenerator aggregateFunctionSynonymGenerator = new StringSynonymGenerator(propertyOption);
                         for (String singleSynonym : synonyms) {
-                            aggregateFunctionSynonymGenerator.addSynonymFor(singleSynonym.split(",")[0],
-                                                                            singleSynonym.split(",")[1]);
+                            aggregateFunctionSynonymGenerator.addSynonymFor(singleSynonym.split(";")[0].strip(),
+                                                                            singleSynonym.split(";")[1].strip());
                         }
                         this.propertyMap.put(propertyOption, aggregateFunctionSynonymGenerator);
                     }
