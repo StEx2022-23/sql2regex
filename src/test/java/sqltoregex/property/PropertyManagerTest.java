@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 class PropertyManagerTest {
-    PropertyManager propertyManager = new PropertyManager();
+    static PropertyManager propertyManager;
     static Set<PropertyOption> spellings;
     static Set<PropertyOption> orders;
     static Set<SimpleDateFormat> dateFormats;
@@ -19,8 +19,8 @@ class PropertyManagerTest {
     static Set<String> aggregateFunctionLang;
     static String sql;
 
-    @BeforeAll
-    static void resetSets(){
+    void resetSets() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        propertyManager = new PropertyManager();
         spellings = new HashSet<>();
         orders = new HashSet<>();
         dateFormats = new HashSet<>();
@@ -30,11 +30,9 @@ class PropertyManagerTest {
         sql = "SELECT * FROM test";
     }
 
-    PropertyManagerTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
-    }
-
     @Test
     void testLoadDefaultProperties() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
+        this.resetSets();
         PropertyManager propertyManager = new PropertyManager();
         Set<PropertyOption> propertyOptionSet = propertyManager.readPropertyOptions();
         List<String> propertyOptionWhichHaveBeenSet = List.of(
@@ -56,7 +54,8 @@ class PropertyManagerTest {
     }
 
     @Test
-    void testUserConfigurations() {
+    void testUserConfigurations() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        resetSets();
         spellings.add(PropertyOption.KEYWORDSPELLING);
         orders.add(PropertyOption.COLUMNNAMEORDER);
         dateFormats.add(new SimpleDateFormat("yyyy-MM-dd"));
@@ -78,14 +77,16 @@ class PropertyManagerTest {
     }
 
     @Test
-    void testUserConfigurationsWhenEverythingIsDisabeld() {
+    void testUserConfigurationsWhenEverythingIsDisabeld() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        resetSets();
         PropertyForm propertyForm = new PropertyForm(spellings, orders, dateFormats, timeFormats, dateTimeFormats, aggregateFunctionLang, sql);
         PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
         Assertions.assertEquals(propertyMapBuilder.build(), propertyManager.parseUserOptionsInput(propertyForm));
     }
 
     @Test
-    void testAggregateFunctionLangInPropertyManager() {
+    void testAggregateFunctionLangInPropertyManager() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        resetSets();
         aggregateFunctionLang.add("SUMME,SUM");
         aggregateFunctionLang.add("MITTELWERT,AVG");
         PropertyForm propertyForm = new PropertyForm(spellings, orders, dateFormats, timeFormats, dateTimeFormats, aggregateFunctionLang, sql);
