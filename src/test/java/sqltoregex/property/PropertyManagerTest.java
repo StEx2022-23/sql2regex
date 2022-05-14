@@ -30,10 +30,13 @@ class PropertyManagerTest {
         sql = "SELECT * FROM test";
     }
 
-    @Test
-    void testLoadDefaultProperties() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
+    @BeforeEach
+    void beforeEach() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         this.resetSets();
-        PropertyManager propertyManager = new PropertyManager();
+    }
+
+    @Test
+    void testLoadDefaultProperties() {
         Set<PropertyOption> propertyOptionSet = propertyManager.readPropertyOptions();
         List<String> propertyOptionWhichHaveBeenSet = List.of(
                 "KEYWORDSPELLING",
@@ -54,8 +57,7 @@ class PropertyManagerTest {
     }
 
     @Test
-    void testUserConfigurations() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
-        resetSets();
+    void testUserConfigurations() {
         spellings.add(PropertyOption.KEYWORDSPELLING);
         orders.add(PropertyOption.COLUMNNAMEORDER);
         dateFormats.add(new SimpleDateFormat("yyyy-MM-dd"));
@@ -77,16 +79,14 @@ class PropertyManagerTest {
     }
 
     @Test
-    void testUserConfigurationsWhenEverythingIsDisabeld() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
-        resetSets();
+    void testUserConfigurationsWhenEverythingIsDisabeld() {
         PropertyForm propertyForm = new PropertyForm(spellings, orders, dateFormats, timeFormats, dateTimeFormats, aggregateFunctionLang, sql);
         PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
         Assertions.assertEquals(propertyMapBuilder.build(), propertyManager.parseUserOptionsInput(propertyForm));
     }
 
     @Test
-    void testAggregateFunctionLangInPropertyManager() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
-        resetSets();
+    void testAggregateFunctionLangInPropertyManager() {
         aggregateFunctionLang.add("SUMME,SUM");
         aggregateFunctionLang.add("MITTELWERT,AVG");
         PropertyForm propertyForm = new PropertyForm(spellings, orders, dateFormats, timeFormats, dateTimeFormats, aggregateFunctionLang, sql);
