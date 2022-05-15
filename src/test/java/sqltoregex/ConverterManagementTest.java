@@ -11,11 +11,11 @@ class ConverterManagementTest {
     void testStatementDeparsingWithoutValidation() throws JSQLParserException {
         Assertions.assertEquals(
                 "^SELECT col1, col2 FROM table$",
-                converterManagement.deparse("SELECT col1, col2 FROM table", Boolean.FALSE, Boolean.FALSE)
+                converterManagement.deparse("SELECT col1, col2 FROM table", false, false)
         );
         Assertions.assertEquals(
                 "^col1 + col2$",
-                converterManagement.deparse("col1+col2", Boolean.TRUE, Boolean.FALSE)
+                converterManagement.deparse("col1+col2", true, false)
         );
     }
 
@@ -23,10 +23,10 @@ class ConverterManagementTest {
     void testStatementDeparsingWithValidation() throws JSQLParserException {
         Assertions.assertEquals(
                 "^SELECT col1, col2 FROM table$",
-                converterManagement.deparse("SELECT col1, col2 FROM table", Boolean.FALSE, Boolean.TRUE)
+                converterManagement.deparse("SELECT col1, col2 FROM table", false, true)
         );
         Assertions.assertThrows(IllegalArgumentException.class, () ->
-            converterManagement.deparse("col1, col2", Boolean.FALSE, Boolean.TRUE)
+            converterManagement.deparse("col1, col2", false, true)
         );
     }
 
@@ -34,10 +34,10 @@ class ConverterManagementTest {
     void testExpressionDeparsing() throws JSQLParserException {
         Assertions.assertEquals(
                 "^col1 + col2$",
-                converterManagement.deparse("col1+col2", Boolean.TRUE, Boolean.FALSE)
+                converterManagement.deparse("col1+col2", true, false)
         );
         Assertions.assertThrows(JSQLParserException.class, () ->
-            converterManagement.deparse("SELECT col1, col2 FROM table", Boolean.TRUE, Boolean.FALSE)
+            converterManagement.deparse("SELECT col1, col2 FROM table", true, false)
         );
     }
 

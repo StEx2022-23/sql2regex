@@ -28,9 +28,9 @@ public class ConverterManagement {
      * Validate inserted SQL-statements for oracle, mysql, sqlserver, mariadb
      * return true or false, with a console output about the error messages
      * @param sqlstatement String
-     * @return Boolean
+     * @return boolean
      */
-    public Boolean validate(String sqlstatement){
+    public boolean validate(String sqlstatement){
         List<DatabaseType> supportedDBMS = new ArrayList<>();
         supportedDBMS.add(DatabaseType.ORACLE);
         supportedDBMS.add(DatabaseType.MYSQL);
@@ -62,7 +62,7 @@ public class ConverterManagement {
      * @param list List<String>
      * @return boolean
      */
-    private Boolean isDistinctList(List<String> list){
+    private boolean isDistinctList(List<String> list){
         if(list.isEmpty()) throw new IllegalArgumentException("List should not be empty. One element is required.");
         Set<String> set = new HashSet<>(list);
         return (set.size() == list.size());
@@ -95,9 +95,9 @@ public class ConverterManagement {
         StringBuilder outputRegex = new StringBuilder();
         outputRegex.append("^");
 
-        if(regexList.size() == 1 || Boolean.FALSE.equals(isDistinctList(regexList))){
+        if(regexList.size() == 1 || !isDistinctList(regexList)){
             outputRegex.append(regexList.get(0));
-        } else if(Boolean.TRUE.equals(isDistinctList(regexList))){
+        } else if(isDistinctList(regexList)){
             for(String str : regexList){
                 outputRegex.append("(");
                 outputRegex.append(str);
@@ -111,7 +111,8 @@ public class ConverterManagement {
 
     /**
      * (de-)parsing the given statement
-     * @param sqlStatement String, isOnlyExpression Boolean, toBeValidated Boolean
+     * @param sqlStatement String
+     * @param isOnlyExpression boolean
      * @return deparsed Statement as RegEx - String
      * @throws JSQLParserException is thrown if parsing goes wrong
      */
@@ -121,7 +122,9 @@ public class ConverterManagement {
 
     /**
      * (de-)parsing the given statement
-     * @param sqlStatement String, isOnlyExpression Boolean, toBeValidated Boolean
+     * @param sqlStatement String
+     * @param isOnlyExpression boolean
+     * @param toBeValidated boolean
      * @return deparsed Statement as RegEx - String
      * @throws JSQLParserException is thrown if parsing goes wrong
      */
