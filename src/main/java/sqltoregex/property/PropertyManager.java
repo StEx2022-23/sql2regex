@@ -5,6 +5,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -14,6 +15,8 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class PropertyManager {
@@ -29,7 +32,8 @@ public class PropertyManager {
         try {
             return clazz.cast(rawProperty);
         } catch (ClassCastException e) {
-            //think about logging ...
+            Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+            logger.log(Level.INFO, "Something went wrong by casting property: {0}", e.toString());
         }
         return null;
     }
@@ -77,7 +81,8 @@ public class PropertyManager {
                     propertyMapBuilder.withStringSet(pairOfSynonymList, PropertyOption.AGGREGATEFUNCTIONLANG);
                 }
                 default -> {
-                    // think about logging ...
+                    Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+                    logger.log(Level.INFO, "Something went wrong by adding a property to the map.");
                 }
             }
         }

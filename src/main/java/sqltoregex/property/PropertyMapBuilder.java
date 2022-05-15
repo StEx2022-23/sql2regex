@@ -38,7 +38,7 @@ public class PropertyMapBuilder {
         return this.propertyMap;
     }
 
-    public void withPropertyOption(PropertyOption propertyOption) {
+    public PropertyMapBuilder withPropertyOption(PropertyOption propertyOption) {
         switch (propertyOption) {
             case KEYWORDSPELLING, COLUMNNAMESPELLING, TABLENAMESPELLING -> {
                 SpellingMistake spellingMistake = new SpellingMistake(propertyOption);
@@ -52,6 +52,7 @@ public class PropertyMapBuilder {
             }
             default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + propertyOption);
         }
+        return this;
     }
 
     public PropertyMapBuilder withPropertyOptionSet(Set<PropertyOption> propertyOptions) {
