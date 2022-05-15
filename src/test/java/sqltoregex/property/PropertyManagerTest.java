@@ -76,7 +76,7 @@ class PropertyManagerTest {
                 continue;
             }
             Assertions.assertTrue(propertyManager.getPropertyMap().containsKey(propertyOption));
-            Assertions.assertTrue(propertyManager.getPropertyMap().get(propertyOption) != null);
+            Assertions.assertNotNull(propertyManager.getPropertyMap().get(propertyOption));
         }
     }
 }
