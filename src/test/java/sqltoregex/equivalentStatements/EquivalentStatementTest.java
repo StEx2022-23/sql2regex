@@ -14,11 +14,10 @@ import java.util.regex.Pattern;
 
 class EquivalentStatementTest {
     Map<String, List<String>> equivalentStatements;
-    private static final String STATEMENTTYPE_SELECT = "SELECT";
     private static final String DELIMITER_FOR_EQUIVALENTS = "#####";
     private static final String DELIMITER_FOR_SINGLE_STATEMENTS = ";";
 
-    void parseTextFile(String statementType) throws IOException {
+    void parseTextFile(SupportedStatementType statementType) throws IOException {
         equivalentStatements = new HashMap<>();
         String data = new String(Files.readAllBytes(Paths.get("src/test/java/sqltoregex/equivalentStatements/"+statementType)));
         data = data.replaceAll("<!--.*--!>", "");
@@ -34,7 +33,7 @@ class EquivalentStatementTest {
     @Test
     void testSelectStatements() throws IOException, JSQLParserException {
         ConverterManagement converterManagement = new ConverterManagement();
-        this.parseTextFile(STATEMENTTYPE_SELECT);
+        this.parseTextFile(SupportedStatementType.SELECT);
         for(String key : this.equivalentStatements.keySet()){
             Pattern pattern = Pattern.compile(converterManagement.deparse(key, Boolean.FALSE, Boolean.FALSE));
             for(String toValidateStatements : this.equivalentStatements.get(key)){
