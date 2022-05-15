@@ -33,7 +33,7 @@ public class PropertyManager {
             return clazz.cast(rawProperty);
         } catch (ClassCastException e) {
             Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-            logger.log(Level.INFO, "Something went wrong by casting property.", e.toString());
+            logger.log(Level.INFO, "Something went wrong by casting property: {0}", e.toString());
         }
         return null;
     }

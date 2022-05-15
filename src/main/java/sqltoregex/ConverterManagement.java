@@ -15,8 +15,6 @@ import org.springframework.stereotype.Service;
 import sqltoregex.deparser.StatementDeParserForRegEx;
 
 import java.util.*;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,7 +43,7 @@ public class ConverterManagement {
         else{
             for(ValidationError va : validationerrors){
                 Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-                logger.log(Level.WARNING, "Something went wrong by adding a property to the map.", va.toString());
+                logger.log(Level.WARNING, "Something went wrong by adding a property to the map: {0}", va.toString());
             }
             return false;
         }
