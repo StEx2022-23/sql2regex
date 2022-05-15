@@ -33,12 +33,6 @@ public class ConverterManagement {
      * @return Boolean
      */
     public Boolean validate(String sqlstatement){
-        Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-        logger.setLevel(Level.ALL);
-        Handler handler = new ConsoleHandler();
-        handler.setLevel(Level.ALL);
-        logger.addHandler(handler);
-
         List<DatabaseType> supportedDBMS = new ArrayList<>();
         supportedDBMS.add(DatabaseType.ORACLE);
         supportedDBMS.add(DatabaseType.MYSQL);
@@ -50,7 +44,8 @@ public class ConverterManagement {
         if(validationerrors.isEmpty()) { return true;}
         else{
             for(ValidationError va : validationerrors){
-                logger.log(Level.WARNING, () -> "Something went wrong: " + va.toString());
+                Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+                logger.log(Level.WARNING, "Something went wrong by adding a property to the map.", va.toString());
             }
             return false;
         }
