@@ -111,28 +111,38 @@ public class ConverterManagement {
 
     /**
      * (de-)parsing the given statement
-     * @param sqlstatement String, isOnlyExpression Boolean, toBeValidated Boolean
+     * @param sqlStatement String, isOnlyExpression Boolean, toBeValidated Boolean
      * @return deparsed Statement as RegEx - String
      * @throws JSQLParserException is thrown if parsing goes wrong
      */
-    public String deparse(String sqlstatement, Boolean isOnlyExpression, Boolean toBeValidated) throws JSQLParserException {
+    public String deparse(String sqlStatement, boolean isOnlyExpression) throws JSQLParserException {
+        return deparse(sqlStatement, isOnlyExpression, true);
+    }
+
+    /**
+     * (de-)parsing the given statement
+     * @param sqlStatement String, isOnlyExpression Boolean, toBeValidated Boolean
+     * @return deparsed Statement as RegEx - String
+     * @throws JSQLParserException is thrown if parsing goes wrong
+     */
+    public String deparse(String sqlStatement, boolean isOnlyExpression, boolean toBeValidated) throws JSQLParserException {
         Statement statement;
         Expression expression;
 
         StringBuilder buffer = new StringBuilder();
 
-        if(Boolean.TRUE.equals(isOnlyExpression)){
-            expression = this.parseExpression(sqlstatement);
+        if(isOnlyExpression){
+            expression = this.parseExpression(sqlStatement);
             ExpressionVisitor expressionVisitor = new ExpressionVisitorAdapter();
             expression.accept(expressionVisitor);
             ExpressionDeParser expressionDeParser = new ExpressionDeParser();
             expression.accept(expressionDeParser);
             return this.buildOutputRegex(toMaskedStrings(expressionDeParser));
         } else {
-            if(Boolean.TRUE.equals(toBeValidated) && Boolean.FALSE.equals(this.validate(sqlstatement))){
+            if(toBeValidated && this.validate(sqlStatement)){
                 throw new IllegalArgumentException();
             }
-            statement = this.parseStatement(sqlstatement);
+            statement = this.parseStatement(sqlStatement);
             StatementDeParser defaultStatementDeparser = new StatementDeParser(buffer);
             statement.accept(defaultStatementDeparser);
             String regExOne = toMaskedStrings(defaultStatementDeparser);

@@ -35,7 +35,7 @@ class EquivalentStatementTest {
         ConverterManagement converterManagement = new ConverterManagement();
         this.parseTextFile(SupportedStatementType.SELECT);
         for(String key : this.equivalentStatements.keySet()){
-            Pattern pattern = Pattern.compile(converterManagement.deparse(key, Boolean.FALSE, Boolean.FALSE));
+            Pattern pattern = Pattern.compile(converterManagement.deparse(key, false, false));
             for(String toValidateStatements : this.equivalentStatements.get(key)){
                 Matcher matcher = pattern.matcher(toValidateStatements);
                 Assertions.assertTrue(matcher.matches());
