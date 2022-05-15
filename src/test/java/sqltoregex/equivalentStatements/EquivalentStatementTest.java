@@ -19,7 +19,7 @@ class EquivalentStatementTest {
 
     void parseTextFile(SupportedStatementType statementType) throws IOException {
         equivalentStatements = new HashMap<>();
-        String data = new String(Files.readAllBytes(Paths.get("src/test/java/sqltoregex/equivalentStatements/"+statementType)));
+        String data = new String(Files.readAllBytes(Paths.get("src/test/resources/sqltoregex/equivalentStatementTest/"+statementType)));
         data = data.replaceAll("<!--.*--!>", "");
         data = data.replace("\r", "").replace("\n", "");
         String[] splitByEquivalents = data.split(DELIMITER_FOR_EQUIVALENTS);
