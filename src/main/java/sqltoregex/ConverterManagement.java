@@ -142,7 +142,7 @@ public class ConverterManagement {
             expression.accept(expressionDeParser);
             return this.buildOutputRegex(toMaskedStrings(expressionDeParser));
         } else {
-            if(toBeValidated && this.validate(sqlStatement)){
+            if(toBeValidated && !this.validate(sqlStatement)){
                 throw new IllegalArgumentException();
             }
             statement = this.parseStatement(sqlStatement);
