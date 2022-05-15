@@ -10,7 +10,6 @@ import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import net.sf.jsqlparser.util.validation.Validation;
 import net.sf.jsqlparser.util.validation.ValidationError;
-import net.sf.jsqlparser.util.validation.ValidationException;
 import net.sf.jsqlparser.util.validation.feature.DatabaseType;
 import org.springframework.stereotype.Service;
 import sqltoregex.deparser.StatementDeParserForRegEx;
@@ -137,10 +136,8 @@ public class ConverterManagement {
             expression.accept(expressionDeParser);
             return this.buildOutputRegex(toMaskedStrings(expressionDeParser));
         } else {
-            if(Boolean.TRUE.equals(toBeValidated)){
-                if(Boolean.FALSE.equals(this.validate(sqlstatement))){
-                    throw new IllegalArgumentException();
-                }
+            if(Boolean.TRUE.equals(toBeValidated) && Boolean.FALSE.equals(this.validate(sqlstatement))){
+                throw new IllegalArgumentException();
             }
             statement = this.parseStatement(sqlstatement);
             StatementDeParser defaultStatementDeparser = new StatementDeParser(buffer);

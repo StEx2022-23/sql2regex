@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sqltoregex.ConverterManagement;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -13,7 +12,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class EquivalentStatementTest {
+class EquivalentStatementTest {
     Map<String, List<String>> equivalentStatements;
     private static final String STATEMENTTYPE_SELECT = "SELECT";
     private static final String DELIMITER_FOR_EQUIVALENTS = "#####";
