@@ -43,7 +43,7 @@ public class ConverterManagement {
         else{
             for(ValidationError va : validationerrors){
                 Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-                logger.log(Level.WARNING, "Something went wrong by adding a property to the map: {0}", va.toString());
+                logger.log(Level.WARNING, "Something went wrong by adding a property to the map: {0}", va);
             }
             return false;
         }
