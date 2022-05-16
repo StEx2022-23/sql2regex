@@ -22,6 +22,17 @@ public class ExpressionDeParserForRegExTest {
     }
 
     @Test
+    void binaryExpression() throws JSQLParserException{
+        Expression expression = (Expression) CCJSqlParserUtil.parseExpression(
+                "3 / 2");
+        StringBuilder b = new StringBuilder();
+        ExpressionDeParserForRegEx deParser = new ExpressionDeParserForRegEx();
+        deParser.setBuffer(b);
+        expression.accept(deParser);
+        Assertions.assertEquals("3\\s*/\\s*2", b.toString());
+    }
+
+    @Test
     void between() throws JSQLParserException {
         Expression expression = (Expression) CCJSqlParserUtil.parseExpression(
                 "a BETWEEN 1 AND 5");
@@ -29,6 +40,16 @@ public class ExpressionDeParserForRegExTest {
         ExpressionDeParserForRegEx deParser = new ExpressionDeParserForRegEx();
         deParser.setBuffer(b);
         expression.accept(deParser);
+        Assertions.assertEquals("a\\s+BETWEEN\\s+1\\s+AND\\s+5", b.toString());
+    }
+
+    @Test
+    void whiteSpaces() throws JSQLParserException {
+        Select select = (Select) CCJSqlParserUtil.parse("SELECT col1 FROM tabl1 WHERE col1 BETWEEN 1 AND 5");
+        StringBuilder b = new StringBuilder();
+        ExpressionDeParserForRegEx deParser = new ExpressionDeParserForRegEx();
+        deParser.setBuffer(b);
+        //select.accept(deParser);
         Assertions.assertEquals("a\\s+BETWEEN\\s+1\\s+AND\\s+5", b.toString());
     }
 }

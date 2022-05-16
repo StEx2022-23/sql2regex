@@ -16,6 +16,7 @@ import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
+    public static final String NOT = "NOT";
 
 
     public ExpressionDeParserForRegEx() {
@@ -45,19 +46,19 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(AndExpression andExpression) {
-        visitCommutativeBinaryExpression(andExpression, andExpression.isUseOperator() ? REQUIRED_WHITE_SPACE + "&&" + REQUIRED_WHITE_SPACE : REQUIRED_WHITE_SPACE + "AND" + REQUIRED_WHITE_SPACE);
+        visitCommutativeBinaryExpression(andExpression, andExpression.isUseOperator() ? OPTIONAL_WHITE_SPACE + "&&" + OPTIONAL_WHITE_SPACE : OPTIONAL_WHITE_SPACE + "AND" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(Between between) {
         between.getLeftExpression().accept(this);
         if (between.isNot()) {
-            buffer.append(REQUIRED_WHITE_SPACE + "NOT");
+            buffer.append(OPTIONAL_WHITE_SPACE + "NOT");
         }
 
-        buffer.append(REQUIRED_WHITE_SPACE + "BETWEEN" + REQUIRED_WHITE_SPACE);
+        buffer.append(OPTIONAL_WHITE_SPACE + "BETWEEN" + OPTIONAL_WHITE_SPACE);
         between.getBetweenExpressionStart().accept(this);
-        buffer.append(REQUIRED_WHITE_SPACE + "AND" + REQUIRED_WHITE_SPACE);
+        buffer.append(OPTIONAL_WHITE_SPACE + "AND" + OPTIONAL_WHITE_SPACE);
         between.getBetweenExpressionEnd().accept(this);
     }
 
@@ -68,27 +69,36 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(Division division) {
-        super.visit(division);
+        visitBinaryExpression(division, OPTIONAL_WHITE_SPACE + "/" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(IntegerDivision division) {
-        super.visit(division);
+        visitBinaryExpression(division, OPTIONAL_WHITE_SPACE + "DIV" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(DoubleValue doubleValue) {
-        super.visit(doubleValue);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer.append(doubleValue.toString());
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(HexValue hexValue) {
-        super.visit(hexValue);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer.append(hexValue.toString());
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(NotExpression notExpr) {
-        super.visit(notExpr);
+        if (notExpr.isExclamationMark()) {
+            buffer.append("!" + OPTIONAL_WHITE_SPACE);
+        } else {
+            buffer.append(OPTIONAL_WHITE_SPACE + NOT + OPTIONAL_WHITE_SPACE);
+        }
+        notExpr.getExpression().accept(this);
     }
 
     @Override
