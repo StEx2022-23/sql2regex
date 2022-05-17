@@ -4,7 +4,7 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 import org.springframework.util.Assert;
-import sqltoregex.property.PropertyOption;
+import sqltoregex.property.SettingsOption;
 import sqltoregex.property.RegExGenerator;
 
 import java.util.*;
@@ -32,14 +32,14 @@ abstract class SynonymGenerator<A, S> implements RegExGenerator<A,S> {
     protected SimpleWeightedGraph<A, DefaultWeightedEdge> synonymsGraph;
     private String prefix = "";
     private String suffix = "";
-    private PropertyOption propertyOption;
+    private SettingsOption settingsOption;
     protected boolean isCapturingGroup = false;
     protected boolean graphForSynonymsOfTwoWords = false;
 
-    protected SynonymGenerator(PropertyOption propertyOption) {
-        Assert.notNull(propertyOption, "PropertyOption must not be null");
+    protected SynonymGenerator(SettingsOption settingsOption) {
+        Assert.notNull(settingsOption, "SettingsOption must not be null");
         this.synonymsGraph = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
-        this.propertyOption = propertyOption;
+        this.settingsOption = settingsOption;
     }
 
     /**
@@ -235,11 +235,11 @@ abstract class SynonymGenerator<A, S> implements RegExGenerator<A,S> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SynonymGenerator<?, ?> that)) return false;
-        return synonymsGraph.vertexSet().equals(that.synonymsGraph.vertexSet()) && synonymsGraph.edgeSet().size() == that.synonymsGraph.edgeSet().size() && prefix.equals(that.prefix) && suffix.equals(that.suffix) && propertyOption == that.propertyOption;
+        return synonymsGraph.vertexSet().equals(that.synonymsGraph.vertexSet()) && synonymsGraph.edgeSet().size() == that.synonymsGraph.edgeSet().size() && prefix.equals(that.prefix) && suffix.equals(that.suffix) && settingsOption == that.settingsOption;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(synonymsGraph.vertexSet(), synonymsGraph.edgeSet().size(), prefix, suffix, propertyOption);
+        return Objects.hash(synonymsGraph.vertexSet(), synonymsGraph.edgeSet().size(), prefix, suffix, settingsOption);
     }
 }

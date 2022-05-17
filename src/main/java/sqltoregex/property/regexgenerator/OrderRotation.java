@@ -1,7 +1,7 @@
 package sqltoregex.property.regexgenerator;
 
 import org.springframework.util.Assert;
-import sqltoregex.property.PropertyOption;
+import sqltoregex.property.SettingsOption;
 import sqltoregex.property.RegExGenerator;
 
 import java.util.*;
@@ -12,25 +12,25 @@ import java.util.*;
  * SELECT table1, table2
  * SELECT (?:table1\s*,\s*table2|table2\s*,\s*table1)
  */
-public class OrderRotation implements RegExGenerator<PropertyOption, List<String>> {
+public class OrderRotation implements RegExGenerator<SettingsOption, List<String>> {
     private final StringBuilder orderRotationOfValueList = new StringBuilder();
     private SpellingMistake spellingMistake;
-    private final PropertyOption propertyoption;
+    private final SettingsOption propertyoption;
     protected boolean isCapturingGroup = false;
 
-    public OrderRotation(PropertyOption propertyOption, SpellingMistake spellingMistake){
+    public OrderRotation(SettingsOption settingsOption, SpellingMistake spellingMistake){
         Assert.notNull(spellingMistake, "SpellingMistake must not be null");
-        Assert.notNull(propertyOption, "PropertyOption must not be null");
+        Assert.notNull(settingsOption, "SettingsOption must not be null");
         this.spellingMistake = spellingMistake;
-        this.propertyoption = propertyOption;
+        this.propertyoption = settingsOption;
     }
 
-    public OrderRotation(PropertyOption propertyOption){
-        this.propertyoption = propertyOption;
+    public OrderRotation(SettingsOption settingsOption){
+        this.propertyoption = settingsOption;
     }
 
     @Override
-    public Set<PropertyOption> getSettings() {
+    public Set<SettingsOption> getSettings() {
         return new HashSet<>(List.of(propertyoption));
     }
 

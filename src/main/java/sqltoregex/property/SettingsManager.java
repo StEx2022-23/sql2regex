@@ -19,12 +19,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Service
-public class PropertyManager {
+public class SettingsManager {
     private static final String PROPERTY_DEACTIVATED = "false";
-    private final Map<PropertyOption, RegExGenerator<?, ?>> propertyMap = new EnumMap<>(PropertyOption.class);
+    private final Map<SettingsOption, RegExGenerator<?, ?>> propertyMap = new EnumMap<>(SettingsOption.class);
 
 
-    public PropertyManager() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
+    public SettingsManager() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
         this.parseProperties();
     }
 
@@ -38,38 +38,38 @@ public class PropertyManager {
         return null;
     }
 
-    public Map<PropertyOption, RegExGenerator<?, ?>> parseUserOptionsInput(PropertyForm form){
-        PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
+    public Map<SettingsOption, RegExGenerator<?, ?>> parseUserOptionsInput(SettingsForm form){
+        SettingsMapBuilder settingsMapBuilder = new SettingsMapBuilder();
 
-        return propertyMapBuilder
+        return settingsMapBuilder
                 .withPropertyOptionSet(form.getSpellings())
                 .withPropertyOptionSet(form.getOrders())
-                .withSimpleDateFormatSet(form.getDateFormats(), PropertyOption.DATESYNONYMS)
-                .withSimpleDateFormatSet(form.getTimeFormats(), PropertyOption.TIMESYNONYMS)
-                .withSimpleDateFormatSet(form.getDateTimeFormats(), PropertyOption.DATETIMESYNONYMS)
-                .withStringSet(form.getAggregateFunctionLang(), PropertyOption.AGGREGATEFUNCTIONLANG)
+                .withSimpleDateFormatSet(form.getDateFormats(), SettingsOption.DATESYNONYMS)
+                .withSimpleDateFormatSet(form.getTimeFormats(), SettingsOption.TIMESYNONYMS)
+                .withSimpleDateFormatSet(form.getDateTimeFormats(), SettingsOption.DATETIMESYNONYMS)
+                .withStringSet(form.getAggregateFunctionLang(), SettingsOption.AGGREGATEFUNCTIONLANG)
                 .build();
     }
 
-    private PropertyMapBuilder addPropertyToMap(Map<PropertyOption, NodeList> parsedValues) {
-        PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
-        for(PropertyOption prop : PropertyOption.values()){
+    private SettingsMapBuilder addPropertyToMap(Map<SettingsOption, NodeList> parsedValues) {
+        SettingsMapBuilder settingsMapBuilder = new SettingsMapBuilder();
+        for(SettingsOption prop : SettingsOption.values()){
             if (parsedValues.containsKey(prop) && parsedValues.get(prop).item(0).getTextContent().equals(PROPERTY_DEACTIVATED)) {
-                return propertyMapBuilder;
+                return settingsMapBuilder;
             }
             switch (prop) {
-                case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER -> propertyMapBuilder.withPropertyOption(prop);
+                case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER -> settingsMapBuilder.withPropertyOption(prop);
                 case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
                     Set<String> valueList = new HashSet<>();
-                    PropertyNodeListIterator propertyNodeListIterator = new PropertyNodeListIterator(parsedValues.get(prop));
-                    for(Node node : propertyNodeListIterator){
+                    SettingsNodeListIterator settingsNodeListIterator = new SettingsNodeListIterator(parsedValues.get(prop));
+                    for(Node node : settingsNodeListIterator){
                         valueList.add(node.getTextContent());
                     }
-                    propertyMapBuilder.withStringSet(valueList, prop);
+                    settingsMapBuilder.withStringSet(valueList, prop);
                 }
                 case AGGREGATEFUNCTIONLANG -> {
                     List<Node> valuePairsForSynonyms = new LinkedList<>();
-                    PropertyNodeListIterator valueTagIterator = new PropertyNodeListIterator(parsedValues.get(prop));
+                    SettingsNodeListIterator valueTagIterator = new SettingsNodeListIterator(parsedValues.get(prop));
                     for(Node node : valueTagIterator){
                         valuePairsForSynonyms.add(node);
                     }
@@ -78,7 +78,7 @@ public class PropertyManager {
                         String valuePair = valueNode.getTextContent();
                         pairOfSynonymList.add(valuePair);
                     }
-                    propertyMapBuilder.withStringSet(pairOfSynonymList, PropertyOption.AGGREGATEFUNCTIONLANG);
+                    settingsMapBuilder.withStringSet(pairOfSynonymList, SettingsOption.AGGREGATEFUNCTIONLANG);
                 }
                 default -> {
                     Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -86,7 +86,7 @@ public class PropertyManager {
                 }
             }
         }
-        return propertyMapBuilder;
+        return settingsMapBuilder;
     }
 
     /**
@@ -103,21 +103,21 @@ public class PropertyManager {
         return propertySet;
     }
 
-    public <S, R> RegExGenerator<S,R> getPropertyByPropOption(PropertyOption propertyOption, Class<? extends RegExGenerator<S,R>> clazz) {
-        for (Map.Entry<PropertyOption, RegExGenerator<?, ?>> entry : this.propertyMap.entrySet()) {
-            if (entry.getKey().equals(propertyOption)) {
+    public <S, R> RegExGenerator<S,R> getPropertyByPropOption(SettingsOption settingsOption, Class<? extends RegExGenerator<S,R>> clazz) {
+        for (Map.Entry<SettingsOption, RegExGenerator<?, ?>> entry : this.propertyMap.entrySet()) {
+            if (entry.getKey().equals(settingsOption)) {
                 return castProperty(propertyMap.get(entry.getKey()), clazz);
             }
         }
-        throw new NoSuchElementException("There is no property with this property option:" + propertyOption);
+        throw new NoSuchElementException("There is no property with this property option:" + settingsOption);
     }
 
-    public Map<PropertyOption, RegExGenerator<?, ?>> getPropertyMap() {
+    public Map<SettingsOption, RegExGenerator<?, ?>> getPropertyMap() {
         return this.propertyMap;
     }
 
     private void parseProperties() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
-        PropertyOption relatedOption;
+        SettingsOption relatedOption;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
         factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
@@ -127,15 +127,15 @@ public class PropertyManager {
 
         stripWhitespaces(document);
 
-        Map<PropertyOption, NodeList> parsedValues = new EnumMap<>(PropertyOption.class);
+        Map<SettingsOption, NodeList> parsedValues = new EnumMap<>(SettingsOption.class);
         Node root = document.getElementsByTagName("properties").item(0);
         NodeList properties = root.getChildNodes();
-        PropertyNodeListIterator rootElementIterator = new PropertyNodeListIterator(properties);
+        SettingsNodeListIterator rootElementIterator = new SettingsNodeListIterator(properties);
         for (Node rootNode : rootElementIterator) {
             NodeList propertyCategory = rootNode.getChildNodes();
-            PropertyNodeListIterator propertyCategoryIterator = new PropertyNodeListIterator(propertyCategory);
+            SettingsNodeListIterator propertyCategoryIterator = new SettingsNodeListIterator(propertyCategory);
             for (Node categoryNode : propertyCategoryIterator) {
-                relatedOption = PropertyOption.valueOf(categoryNode.getNodeName().toUpperCase());
+                relatedOption = SettingsOption.valueOf(categoryNode.getNodeName().toUpperCase());
                 NodeList innerNodes = categoryNode.getChildNodes();
                 parsedValues.put(relatedOption, innerNodes);
             }
@@ -143,7 +143,7 @@ public class PropertyManager {
         this.propertyMap.putAll(this.addPropertyToMap(parsedValues).build());
     }
 
-    public Set<PropertyOption> readPropertyOptions() {
+    public Set<SettingsOption> readPropertyOptions() {
         return this.propertyMap.keySet();
     }
 

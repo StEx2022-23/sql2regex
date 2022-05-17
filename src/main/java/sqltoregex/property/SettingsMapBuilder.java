@@ -12,24 +12,24 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class PropertyMapBuilder {
+public class SettingsMapBuilder {
     private final Set<OrderRotation> orderRotations;
-    private final Map<PropertyOption, RegExGenerator<?, ?>> propertyMap;
+    private final Map<SettingsOption, RegExGenerator<?, ?>> propertyMap;
     private final Set<SpellingMistake> spellingMistakes;
     private static final String UNSUPPORTED_BUILD_WITH = "Unsupported build with:";
     private static final String STRING_SYNONYM_DELIMITER = ";";
 
-    public PropertyMapBuilder() {
-        this.propertyMap = new EnumMap<>(PropertyOption.class);
+    public SettingsMapBuilder() {
+        this.propertyMap = new EnumMap<>(SettingsOption.class);
         this.orderRotations = new LinkedHashSet<>();
         this.spellingMistakes = new LinkedHashSet<>();
     }
 
-    public Map<PropertyOption, RegExGenerator<?, ?>> build() {
+    public Map<SettingsOption, RegExGenerator<?, ?>> build() {
         for (OrderRotation orderRotation : orderRotations) {
-            for (PropertyOption propertyOption : orderRotation.getSettings()) {
-                SpellingMistake spellingMistake = new SpellingMistake(PropertyOption.valueOf(
-                        propertyOption.toString().substring(0, propertyOption.toString().length() - 5) + "SPELLING"));
+            for (SettingsOption settingsOption : orderRotation.getSettings()) {
+                SpellingMistake spellingMistake = new SpellingMistake(SettingsOption.valueOf(
+                        settingsOption.toString().substring(0, settingsOption.toString().length() - 5) + "SPELLING"));
                 if (spellingMistakes.contains(spellingMistake)) {
                     orderRotation.setSpellingMistake(spellingMistake);
                 }
@@ -38,68 +38,70 @@ public class PropertyMapBuilder {
         return this.propertyMap;
     }
 
-    public PropertyMapBuilder withPropertyOption(PropertyOption propertyOption) {
-        switch (propertyOption) {
+    public SettingsMapBuilder withPropertyOption(SettingsOption settingsOption) {
+        switch (settingsOption) {
             case KEYWORDSPELLING, COLUMNNAMESPELLING, TABLENAMESPELLING -> {
-                SpellingMistake spellingMistake = new SpellingMistake(propertyOption);
-                this.propertyMap.put(propertyOption, spellingMistake);
+                SpellingMistake spellingMistake = new SpellingMistake(settingsOption);
+                this.propertyMap.put(settingsOption, spellingMistake);
                 spellingMistakes.add(spellingMistake);
             }
             case TABLENAMEORDER, COLUMNNAMEORDER -> {
-                OrderRotation orderRotation = new OrderRotation(propertyOption);
-                this.propertyMap.put(propertyOption, orderRotation);
+                OrderRotation orderRotation = new OrderRotation(settingsOption);
+                this.propertyMap.put(settingsOption, orderRotation);
                 orderRotations.add(orderRotation);
             }
-            default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + propertyOption);
+            default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + settingsOption);
         }
         return this;
     }
 
-    public PropertyMapBuilder withPropertyOptionSet(Set<PropertyOption> propertyOptions) {
-        Assert.notNull(propertyOptions, "Set of property options must not be null");
-        for (PropertyOption propertyOption : propertyOptions) {
-            withPropertyOption(propertyOption);
+    public SettingsMapBuilder withPropertyOptionSet(Set<SettingsOption> settingsOptions) {
+        Assert.notNull(settingsOptions, "Set of property options must not be null");
+        for (SettingsOption settingsOption : settingsOptions) {
+            withPropertyOption(settingsOption);
         }
         return this;
     }
 
-    public PropertyMapBuilder withSimpleDateFormatSet(Set<SimpleDateFormat> synonyms, PropertyOption propertyOption) {
+    public SettingsMapBuilder withSimpleDateFormatSet(Set<SimpleDateFormat> synonyms, SettingsOption settingsOption) {
         Assert.notNull(synonyms, "Set of simple date formats options must not be null");
-        switch (propertyOption) {
+        switch (settingsOption) {
             case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
                 DateAndTimeFormatSynonymGenerator synonymGenerator = new DateAndTimeFormatSynonymGenerator(
-                        propertyOption);
+                        settingsOption);
                 for (SimpleDateFormat format : synonyms) {
                     synonymGenerator.addSynonym(format);
                 }
-                this.propertyMap.put(propertyOption, synonymGenerator);
+                this.propertyMap.put(settingsOption, synonymGenerator);
             }
-            default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + propertyOption);
+            default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + settingsOption);
         }
         return this;
     }
 
-    public PropertyMapBuilder withStringSet(Set<String> synonyms, PropertyOption propertyOption) {
+    public SettingsMapBuilder withStringSet(Set<String> synonyms, SettingsOption settingsOption) {
         Assert.notNull(synonyms, "Set of strings options must not be null");
-            switch (propertyOption) {
+            switch (settingsOption) {
                 case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
-                    DateAndTimeFormatSynonymGenerator synonymGenerator = new DateAndTimeFormatSynonymGenerator(propertyOption);
+                    DateAndTimeFormatSynonymGenerator synonymGenerator = new DateAndTimeFormatSynonymGenerator(
+                            settingsOption);
                     for (String format : synonyms) {
                         synonymGenerator.addSynonym(new SimpleDateFormat(format));
                     }
-                    this.propertyMap.put(propertyOption, synonymGenerator);
+                    this.propertyMap.put(settingsOption, synonymGenerator);
                 }
                 case AGGREGATEFUNCTIONLANG -> {
                     if (!synonyms.isEmpty()) {
-                        StringSynonymGenerator aggregateFunctionSynonymGenerator = new StringSynonymGenerator(propertyOption);
+                        StringSynonymGenerator aggregateFunctionSynonymGenerator = new StringSynonymGenerator(
+                                settingsOption);
                         for (String singleSynonym : synonyms) {
                             aggregateFunctionSynonymGenerator.addSynonymFor(singleSynonym.split(STRING_SYNONYM_DELIMITER)[0].strip(),
                                                                             singleSynonym.split(STRING_SYNONYM_DELIMITER)[1].strip());
                         }
-                        this.propertyMap.put(propertyOption, aggregateFunctionSynonymGenerator);
+                        this.propertyMap.put(settingsOption, aggregateFunctionSynonymGenerator);
                     }
                 }
-                default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + propertyOption);
+                default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + settingsOption);
             }
         return this;
     }

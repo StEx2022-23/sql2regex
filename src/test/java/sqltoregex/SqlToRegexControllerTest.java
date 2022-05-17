@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import sqltoregex.property.PropertyOption;
+import sqltoregex.property.SettingsOption;
 
 import java.util.Arrays;
 
@@ -34,8 +34,8 @@ class SqlToRegexControllerTest {
                             .post("/convert")
                             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                             .content(EntityUtils.toString(new UrlEncodedFormEntity(Arrays.asList(
-                                    new BasicNameValuePair("spellings", PropertyOption.KEYWORDSPELLING.toString()),
-                                    new BasicNameValuePair("orders", PropertyOption.TABLENAMEORDER.toString()),
+                                    new BasicNameValuePair("spellings", SettingsOption.KEYWORDSPELLING.toString()),
+                                    new BasicNameValuePair("orders", SettingsOption.TABLENAMEORDER.toString()),
                                     new BasicNameValuePair("dateFormats", "yyyy-MM-dd"),
                                     new BasicNameValuePair("timeFormats", "HH:MM:SS"),
                                     new BasicNameValuePair("dateTimeFormats", "YYYY-MM-DD HH:MM:SS"),

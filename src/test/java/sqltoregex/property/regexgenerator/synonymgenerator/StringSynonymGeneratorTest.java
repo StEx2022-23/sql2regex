@@ -3,7 +3,7 @@ package sqltoregex.property.regexgenerator.synonymgenerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sqltoregex.property.PropertyOption;
+import sqltoregex.property.SettingsOption;
 
 class StringSynonymGeneratorTest {
 
@@ -11,7 +11,7 @@ class StringSynonymGeneratorTest {
 
     @BeforeEach
     void beforeAll() {
-        this.defaultSynonymManager = new StringSynonymGenerator(PropertyOption.DEFAULT);
+        this.defaultSynonymManager = new StringSynonymGenerator(SettingsOption.DEFAULT);
         defaultSynonymManager.addSynonym("witzig");
         defaultSynonymManager.addSynonym("komisch");
         defaultSynonymManager.addSynonym("ulkig");

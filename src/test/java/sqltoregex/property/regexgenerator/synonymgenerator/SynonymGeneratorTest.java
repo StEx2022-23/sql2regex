@@ -1,7 +1,7 @@
 package sqltoregex.property.regexgenerator.synonymgenerator;
 
 import org.junit.jupiter.api.*;
-import sqltoregex.property.PropertyOption;
+import sqltoregex.property.SettingsOption;
 
 import java.util.HashSet;
 import java.util.List;
@@ -60,7 +60,7 @@ class SynonymGeneratorTest {
 
     @BeforeEach
     void beforeEach() {
-        stringSynonymGenerator = new StringSynonymGenerator(PropertyOption.DEFAULT);
+        stringSynonymGenerator = new StringSynonymGenerator(SettingsOption.DEFAULT);
     }
 
     @Test
@@ -86,7 +86,7 @@ class SynonymGeneratorTest {
     }
 
     private StringSynonymGenerator getFullDefaultStringSynonymGenerator() {
-        StringSynonymGenerator _stringSynonymGenerator = new StringSynonymGenerator(PropertyOption.DEFAULT);
+        StringSynonymGenerator _stringSynonymGenerator = new StringSynonymGenerator(SettingsOption.DEFAULT);
         _stringSynonymGenerator.addSynonym("Mittelwert");
         _stringSynonymGenerator.addSynonym("AVG");
         _stringSynonymGenerator.addSynonym("Average");
