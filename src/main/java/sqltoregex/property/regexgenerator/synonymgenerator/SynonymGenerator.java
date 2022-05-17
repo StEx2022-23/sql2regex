@@ -4,9 +4,8 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 import org.springframework.util.Assert;
-import sqltoregex.property.Property;
 import sqltoregex.property.PropertyOption;
-import sqltoregex.property.regexgenerator.RegExGenerator;
+import sqltoregex.property.RegExGenerator;
 
 import java.util.*;
 
@@ -27,7 +26,7 @@ import java.util.*;
  * @param <S> class of search objects
  */
 
-abstract class SynonymGenerator<A, S> implements Property<A>, RegExGenerator<S> {
+abstract class SynonymGenerator<A, S> implements RegExGenerator<A,S> {
     public static final long DEFAULT_WEIGHT = 1L;
     //due to: Edges undirected (synonyms apply in both directions); Self-loops: no; Multiple edges: no; weighted: yes
     protected SimpleWeightedGraph<A, DefaultWeightedEdge> synonymsGraph;

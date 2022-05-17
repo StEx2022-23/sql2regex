@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class PropertyMapBuilder {
     private final Set<OrderRotation> orderRotations;
-    private final Map<PropertyOption, Property<?>> propertyMap;
+    private final Map<PropertyOption, RegExGenerator<?, ?>> propertyMap;
     private final Set<SpellingMistake> spellingMistakes;
     private static final String UNSUPPORTED_BUILD_WITH = "Unsupported build with:";
     private static final String STRING_SYNONYM_DELIMITER = ";";
@@ -25,7 +25,7 @@ public class PropertyMapBuilder {
         this.spellingMistakes = new LinkedHashSet<>();
     }
 
-    public Map<PropertyOption, Property<?>> build() {
+    public Map<PropertyOption, RegExGenerator<?, ?>> build() {
         for (OrderRotation orderRotation : orderRotations) {
             for (PropertyOption propertyOption : orderRotation.getSettings()) {
                 SpellingMistake spellingMistake = new SpellingMistake(PropertyOption.valueOf(

@@ -1,8 +1,8 @@
 package sqltoregex.property.regexgenerator;
 
 import org.springframework.util.Assert;
-import sqltoregex.property.Property;
 import sqltoregex.property.PropertyOption;
+import sqltoregex.property.RegExGenerator;
 
 import java.util.*;
 
@@ -12,7 +12,7 @@ import java.util.*;
  * SELECT table1, table2
  * SELECT (?:table1\s*,\s*table2|table2\s*,\s*table1)
  */
-public class OrderRotation implements Property<PropertyOption>, RegExGenerator<List<String>> {
+public class OrderRotation implements RegExGenerator<PropertyOption, List<String>> {
     private final StringBuilder orderRotationOfValueList = new StringBuilder();
     private SpellingMistake spellingMistake;
     private final PropertyOption propertyoption;
@@ -42,15 +42,17 @@ public class OrderRotation implements Property<PropertyOption>, RegExGenerator<L
     private void orderRotationRek(Integer amount, List<String> valueList){
         StringBuilder singleValue = new StringBuilder();
         if (amount == 1) {
-            for(String value : valueList){
+            Iterator<String> iterator = valueList.iterator();
+            while (iterator.hasNext()) {
                 if(spellingMistake != null) {
-                    singleValue.append(spellingMistake.generateRegExFor(value));
+                    singleValue.append(spellingMistake.generateRegExFor(iterator.next()));
                 } else{
-                    singleValue.append(value);
+                    singleValue.append(iterator.next());
                 }
-                singleValue.append("\\s*,\\s*");
+                if(iterator.hasNext()){
+                    singleValue.append("\\s*,\\s*");
+                }
             }
-            singleValue.replace(singleValue.length()-7, singleValue.length(), "");
             singleValue.append("|");
             orderRotationOfValueList.append(singleValue);
         } else {

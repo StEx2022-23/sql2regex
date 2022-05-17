@@ -33,14 +33,14 @@ class PropertyMapBuilderTest {
     void buildWith2EqualObjects() {
         builder.withPropertyOption(PropertyOption.COLUMNNAMEORDER);
         builder.withPropertyOption(PropertyOption.COLUMNNAMEORDER);
-        Map<PropertyOption, Property<?>> map = builder.build();
+        Map<PropertyOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
     }
 
     @Test
     void buildWithColumnNameOrder() {
         builder.withPropertyOption(PropertyOption.COLUMNNAMEORDER);
-        Map<PropertyOption, Property<?>> map = builder.build();
+        Map<PropertyOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(PropertyOption.COLUMNNAMEORDER));
         Assertions.assertTrue(map.containsValue(new OrderRotation(PropertyOption.COLUMNNAMEORDER)));
@@ -51,7 +51,7 @@ class PropertyMapBuilderTest {
         final String FORMAT = "yyyy-MM-dd";
         builder.withSimpleDateFormatSet(new HashSet<>(List.of(new SimpleDateFormat(FORMAT))),
                                         PropertyOption.DATESYNONYMS);
-        Map<PropertyOption, Property<?>> map = builder.build();
+        Map<PropertyOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         DateAndTimeFormatSynonymGenerator dateAndTimeFormatSynonymGenerator = new DateAndTimeFormatSynonymGenerator(
                 PropertyOption.DATESYNONYMS);
@@ -65,7 +65,7 @@ class PropertyMapBuilderTest {
         final String FORMAT = "yyyy-MM-dd hh:mm:ss";
         builder.withSimpleDateFormatSet(new HashSet<>(List.of(new SimpleDateFormat(FORMAT))),
                                         PropertyOption.DATETIMESYNONYMS);
-        Map<PropertyOption, Property<?>> map = builder.build();
+        Map<PropertyOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(PropertyOption.DATETIMESYNONYMS));
         DateAndTimeFormatSynonymGenerator dateAndTimeFormatSynonymGenerator = new DateAndTimeFormatSynonymGenerator(
@@ -77,14 +77,14 @@ class PropertyMapBuilderTest {
     @Test
     void buildWithEmptyAggregateFunctionLang() {
         builder.withStringSet(Collections.emptySet(), PropertyOption.AGGREGATEFUNCTIONLANG);
-        Map<PropertyOption, Property<?>> map = builder.build();
+        Map<PropertyOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(0, map.size());
     }
 
     @Test
     void buildWithEmptyDateSynonyms() {
         builder.withSimpleDateFormatSet(Collections.emptySet(), PropertyOption.DATESYNONYMS);
-        Map<PropertyOption, Property<?>> map = builder.build();
+        Map<PropertyOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(PropertyOption.DATESYNONYMS));
         Assertions.assertTrue(map.containsValue(new DateAndTimeFormatSynonymGenerator(PropertyOption.DATESYNONYMS)));
@@ -93,7 +93,7 @@ class PropertyMapBuilderTest {
     @Test
     void buildWithEmptyDateTimeSynonyms() {
         builder.withSimpleDateFormatSet(Collections.emptySet(), PropertyOption.DATETIMESYNONYMS);
-        Map<PropertyOption, Property<?>> map = builder.build();
+        Map<PropertyOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(PropertyOption.DATETIMESYNONYMS));
         Assertions.assertTrue(
@@ -103,14 +103,14 @@ class PropertyMapBuilderTest {
     @Test
     void buildWithEmptySetOfPropertyOption() {
         builder.withPropertyOptionSet(new HashSet<>());
-        Map<PropertyOption, Property<?>> map = builder.build();
+        Map<PropertyOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(0, map.size());
     }
 
     @Test
     void buildWithEmptyTimeSynonyms() {
         builder.withSimpleDateFormatSet(Collections.emptySet(), PropertyOption.TIMESYNONYMS);
-        Map<PropertyOption, Property<?>> map = builder.build();
+        Map<PropertyOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(PropertyOption.TIMESYNONYMS));
         Assertions.assertTrue(map.containsValue(new DateAndTimeFormatSynonymGenerator(PropertyOption.TIMESYNONYMS)));
@@ -119,7 +119,7 @@ class PropertyMapBuilderTest {
     @Test
     void buildWithKeyWordSpelling() {
         builder.withPropertyOption(PropertyOption.KEYWORDSPELLING);
-        Map<PropertyOption, Property<?>> map = builder.build();
+        Map<PropertyOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(PropertyOption.KEYWORDSPELLING));
         Assertions.assertTrue(map.containsValue(new SpellingMistake(PropertyOption.KEYWORDSPELLING)));
@@ -128,7 +128,7 @@ class PropertyMapBuilderTest {
     @Test
     void buildWithTableNameOrder() {
         builder.withPropertyOption(PropertyOption.TABLENAMEORDER);
-        Map<PropertyOption, Property<?>> map = builder.build();
+        Map<PropertyOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(PropertyOption.TABLENAMEORDER));
         Assertions.assertTrue(map.containsValue(new OrderRotation(PropertyOption.TABLENAMEORDER)));
@@ -139,7 +139,7 @@ class PropertyMapBuilderTest {
         final String FORMAT = "hh:mm:ss";
         builder.withSimpleDateFormatSet(new HashSet<>(List.of(new SimpleDateFormat(FORMAT))),
                                         PropertyOption.TIMESYNONYMS);
-        Map<PropertyOption, Property<?>> map = builder.build();
+        Map<PropertyOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         DateAndTimeFormatSynonymGenerator dateAndTimeFormatSynonymGenerator = new DateAndTimeFormatSynonymGenerator(
                 PropertyOption.TIMESYNONYMS);
@@ -161,7 +161,7 @@ class PropertyMapBuilderTest {
         aggregateFunctionLang.add(PAIR_ONE);
         aggregateFunctionLang.add(PAIR_TWO);
         builder.withStringSet(aggregateFunctionLang, PropertyOption.AGGREGATEFUNCTIONLANG);
-        Map<PropertyOption, Property<?>> map = builder.build();
+        Map<PropertyOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(PropertyOption.AGGREGATEFUNCTIONLANG));
         StringSynonymGenerator stringSynonymGenerator = new StringSynonymGenerator(

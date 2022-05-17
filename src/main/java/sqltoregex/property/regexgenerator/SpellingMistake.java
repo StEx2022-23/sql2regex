@@ -1,6 +1,6 @@
 package sqltoregex.property.regexgenerator;
 
-import sqltoregex.property.Property;
+import sqltoregex.property.RegExGenerator;
 import sqltoregex.property.PropertyOption;
 
 import java.util.*;
@@ -11,7 +11,7 @@ import java.util.*;
  * Example:
  * test ↔ (?:test|est|tst|tet|tes) or (test|est|tst|tet|tes)
  */
-public class SpellingMistake implements Property<PropertyOption>, RegExGenerator<String> {
+public class SpellingMistake implements RegExGenerator<PropertyOption, String> {
     private final PropertyOption propertyOption;
     protected boolean isCapturingGroup = false;
 

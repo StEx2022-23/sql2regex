@@ -21,14 +21,14 @@ import java.util.logging.Logger;
 @Service
 public class PropertyManager {
     private static final String PROPERTY_DEACTIVATED = "false";
-    private final Map<PropertyOption, Property<?>> propertyMap = new EnumMap<>(PropertyOption.class);
+    private final Map<PropertyOption, RegExGenerator<?, ?>> propertyMap = new EnumMap<>(PropertyOption.class);
 
 
     public PropertyManager() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
         this.parseProperties();
     }
 
-    public static <T> Property<T> castProperty(Property<?> rawProperty, Class<? extends Property<T>> clazz) {
+    public static <S, R> RegExGenerator<S,R> castProperty(RegExGenerator<?, ?> rawProperty, Class<? extends RegExGenerator<S, R>> clazz) {
         try {
             return clazz.cast(rawProperty);
         } catch (ClassCastException e) {
@@ -38,7 +38,7 @@ public class PropertyManager {
         return null;
     }
 
-    public Map<PropertyOption, Property<?>> parseUserOptionsInput(PropertyForm form){
+    public Map<PropertyOption, RegExGenerator<?, ?>> parseUserOptionsInput(PropertyForm form){
         PropertyMapBuilder propertyMapBuilder = new PropertyMapBuilder();
 
         return propertyMapBuilder
@@ -92,9 +92,9 @@ public class PropertyManager {
     /**
      * Method for getting all OrderRotations, all Spellings, all Dateformats, allTime Formats.
      */
-    public <T> Set<Property<T>> getPropertyByClass(Class<? extends Property<T>> clazz) {
-        Set<Property<T>> propertySet = new LinkedHashSet<>();
-        for (Property<?> property :
+    public <S, R> Set<RegExGenerator<S,R>> getPropertyByClass(Class<? extends RegExGenerator<S,R>> clazz) {
+        Set<RegExGenerator<S,R>> propertySet = new LinkedHashSet<>();
+        for (RegExGenerator<?, ?> property :
                 this.propertyMap.values()) {
             if (property.getClass().equals(clazz)) {
                 propertySet.add(castProperty(property, clazz));
@@ -103,8 +103,8 @@ public class PropertyManager {
         return propertySet;
     }
 
-    public <T> Property<T> getPropertyByPropOption(PropertyOption propertyOption, Class<? extends Property<T>> clazz) {
-        for (Map.Entry<PropertyOption, Property<?>> entry : this.propertyMap.entrySet()) {
+    public <S, R> RegExGenerator<S,R> getPropertyByPropOption(PropertyOption propertyOption, Class<? extends RegExGenerator<S,R>> clazz) {
+        for (Map.Entry<PropertyOption, RegExGenerator<?, ?>> entry : this.propertyMap.entrySet()) {
             if (entry.getKey().equals(propertyOption)) {
                 return castProperty(propertyMap.get(entry.getKey()), clazz);
             }
@@ -112,7 +112,7 @@ public class PropertyManager {
         throw new NoSuchElementException("There is no property with this property option:" + propertyOption);
     }
 
-    public Map<PropertyOption, Property<?>> getPropertyMap() {
+    public Map<PropertyOption, RegExGenerator<?, ?>> getPropertyMap() {
         return this.propertyMap;
     }
 

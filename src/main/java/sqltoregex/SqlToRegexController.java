@@ -1,5 +1,9 @@
 package sqltoregex;
 
+import net.sf.jsqlparser.expression.DateValue;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.TimeValue;
+import net.sf.jsqlparser.expression.TimestampValue;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
@@ -12,6 +16,7 @@ import sqltoregex.property.regexgenerator.synonymgenerator.StringSynonymGenerato
 
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Controller
@@ -29,27 +34,27 @@ public class SqlToRegexController {
     public String home(Model model) {
         model.addAttribute(TITLE, "sql2regex");
 
-        Property<PropertyOption> keywordSpelling = propertyManager.getPropertyByPropOption(PropertyOption.KEYWORDSPELLING, SpellingMistake.class);
+        RegExGenerator<PropertyOption, String> keywordSpelling = propertyManager.getPropertyByPropOption(PropertyOption.KEYWORDSPELLING, SpellingMistake.class);
         Set<PropertyOption> spellings = new HashSet<>(keywordSpelling.getSettings());
         model.addAttribute("spellings", spellings);
 
-        Property<PropertyOption> tableNameOrder = propertyManager.getPropertyByPropOption(PropertyOption.TABLENAMEORDER, OrderRotation.class);
-        Property<PropertyOption> columnNameOrder = propertyManager.getPropertyByPropOption(PropertyOption.COLUMNNAMEORDER, OrderRotation.class);
+        RegExGenerator<PropertyOption, List<String>> tableNameOrder = propertyManager.getPropertyByPropOption(PropertyOption.TABLENAMEORDER, OrderRotation.class);
+        RegExGenerator<PropertyOption, List<String>> columnNameOrder = propertyManager.getPropertyByPropOption(PropertyOption.COLUMNNAMEORDER, OrderRotation.class);
         Set<PropertyOption> orders = new HashSet<>();
         orders.addAll(tableNameOrder.getSettings());
         orders.addAll(columnNameOrder.getSettings());
         model.addAttribute("orders", orders);
 
-        Property<SimpleDateFormat> dateFormats = propertyManager.getPropertyByPropOption(PropertyOption.DATESYNONYMS, DateAndTimeFormatSynonymGenerator.class);
+        RegExGenerator<SimpleDateFormat, Expression> dateFormats = propertyManager.getPropertyByPropOption(PropertyOption.DATESYNONYMS, DateAndTimeFormatSynonymGenerator.class);
         model.addAttribute("dateFormats", dateFormats.getSettings());
 
-        Property<SimpleDateFormat> timeFormats = propertyManager.getPropertyByPropOption(PropertyOption.TIMESYNONYMS, DateAndTimeFormatSynonymGenerator.class);
+        RegExGenerator<SimpleDateFormat, Expression> timeFormats = propertyManager.getPropertyByPropOption(PropertyOption.TIMESYNONYMS, DateAndTimeFormatSynonymGenerator.class);
         model.addAttribute("timeFormats", timeFormats.getSettings());
 
-        Property<SimpleDateFormat> dateTimeFormats = propertyManager.getPropertyByPropOption(PropertyOption.DATETIMESYNONYMS, DateAndTimeFormatSynonymGenerator.class);
+        RegExGenerator<SimpleDateFormat, Expression> dateTimeFormats = propertyManager.getPropertyByPropOption(PropertyOption.DATETIMESYNONYMS, DateAndTimeFormatSynonymGenerator.class);
         model.addAttribute("dateTimeFormats", dateTimeFormats.getSettings());
 
-        Property<String> aggregateFunctionSynonyms = propertyManager.getPropertyByPropOption(PropertyOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class);
+        RegExGenerator<String, String> aggregateFunctionSynonyms = propertyManager.getPropertyByPropOption(PropertyOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class);
         model.addAttribute("aggregateFunctionLang", aggregateFunctionSynonyms.getSettings());
 
         model.addAttribute("propertyForm", new PropertyForm(spellings, orders, dateFormats.getSettings(), timeFormats.getSettings(), dateTimeFormats.getSettings(), aggregateFunctionSynonyms.getSettings(), "SELECT *"));
