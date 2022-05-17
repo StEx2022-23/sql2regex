@@ -12,7 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class SettingsMapBuilder {
+class SettingsMapBuilder {
     private final Set<OrderRotation> orderRotations;
     private final Map<SettingsOption, RegExGenerator<?, ?>> propertyMap;
     private final Set<SpellingMistake> spellingMistakes;
