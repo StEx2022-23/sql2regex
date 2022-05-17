@@ -34,6 +34,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
     @Override
     protected SimpleDateFormat prepareSynonymForAdd(SimpleDateFormat syn) {
         Assert.notNull(syn, "Format must not be null");
+        syn.setLenient(false);
         return syn;
     }
 
