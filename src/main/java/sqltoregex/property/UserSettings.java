@@ -3,9 +3,6 @@ package sqltoregex.property;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class UserSettings {
     private static UserSettings instance;
