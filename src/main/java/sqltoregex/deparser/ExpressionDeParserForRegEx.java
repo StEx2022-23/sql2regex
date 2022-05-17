@@ -18,6 +18,9 @@ import sqltoregex.property.regexgenerator.synonymgenerator.DateAndTimeFormatSyno
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Missing overrides: AnalyticExpression
+ */
 public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
@@ -139,25 +142,25 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         int isOracleSyntax = 0;
 
         expression.getLeftExpression().accept(this);
-        if (expression.getOldOracleJoinSyntax() == EqualsTo.ORACLE_JOIN_RIGHT) {
+        if (expression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_RIGHT) {
             buffer.append("(+)" + OPTIONAL_WHITE_SPACE);
-            isOracleSyntax = EqualsTo.ORACLE_JOIN_RIGHT;
+            isOracleSyntax = SupportsOldOracleJoinSyntax.ORACLE_JOIN_RIGHT;
         }
         buffer.append(operator);
         expression.getRightExpression().accept(this);
-        if (expression.getOldOracleJoinSyntax() == EqualsTo.ORACLE_JOIN_LEFT) {
+        if (expression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_LEFT) {
             buffer.append("(+)" + OPTIONAL_WHITE_SPACE);
-            isOracleSyntax = EqualsTo.ORACLE_JOIN_LEFT;
+            isOracleSyntax = SupportsOldOracleJoinSyntax.ORACLE_JOIN_LEFT;
         }
 
         if (isOracleSyntax != 0){
             expression.getRightExpression().accept(this);
-            if (expression.getOldOracleJoinSyntax() == EqualsTo.ORACLE_JOIN_LEFT) {
+            if (expression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_LEFT) {
                 buffer.append("(+)" + OPTIONAL_WHITE_SPACE);
             }
             buffer.append(operator);
             expression.getLeftExpression().accept(this);
-            if (expression.getOldOracleJoinSyntax() == EqualsTo.ORACLE_JOIN_RIGHT) {
+            if (expression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_RIGHT) {
                 buffer.append("(+)" + OPTIONAL_WHITE_SPACE);
             }
         }
@@ -447,6 +450,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     }
 
     @Override
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     public void visit(Function function) {
         if (function.isEscaped()) {
             buffer.append("\\{fn ");
@@ -535,16 +539,6 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             }
             expressions.get(i).accept(this);
         }
-    }
-
-    @Override
-    public SelectVisitor getSelectVisitor() {
-        return super.getSelectVisitor();
-    }
-
-    @Override
-    public void setSelectVisitor(SelectVisitor visitor) {
-        super.setSelectVisitor(visitor);
     }
 
     @Override
@@ -687,12 +681,6 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     }
 
     @Override
-    public void visit(AnalyticExpression aexpr) {
-        throw new UnsupportedOperationException();
-        //super.visit(aexpr);
-    }
-
-    @Override
     public void visit(ExtractExpression eexpr) {
         buffer.append(OPTIONAL_WHITE_SPACE);
         buffer.append("EXTRACT(").append(OPTIONAL_WHITE_SPACE).append(eexpr.getName());
@@ -705,7 +693,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     @Override
     public void visit(MultiExpressionList multiExprList) {
         buffer.append(OPTIONAL_WHITE_SPACE);
-        for (Iterator<ExpressionList> it = multiExprList.getExprList().iterator(); it.hasNext();) {
+        for (Iterator<ExpressionList> it = multiExprList.getExpressionLists().iterator(); it.hasNext();) {
             it.next().accept(this);
             if (it.hasNext()) {
                 buffer.append(",").append(OPTIONAL_WHITE_SPACE);
@@ -758,9 +746,9 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     }
 
     @Override
-    public void visit(UserVariable var) {
+    public void visit(UserVariable userVariable) {
         buffer.append(OPTIONAL_WHITE_SPACE);
-        super.visit(var);
+        super.visit(userVariable);
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
@@ -799,7 +787,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         }
         buffer.append("(");
 
-        if (rowConstructor.getColumnDefinitions().size()>0) {
+        if (rowConstructor.getColumnDefinitions().isEmpty()) {
             buffer.append("(");
             int i = 0;
             for (ColumnDefinition columnDefinition:rowConstructor.getColumnDefinitions()) {
@@ -887,11 +875,11 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     }
 
     @Override
-    public void visit(VariableAssignment var) {
+    public void visit(VariableAssignment variableAssignment) {
         buffer.append(OPTIONAL_WHITE_SPACE);
-        var.getVariable().accept(this);
-        buffer.append(REQUIRED_WHITE_SPACE).append(var.getOperation()).append(REQUIRED_WHITE_SPACE);
-        var.getExpression().accept(this);
+        variableAssignment.getVariable().accept(this);
+        buffer.append(REQUIRED_WHITE_SPACE).append(variableAssignment.getOperation()).append(REQUIRED_WHITE_SPACE);
+        variableAssignment.getExpression().accept(this);
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
@@ -917,10 +905,10 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     }
 
     @Override
-    public void visit(TimezoneExpression var) {
-        var.getLeftExpression().accept(this);
+    public void visit(TimezoneExpression timezoneExpression) {
+        timezoneExpression.getLeftExpression().accept(this);
 
-        for (Expression expr : var.getTimezoneExpressions()) {
+        for (Expression expr : timezoneExpression.getTimezoneExpressions()) {
             buffer.append(OPTIONAL_WHITE_SPACE).append("AT").append(REQUIRED_WHITE_SPACE).append("TIME")
                     .append(REQUIRED_WHITE_SPACE).append("ZONE").append(OPTIONAL_WHITE_SPACE);
             expr.accept(this);
