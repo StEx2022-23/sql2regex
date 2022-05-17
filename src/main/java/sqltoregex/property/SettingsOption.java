@@ -3,7 +3,7 @@ package sqltoregex.property;
 /**
  * Enum representing all possible PropertyOptions.
  */
-public enum PropertyOption {
+public enum SettingsOption {
     KEYWORDSPELLING,
     TABLENAMEORDER,
     TABLENAMESPELLING,

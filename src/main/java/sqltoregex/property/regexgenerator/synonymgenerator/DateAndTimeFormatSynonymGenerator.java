@@ -6,7 +6,7 @@ import net.sf.jsqlparser.expression.TimeValue;
 import net.sf.jsqlparser.expression.TimestampValue;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import org.springframework.util.Assert;
-import sqltoregex.property.PropertyOption;
+import sqltoregex.property.SettingsOption;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -19,8 +19,8 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
     public static final String MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE = "Query Expression must be of type " +
             "Date-/Time-/TimestampValue";
 
-    public DateAndTimeFormatSynonymGenerator(PropertyOption propertyOption) {
-        super(propertyOption);
+    public DateAndTimeFormatSynonymGenerator(SettingsOption settingsOption) {
+        super(settingsOption);
     }
 
     @Override

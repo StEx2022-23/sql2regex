@@ -5,7 +5,7 @@ import net.sf.jsqlparser.expression.TimeValue;
 import net.sf.jsqlparser.expression.TimestampValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import sqltoregex.property.PropertyOption;
+import sqltoregex.property.SettingsOption;
 
 import java.text.SimpleDateFormat;
 
@@ -14,7 +14,7 @@ class DateAndTimeFormatSynonymGeneratorTest {
 
     private DateAndTimeFormatSynonymGenerator getSynonymManagerForDates() {
         DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = new DateAndTimeFormatSynonymGenerator(
-                PropertyOption.DEFAULT);
+                SettingsOption.DEFAULT);
         dateAndTimeSynonymManager.addSynonym(new SimpleDateFormat("yyyy-MM-dd"));
         dateAndTimeSynonymManager.addSynonym(new SimpleDateFormat("yy-MM-dd"));
         return dateAndTimeSynonymManager;
@@ -22,7 +22,7 @@ class DateAndTimeFormatSynonymGeneratorTest {
 
     private DateAndTimeFormatSynonymGenerator getSynonymManagerForTimes() {
         DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = new DateAndTimeFormatSynonymGenerator(
-                PropertyOption.DEFAULT);
+                SettingsOption.DEFAULT);
         dateAndTimeSynonymManager.addSynonym(new SimpleDateFormat("HH:mm:ss"));
         dateAndTimeSynonymManager.addSynonym(new SimpleDateFormat("H:m:s"));
         return dateAndTimeSynonymManager;
@@ -30,7 +30,7 @@ class DateAndTimeFormatSynonymGeneratorTest {
 
     private DateAndTimeFormatSynonymGenerator getSynonymManagerForTimestamps() {
         DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = new DateAndTimeFormatSynonymGenerator(
-                PropertyOption.DEFAULT);
+                SettingsOption.DEFAULT);
         dateAndTimeSynonymManager.addSynonym(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         dateAndTimeSynonymManager.addSynonym(new SimpleDateFormat("yyyy-MM-dd H:m:s"));
         return dateAndTimeSynonymManager;
@@ -60,7 +60,7 @@ class DateAndTimeFormatSynonymGeneratorTest {
     @Test
     void queryNotExistingSynonym() {
         DateAndTimeFormatSynonymGenerator dateAndTimeSynonymManager = new DateAndTimeFormatSynonymGenerator(
-                PropertyOption.DEFAULT);
+                SettingsOption.DEFAULT);
         Assertions.assertEquals("(?:2012-5-6)",
                                 dateAndTimeSynonymManager.generateRegExFor(new DateValue("'2012-5-6'")));
         Assertions.assertEquals("(?:2012-05-06)",

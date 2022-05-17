@@ -6,17 +6,17 @@ import java.util.Map;
 
 class UserProperty{
     private static UserProperty instance;
-    public final ImmutableMap<PropertyOption, Property<?>> propertyMap;
+    public final ImmutableMap<SettingsOption, RegExGenerator<?, ?>> propertyMap;
 
-    private UserProperty(Map<PropertyOption, Property<?>> map){
-        this.propertyMap = new ImmutableMap.Builder<PropertyOption, Property<?>>().putAll(map).build();
+    private UserProperty(Map<SettingsOption, RegExGenerator<?, ?>> map){
+        this.propertyMap = new ImmutableMap.Builder<SettingsOption, RegExGenerator<?, ?>>().putAll(map).build();
     }
 
     private UserProperty(){
-        this.propertyMap = new ImmutableMap.Builder<PropertyOption, Property<?>>().build();
+        this.propertyMap = new ImmutableMap.Builder<SettingsOption, RegExGenerator<?, ?>>().build();
     }
 
-    public static UserProperty getInstance(Map<PropertyOption, Property<?>> map) {
+    public static UserProperty getInstance(Map<SettingsOption, RegExGenerator<?, ?>> map) {
         if (instance == null){
             instance = new UserProperty(map);
         }
@@ -30,7 +30,7 @@ class UserProperty{
         return instance;
     }
 
-    public Map<PropertyOption, Property<?>> getPropertyMap(){
+    public Map<SettingsOption, RegExGenerator<?, ?>> getPropertyMap(){
         return this.propertyMap;
     }
 }

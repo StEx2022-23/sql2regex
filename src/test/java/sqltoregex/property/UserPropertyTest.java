@@ -11,17 +11,17 @@ class UserPropertyTest {
 
     @Test
     void MapNotMutable() {
-        Map<PropertyOption, Property<?>> map = new HashMap<>();
+        Map<SettingsOption, RegExGenerator<?, ?>> map = new HashMap<>();
         UserProperty userProperty1 = UserProperty.getInstance(map);
         Assertions.assertThrows(UnsupportedOperationException.class, () -> userProperty1.propertyMap.putAll(map));
-        OrderRotation orderRotation = new OrderRotation(PropertyOption.DEFAULT);
+        OrderRotation orderRotation = new OrderRotation(SettingsOption.DEFAULT);
         Assertions.assertThrows(UnsupportedOperationException.class,
-                                () -> userProperty1.propertyMap.put(PropertyOption.COLUMNNAMEORDER, orderRotation));
+                                () -> userProperty1.propertyMap.put(SettingsOption.COLUMNNAMEORDER, orderRotation));
     }
 
     @Test
     void onlyOneInstance() {
-        Map<PropertyOption, Property<?>> map = new HashMap<>();
+        Map<SettingsOption, RegExGenerator<?, ?>> map = new HashMap<>();
         UserProperty userProperty1 = UserProperty.getInstance(map);
         UserProperty userProperty2 = UserProperty.getInstance(map);
         Assertions.assertEquals(userProperty1, userProperty2);

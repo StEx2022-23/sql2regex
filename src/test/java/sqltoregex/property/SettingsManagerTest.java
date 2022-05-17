@@ -16,10 +16,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-class PropertyManagerTest {
-    static PropertyManager propertyManager;
-    static Set<PropertyOption> spellings;
-    static Set<PropertyOption> orders;
+class SettingsManagerTest {
+    static SettingsManager settingsManager;
+    static Set<SettingsOption> spellings;
+    static Set<SettingsOption> orders;
     static Set<SimpleDateFormat> dateFormats;
     static Set<SimpleDateFormat> timeFormats;
     static Set<SimpleDateFormat> dateTimeFormats;
@@ -32,7 +32,7 @@ class PropertyManagerTest {
     }
 
     void resetSets() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
-        propertyManager = new PropertyManager();
+        settingsManager = new SettingsManager();
         spellings = new HashSet<>();
         orders = new HashSet<>();
         dateFormats = new HashSet<>();
@@ -44,7 +44,7 @@ class PropertyManagerTest {
 
     @Test
     void testLoadDefaultProperties() {
-        Set<PropertyOption> propertyOptionSet = propertyManager.readPropertyOptions();
+        Set<SettingsOption> settingsOptionSet = settingsManager.readPropertyOptions();
         List<String> propertyOptionWhichHaveBeenSet = List.of(
                 "KEYWORDSPELLING",
                 "TABLENAMESPELLING",
@@ -58,25 +58,25 @@ class PropertyManagerTest {
                 "AGGREGATEFUNCTIONLANG"
         );
         for (String str : propertyOptionWhichHaveBeenSet) {
-            Assertions.assertTrue(propertyOptionSet.toString().contains(str));
+            Assertions.assertTrue(settingsOptionSet.toString().contains(str));
         }
     }
 
     @Test
     void testGetPropertyByClazz(){
-        Assertions.assertEquals(3, propertyManager.getPropertyByClass(SpellingMistake.class).size());
-        Assertions.assertEquals(2, propertyManager.getPropertyByClass(OrderRotation.class).size());
-        Assertions.assertEquals(1, propertyManager.getPropertyByClass(StringSynonymGenerator.class).size());
+        Assertions.assertEquals(3, settingsManager.getPropertyByClass(SpellingMistake.class).size());
+        Assertions.assertEquals(2, settingsManager.getPropertyByClass(OrderRotation.class).size());
+        Assertions.assertEquals(1, settingsManager.getPropertyByClass(StringSynonymGenerator.class).size());
     }
 
     @Test
     void testGetProperty(){
-        for (PropertyOption propertyOption : PropertyOption.values()) {
-            if(PropertyOption.DEFAULT.equals(propertyOption)){
+        for (SettingsOption settingsOption : SettingsOption.values()) {
+            if(SettingsOption.DEFAULT.equals(settingsOption)){
                 continue;
             }
-            Assertions.assertTrue(propertyManager.getPropertyMap().containsKey(propertyOption));
-            Assertions.assertNotNull(propertyManager.getPropertyMap().get(propertyOption));
+            Assertions.assertTrue(settingsManager.getPropertyMap().containsKey(settingsOption));
+            Assertions.assertNotNull(settingsManager.getPropertyMap().get(settingsOption));
         }
     }
 }
