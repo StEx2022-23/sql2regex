@@ -7,27 +7,45 @@ import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.conditional.XorExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.select.AllColumns;
-import net.sf.jsqlparser.statement.select.AllTableColumns;
-import net.sf.jsqlparser.statement.select.SelectVisitor;
-import net.sf.jsqlparser.statement.select.SubSelect;
+import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
+import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
+import net.sf.jsqlparser.util.deparser.OrderByDeParser;
+import sqltoregex.property.SettingsManager;
+import sqltoregex.property.SettingsOption;
+import sqltoregex.property.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     public static final String NOT = "NOT";
 
+    private final SettingsManager settingsManager;
+    private OrderByDeParserForRegEx orderByDeParser;
+    private SelectVisitor selectVisitor = getSelectVisitor();
 
-    public ExpressionDeParserForRegEx() {
+    public ExpressionDeParserForRegEx(SettingsManager settingsManager) {
         super();
+        this.settingsManager = settingsManager;
     }
 
-    public ExpressionDeParserForRegEx(SelectVisitor selectVisitor, StringBuilder buffer) {
+    public ExpressionDeParserForRegEx(SelectVisitor selectVisitor, StringBuilder buffer, SettingsManager settingsManager) {
         super(selectVisitor, buffer);
+        this.settingsManager = settingsManager;
+    }
+
+    ExpressionDeParserForRegEx(SelectVisitor selectVisitor, StringBuilder buffer, OrderByDeParserForRegEx orderByDeParser, SettingsManager settingsManager) {
+        super(selectVisitor, buffer);
+        this.orderByDeParser = orderByDeParser;
+        this.settingsManager = settingsManager;
     }
 
     protected void visitCommutativeBinaryExpression(BinaryExpression binaryExpression, String operator){
+        buffer.append(OPTIONAL_WHITE_SPACE);
         binaryExpression.getLeftExpression().accept(this);
         buffer.append(operator);
         binaryExpression.getRightExpression().accept(this);
@@ -37,6 +55,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         binaryExpression.getRightExpression().accept(this);
         buffer.append(operator);
         binaryExpression.getLeftExpression().accept(this);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
@@ -51,6 +70,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(Between between) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         between.getLeftExpression().accept(this);
         if (between.isNot()) {
             buffer.append(OPTIONAL_WHITE_SPACE + "NOT");
@@ -60,6 +80,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         between.getBetweenExpressionStart().accept(this);
         buffer.append(OPTIONAL_WHITE_SPACE + "AND" + OPTIONAL_WHITE_SPACE);
         between.getBetweenExpressionEnd().accept(this);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
@@ -93,186 +114,428 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(NotExpression notExpr) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         if (notExpr.isExclamationMark()) {
             buffer.append("!" + OPTIONAL_WHITE_SPACE);
         } else {
             buffer.append(OPTIONAL_WHITE_SPACE + NOT + OPTIONAL_WHITE_SPACE);
         }
         notExpr.getExpression().accept(this);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(BitwiseRightShift expr) {
-        super.visit(expr);
+        visitBinaryExpression(expr, OPTIONAL_WHITE_SPACE + ">>" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(BitwiseLeftShift expr) {
-        super.visit(expr);
+        visitBinaryExpression(expr, OPTIONAL_WHITE_SPACE + "<<" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visitOldOracleJoinBinaryExpression(OldOracleJoinBinaryExpression expression, String operator) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         int isOracleSyntax = 0;
 
         expression.getLeftExpression().accept(this);
         if (expression.getOldOracleJoinSyntax() == EqualsTo.ORACLE_JOIN_RIGHT) {
-            buffer.append("(+)");
+            buffer.append("(+)" + OPTIONAL_WHITE_SPACE);
             isOracleSyntax = EqualsTo.ORACLE_JOIN_RIGHT;
         }
         buffer.append(operator);
         expression.getRightExpression().accept(this);
         if (expression.getOldOracleJoinSyntax() == EqualsTo.ORACLE_JOIN_LEFT) {
-            buffer.append("(+)");
+            buffer.append("(+)" + OPTIONAL_WHITE_SPACE);
             isOracleSyntax = EqualsTo.ORACLE_JOIN_LEFT;
         }
 
         if (isOracleSyntax != 0){
             expression.getRightExpression().accept(this);
             if (expression.getOldOracleJoinSyntax() == EqualsTo.ORACLE_JOIN_LEFT) {
-                buffer.append("(+)");
+                buffer.append("(+)" + OPTIONAL_WHITE_SPACE);
             }
             buffer.append(operator);
             expression.getLeftExpression().accept(this);
             if (expression.getOldOracleJoinSyntax() == EqualsTo.ORACLE_JOIN_RIGHT) {
-                buffer.append("(+)");
+                buffer.append("(+)" + OPTIONAL_WHITE_SPACE);
             }
         }
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(GreaterThan greaterThan) {
-        super.visit(greaterThan);
+        visitOldOracleJoinBinaryExpression(greaterThan, OPTIONAL_WHITE_SPACE + ">" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
-        super.visit(greaterThanEquals);
+        visitOldOracleJoinBinaryExpression(greaterThanEquals, OPTIONAL_WHITE_SPACE + ">=" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(InExpression inExpression) {
-        super.visit(inExpression);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        inExpression.getLeftExpression().accept(this);
+        if (inExpression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_RIGHT) {
+            buffer.append("(+)" + OPTIONAL_WHITE_SPACE);
+        }
+        if (inExpression.isNot()) {
+            buffer.append(OPTIONAL_WHITE_SPACE + "NOT");
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE + "IN" + OPTIONAL_WHITE_SPACE);
+        if (inExpression.getRightExpression() != null) {
+            inExpression.getRightExpression().accept(this);
+        } else {
+            inExpression.getRightItemsList().accept(this);
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(FullTextSearch fullTextSearch) {
-        super.visit(fullTextSearch);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        // Build a list of matched columns
+        StringBuilder columnsListCommaSeperated = new StringBuilder();
+        Iterator<Column> iterator = fullTextSearch.getMatchColumns().iterator();
+        while (iterator.hasNext()) {
+            Column col = iterator.next();
+            columnsListCommaSeperated.append(col.getFullyQualifiedName());
+            if (iterator.hasNext()) {
+                columnsListCommaSeperated.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
+            }
+        }
+        buffer.append("MATCH" + REQUIRED_WHITE_SPACE + OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE)
+                .append(columnsListCommaSeperated).append(OPTIONAL_WHITE_SPACE).append("\\)").append(REQUIRED_WHITE_SPACE)
+                .append("AGAINST").append(REQUIRED_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE)
+                .append(fullTextSearch.getAgainstValue())
+                .append(fullTextSearch.getSearchModifier() != null ?
+                                REQUIRED_WHITE_SPACE + fullTextSearch.getSearchModifier() : "")
+                .append(OPTIONAL_WHITE_SPACE).append("\\)")
+                .append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(SignedExpression signedExpression) {
-        super.visit(signedExpression);
+        buffer.append(signedExpression.getSign());
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        signedExpression.getExpression().accept(this);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(IsNullExpression isNullExpression) {
-        super.visit(isNullExpression);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        isNullExpression.getLeftExpression().accept(this);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        if (isNullExpression.isUseIsNull()) {
+            if (isNullExpression.isNot()) {
+                buffer.append("NOT" + REQUIRED_WHITE_SPACE + "ISNULL");
+            } else {
+                buffer.append("ISNULL" + OPTIONAL_WHITE_SPACE);
+            }
+        } else {
+            if (isNullExpression.isNot()) {
+                buffer.append("IS" + REQUIRED_WHITE_SPACE + "NOT NULL");
+            } else {
+                buffer.append("IS" + REQUIRED_WHITE_SPACE + "NULL");
+            }
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(IsBooleanExpression isBooleanExpression) {
-        super.visit(isBooleanExpression);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        isBooleanExpression.getLeftExpression().accept(this);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        if (isBooleanExpression.isTrue()) {
+            if (isBooleanExpression.isNot()) {
+                buffer.append("IS" + REQUIRED_WHITE_SPACE + "NOT" + REQUIRED_WHITE_SPACE + "TRUE");
+            } else {
+                buffer.append("IS" + REQUIRED_WHITE_SPACE +"TRUE");
+            }
+        } else {
+            if (isBooleanExpression.isNot()) {
+                buffer.append("IS" + REQUIRED_WHITE_SPACE + "NOT" + REQUIRED_WHITE_SPACE + "FALSE");
+            } else {
+                buffer.append("IS" + REQUIRED_WHITE_SPACE + "FALSE");
+            }
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(JdbcParameter jdbcParameter) {
-        super.visit(jdbcParameter);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer.append("?");
+        if (jdbcParameter.isUseFixedIndex()) {
+            buffer.append(jdbcParameter.getIndex());
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(LikeExpression likeExpression) {
-        super.visit(likeExpression);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        visitBinaryExpression(likeExpression,
+                              (likeExpression.isNot() ? "NOT" + OPTIONAL_WHITE_SPACE : "") + (likeExpression.isCaseInsensitive() ? "ILIKE" : "LIKE") + OPTIONAL_WHITE_SPACE);
+        Expression escape = likeExpression.getEscape();
+        if (escape != null) {
+            buffer.append(OPTIONAL_WHITE_SPACE);
+            buffer.append("ESCAPE");
+            buffer.append(OPTIONAL_WHITE_SPACE);
+            likeExpression.getEscape().accept(this);
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(ExistsExpression existsExpression) {
-        super.visit(existsExpression);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        if (existsExpression.isNot()) {
+            buffer.append("NOT EXISTS");
+        } else {
+            buffer.append("EXISTS");
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        existsExpression.getRightExpression().accept(this);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(LongValue longValue) {
-        super.visit(longValue);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer.append(longValue.getStringValue());
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(MinorThan minorThan) {
-        super.visit(minorThan);
+        visitOldOracleJoinBinaryExpression(minorThan, OPTIONAL_WHITE_SPACE + "<" + OPTIONAL_WHITE_SPACE);
+
+        visitOldOracleJoinBinaryExpression(new GreaterThan()
+                .withLeftExpression(minorThan.getLeftExpression())
+                .withRightExpression(minorThan.getRightExpression())
+                .withOldOracleJoinSyntax(minorThan.getOldOracleJoinSyntax())
+                .withOraclePriorPosition(minorThan.getOraclePriorPosition())
+        , OPTIONAL_WHITE_SPACE + ">" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
-        super.visit(minorThanEquals);
+        visitOldOracleJoinBinaryExpression(minorThanEquals, OPTIONAL_WHITE_SPACE + "<=" + OPTIONAL_WHITE_SPACE);
+
+        visitOldOracleJoinBinaryExpression(new GreaterThanEquals()
+                                                   .withLeftExpression(minorThanEquals.getLeftExpression())
+                                                   .withRightExpression(minorThanEquals.getRightExpression())
+                                                   .withOldOracleJoinSyntax(minorThanEquals.getOldOracleJoinSyntax())
+                                                   .withOraclePriorPosition(minorThanEquals.getOraclePriorPosition())
+                , OPTIONAL_WHITE_SPACE + ">=" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(Multiplication multiplication) {
-        super.visit(multiplication);
+        visitCommutativeBinaryExpression(multiplication, OPTIONAL_WHITE_SPACE + "*" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
-        super.visit(notEqualsTo);
+        visitOldOracleJoinBinaryExpression(notEqualsTo, REQUIRED_WHITE_SPACE + notEqualsTo.getStringExpression() + REQUIRED_WHITE_SPACE);
     }
 
     @Override
     public void visit(NullValue nullValue) {
-        super.visit(nullValue);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer.append(nullValue.toString());
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(OrExpression orExpression) {
-        super.visit(orExpression);
+        visitCommutativeBinaryExpression(orExpression, OPTIONAL_WHITE_SPACE + "OR" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(XorExpression xorExpression) {
-        super.visit(xorExpression);
+        visitCommutativeBinaryExpression(xorExpression, OPTIONAL_WHITE_SPACE + "XOR" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(Parenthesis parenthesis) {
-        super.visit(parenthesis);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer.append("\\(");
+        parenthesis.getExpression().accept(this);
+        buffer.append("\\)");
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(StringValue stringValue) {
-        super.visit(stringValue);
+        if (stringValue.getPrefix() != null) {
+            buffer.append(stringValue.getPrefix());
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE)
+                .append("['\"]").append(stringValue.getValue()).append("['\"]")
+                .append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(Subtraction subtraction) {
-        super.visit(subtraction);
+        visitBinaryExpression(subtraction, OPTIONAL_WHITE_SPACE + "-" + OPTIONAL_WHITE_SPACE);
+        buffer.append('|');
+        buffer.append('-');
+        visitBinaryExpression(new Addition()
+                                      .withLeftExpression(subtraction.getLeftExpression())
+                                      .withRightExpression(subtraction.getRightExpression())
+        , "+");
     }
 
     @Override
     protected void visitBinaryExpression(BinaryExpression binaryExpression, String operator) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visitBinaryExpression(binaryExpression, operator);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(SubSelect subSelect) {
-        super.visit(subSelect);
+        if (subSelect.isUseBrackets()) {
+            buffer.append("\\(");
+        }
+        if (selectVisitor != null) {
+            if (subSelect.getWithItemsList() != null) {
+                buffer.append("WITH" + REQUIRED_WHITE_SPACE);
+                for (Iterator<WithItem> iter = subSelect.getWithItemsList().iterator(); iter.hasNext();) {
+                    iter.next().accept(selectVisitor);
+                    if (iter.hasNext()) {
+                        buffer.append("," + REQUIRED_WHITE_SPACE);
+                    }
+                    buffer.append(REQUIRED_WHITE_SPACE);
+                }
+                buffer.append(REQUIRED_WHITE_SPACE);
+            }
+
+            subSelect.getSelectBody().accept(selectVisitor);
+        }
+        if (subSelect.isUseBrackets()) {
+            buffer.append("\\)");
+        }
     }
 
     @Override
     public void visit(Column tableColumn) {
-        super.visit(tableColumn);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        final Table table = tableColumn.getTable();
+        String tableName = null;
+        if (table != null) {
+            tableName = ("(?:");
+            tableName += table.getFullyQualifiedName();
+            if (table.getAlias() != null) {
+                tableName += "|";
+                tableName += table.getAlias().getName();
+            }
+            tableName += ')';
+        }
+        if (tableName != null) {
+            buffer.append(tableName).append(".");
+        }
+
+        buffer.append(tableColumn.getColumnName());
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(Function function) {
-        super.visit(function);
+        if (function.isEscaped()) {
+            buffer.append("\\{fn ");
+        }
+
+        buffer.append(function.getName());
+        if (function.getParameters() == null && function.getNamedParameters() == null) {
+            buffer.append("()");
+        } else {
+            buffer.append("(").append(OPTIONAL_WHITE_SPACE);
+            buffer.append(OPTIONAL_WHITE_SPACE);
+            if (function.isDistinct()) {
+                buffer.append("DISTINCT").append(REQUIRED_WHITE_SPACE);
+            } else if (function.isAllColumns()) {
+                buffer.append("ALL").append(REQUIRED_WHITE_SPACE);
+            } else if (function.isUnique()) {
+                buffer.append("UNIQUE").append(REQUIRED_WHITE_SPACE);
+            }
+            if (function.getNamedParameters() != null) {
+                visit(function.getNamedParameters());
+            }
+            if (function.getParameters() != null) {
+                visit(function.getParameters());
+            }
+            if (function.getOrderByElements() != null) {
+                buffer.append(REQUIRED_WHITE_SPACE).append("ORDER BY").append(REQUIRED_WHITE_SPACE);
+                boolean comma = false;
+                orderByDeParser.setExpressionVisitor(this);
+                orderByDeParser.setBuffer(buffer);
+                for (OrderByElement orderByElement : function.getOrderByElements()) {
+                    if (comma) {
+                        buffer.append(",").append(OPTIONAL_WHITE_SPACE);
+                    } else {
+                        comma = true;
+                    }
+                    orderByDeParser.deParseElement(orderByElement);
+                }
+            }
+            buffer.append(OPTIONAL_WHITE_SPACE).append(")");
+        }
+
+        if (function.getAttribute() != null) {
+            buffer.append(".").append(function.getAttribute());
+        } else if (function.getAttributeName() != null) {
+            buffer.append(".").append(function.getAttributeName());
+        }
+        if (function.getKeep() != null) {
+            buffer.append(REQUIRED_WHITE_SPACE).append(function.getKeep());
+        }
+
+        if (function.isEscaped()) {
+            buffer.append(OPTIONAL_WHITE_SPACE).append("\\}").append(OPTIONAL_WHITE_SPACE);
+        }
     }
 
     @Override
     public void visit(ExpressionList expressionList) {
-        super.visit(expressionList);
+        if (expressionList.isUsingBrackets()) {
+            buffer.append("(").append(OPTIONAL_WHITE_SPACE);
+        }
+        for (Iterator<Expression> iter = expressionList.getExpressions().iterator(); iter.hasNext();) {
+            Expression expression = iter.next();
+            expression.accept(this);
+            if (iter.hasNext()) {
+                buffer.append(",").append(OPTIONAL_WHITE_SPACE);
+            }
+        }
+        if (expressionList.isUsingBrackets()) {
+            buffer.append(OPTIONAL_WHITE_SPACE).append(")");
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(NamedExpressionList namedExpressionList) {
-        super.visit(namedExpressionList);
+        List<String> names = namedExpressionList.getNames();
+        List<Expression> expressions = namedExpressionList.getExpressions();
+        for (int i = 0; i < names.size(); i++) {
+            if (i > 0) {
+                buffer.append(REQUIRED_WHITE_SPACE);
+            }
+            String name = names.get(i);
+            if (!name.equals("")) {
+                buffer.append(name);
+                buffer.append(REQUIRED_WHITE_SPACE);
+            }
+            expressions.get(i).accept(this);
+        }
     }
 
     @Override
@@ -287,246 +550,447 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(DateValue dateValue) {
-        super.visit(dateValue);
+        buffer.append("\\{d").append(OPTIONAL_WHITE_SPACE).append("'").append(dateValue.getValue().toString())
+                .append("'").append(OPTIONAL_WHITE_SPACE).append("\\}")
+                .append('|')
+                .append(settingsManager.getPropertyByPropOption(SettingsOption.DATESYNONYMS,
+                                                                DateAndTimeFormatSynonymGenerator.class).generateRegExFor(dateValue));
     }
 
     @Override
     public void visit(TimestampValue timestampValue) {
-        super.visit(timestampValue);
+        buffer.append("\\{ts").append(OPTIONAL_WHITE_SPACE).append("'").append(timestampValue.getValue().toString())
+            .append(OPTIONAL_WHITE_SPACE).append("\\}")
+                .append('|')
+                .append(settingsManager.getPropertyByPropOption(SettingsOption.DATETIMESYNONYMS,
+                                                                DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timestampValue));
     }
 
     @Override
     public void visit(TimeValue timeValue) {
-        super.visit(timeValue);
+        buffer.append("\\{t").append(OPTIONAL_WHITE_SPACE).append("'").append(timeValue.getValue().toString())
+            .append(OPTIONAL_WHITE_SPACE).append("\\}")
+                .append('|')
+                .append(settingsManager.getPropertyByPropOption(SettingsOption.TIMESYNONYMS,
+                                                                DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timeValue));
     }
 
     @Override
     public void visit(CaseExpression caseExpression) {
-        super.visit(caseExpression);
+        buffer.append(caseExpression.isUsingBrackets() ? "(" : "").append(OPTIONAL_WHITE_SPACE).append("CASE").append(OPTIONAL_WHITE_SPACE);
+        Expression switchExp = caseExpression.getSwitchExpression();
+        if (switchExp != null) {
+            switchExp.accept(this);
+            buffer.append(OPTIONAL_WHITE_SPACE);
+        }
+
+        for (Expression exp : caseExpression.getWhenClauses()) {
+            exp.accept(this);
+        }
+
+        Expression elseExp = caseExpression.getElseExpression();
+        if (elseExp != null) {
+            buffer.append("ELSE").append(OPTIONAL_WHITE_SPACE);
+            elseExp.accept(this);
+            buffer.append(OPTIONAL_WHITE_SPACE);
+        }
+
+        buffer.append("END").append(caseExpression.isUsingBrackets() ? OPTIONAL_WHITE_SPACE + ")" : "");
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(WhenClause whenClause) {
-        super.visit(whenClause);
+        buffer.append("WHEN").append(OPTIONAL_WHITE_SPACE);
+        whenClause.getWhenExpression().accept(this);
+        buffer.append(OPTIONAL_WHITE_SPACE).append("THEN").append(OPTIONAL_WHITE_SPACE);
+        whenClause.getThenExpression().accept(this);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(AnyComparisonExpression anyComparisonExpression) {
-        super.visit(anyComparisonExpression);
+        buffer.append(anyComparisonExpression.getAnyType().name()).append(OPTIONAL_WHITE_SPACE).append("(").append(OPTIONAL_WHITE_SPACE);
+        SubSelect subSelect = anyComparisonExpression.getSubSelect();
+        if (subSelect!=null) {
+            subSelect.accept((ExpressionVisitor) this);
+        } else {
+            ExpressionList expressionList = (ExpressionList) anyComparisonExpression.getItemsList();
+            buffer.append("VALUES").append(OPTIONAL_WHITE_SPACE);
+            buffer.append(
+                    PlainSelect.getStringList(expressionList.getExpressions(), true, anyComparisonExpression.isUsingBracketsForValues()));
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE).append(")").append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(Concat concat) {
-        super.visit(concat);
+        visitBinaryExpression(concat, OPTIONAL_WHITE_SPACE + "||" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(Matches matches) {
-        super.visit(matches);
+        visitOldOracleJoinBinaryExpression(matches,OPTIONAL_WHITE_SPACE+ "@@" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(BitwiseAnd bitwiseAnd) {
-        super.visit(bitwiseAnd);
+        visitBinaryExpression(bitwiseAnd, OPTIONAL_WHITE_SPACE+ "&" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(BitwiseOr bitwiseOr) {
-        super.visit(bitwiseOr);
+        visitBinaryExpression(bitwiseOr, OPTIONAL_WHITE_SPACE + "|" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(BitwiseXor bitwiseXor) {
-        super.visit(bitwiseXor);
+        visitBinaryExpression(bitwiseXor, OPTIONAL_WHITE_SPACE + "^" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(CastExpression cast) {
-        super.visit(cast);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        if (cast.isUseCastKeyword()) {
+            buffer.append("CAST(");
+            cast.getLeftExpression().accept(this);
+            buffer.append(OPTIONAL_WHITE_SPACE).append("AS").append(OPTIONAL_WHITE_SPACE);
+            buffer.append( cast.getRowConstructor()!=null ? cast.getRowConstructor() : cast.getType() );
+            buffer.append(")");
+        } else {
+            cast.getLeftExpression().accept(this);
+            buffer.append("::");
+            buffer.append(cast.getType());
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(TryCastExpression cast) {
-        super.visit(cast);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        if (cast.isUseCastKeyword()) {
+            buffer.append("TRY_CAST(");
+            cast.getLeftExpression().accept(this);
+            buffer.append(OPTIONAL_WHITE_SPACE).append("AS").append(OPTIONAL_WHITE_SPACE);
+            buffer.append( cast.getRowConstructor()!=null ? cast.getRowConstructor() : cast.getType() );
+            buffer.append(")");
+        } else {
+            cast.getLeftExpression().accept(this);
+            buffer.append("::");
+            buffer.append(cast.getType());
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(Modulo modulo) {
-        super.visit(modulo);
+        visitBinaryExpression(modulo, OPTIONAL_WHITE_SPACE + "%" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(AnalyticExpression aexpr) {
-        super.visit(aexpr);
+        throw new UnsupportedOperationException();
+        //super.visit(aexpr);
     }
 
     @Override
     public void visit(ExtractExpression eexpr) {
-        super.visit(eexpr);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer.append("EXTRACT(").append(OPTIONAL_WHITE_SPACE).append(eexpr.getName());
+        buffer.append(OPTIONAL_WHITE_SPACE).append("FROM").append(OPTIONAL_WHITE_SPACE);
+        eexpr.getExpression().accept(this);
+        buffer.append(')');
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(MultiExpressionList multiExprList) {
-        super.visit(multiExprList);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        for (Iterator<ExpressionList> it = multiExprList.getExprList().iterator(); it.hasNext();) {
+            it.next().accept(this);
+            if (it.hasNext()) {
+                buffer.append(",").append(OPTIONAL_WHITE_SPACE);
+            }
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(IntervalExpression iexpr) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(iexpr);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(JdbcNamedParameter jdbcNamedParameter) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(jdbcNamedParameter);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(OracleHierarchicalExpression oexpr) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(oexpr);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(RegExpMatchOperator rexpr) {
-        super.visit(rexpr);
+        visitBinaryExpression(rexpr, OPTIONAL_WHITE_SPACE + rexpr.getStringExpression() + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(RegExpMySQLOperator rexpr) {
-        super.visit(rexpr);
+        visitBinaryExpression(rexpr, OPTIONAL_WHITE_SPACE + rexpr.getStringExpression() + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(JsonExpression jsonExpr) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(jsonExpr);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(JsonOperator jsonExpr) {
-        super.visit(jsonExpr);
+        visitBinaryExpression(jsonExpr, OPTIONAL_WHITE_SPACE + jsonExpr.getStringExpression() + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(UserVariable var) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(var);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(NumericBind bind) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(bind);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(KeepExpression aexpr) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(aexpr);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(MySQLGroupConcat groupConcat) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(groupConcat);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(ValueListExpression valueList) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(valueList);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(RowConstructor rowConstructor) {
-        super.visit(rowConstructor);
+        if (rowConstructor.getName() != null) {
+            buffer.append(rowConstructor.getName());
+        }
+        buffer.append("(");
+
+        if (rowConstructor.getColumnDefinitions().size()>0) {
+            buffer.append("(");
+            int i = 0;
+            for (ColumnDefinition columnDefinition:rowConstructor.getColumnDefinitions()) {
+                buffer.append(i>0 ? "," + OPTIONAL_WHITE_SPACE : "").append(columnDefinition.toString());
+                i++;
+            }
+            buffer.append(")");
+        } else {
+            boolean first = true;
+            for (Expression expr : rowConstructor.getExprList().getExpressions()) {
+                if (first) {
+                    first = false;
+                } else {
+                    buffer.append(",").append(OPTIONAL_WHITE_SPACE);
+                }
+                expr.accept(this);
+            }
+        }
+        buffer.append(")");
     }
 
     @Override
     public void visit(RowGetExpression rowGetExpression) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(rowGetExpression);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(OracleHint hint) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(hint);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(TimeKeyExpression timeKeyExpression) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(timeKeyExpression);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(DateTimeLiteralExpression literal) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(literal);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(NextValExpression nextVal) {
-        super.visit(nextVal);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer.append(nextVal.isUsingNextValueFor()  ? "NEXT"+ REQUIRED_WHITE_SPACE +"VALUE" +
+                REQUIRED_WHITE_SPACE+ "FOR" + OPTIONAL_WHITE_SPACE : "NEXTVAL"+ REQUIRED_WHITE_SPACE + "FOR"
+                + OPTIONAL_WHITE_SPACE).append(nextVal.getName());
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(CollateExpression col) {
-        super.visit(col);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer.append(col.getLeftExpression().toString()).append(OPTIONAL_WHITE_SPACE).append("COLLATE")
+                .append(OPTIONAL_WHITE_SPACE).append(col.getCollate());
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(SimilarToExpression expr) {
-        super.visit(expr);
+        visitBinaryExpression(expr, (expr.isNot() ? "NOT" + REQUIRED_WHITE_SPACE : "") + OPTIONAL_WHITE_SPACE
+                + "SIMILAR" + REQUIRED_WHITE_SPACE + "TO" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(ArrayExpression array) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(array);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(ArrayConstructor aThis) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(aThis);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(VariableAssignment var) {
-        super.visit(var);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        var.getVariable().accept(this);
+        buffer.append(REQUIRED_WHITE_SPACE).append(var.getOperation()).append(REQUIRED_WHITE_SPACE);
+        var.getExpression().accept(this);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(XMLSerializeExpr expr) {
-        super.visit(expr);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        //xmlserialize(xmlagg(xmltext(COMMENT_LINE) ORDER BY COMMENT_SEQUENCE) as varchar(1024))
+        buffer.append("xmlserialize(xmlagg(xmltext(");
+        expr.getExpression().accept(this);
+        buffer.append(")");
+        if (expr.getOrderByElements() != null){
+            buffer.append(OPTIONAL_WHITE_SPACE).append("ORDER BY").append(OPTIONAL_WHITE_SPACE);
+            for (Iterator<OrderByElement> i = expr.getOrderByElements().iterator(); i.hasNext();) {
+                buffer.append(i.next().toString());
+                if (i.hasNext()) {
+                    buffer.append(",").append(OPTIONAL_WHITE_SPACE);
+                }
+            }
+        }
+        buffer.append(")").append(OPTIONAL_WHITE_SPACE).append("AS").append(REQUIRED_WHITE_SPACE)
+                .append(expr.getDataType()).append(")");
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(TimezoneExpression var) {
-        super.visit(var);
+        var.getLeftExpression().accept(this);
+
+        for (Expression expr : var.getTimezoneExpressions()) {
+            buffer.append(OPTIONAL_WHITE_SPACE).append("AT").append(REQUIRED_WHITE_SPACE).append("TIME")
+                    .append(REQUIRED_WHITE_SPACE).append("ZONE").append(OPTIONAL_WHITE_SPACE);
+            expr.accept(this);
+        }
     }
 
     @Override
     public void visit(JsonAggregateFunction expression) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(expression);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(JsonFunction expression) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(expression);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(ConnectByRootOperator connectByRootOperator) {
-        super.visit(connectByRootOperator);
+        buffer.append("CONNECT_BY_ROOT").append(OPTIONAL_WHITE_SPACE);
+        connectByRootOperator.getColumn().accept(this);
     }
 
     @Override
     public void visit(OracleNamedFunctionParameter oracleNamedFunctionParameter) {
-        super.visit(oracleNamedFunctionParameter);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer
+                .append(oracleNamedFunctionParameter.getName())
+                .append(OPTIONAL_WHITE_SPACE)
+                .append("=>")
+                .append(OPTIONAL_WHITE_SPACE);
+
+        oracleNamedFunctionParameter.getExpression().accept(this);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(AllColumns allColumns) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(allColumns);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(AllTableColumns allTableColumns) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(allTableColumns);
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(AllValue allValue) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
         super.visit(allValue);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+    }
+
+    @Override
+    public void visit(IsDistinctExpression isDistinctExpression) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        super.visit(isDistinctExpression);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+    }
+
+    @Override
+    public void visit(GeometryDistance geometryDistance) {
+        visitOldOracleJoinBinaryExpression(geometryDistance, OPTIONAL_WHITE_SPACE + geometryDistance.getStringExpression() + OPTIONAL_WHITE_SPACE);
     }
 }
