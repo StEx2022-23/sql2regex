@@ -21,11 +21,11 @@ import java.util.logging.Logger;
 @Service
 public class SettingsManager {
     private static final String PROPERTY_DEACTIVATED = "false";
-    private final Map<SettingsOption, RegExGenerator<?, ?>> propertyMap = new EnumMap<>(SettingsOption.class);
+    private final Map<SettingsOption, RegExGenerator<?, ?>> settingsMap = new EnumMap<>(SettingsOption.class);
 
 
     public SettingsManager() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
-        this.parseProperties();
+        this.parseSettings();
     }
 
     public static <S, R> RegExGenerator<S,R> castProperty(RegExGenerator<?, ?> rawProperty, Class<? extends RegExGenerator<S, R>> clazz) {
@@ -92,10 +92,10 @@ public class SettingsManager {
     /**
      * Method for getting all OrderRotations, all Spellings, all Dateformats, allTime Formats.
      */
-    public <S, R> Set<RegExGenerator<S,R>> getPropertyByClass(Class<? extends RegExGenerator<S,R>> clazz) {
+    public <S, R> Set<RegExGenerator<S,R>> getSettingByClass(Class<? extends RegExGenerator<S,R>> clazz) {
         Set<RegExGenerator<S,R>> propertySet = new LinkedHashSet<>();
         for (RegExGenerator<?, ?> property :
-                this.propertyMap.values()) {
+                this.settingsMap.values()) {
             if (property.getClass().equals(clazz)) {
                 propertySet.add(castProperty(property, clazz));
             }
@@ -103,20 +103,20 @@ public class SettingsManager {
         return propertySet;
     }
 
-    public <S, R> RegExGenerator<S,R> getPropertyByPropOption(SettingsOption settingsOption, Class<? extends RegExGenerator<S,R>> clazz) {
-        for (Map.Entry<SettingsOption, RegExGenerator<?, ?>> entry : this.propertyMap.entrySet()) {
+    public <S, R> RegExGenerator<S,R> getSettingBySettingOption(SettingsOption settingsOption, Class<? extends RegExGenerator<S,R>> clazz) {
+        for (Map.Entry<SettingsOption, RegExGenerator<?, ?>> entry : this.settingsMap.entrySet()) {
             if (entry.getKey().equals(settingsOption)) {
-                return castProperty(propertyMap.get(entry.getKey()), clazz);
+                return castProperty(settingsMap.get(entry.getKey()), clazz);
             }
         }
         throw new NoSuchElementException("There is no property with this property option:" + settingsOption);
     }
 
-    public Map<SettingsOption, RegExGenerator<?, ?>> getPropertyMap() {
-        return this.propertyMap;
+    public Map<SettingsOption, RegExGenerator<?, ?>> getSettingsMap() {
+        return this.settingsMap;
     }
 
-    private void parseProperties() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
+    private void parseSettings() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
         SettingsOption relatedOption;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
@@ -140,11 +140,11 @@ public class SettingsManager {
                 parsedValues.put(relatedOption, innerNodes);
             }
         }
-        this.propertyMap.putAll(this.addPropertyToMap(parsedValues).build());
+        this.settingsMap.putAll(this.addPropertyToMap(parsedValues).build());
     }
 
     public Set<SettingsOption> readPropertyOptions() {
-        return this.propertyMap.keySet();
+        return this.settingsMap.keySet();
     }
 
     /**

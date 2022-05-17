@@ -11,7 +11,6 @@ import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
-import net.sf.jsqlparser.util.deparser.OrderByDeParser;
 import sqltoregex.property.SettingsManager;
 import sqltoregex.property.SettingsOption;
 import sqltoregex.property.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
@@ -553,8 +552,8 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         buffer.append("\\{d").append(OPTIONAL_WHITE_SPACE).append("'").append(dateValue.getValue().toString())
                 .append("'").append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')
-                .append(settingsManager.getPropertyByPropOption(SettingsOption.DATESYNONYMS,
-                                                                DateAndTimeFormatSynonymGenerator.class).generateRegExFor(dateValue));
+                .append(settingsManager.getSettingBySettingOption(SettingsOption.DATESYNONYMS,
+                                                                  DateAndTimeFormatSynonymGenerator.class).generateRegExFor(dateValue));
     }
 
     @Override
@@ -562,8 +561,8 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         buffer.append("\\{ts").append(OPTIONAL_WHITE_SPACE).append("'").append(timestampValue.getValue().toString())
             .append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')
-                .append(settingsManager.getPropertyByPropOption(SettingsOption.DATETIMESYNONYMS,
-                                                                DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timestampValue));
+                .append(settingsManager.getSettingBySettingOption(SettingsOption.DATETIMESYNONYMS,
+                                                                  DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timestampValue));
     }
 
     @Override
@@ -571,8 +570,8 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         buffer.append("\\{t").append(OPTIONAL_WHITE_SPACE).append("'").append(timeValue.getValue().toString())
             .append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')
-                .append(settingsManager.getPropertyByPropOption(SettingsOption.TIMESYNONYMS,
-                                                                DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timeValue));
+                .append(settingsManager.getSettingBySettingOption(SettingsOption.TIMESYNONYMS,
+                                                                  DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timeValue));
     }
 
     @Override

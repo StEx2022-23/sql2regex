@@ -60,33 +60,33 @@ public class SqlToRegexController {
     public String home(Model model) {
         model.addAttribute(TITLE, "sql2regex");
 
-        RegExGenerator<SettingsOption, String> keywordSpelling = settingsManager.getPropertyByPropOption(
+        RegExGenerator<SettingsOption, String> keywordSpelling = settingsManager.getSettingBySettingOption(
                 SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
         Set<SettingsOption> spellings = new HashSet<>(keywordSpelling.getSettings());
         model.addAttribute("spellings", spellings);
 
-        RegExGenerator<SettingsOption, List<String>> tableNameOrder = settingsManager.getPropertyByPropOption(
+        RegExGenerator<SettingsOption, List<String>> tableNameOrder = settingsManager.getSettingBySettingOption(
                 SettingsOption.TABLENAMEORDER, OrderRotation.class);
-        RegExGenerator<SettingsOption, List<String>> columnNameOrder = settingsManager.getPropertyByPropOption(
+        RegExGenerator<SettingsOption, List<String>> columnNameOrder = settingsManager.getSettingBySettingOption(
                 SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
         Set<SettingsOption> orders = new HashSet<>();
         orders.addAll(tableNameOrder.getSettings());
         orders.addAll(columnNameOrder.getSettings());
         model.addAttribute("orders", orders);
 
-        RegExGenerator<SimpleDateFormat, Expression> dateFormats = settingsManager.getPropertyByPropOption(
+        RegExGenerator<SimpleDateFormat, Expression> dateFormats = settingsManager.getSettingBySettingOption(
                 SettingsOption.DATESYNONYMS, DateAndTimeFormatSynonymGenerator.class);
         model.addAttribute("dateFormats", dateFormats.getSettings());
 
-        RegExGenerator<SimpleDateFormat, Expression> timeFormats = settingsManager.getPropertyByPropOption(
+        RegExGenerator<SimpleDateFormat, Expression> timeFormats = settingsManager.getSettingBySettingOption(
                 SettingsOption.TIMESYNONYMS, DateAndTimeFormatSynonymGenerator.class);
         model.addAttribute("timeFormats", timeFormats.getSettings());
 
-        RegExGenerator<SimpleDateFormat, Expression> dateTimeFormats = settingsManager.getPropertyByPropOption(
+        RegExGenerator<SimpleDateFormat, Expression> dateTimeFormats = settingsManager.getSettingBySettingOption(
                 SettingsOption.DATETIMESYNONYMS, DateAndTimeFormatSynonymGenerator.class);
         model.addAttribute("dateTimeFormats", dateTimeFormats.getSettings());
 
-        RegExGenerator<String, String> aggregateFunctionSynonyms = settingsManager.getPropertyByPropOption(
+        RegExGenerator<String, String> aggregateFunctionSynonyms = settingsManager.getSettingBySettingOption(
                 SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class);
         model.addAttribute("aggregateFunctionLang", aggregateFunctionSynonyms.getSettings());
 

@@ -64,9 +64,9 @@ class SettingsManagerTest {
 
     @Test
     void testGetPropertyByClazz(){
-        Assertions.assertEquals(3, settingsManager.getPropertyByClass(SpellingMistake.class).size());
-        Assertions.assertEquals(2, settingsManager.getPropertyByClass(OrderRotation.class).size());
-        Assertions.assertEquals(1, settingsManager.getPropertyByClass(StringSynonymGenerator.class).size());
+        Assertions.assertEquals(3, settingsManager.getSettingByClass(SpellingMistake.class).size());
+        Assertions.assertEquals(2, settingsManager.getSettingByClass(OrderRotation.class).size());
+        Assertions.assertEquals(1, settingsManager.getSettingByClass(StringSynonymGenerator.class).size());
     }
 
     @Test
@@ -75,8 +75,8 @@ class SettingsManagerTest {
             if(SettingsOption.DEFAULT.equals(settingsOption)){
                 continue;
             }
-            Assertions.assertTrue(settingsManager.getPropertyMap().containsKey(settingsOption));
-            Assertions.assertNotNull(settingsManager.getPropertyMap().get(settingsOption));
+            Assertions.assertTrue(settingsManager.getSettingsMap().containsKey(settingsOption));
+            Assertions.assertNotNull(settingsManager.getSettingsMap().get(settingsOption));
         }
     }
 }
