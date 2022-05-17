@@ -4,28 +4,28 @@ import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 
-class UserProperty{
-    private static UserProperty instance;
+public class UserSettings {
+    private static UserSettings instance;
     public final ImmutableMap<SettingsOption, RegExGenerator<?, ?>> propertyMap;
 
-    private UserProperty(Map<SettingsOption, RegExGenerator<?, ?>> map){
+    private UserSettings(Map<SettingsOption, RegExGenerator<?, ?>> map){
         this.propertyMap = new ImmutableMap.Builder<SettingsOption, RegExGenerator<?, ?>>().putAll(map).build();
     }
 
-    private UserProperty(){
+    private UserSettings(){
         this.propertyMap = new ImmutableMap.Builder<SettingsOption, RegExGenerator<?, ?>>().build();
     }
 
-    public static UserProperty getInstance(Map<SettingsOption, RegExGenerator<?, ?>> map) {
+    public static UserSettings getInstance(Map<SettingsOption, RegExGenerator<?, ?>> map) {
         if (instance == null){
-            instance = new UserProperty(map);
+            instance = new UserSettings(map);
         }
         return instance;
     }
 
-    public static UserProperty getInstance() {
+    public static UserSettings getInstance() {
         if (instance == null){
-            instance = new UserProperty();
+            instance = new UserSettings();
         }
         return instance;
     }
