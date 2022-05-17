@@ -25,6 +25,10 @@ public class ExpressionDeParserForRegExTest {
     public ExpressionDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
     }
 
+    /**
+     * Assertions.assertEquals("1\\s+AND\\s+2|2\\s+AND\\s+1", b.toString());
+     * @throws JSQLParserException
+     */
     @Test
     void commutativeBinaryExpression() throws JSQLParserException {
         Expression expression = (Expression) CCJSqlParserUtil.parseExpression(
@@ -33,9 +37,13 @@ public class ExpressionDeParserForRegExTest {
         ExpressionDeParserForRegEx deParser = new ExpressionDeParserForRegEx(settingsManager);
         deParser.setBuffer(b);
         expression.accept(deParser);
-        Assertions.assertEquals("1\\s+AND\\s+2|2\\s+AND\\s+1", b.toString());
+        Assertions.assertEquals("\\s*\\s*1\\s*\\s*AND\\s*\\s*2\\s*|\\s*2\\s*\\s*AND\\s*\\s*1\\s*\\s*", b.toString());
     }
 
+    /**
+     * Assertions.assertEquals("3\\s*\\s*2", b.toString());
+     * @throws JSQLParserException
+     */
     @Test
     void binaryExpression() throws JSQLParserException{
         Expression expression = (Expression) CCJSqlParserUtil.parseExpression(
@@ -44,9 +52,13 @@ public class ExpressionDeParserForRegExTest {
         ExpressionDeParserForRegEx deParser = new ExpressionDeParserForRegEx(settingsManager);
         deParser.setBuffer(b);
         expression.accept(deParser);
-        Assertions.assertEquals("3\\s*/\\s*2", b.toString());
+        Assertions.assertEquals("\\s*\\s*3\\s*\\s*/\\s*\\s*2\\s*\\s*", b.toString());
     }
 
+    /**
+     * Assertions.assertEquals("a\\s+BETWEEN\\s+1\\s+AND\\s+5", b.toString());
+     * @throws JSQLParserException
+     */
     @Test
     void between() throws JSQLParserException {
         Expression expression = (Expression) CCJSqlParserUtil.parseExpression(
@@ -55,7 +67,7 @@ public class ExpressionDeParserForRegExTest {
         ExpressionDeParserForRegEx deParser = new ExpressionDeParserForRegEx(settingsManager);
         deParser.setBuffer(b);
         expression.accept(deParser);
-        Assertions.assertEquals("a\\s+BETWEEN\\s+1\\s+AND\\s+5", b.toString());
+        Assertions.assertEquals("\\s*\\s*a\\s*\\s*BETWEEN\\s*\\s*1\\s*\\s*AND\\s*\\s*5\\s*\\s*", b.toString());
     }
 
     @Test
