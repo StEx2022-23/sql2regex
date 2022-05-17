@@ -2,21 +2,21 @@ package sqltoregex.property.regexgenerator;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import sqltoregex.property.PropertyOption;
+import sqltoregex.property.SettingsOption;
 
 class SpellingMistakeTest {
-    public SpellingMistake spellingMistake = new SpellingMistake(PropertyOption.DEFAULT);
+    public SpellingMistake spellingMistake = new SpellingMistake(SettingsOption.DEFAULT);
 
     @Test
     void equals() {
-        Assertions.assertEquals(new SpellingMistake(PropertyOption.DEFAULT),
-                                new SpellingMistake(PropertyOption.DEFAULT));
+        Assertions.assertEquals(new SpellingMistake(SettingsOption.DEFAULT),
+                                new SpellingMistake(SettingsOption.DEFAULT));
     }
 
     @Test
     void testGetProperty() {
         Assertions.assertEquals(1, spellingMistake.getSettings().size());
-        Assertions.assertTrue(spellingMistake.getSettings().contains(PropertyOption.DEFAULT));
+        Assertions.assertTrue(spellingMistake.getSettings().contains(SettingsOption.DEFAULT));
     }
 
     @Test

@@ -5,8 +5,8 @@ import javax.validation.constraints.NotNull;
 import java.text.SimpleDateFormat;
 import java.util.Set;
 
-public record PropertyForm(@NotNull Set<PropertyOption> spellings,
-                           @NotNull Set<PropertyOption> orders,
+public record SettingsForm(@NotNull Set<SettingsOption> spellings,
+                           @NotNull Set<SettingsOption> orders,
                            @NotNull Set<SimpleDateFormat> dateFormats,
                            @NotNull Set<SimpleDateFormat> timeFormats,
                            @NotNull Set<SimpleDateFormat> dateTimeFormats,
@@ -25,11 +25,11 @@ public record PropertyForm(@NotNull Set<PropertyOption> spellings,
         return dateTimeFormats;
     }
 
-    public Set<PropertyOption> getOrders() {
+    public Set<SettingsOption> getOrders() {
         return orders;
     }
 
-    public Set<PropertyOption> getSpellings() {
+    public Set<SettingsOption> getSpellings() {
         return spellings;
     }
 

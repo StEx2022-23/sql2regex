@@ -6,10 +6,10 @@ import org.w3c.dom.NodeList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class PropertyNodeListIterator implements Iterable<Node>{
+public class SettingsNodeListIterator implements Iterable<Node>{
     private final NodeList nodeList;
 
-    public PropertyNodeListIterator(final NodeList nodeList) {
+    public SettingsNodeListIterator(final NodeList nodeList) {
         this.nodeList = nodeList;
     }
 

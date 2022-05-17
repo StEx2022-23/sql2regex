@@ -3291,7 +3291,7 @@
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "PropertyManager",
+											"text": "SettingsManager",
 											"horizontalAlignment": 2,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -14213,7 +14213,7 @@
 									"_parent": {
 										"$ref": "AAAAAAGAjw1tKToqzS8="
 									},
-									"name": "PropertyManager",
+									"name": "SettingsManager",
 									"stereotype": "Service",
 									"visibility": "public",
 									"attributes": [

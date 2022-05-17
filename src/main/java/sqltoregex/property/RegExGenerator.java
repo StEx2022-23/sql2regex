@@ -1,7 +1,11 @@
-package sqltoregex.property.regexgenerator;
+package sqltoregex.property;
 
-public interface RegExGenerator<T> {
-    String generateRegExFor(T wordToFindSynonyms);
+import java.util.Set;
+
+public interface RegExGenerator<S, R> {
+    Set<S> getSettings();
+
+    String generateRegExFor(R input);
 
     /**
      * Sets whether there will be an enclosing non capturing group (?: ... ) around the generated regEx.

@@ -1,7 +1,7 @@
 package sqltoregex.property.regexgenerator;
 
-import sqltoregex.property.Property;
-import sqltoregex.property.PropertyOption;
+import sqltoregex.property.RegExGenerator;
+import sqltoregex.property.SettingsOption;
 
 import java.util.*;
 
@@ -11,17 +11,17 @@ import java.util.*;
  * Example:
  * test ↔ (?:test|est|tst|tet|tes) or (test|est|tst|tet|tes)
  */
-public class SpellingMistake implements Property<PropertyOption>, RegExGenerator<String> {
-    private final PropertyOption propertyOption;
+public class SpellingMistake implements RegExGenerator<SettingsOption, String> {
+    private final SettingsOption settingsOption;
     protected boolean isCapturingGroup = false;
 
-    public SpellingMistake(PropertyOption propertyOption){
-        this.propertyOption = propertyOption;
+    public SpellingMistake(SettingsOption settingsOption){
+        this.settingsOption = settingsOption;
     }
 
     @Override
-    public Set<PropertyOption> getSettings() {
-        return new HashSet<>(List.of(propertyOption));
+    public Set<SettingsOption> getSettings() {
+        return new HashSet<>(List.of(settingsOption));
     }
 
     /**
@@ -56,11 +56,11 @@ public class SpellingMistake implements Property<PropertyOption>, RegExGenerator
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SpellingMistake that)) return false;
-        return propertyOption == that.propertyOption;
+        return settingsOption == that.settingsOption;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(propertyOption);
+        return Objects.hash(settingsOption);
     }
 }
