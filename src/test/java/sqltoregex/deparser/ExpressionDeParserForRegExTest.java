@@ -245,8 +245,7 @@ class ExpressionDeParserForRegExTest {
         final List<String> notMatching = new LinkedList<>();
         matching.add("NOT EXISTS b");
         matching.add("NOT  EXISTS  b");
-        notMatching.add("NOTEXISTS b");
-        testDeParsedExpressionVsStringLists("!EXISTS b", matching, notMatching);
+        testDeParsedExpressionVsStringLists("NOT EXISTS b", matching, notMatching);
     }
 
 

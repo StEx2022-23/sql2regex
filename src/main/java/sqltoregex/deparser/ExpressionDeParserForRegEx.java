@@ -89,7 +89,17 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(EqualsTo equalsTo) {
+        buffer.append("(?:");
         visitOldOracleJoinBinaryExpression(equalsTo, OPTIONAL_WHITE_SPACE + "=" + OPTIONAL_WHITE_SPACE);
+        buffer.append('|');
+        visitOldOracleJoinBinaryExpression(
+                new EqualsTo()
+                        .withLeftExpression(equalsTo.getRightExpression())
+                        .withRightExpression(equalsTo.getLeftExpression())
+                        .withOldOracleJoinSyntax((equalsTo.getOldOracleJoinSyntax()+equalsTo.getOldOracleJoinSyntax()) % 3)
+                        .withOraclePriorPosition(equalsTo.getOraclePriorPosition())
+                , OPTIONAL_WHITE_SPACE + "=" + OPTIONAL_WHITE_SPACE);
+        buffer.append(")");
     }
 
     @Override
@@ -148,7 +158,6 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visitOldOracleJoinBinaryExpression(OldOracleJoinBinaryExpression expression, String operator) {
-        buffer.append("(?:");
         buffer.append(OPTIONAL_WHITE_SPACE);
         int isOracleSyntax = 0;
 
@@ -163,18 +172,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             buffer.append("\\(\\+\\)" + OPTIONAL_WHITE_SPACE);
             isOracleSyntax = SupportsOldOracleJoinSyntax.ORACLE_JOIN_LEFT;
         }
-        buffer.append("|");
-        expression.getRightExpression().accept(this);
-        if (expression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_LEFT) {
-            buffer.append("\\(\\+\\)" + OPTIONAL_WHITE_SPACE);
-        }
-        buffer.append(operator);
-        expression.getLeftExpression().accept(this);
-        if (expression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_RIGHT) {
-            buffer.append("\\(\\+\\)" + OPTIONAL_WHITE_SPACE);
-        }
         buffer.append(OPTIONAL_WHITE_SPACE);
-        buffer.append(")");
     }
 
     @Override
@@ -358,12 +356,21 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(Multiplication multiplication) {
-        visitCommutativeBinaryExpression(multiplication, OPTIONAL_WHITE_SPACE + "*" + OPTIONAL_WHITE_SPACE);
+        visitCommutativeBinaryExpression(multiplication, OPTIONAL_WHITE_SPACE + "\\*" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
+        buffer.append("(?:");
         visitOldOracleJoinBinaryExpression(notEqualsTo, OPTIONAL_WHITE_SPACE + notEqualsTo.getStringExpression() + OPTIONAL_WHITE_SPACE);
+        buffer.append('|');
+        visitOldOracleJoinBinaryExpression(new NotEqualsTo()
+                                                   .withLeftExpression(notEqualsTo.getRightExpression())
+                                                   .withRightExpression(notEqualsTo.getLeftExpression())
+                                                   .withOldOracleJoinSyntax((notEqualsTo.getOldOracleJoinSyntax()+notEqualsTo.getOldOracleJoinSyntax()) % 3)
+                                                   .withOraclePriorPosition(notEqualsTo.getOraclePriorPosition())
+                , OPTIONAL_WHITE_SPACE + notEqualsTo.getStringExpression() + OPTIONAL_WHITE_SPACE);
+        buffer.append(")");
     }
 
     @Override
