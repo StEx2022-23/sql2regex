@@ -112,6 +112,10 @@ public class SettingsManager {
         throw new NoSuchElementException("There is no property with this property option:" + settingsOption);
     }
 
+    public boolean getSettingBySettingOption(SettingsOption settingsOption){
+        return this.settingsMap.containsKey(settingsOption);
+    }
+
     public Map<SettingsOption, RegExGenerator<?, ?>> getSettingsMap() {
         return this.settingsMap;
     }
