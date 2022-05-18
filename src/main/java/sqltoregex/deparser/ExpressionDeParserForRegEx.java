@@ -25,6 +25,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     public static final String NOT = "NOT";
+    public static final String OLD_ORACLE_JOIN = "\\(\\+\\)";
 
     private final SettingsManager settingsManager;
     private OrderByDeParserForRegEx orderByDeParser;
@@ -47,6 +48,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     }
 
     protected void visitCommutativeBinaryExpression(BinaryExpression binaryExpression, String operator){
+        buffer.append("(?:");
         buffer.append(OPTIONAL_WHITE_SPACE);
         binaryExpression.getLeftExpression().accept(this);
         buffer.append(operator);
@@ -58,6 +60,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         buffer.append(operator);
         binaryExpression.getLeftExpression().accept(this);
         buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer.append(")");
     }
 
     @Override
@@ -87,7 +90,17 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(EqualsTo equalsTo) {
+        buffer.append("(?:");
         visitOldOracleJoinBinaryExpression(equalsTo, OPTIONAL_WHITE_SPACE + "=" + OPTIONAL_WHITE_SPACE);
+        buffer.append('|');
+        visitOldOracleJoinBinaryExpression(
+                new EqualsTo()
+                        .withLeftExpression(equalsTo.getRightExpression())
+                        .withRightExpression(equalsTo.getLeftExpression())
+                        .withOldOracleJoinSyntax((equalsTo.getOldOracleJoinSyntax()+equalsTo.getOldOracleJoinSyntax()) % 3)
+                        .withOraclePriorPosition(equalsTo.getOraclePriorPosition())
+                , OPTIONAL_WHITE_SPACE + "=" + OPTIONAL_WHITE_SPACE);
+        buffer.append(")");
     }
 
     @Override
@@ -117,10 +130,18 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     @Override
     public void visit(NotExpression notExpr) {
         buffer.append(OPTIONAL_WHITE_SPACE);
-        if (notExpr.isExclamationMark()) {
+        if (settingsManager.getSettingBySettingOption(SettingsOption.NOT_AS_EXCLAMATION_AND_WORD)) {
+            buffer.append("(?:");
             buffer.append("!" + OPTIONAL_WHITE_SPACE);
-        } else {
+            buffer.append("|");
             buffer.append(OPTIONAL_WHITE_SPACE + NOT + OPTIONAL_WHITE_SPACE);
+            buffer.append(")");
+        }else{
+            if (notExpr.isExclamationMark()) {
+                buffer.append("!").append(OPTIONAL_WHITE_SPACE);
+            } else {
+                buffer.append(NOT).append(OPTIONAL_WHITE_SPACE);
+            }
         }
         notExpr.getExpression().accept(this);
         buffer.append(OPTIONAL_WHITE_SPACE);
@@ -139,30 +160,15 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     @Override
     public void visitOldOracleJoinBinaryExpression(OldOracleJoinBinaryExpression expression, String operator) {
         buffer.append(OPTIONAL_WHITE_SPACE);
-        int isOracleSyntax = 0;
 
         expression.getLeftExpression().accept(this);
         if (expression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_RIGHT) {
-            buffer.append("(+)" + OPTIONAL_WHITE_SPACE);
-            isOracleSyntax = SupportsOldOracleJoinSyntax.ORACLE_JOIN_RIGHT;
+            buffer.append(OLD_ORACLE_JOIN + OPTIONAL_WHITE_SPACE);
         }
         buffer.append(operator);
         expression.getRightExpression().accept(this);
         if (expression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_LEFT) {
-            buffer.append("(+)" + OPTIONAL_WHITE_SPACE);
-            isOracleSyntax = SupportsOldOracleJoinSyntax.ORACLE_JOIN_LEFT;
-        }
-
-        if (isOracleSyntax != 0){
-            expression.getRightExpression().accept(this);
-            if (expression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_LEFT) {
-                buffer.append("(+)" + OPTIONAL_WHITE_SPACE);
-            }
-            buffer.append(operator);
-            expression.getLeftExpression().accept(this);
-            if (expression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_RIGHT) {
-                buffer.append("(+)" + OPTIONAL_WHITE_SPACE);
-            }
+            buffer.append(OLD_ORACLE_JOIN + OPTIONAL_WHITE_SPACE);
         }
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
@@ -182,7 +188,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         buffer.append(OPTIONAL_WHITE_SPACE);
         inExpression.getLeftExpression().accept(this);
         if (inExpression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_RIGHT) {
-            buffer.append("(+)" + OPTIONAL_WHITE_SPACE);
+            buffer.append(OLD_ORACLE_JOIN + OPTIONAL_WHITE_SPACE);
         }
         if (inExpression.isNot()) {
             buffer.append(OPTIONAL_WHITE_SPACE + "NOT");
@@ -209,12 +215,15 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 columnsListCommaSeperated.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
             }
         }
-        buffer.append("MATCH" + REQUIRED_WHITE_SPACE + OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE)
+        buffer.append("MATCH" + OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE)
                 .append(columnsListCommaSeperated).append(OPTIONAL_WHITE_SPACE).append("\\)").append(REQUIRED_WHITE_SPACE)
-                .append("AGAINST").append(REQUIRED_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE)
-                .append(fullTextSearch.getAgainstValue())
+                .append("AGAINST").append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE)
+                .append("['|\"]")
+                .append(fullTextSearch.getAgainstValue().toString(), 1,
+                        fullTextSearch.getAgainstValue().toString().length()-1)
+                .append("['|\"]")
                 .append(fullTextSearch.getSearchModifier() != null ?
-                                REQUIRED_WHITE_SPACE + fullTextSearch.getSearchModifier() : "")
+                                OPTIONAL_WHITE_SPACE + fullTextSearch.getSearchModifier() : "")
                 .append(OPTIONAL_WHITE_SPACE).append("\\)")
                 .append(OPTIONAL_WHITE_SPACE);
     }
@@ -232,19 +241,20 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         buffer.append(OPTIONAL_WHITE_SPACE);
         isNullExpression.getLeftExpression().accept(this);
         buffer.append(OPTIONAL_WHITE_SPACE);
-        if (isNullExpression.isUseIsNull()) {
-            if (isNullExpression.isNot()) {
-                buffer.append("NOT" + REQUIRED_WHITE_SPACE + "ISNULL");
-            } else {
-                buffer.append("ISNULL" + OPTIONAL_WHITE_SPACE);
-            }
+        buffer.append("(?:");
+        if (isNullExpression.isNot()) {
+            buffer.append("NOT" + REQUIRED_WHITE_SPACE + "IS" + OPTIONAL_WHITE_SPACE + "NULL");
         } else {
-            if (isNullExpression.isNot()) {
-                buffer.append("IS" + REQUIRED_WHITE_SPACE + "NOT NULL");
-            } else {
-                buffer.append("IS" + REQUIRED_WHITE_SPACE + "NULL");
-            }
+            buffer.append("IS" + OPTIONAL_WHITE_SPACE + "NULL");
         }
+        buffer.append("|");
+        buffer.append("IS" + REQUIRED_WHITE_SPACE);
+        if (isNullExpression.isNot()) {
+            buffer.append("NOT");
+        }
+        buffer.append(REQUIRED_WHITE_SPACE);
+        buffer.append("NULL");
+        buffer.append(")");
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
@@ -254,17 +264,17 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         isBooleanExpression.getLeftExpression().accept(this);
         buffer.append(OPTIONAL_WHITE_SPACE);
         if (isBooleanExpression.isTrue()) {
+            buffer.append("IS" + REQUIRED_WHITE_SPACE);
             if (isBooleanExpression.isNot()) {
-                buffer.append("IS" + REQUIRED_WHITE_SPACE + "NOT" + REQUIRED_WHITE_SPACE + "TRUE");
-            } else {
-                buffer.append("IS" + REQUIRED_WHITE_SPACE +"TRUE");
+                buffer.append("NOT" + REQUIRED_WHITE_SPACE);
             }
+            buffer.append("TRUE");
         } else {
+            buffer.append("IS" + REQUIRED_WHITE_SPACE);
             if (isBooleanExpression.isNot()) {
-                buffer.append("IS" + REQUIRED_WHITE_SPACE + "NOT" + REQUIRED_WHITE_SPACE + "FALSE");
-            } else {
-                buffer.append("IS" + REQUIRED_WHITE_SPACE + "FALSE");
+                buffer.append("NOT" + REQUIRED_WHITE_SPACE);
             }
+            buffer.append("FALSE");
         }
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
@@ -283,7 +293,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     public void visit(LikeExpression likeExpression) {
         buffer.append(OPTIONAL_WHITE_SPACE);
         visitBinaryExpression(likeExpression,
-                              (likeExpression.isNot() ? "NOT" + OPTIONAL_WHITE_SPACE : "") + (likeExpression.isCaseInsensitive() ? "ILIKE" : "LIKE") + OPTIONAL_WHITE_SPACE);
+                              (likeExpression.isNot() ? "NOT" + REQUIRED_WHITE_SPACE : "") + (likeExpression.isCaseInsensitive() ? "ILIKE" : "LIKE") + OPTIONAL_WHITE_SPACE);
         Expression escape = likeExpression.getEscape();
         if (escape != null) {
             buffer.append(OPTIONAL_WHITE_SPACE);
@@ -298,10 +308,10 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     public void visit(ExistsExpression existsExpression) {
         buffer.append(OPTIONAL_WHITE_SPACE);
         if (existsExpression.isNot()) {
-            buffer.append("NOT EXISTS");
-        } else {
-            buffer.append("EXISTS");
+            buffer.append("NOT").append(REQUIRED_WHITE_SPACE);
         }
+        buffer.append("EXISTS");
+
         buffer.append(OPTIONAL_WHITE_SPACE);
         existsExpression.getRightExpression().accept(this);
         buffer.append(OPTIONAL_WHITE_SPACE);
@@ -316,36 +326,49 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(MinorThan minorThan) {
+        buffer.append("(?:");
         visitOldOracleJoinBinaryExpression(minorThan, OPTIONAL_WHITE_SPACE + "<" + OPTIONAL_WHITE_SPACE);
-
+        buffer.append('|');
         visitOldOracleJoinBinaryExpression(new GreaterThan()
-                .withLeftExpression(minorThan.getLeftExpression())
-                .withRightExpression(minorThan.getRightExpression())
+                .withLeftExpression(minorThan.getRightExpression())
+                .withRightExpression(minorThan.getLeftExpression())
                 .withOldOracleJoinSyntax(minorThan.getOldOracleJoinSyntax())
                 .withOraclePriorPosition(minorThan.getOraclePriorPosition())
         , OPTIONAL_WHITE_SPACE + ">" + OPTIONAL_WHITE_SPACE);
+        buffer.append(")");
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
+        buffer.append("(?:");
         visitOldOracleJoinBinaryExpression(minorThanEquals, OPTIONAL_WHITE_SPACE + "<=" + OPTIONAL_WHITE_SPACE);
-
+        buffer.append('|');
         visitOldOracleJoinBinaryExpression(new GreaterThanEquals()
-                                                   .withLeftExpression(minorThanEquals.getLeftExpression())
-                                                   .withRightExpression(minorThanEquals.getRightExpression())
+                                                   .withLeftExpression(minorThanEquals.getRightExpression())
+                                                   .withRightExpression(minorThanEquals.getLeftExpression())
                                                    .withOldOracleJoinSyntax(minorThanEquals.getOldOracleJoinSyntax())
                                                    .withOraclePriorPosition(minorThanEquals.getOraclePriorPosition())
                 , OPTIONAL_WHITE_SPACE + ">=" + OPTIONAL_WHITE_SPACE);
+        buffer.append(")");
     }
 
     @Override
     public void visit(Multiplication multiplication) {
-        visitCommutativeBinaryExpression(multiplication, OPTIONAL_WHITE_SPACE + "*" + OPTIONAL_WHITE_SPACE);
+        visitCommutativeBinaryExpression(multiplication, OPTIONAL_WHITE_SPACE + "\\*" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
-        visitOldOracleJoinBinaryExpression(notEqualsTo, REQUIRED_WHITE_SPACE + notEqualsTo.getStringExpression() + REQUIRED_WHITE_SPACE);
+        buffer.append("(?:");
+        visitOldOracleJoinBinaryExpression(notEqualsTo, OPTIONAL_WHITE_SPACE + notEqualsTo.getStringExpression() + OPTIONAL_WHITE_SPACE);
+        buffer.append('|');
+        visitOldOracleJoinBinaryExpression(new NotEqualsTo()
+                                                   .withLeftExpression(notEqualsTo.getRightExpression())
+                                                   .withRightExpression(notEqualsTo.getLeftExpression())
+                                                   .withOldOracleJoinSyntax((notEqualsTo.getOldOracleJoinSyntax()+notEqualsTo.getOldOracleJoinSyntax()) % 3)
+                                                   .withOraclePriorPosition(notEqualsTo.getOraclePriorPosition())
+                , OPTIONAL_WHITE_SPACE + notEqualsTo.getStringExpression() + OPTIONAL_WHITE_SPACE);
+        buffer.append(")");
     }
 
     @Override

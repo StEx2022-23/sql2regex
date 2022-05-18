@@ -1,21 +1,23 @@
 <properties>
     <spelling>
         <keywordspelling>
-                <value>true</value>
+            <value>true</value>
         </keywordspelling>
-        <tablenameorder>
-                <value>true</value>
-        </tablenameorder>
         <tablenamespelling>
             <value>true</value>
         </tablenamespelling>
-        <columnnameorder>
-                <value>true</value>
-        </columnnameorder>
         <columnnamespelling>
             <value>true</value>
         </columnnamespelling>
     </spelling>
+    <order>
+        <tablenameorder>
+            <value>true</value>
+        </tablenameorder>
+        <columnnameorder>
+            <value>true</value>
+        </columnnameorder>
+    </order>
     <synonyms>
         <datesynonyms>
             <value>yyyy-MM-dd</value>
@@ -35,6 +37,11 @@
             <pair>AVG;MITTELWERT</pair>
         </aggregatefunctionlang>
     </synonyms>
+    <specificsettings>
+        <NOT_AS_EXCLAMATION_AND_WORD>
+            <value>true</value>
+        </NOT_AS_EXCLAMATION_AND_WORD>
+    </specificsettings>
 </properties>
 
 <!-- check the enum class after changing -->

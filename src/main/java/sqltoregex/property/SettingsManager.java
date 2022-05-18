@@ -80,6 +80,10 @@ public class SettingsManager {
                     }
                     settingsMapBuilder.withStringSet(pairOfSynonymList, SettingsOption.AGGREGATEFUNCTIONLANG);
                 }
+                case NOT_AS_EXCLAMATION_AND_WORD -> settingsMapBuilder.withPropertyOption(SettingsOption.NOT_AS_EXCLAMATION_AND_WORD);
+                case DEFAULT -> {
+                    //pass because nothing needs to be needed for default
+                    }
                 default -> {
                     Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
                     logger.log(Level.INFO, "Something went wrong by adding a property to the map.");
@@ -96,7 +100,7 @@ public class SettingsManager {
         Set<RegExGenerator<S,R>> propertySet = new LinkedHashSet<>();
         for (RegExGenerator<?, ?> property :
                 this.settingsMap.values()) {
-            if (property.getClass().equals(clazz)) {
+            if (property != null && property.getClass().equals(clazz)) {
                 propertySet.add(castProperty(property, clazz));
             }
         }
@@ -110,6 +114,10 @@ public class SettingsManager {
             }
         }
         throw new NoSuchElementException("There is no property with this property option:" + settingsOption);
+    }
+
+    public boolean getSettingBySettingOption(SettingsOption settingsOption){
+        return this.settingsMap.containsKey(settingsOption);
     }
 
     public Map<SettingsOption, RegExGenerator<?, ?>> getSettingsMap() {
