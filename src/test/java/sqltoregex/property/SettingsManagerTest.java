@@ -75,8 +75,12 @@ class SettingsManagerTest {
             if(SettingsOption.DEFAULT.equals(settingsOption)){
                 continue;
             }
-            Assertions.assertTrue(settingsManager.getSettingsMap().containsKey(settingsOption));
-            Assertions.assertNotNull(settingsManager.getSettingsMap().get(settingsOption));
+            Assertions.assertTrue(settingsManager.getSettingsMap().containsKey(settingsOption), "Does not contain " + settingsOption);
+            if (settingsOption == SettingsOption.NOT_AS_EXCLAMATION_AND_WORD) {
+                Assertions.assertNull(settingsManager.getSettingsMap().get(settingsOption));
+            } else {
+                Assertions.assertNotNull(settingsManager.getSettingsMap().get(settingsOption));
+            }
         }
     }
 }
