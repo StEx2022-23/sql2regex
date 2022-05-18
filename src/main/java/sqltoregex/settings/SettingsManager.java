@@ -54,14 +54,14 @@ public class SettingsManager {
      * Method for getting all OrderRotations, all Spellings, all Dateformats, allTime Formats.
      */
     public <S, R> Set<RegExGenerator<S,R>> getSettingByClass(Class<? extends RegExGenerator<S,R>> clazz) {
-        Set<RegExGenerator<S,R>> SettingsSet = new LinkedHashSet<>();
+        Set<RegExGenerator<S,R>> settingsSet = new LinkedHashSet<>();
         for (RegExGenerator<?, ?> setting :
                 this.settingsMap.values()) {
             if (setting != null && setting.getClass().equals(clazz)) {
-                SettingsSet.add(castSetting(setting, clazz));
+                settingsSet.add(castSetting(setting, clazz));
             }
         }
-        return SettingsSet;
+        return settingsSet;
     }
 
     public <S, R> RegExGenerator<S,R> getSettingBySettingOption(SettingsOption settingsOption, Class<? extends RegExGenerator<S,R>> clazz) {

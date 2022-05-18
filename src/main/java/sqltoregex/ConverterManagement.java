@@ -43,7 +43,7 @@ public class ConverterManagement {
         else{
             for(ValidationError va : validationErrors){
                 Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-                logger.log(Level.WARNING, "Error while validating the statement:" + sqlstatement, va);
+                logger.log(Level.WARNING, String.format("Error while validating the statement: %s",sqlstatement), va);
             }
             return false;
         }
