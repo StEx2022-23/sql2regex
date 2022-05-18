@@ -25,8 +25,7 @@ class OrderRotationTest {
     @Test
     void getSetting() {
         OrderRotation orderRotation = new OrderRotation(SettingsOption.COLUMNNAMEORDER);
-        Assertions.assertEquals(1, orderRotation.getSettings().size());
-        Assertions.assertTrue(orderRotation.getSettings().contains(SettingsOption.COLUMNNAMEORDER));
+        Assertions.assertEquals(orderRotation.getSettingsOption(), SettingsOption.COLUMNNAMEORDER);
     }
 
     @Test
