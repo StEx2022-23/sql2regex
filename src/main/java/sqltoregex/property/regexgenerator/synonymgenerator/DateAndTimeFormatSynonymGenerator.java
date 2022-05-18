@@ -34,6 +34,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
     @Override
     protected SimpleDateFormat prepareSynonymForAdd(SimpleDateFormat syn) {
         Assert.notNull(syn, "Format must not be null");
+        syn.setLenient(false);
         return syn;
     }
 
@@ -44,11 +45,13 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
             throw new IllegalArgumentException(MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE);
         }
 
+        DateAndTimeExpressionDeparser deParser = new DateAndTimeExpressionDeparser();
+        wordToFindSynonyms.accept(deParser);
+        String stringToCheck = deParser.getBuffer().toString();
+
         for (SimpleDateFormat vertexSyn : this.synonymsGraph.vertexSet()) {
             try {
-                DateAndTimeExpressionDeparser deParser = new DateAndTimeExpressionDeparser();
-                wordToFindSynonyms.accept(deParser);
-                vertexSyn.parse(deParser.getBuffer().toString());
+                vertexSyn.parse(stringToCheck);
                 return vertexSyn;
             } catch (ParseException e) {
                 //continue to search for other possible patterns without throwing error.

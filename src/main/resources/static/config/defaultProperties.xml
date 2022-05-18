@@ -18,17 +18,17 @@
     </spelling>
     <synonyms>
         <datesynonyms>
-            <value>YYYY-MM-DD</value>
-            <value>YY-MM-DD</value>
+            <value>yyyy-MM-dd</value>
+            <value>yy-MM-dd</value>
             <value>yyyy-MM-dd</value>
             <value>yyyy-M-d</value>
             <value>yyyyMMdd</value>
         </datesynonyms>
         <timesynonyms>
-            <value>HH:MM:SS</value>
+            <value>hh:mm:ss</value>
         </timesynonyms>
         <datetimesynonyms>
-            <value>YYYY-MM-DD HH:MM:SS</value>
+            <value>yyyy-MM-dd hh:mm:ss</value>
         </datetimesynonyms>
         <aggregatefunctionlang>
             <pair>SUM;SUMME</pair>
