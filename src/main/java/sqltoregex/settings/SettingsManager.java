@@ -1,4 +1,4 @@
-package sqltoregex.property;
+package sqltoregex.settings;
 
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 
 @Service
 public class SettingsManager {
-    private static final String PROPERTY_DEACTIVATED = "false";
     private final Map<SettingsOption, RegExGenerator<?, ?>> settingsMap = new EnumMap<>(SettingsOption.class);
 
 
@@ -38,59 +37,17 @@ public class SettingsManager {
         return null;
     }
 
-    public Map<SettingsOption, RegExGenerator<?, ?>> parseUserOptionsInput(SettingsForm form){
+    public Map<SettingsOption, RegExGenerator<?, ?>> parseUserSettingsInput(SettingsForm form){
         SettingsMapBuilder settingsMapBuilder = new SettingsMapBuilder();
 
         return settingsMapBuilder
-                .withPropertyOptionSet(form.getSpellings())
-                .withPropertyOptionSet(form.getOrders())
+                .withSettingsOptionSet(form.getSpellings())
+                .withSettingsOptionSet(form.getOrders())
                 .withSimpleDateFormatSet(form.getDateFormats(), SettingsOption.DATESYNONYMS)
                 .withSimpleDateFormatSet(form.getTimeFormats(), SettingsOption.TIMESYNONYMS)
                 .withSimpleDateFormatSet(form.getDateTimeFormats(), SettingsOption.DATETIMESYNONYMS)
                 .withStringSet(form.getAggregateFunctionLang(), SettingsOption.AGGREGATEFUNCTIONLANG)
                 .build();
-    }
-
-    private SettingsMapBuilder addPropertyToMap(Map<SettingsOption, NodeList> parsedValues) {
-        SettingsMapBuilder settingsMapBuilder = new SettingsMapBuilder();
-        for(SettingsOption prop : SettingsOption.values()){
-            if (parsedValues.containsKey(prop) && parsedValues.get(prop).item(0).getTextContent().equals(PROPERTY_DEACTIVATED)) {
-                return settingsMapBuilder;
-            }
-            switch (prop) {
-                case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER -> settingsMapBuilder.withPropertyOption(prop);
-                case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
-                    Set<String> valueList = new HashSet<>();
-                    SettingsNodeListIterator settingsNodeListIterator = new SettingsNodeListIterator(parsedValues.get(prop));
-                    for(Node node : settingsNodeListIterator){
-                        valueList.add(node.getTextContent());
-                    }
-                    settingsMapBuilder.withStringSet(valueList, prop);
-                }
-                case AGGREGATEFUNCTIONLANG -> {
-                    List<Node> valuePairsForSynonyms = new LinkedList<>();
-                    SettingsNodeListIterator valueTagIterator = new SettingsNodeListIterator(parsedValues.get(prop));
-                    for(Node node : valueTagIterator){
-                        valuePairsForSynonyms.add(node);
-                    }
-                    Set<String> pairOfSynonymList = new HashSet<>();
-                    for(Node valueNode : valuePairsForSynonyms){
-                        String valuePair = valueNode.getTextContent();
-                        pairOfSynonymList.add(valuePair);
-                    }
-                    settingsMapBuilder.withStringSet(pairOfSynonymList, SettingsOption.AGGREGATEFUNCTIONLANG);
-                }
-                case NOT_AS_EXCLAMATION_AND_WORD -> settingsMapBuilder.withPropertyOption(SettingsOption.NOT_AS_EXCLAMATION_AND_WORD);
-                case DEFAULT -> {
-                    //pass because nothing needs to be needed for default
-                    }
-                default -> {
-                    Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-                    logger.log(Level.INFO, "Something went wrong by adding a property to the map.");
-                }
-            }
-        }
-        return settingsMapBuilder;
     }
 
     /**
@@ -134,24 +91,22 @@ public class SettingsManager {
         document.getDocumentElement().normalize();
 
         stripWhitespaces(document);
+        SettingsMapBuilder mapBuilder = new SettingsMapBuilder();
 
-        Map<SettingsOption, NodeList> parsedValues = new EnumMap<>(SettingsOption.class);
         Node root = document.getElementsByTagName("properties").item(0);
-        NodeList properties = root.getChildNodes();
-        SettingsNodeListIterator rootElementIterator = new SettingsNodeListIterator(properties);
-        for (Node rootNode : rootElementIterator) {
-            NodeList propertyCategory = rootNode.getChildNodes();
+        SettingsNodeListIterator categoryIterator = new SettingsNodeListIterator(root.getChildNodes());
+        for (Node categoryNode : categoryIterator) {
+            NodeList propertyCategory = categoryNode.getChildNodes();
             SettingsNodeListIterator propertyCategoryIterator = new SettingsNodeListIterator(propertyCategory);
-            for (Node categoryNode : propertyCategoryIterator) {
-                relatedOption = SettingsOption.valueOf(categoryNode.getNodeName().toUpperCase());
-                NodeList innerNodes = categoryNode.getChildNodes();
-                parsedValues.put(relatedOption, innerNodes);
+            for (Node settingsNode : propertyCategoryIterator) {
+                relatedOption = SettingsOption.valueOf(settingsNode.getNodeName().toUpperCase());
+                mapBuilder.withNodeList(settingsNode.getChildNodes(), relatedOption);
             }
         }
-        this.settingsMap.putAll(this.addPropertyToMap(parsedValues).build());
+        this.settingsMap.putAll(mapBuilder.build());
     }
 
-    public Set<SettingsOption> readPropertyOptions() {
+    public Set<SettingsOption> getDefaultSettings() {
         return this.settingsMap.keySet();
     }
 

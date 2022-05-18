@@ -1,12 +1,12 @@
-package sqltoregex.property;
+package sqltoregex.settings;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-import sqltoregex.property.regexgenerator.OrderRotation;
-import sqltoregex.property.regexgenerator.SpellingMistake;
-import sqltoregex.property.regexgenerator.synonymgenerator.StringSynonymGenerator;
+import sqltoregex.settings.regexgenerator.OrderRotation;
+import sqltoregex.settings.regexgenerator.SpellingMistake;
+import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -44,7 +44,7 @@ class SettingsManagerTest {
 
     @Test
     void testLoadDefaultProperties() {
-        Set<SettingsOption> settingsOptionSet = settingsManager.readPropertyOptions();
+        Set<SettingsOption> settingsOptionSet = settingsManager.getDefaultSettings();
         List<String> propertyOptionWhichHaveBeenSet = List.of(
                 "KEYWORDSPELLING",
                 "TABLENAMESPELLING",

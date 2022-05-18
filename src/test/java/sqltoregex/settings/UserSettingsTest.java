@@ -1,8 +1,8 @@
-package sqltoregex.property;
+package sqltoregex.settings;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import sqltoregex.property.regexgenerator.OrderRotation;
+import sqltoregex.settings.regexgenerator.OrderRotation;
 
 import java.util.HashMap;
 import java.util.Map;

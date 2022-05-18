@@ -1,4 +1,4 @@
-package sqltoregex.property;
+package sqltoregex.settings;
 
 /**
  * Enum representing all possible PropertyOptions.

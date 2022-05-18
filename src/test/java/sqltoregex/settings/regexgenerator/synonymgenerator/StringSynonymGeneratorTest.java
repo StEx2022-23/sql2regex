@@ -1,9 +1,9 @@
-package sqltoregex.property.regexgenerator.synonymgenerator;
+package sqltoregex.settings.regexgenerator.synonymgenerator;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sqltoregex.property.SettingsOption;
+import sqltoregex.settings.SettingsOption;
 
 class StringSynonymGeneratorTest {
 

@@ -1,7 +1,7 @@
-package sqltoregex.property.regexgenerator;
+package sqltoregex.settings.regexgenerator;
 
-import sqltoregex.property.RegExGenerator;
-import sqltoregex.property.SettingsOption;
+import sqltoregex.settings.RegExGenerator;
+import sqltoregex.settings.SettingsOption;
 
 import java.util.*;
 

@@ -7,14 +7,14 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import sqltoregex.property.SettingsForm;
-import sqltoregex.property.SettingsManager;
-import sqltoregex.property.SettingsOption;
-import sqltoregex.property.RegExGenerator;
-import sqltoregex.property.regexgenerator.OrderRotation;
-import sqltoregex.property.regexgenerator.SpellingMistake;
-import sqltoregex.property.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
-import sqltoregex.property.regexgenerator.synonymgenerator.StringSynonymGenerator;
+import sqltoregex.settings.SettingsForm;
+import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.RegExGenerator;
+import sqltoregex.settings.regexgenerator.OrderRotation;
+import sqltoregex.settings.regexgenerator.SpellingMistake;
+import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
+import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
@@ -41,7 +41,7 @@ public class SqlToRegexController {
 
     @PostMapping("/convert")
     public String convert(Model model, @ModelAttribute SettingsForm settingsForm) {
-        this.settingsManager.parseUserOptionsInput(settingsForm);
+        this.settingsManager.parseUserSettingsInput(settingsForm);
         Set<SimpleDateFormat> dateFormats = new HashSet<>();
         dateFormats.add(new SimpleDateFormat("yyyy-MM-dd"));
         dateFormats.add(new SimpleDateFormat("yy-MM-dd"));

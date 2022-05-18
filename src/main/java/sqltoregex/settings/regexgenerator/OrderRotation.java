@@ -1,8 +1,8 @@
-package sqltoregex.property.regexgenerator;
+package sqltoregex.settings.regexgenerator;
 
 import org.springframework.util.Assert;
-import sqltoregex.property.SettingsOption;
-import sqltoregex.property.RegExGenerator;
+import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.RegExGenerator;
 
 import java.util.*;
 

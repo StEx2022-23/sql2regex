@@ -1,4 +1,4 @@
-package sqltoregex.property;
+package sqltoregex.settings;
 
 import com.google.common.collect.ImmutableMap;
 
