@@ -50,7 +50,8 @@
             </div>
         </div>
         <div class="row">
-             <div class="col-sm" th:each="setting : ${aggregateFunctionLang}">
+             <div class="col-sm" th:each="setting : ${aggregateFunctionLang}"
+             th:with="secondSyn=${#strings.arraySplit(setting,';')[1]}">
                   <div class="form-check form-switch">
                        <input class="form-check-input" type="checkbox" id="aggregateFuncLang1" th:value="${setting}" th:field="*{aggregateFunctionLang}">
                        <label class="form-check-label" for="aggregateFuncLang1" th:text="${setting}">Enable format: "yyyy-MM-dd"</label>
