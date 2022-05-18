@@ -1,68 +1,72 @@
 <form th:fragment="propertyform" action="#" th:action="@{/convert}" th:object="${settingsForm}" method="POST">
-    <div class="mb-3">
-        <label for="sqlinput" class="form-label"><strong>SQL-Input</strong></label>
-        <textarea th:field="*{sql}" class="form-control inputHeight" id="sqlinput" rows="3" placeholder="Insert your SQL-Statement here!"></textarea>
-    </div>
-    <div class="container">
-        <div class="row">
-            <div class="col-sm"
-                 th:each="setting : ${spellings}">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="spellingMistake1" th:value="${setting}" th:field="*{spellings}">
-                    <label class="form-check-label" for="dateFormats1" th:text="#{chk. + ${setting}}">SpellingMistakeSTATIC</label>
+        <div class="mb-3">
+            <label for="sqlinput" class="form-label"><strong>SQL-Input</strong></label>
+            <textarea th:field="*{sql}" class="form-control inputHeight" id="sqlinput" rows="3" placeholder="Insert your SQL-Statement here!"></textarea>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm"
+                     th:each="setting : ${spellings}">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="spellingMistake1" th:value="${setting}" th:field="*{spellings}">
+                        <label class="form-check-label" for="dateFormats1" th:text="#{chk. + ${setting}}">SpellingMistakeSTATIC</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm"
+                     th:each="setting : ${orders}">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="orders1" th:value="${setting}" th:field="*{orders}">
+                        <label class="form-check-label" for="orders1" th:text="#{chk. + ${setting}}">orderRotationSTATIC</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm"
+                     th:each="setting : ${dateFormats}">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="dateFormats1" th:value="${setting.toPattern()}" th:field="*{dateFormats}">
+                        <label class="form-check-label" for="dateFormats1" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm"
+                     th:each="setting : ${timeFormats}">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="timeFormats1" th:value="${setting.toPattern()}" th:field="*{timeFormats}">
+                        <label class="form-check-label" for="timeFormats1" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm"
+                     th:each="setting : ${dateTimeFormats}">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="dateTimeFormats1" th:value="${setting.toPattern()}" th:field="*{dateTimeFormats}">
+                        <label class="form-check-label" for="dateTimeFormats1" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm" th:each="setting : ${aggregateFunctionLang}">
+                    <div class="row">
+                        <div th:text="${setting.getKey}"></div>
+                        <div class="col-sm" th:each="synonym : ${setting.getValue()}">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="aggregateFuncLang1" th:value="${setting.getKey()} + ',' + ${synonym}" th:field="*{aggregateFunctionLang}">
+                                <label class="form-check-label" for="aggregateFuncLang1" th:text="${synonym}">Enable format: "yyyy-MM-dd"</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm"
-                 th:each="setting : ${orders}">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="orders1" th:value="${setting}" th:field="*{orders}">
-                    <label class="form-check-label" for="orders1" th:text="#{chk. + ${setting}}">orderRotationSTATIC</label>
-                </div>
-            </div>
+        <div class="d-grid gap-2">
+            <button th:text="#{conv.convert}" type="submit" id="onSubmitConvertForm" class="btn btn-primary btn-lg mb-2 mt-2 display-6"></button>
         </div>
-        <div class="row">
-            <div class="col-sm"
-                 th:each="setting : ${dateFormats}">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="dateFormats1" th:value="${setting.toPattern()}" th:field="*{dateFormats}">
-                    <label class="form-check-label" for="dateFormats1" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm"
-                 th:each="setting : ${timeFormats}">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="timeFormats1" th:value="${setting.toPattern()}" th:field="*{timeFormats}">
-                    <label class="form-check-label" for="timeFormats1" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm"
-                 th:each="setting : ${dateTimeFormats}">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="dateTimeFormats1" th:value="${setting.toPattern()}" th:field="*{dateTimeFormats}">
-                    <label class="form-check-label" for="dateTimeFormats1" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-             <div class="col-sm" th:each="setting : ${aggregateFunctionLang}"
-             th:with="secondSyn=${#strings.arraySplit(setting,';')[1]}">
-                  <div class="form-check form-switch">
-                       <input class="form-check-input" type="checkbox" id="aggregateFuncLang1" th:value="${setting}" th:field="*{aggregateFunctionLang}">
-                       <label class="form-check-label" for="aggregateFuncLang1" th:text="${setting}">Enable format: "yyyy-MM-dd"</label>
-                  </div>
-             </div>
-        </div>
-    </div>
-    <div class="d-grid gap-2">
-        <button th:text="#{conv.convert}" type="submit" id="onSubmitConvertForm" class="btn btn-primary btn-lg mb-2 mt-2 display-6"></button>
-    </div>
-</form>
+    </form>
 <div class="mb-3">
     <label th:text="#{conv.headingregex}" for="regexoutput" class="form-label"></label>
     <textarea class="form-control inputHeight" readonly="readonly" id="regexoutput" rows="3" placeholder="Copy your generated RegEx here!"></textarea>
