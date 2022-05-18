@@ -25,6 +25,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     public static final String NOT = "NOT";
+    public static final String OLD_ORACLE_JOIN = "\\(\\+\\)";
 
     private final SettingsManager settingsManager;
     private OrderByDeParserForRegEx orderByDeParser;
@@ -159,18 +160,15 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     @Override
     public void visitOldOracleJoinBinaryExpression(OldOracleJoinBinaryExpression expression, String operator) {
         buffer.append(OPTIONAL_WHITE_SPACE);
-        int isOracleSyntax = 0;
 
         expression.getLeftExpression().accept(this);
         if (expression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_RIGHT) {
-            buffer.append("\\(\\+\\)" + OPTIONAL_WHITE_SPACE);
-            isOracleSyntax = SupportsOldOracleJoinSyntax.ORACLE_JOIN_RIGHT;
+            buffer.append(OLD_ORACLE_JOIN + OPTIONAL_WHITE_SPACE);
         }
         buffer.append(operator);
         expression.getRightExpression().accept(this);
         if (expression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_LEFT) {
-            buffer.append("\\(\\+\\)" + OPTIONAL_WHITE_SPACE);
-            isOracleSyntax = SupportsOldOracleJoinSyntax.ORACLE_JOIN_LEFT;
+            buffer.append(OLD_ORACLE_JOIN + OPTIONAL_WHITE_SPACE);
         }
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
@@ -190,7 +188,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         buffer.append(OPTIONAL_WHITE_SPACE);
         inExpression.getLeftExpression().accept(this);
         if (inExpression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_RIGHT) {
-            buffer.append("\\(\\+\\)" + OPTIONAL_WHITE_SPACE);
+            buffer.append(OLD_ORACLE_JOIN + OPTIONAL_WHITE_SPACE);
         }
         if (inExpression.isNot()) {
             buffer.append(OPTIONAL_WHITE_SPACE + "NOT");

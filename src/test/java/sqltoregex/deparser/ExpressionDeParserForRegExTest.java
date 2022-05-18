@@ -139,7 +139,8 @@ class ExpressionDeParserForRegExTest {
     @Test
     void multiplication(){
         final List<String> matching = new LinkedList<>();
-        matching.add("5*8");
+        matching.add("5* 8");
+        matching.add("5 *8");
         matching.add("8*5");
         final List<String> notMatching = new LinkedList<>();
         assertIsNonCapturingGroup(testDeParsedExpressionVsStringLists("5*8", matching, notMatching));
@@ -148,10 +149,10 @@ class ExpressionDeParserForRegExTest {
     @Test
     void notEqualsTo(){
         final List<String> matching = new LinkedList<>();
-        matching.add("5!=8");
-        matching.add("8!=5");
+        matching.add("5!=NULL");
+        matching.add("NULL!=5");
         final List<String> notMatching = new LinkedList<>();
-        assertIsNonCapturingGroup(testDeParsedExpressionVsStringLists("5!=8", matching, notMatching));
+        assertIsNonCapturingGroup(testDeParsedExpressionVsStringLists("5!= NULL", matching, notMatching));
     }
 
     @Test
@@ -170,7 +171,9 @@ class ExpressionDeParserForRegExTest {
     void oldOracleJoinBinaryExpression(){
         final List<String> matching = new LinkedList<>();
         matching.add("2(+) = 5");
+        matching.add("2(+)=5");
         matching.add("5 = 2(+)");
+        matching.add("5=2(+)");
         final List<String> notMatching = new LinkedList<>();
         assertIsNonCapturingGroup(testDeParsedExpressionVsStringLists("2(+) = 5", matching, notMatching));
     }
