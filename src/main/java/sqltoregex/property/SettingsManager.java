@@ -5,6 +5,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import sqltoregex.property.regexgenerator.synonymgenerator.SynonymGenerator;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -111,6 +112,15 @@ public class SettingsManager {
         for (Map.Entry<SettingsOption, RegExGenerator<?, ?>> entry : this.settingsMap.entrySet()) {
             if (entry.getKey().equals(settingsOption)) {
                 return castProperty(settingsMap.get(entry.getKey()), clazz);
+            }
+        }
+        throw new NoSuchElementException("There is no property with this property option:" + settingsOption);
+    }
+
+    public <A, S> SynonymGenerator<A,S> getSynonymManagerBySettingOption(SettingsOption settingsOption, Class<? extends SynonymGenerator<A,S>> clazz){
+        for (Map.Entry<SettingsOption, RegExGenerator<?, ?>> entry : this.settingsMap.entrySet()) {
+            if (entry.getKey().equals(settingsOption)) {
+                return (SynonymGenerator<A, S>) castProperty(settingsMap.get(entry.getKey()), clazz);
             }
         }
         throw new NoSuchElementException("There is no property with this property option:" + settingsOption);

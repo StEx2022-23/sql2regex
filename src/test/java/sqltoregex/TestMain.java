@@ -3,6 +3,8 @@ package sqltoregex;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import sqltoregex.controller.MyErrorController;
+import sqltoregex.controller.SqlToRegexController;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
