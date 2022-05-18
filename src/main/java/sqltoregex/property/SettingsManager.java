@@ -81,6 +81,7 @@ public class SettingsManager {
                     settingsMapBuilder.withStringSet(pairOfSynonymList, SettingsOption.AGGREGATEFUNCTIONLANG);
                 }
                 case NOT_AS_EXCLAMATION_AND_WORD -> settingsMapBuilder.withPropertyOption(SettingsOption.NOT_AS_EXCLAMATION_AND_WORD);
+                case DEFAULT -> {}
                 default -> {
                     Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
                     logger.log(Level.INFO, "Something went wrong by adding a property to the map.");
