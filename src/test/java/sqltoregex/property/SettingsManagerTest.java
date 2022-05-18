@@ -55,7 +55,8 @@ class SettingsManagerTest {
                 "DATESYNONYMS",
                 "TIMESYNONYMS",
                 "DATETIMESYNONYMS",
-                "AGGREGATEFUNCTIONLANG"
+                "AGGREGATEFUNCTIONLANG",
+                "NOT_AS_EXCLAMATION_AND_WORD"
         );
         for (String str : propertyOptionWhichHaveBeenSet) {
             Assertions.assertTrue(settingsOptionSet.toString().contains(str));
