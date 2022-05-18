@@ -13,8 +13,8 @@ public enum SettingsOption {
     TIMESYNONYMS,
     DATETIMESYNONYMS,
     AGGREGATEFUNCTIONLANG,
-    DEFAULT,
-    NOT_AS_EXCLAMATION_AND_WORD
+    NOT_AS_EXCLAMATION_AND_WORD,
+    DEFAULT
     // when extending this class keep the naming of the enums and the xml tags the same
     // that they can easily be transformed in each other
 }
