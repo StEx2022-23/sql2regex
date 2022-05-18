@@ -1,12 +1,12 @@
-package sqltoregex.property;
+package sqltoregex.settings;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-import sqltoregex.property.regexgenerator.OrderRotation;
-import sqltoregex.property.regexgenerator.SpellingMistake;
-import sqltoregex.property.regexgenerator.synonymgenerator.StringSynonymGenerator;
+import sqltoregex.settings.regexgenerator.OrderRotation;
+import sqltoregex.settings.regexgenerator.SpellingMistake;
+import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -44,8 +44,8 @@ class SettingsManagerTest {
 
     @Test
     void testLoadDefaultProperties() {
-        Set<SettingsOption> settingsOptionSet = settingsManager.readPropertyOptions();
-        List<String> propertyOptionWhichHaveBeenSet = List.of(
+        Set<SettingsOption> settingsOptionSet = settingsManager.getDefaultSettings();
+        List<String> settingsOptionWhichHaveBeenSet = List.of(
                 "KEYWORDSPELLING",
                 "TABLENAMESPELLING",
                 "TABLENAMEORDER",
@@ -58,20 +58,20 @@ class SettingsManagerTest {
                 "AGGREGATEFUNCTIONLANG",
                 "NOT_AS_EXCLAMATION_AND_WORD"
         );
-        for (String str : propertyOptionWhichHaveBeenSet) {
+        for (String str : settingsOptionWhichHaveBeenSet) {
             Assertions.assertTrue(settingsOptionSet.toString().contains(str));
         }
     }
 
     @Test
-    void testGetPropertyByClazz(){
+    void testGetSettingByClazz(){
         Assertions.assertEquals(3, settingsManager.getSettingByClass(SpellingMistake.class).size());
         Assertions.assertEquals(2, settingsManager.getSettingByClass(OrderRotation.class).size());
         Assertions.assertEquals(1, settingsManager.getSettingByClass(StringSynonymGenerator.class).size());
     }
 
     @Test
-    void testGetProperty(){
+    void testGetSetting(){
         for (SettingsOption settingsOption : SettingsOption.values()) {
             if(SettingsOption.DEFAULT.equals(settingsOption)){
                 continue;

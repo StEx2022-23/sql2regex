@@ -1,11 +1,11 @@
-package sqltoregex.property.regexgenerator.synonymgenerator;
+package sqltoregex.settings.regexgenerator.synonymgenerator;
 
 import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.TimeValue;
 import net.sf.jsqlparser.expression.TimestampValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import sqltoregex.property.SettingsOption;
+import sqltoregex.settings.SettingsOption;
 
 import java.text.SimpleDateFormat;
 

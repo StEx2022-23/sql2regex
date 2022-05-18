@@ -1,7 +1,7 @@
-package sqltoregex.property.regexgenerator.synonymgenerator;
+package sqltoregex.settings.regexgenerator.synonymgenerator;
 
 import org.junit.jupiter.api.*;
-import sqltoregex.property.SettingsOption;
+import sqltoregex.settings.SettingsOption;
 
 import java.util.HashSet;
 import java.util.List;

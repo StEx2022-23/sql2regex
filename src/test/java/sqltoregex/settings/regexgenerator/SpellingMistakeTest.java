@@ -1,8 +1,8 @@
-package sqltoregex.property.regexgenerator;
+package sqltoregex.settings.regexgenerator;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import sqltoregex.property.SettingsOption;
+import sqltoregex.settings.SettingsOption;
 
 class SpellingMistakeTest {
     public SpellingMistake spellingMistake = new SpellingMistake(SettingsOption.DEFAULT);
@@ -14,7 +14,7 @@ class SpellingMistakeTest {
     }
 
     @Test
-    void testGetProperty() {
+    void testGetSetting() {
         Assertions.assertEquals(1, spellingMistake.getSettings().size());
         Assertions.assertTrue(spellingMistake.getSettings().contains(SettingsOption.DEFAULT));
     }
