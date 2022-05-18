@@ -37,11 +37,11 @@
             <pair>AVG;MITTELWERT</pair>
         </aggregatefunctionlang>
     </synonyms>
-    <yesorno>
+    <specificsettings>
         <NOT_AS_EXCLAMATION_AND_WORD>
             <value>true</value>
         </NOT_AS_EXCLAMATION_AND_WORD>
-    </yesorno>
+    </specificsettings>
 </properties>
 
 <!-- check the enum class after changing -->
