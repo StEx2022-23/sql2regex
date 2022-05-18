@@ -15,23 +15,18 @@ import java.util.*;
 public class OrderRotation implements RegExGenerator<SettingsOption, List<String>> {
     private final StringBuilder orderRotationOfValueList = new StringBuilder();
     private SpellingMistake spellingMistake;
-    private final SettingsOption propertyoption;
+    private final SettingsOption settingsoption;
     protected boolean isCapturingGroup = false;
 
     public OrderRotation(SettingsOption settingsOption, SpellingMistake spellingMistake){
         Assert.notNull(spellingMistake, "SpellingMistake must not be null");
         Assert.notNull(settingsOption, "SettingsOption must not be null");
         this.spellingMistake = spellingMistake;
-        this.propertyoption = settingsOption;
+        this.settingsoption = settingsOption;
     }
 
     public OrderRotation(SettingsOption settingsOption){
-        this.propertyoption = settingsOption;
-    }
-
-    @Override
-    public Set<SettingsOption> getSettings() {
-        return new HashSet<>(List.of(propertyoption));
+        this.settingsoption = settingsOption;
     }
 
     /**
@@ -107,15 +102,20 @@ public class OrderRotation implements RegExGenerator<SettingsOption, List<String
     }
 
     @Override
+    public SettingsOption getSettingsOption() {
+        return settingsoption;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OrderRotation that = (OrderRotation) o;
-        return Objects.equals(spellingMistake, that.spellingMistake) && propertyoption == that.propertyoption;
+        return Objects.equals(spellingMistake, that.spellingMistake) && settingsoption == that.settingsoption;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(spellingMistake, propertyoption);
+        return Objects.hash(spellingMistake, settingsoption);
     }
 }

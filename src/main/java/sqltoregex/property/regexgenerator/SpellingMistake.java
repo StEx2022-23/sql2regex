@@ -1,5 +1,6 @@
 package sqltoregex.property.regexgenerator;
 
+import org.springframework.util.Assert;
 import sqltoregex.property.RegExGenerator;
 import sqltoregex.property.SettingsOption;
 
@@ -17,11 +18,6 @@ public class SpellingMistake implements RegExGenerator<SettingsOption, String> {
 
     public SpellingMistake(SettingsOption settingsOption){
         this.settingsOption = settingsOption;
-    }
-
-    @Override
-    public Set<SettingsOption> getSettings() {
-        return new HashSet<>(List.of(settingsOption));
     }
 
     /**
@@ -50,6 +46,11 @@ public class SpellingMistake implements RegExGenerator<SettingsOption, String> {
     @Override
     public void setCapturingGroup(boolean capturingGroup) {
         this.isCapturingGroup = capturingGroup;
+    }
+
+    @Override
+    public SettingsOption getSettingsOption() {
+        return settingsOption;
     }
 
     @Override
