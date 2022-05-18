@@ -38,12 +38,12 @@ public class ConverterManagement {
         supportedDBMS.add(DatabaseType.MARIADB);
 
         Validation validation = new Validation(supportedDBMS, sqlstatement);
-        List<ValidationError> validationerrors = validation.validate();
-        if(validationerrors.isEmpty()) { return true;}
+        List<ValidationError> validationErrors = validation.validate();
+        if(validationErrors.isEmpty()) { return true;}
         else{
-            for(ValidationError va : validationerrors){
+            for(ValidationError va : validationErrors){
                 Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-                logger.log(Level.WARNING, "Something went wrong by adding a property to the map: {0}", va);
+                logger.log(Level.WARNING, "Error while validating the statement:" + sqlstatement, va);
             }
             return false;
         }

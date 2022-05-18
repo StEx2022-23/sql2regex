@@ -45,7 +45,7 @@ class SettingsManagerTest {
     @Test
     void testLoadDefaultProperties() {
         Set<SettingsOption> settingsOptionSet = settingsManager.getDefaultSettings();
-        List<String> propertyOptionWhichHaveBeenSet = List.of(
+        List<String> settingsOptionWhichHaveBeenSet = List.of(
                 "KEYWORDSPELLING",
                 "TABLENAMESPELLING",
                 "TABLENAMEORDER",
@@ -58,20 +58,20 @@ class SettingsManagerTest {
                 "AGGREGATEFUNCTIONLANG",
                 "NOT_AS_EXCLAMATION_AND_WORD"
         );
-        for (String str : propertyOptionWhichHaveBeenSet) {
+        for (String str : settingsOptionWhichHaveBeenSet) {
             Assertions.assertTrue(settingsOptionSet.toString().contains(str));
         }
     }
 
     @Test
-    void testGetPropertyByClazz(){
+    void testGetSettingByClazz(){
         Assertions.assertEquals(3, settingsManager.getSettingByClass(SpellingMistake.class).size());
         Assertions.assertEquals(2, settingsManager.getSettingByClass(OrderRotation.class).size());
         Assertions.assertEquals(1, settingsManager.getSettingByClass(StringSynonymGenerator.class).size());
     }
 
     @Test
-    void testGetProperty(){
+    void testGetSetting(){
         for (SettingsOption settingsOption : SettingsOption.values()) {
             if(SettingsOption.DEFAULT.equals(settingsOption)){
                 continue;

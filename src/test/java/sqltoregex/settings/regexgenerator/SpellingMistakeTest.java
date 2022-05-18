@@ -14,7 +14,7 @@ class SpellingMistakeTest {
     }
 
     @Test
-    void testGetProperty() {
+    void testGetSetting() {
         Assertions.assertEquals(1, spellingMistake.getSettings().size());
         Assertions.assertTrue(spellingMistake.getSettings().contains(SettingsOption.DEFAULT));
     }

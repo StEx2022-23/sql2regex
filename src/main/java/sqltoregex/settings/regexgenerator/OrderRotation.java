@@ -15,23 +15,23 @@ import java.util.*;
 public class OrderRotation implements RegExGenerator<SettingsOption, List<String>> {
     private final StringBuilder orderRotationOfValueList = new StringBuilder();
     private SpellingMistake spellingMistake;
-    private final SettingsOption propertyoption;
+    private final SettingsOption settingsOption;
     protected boolean isCapturingGroup = false;
 
     public OrderRotation(SettingsOption settingsOption, SpellingMistake spellingMistake){
         Assert.notNull(spellingMistake, "SpellingMistake must not be null");
         Assert.notNull(settingsOption, "SettingsOption must not be null");
         this.spellingMistake = spellingMistake;
-        this.propertyoption = settingsOption;
+        this.settingsOption = settingsOption;
     }
 
     public OrderRotation(SettingsOption settingsOption){
-        this.propertyoption = settingsOption;
+        this.settingsOption = settingsOption;
     }
 
     @Override
     public Set<SettingsOption> getSettings() {
-        return new HashSet<>(List.of(propertyoption));
+        return new HashSet<>(List.of(settingsOption));
     }
 
     /**
@@ -111,11 +111,11 @@ public class OrderRotation implements RegExGenerator<SettingsOption, List<String
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OrderRotation that = (OrderRotation) o;
-        return Objects.equals(spellingMistake, that.spellingMistake) && propertyoption == that.propertyoption;
+        return Objects.equals(spellingMistake, that.spellingMistake) && settingsOption == that.settingsOption;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(spellingMistake, propertyoption);
+        return Objects.hash(spellingMistake, settingsOption);
     }
 }

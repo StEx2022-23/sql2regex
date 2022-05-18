@@ -1,7 +1,7 @@
 package sqltoregex.settings;
 
 /**
- * Enum representing all possible PropertyOptions.
+ * Enum representing all possible setting options.
  */
 public enum SettingsOption {
     KEYWORDSPELLING,

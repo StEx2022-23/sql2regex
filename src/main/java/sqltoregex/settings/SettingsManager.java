@@ -27,12 +27,12 @@ public class SettingsManager {
         this.parseSettings();
     }
 
-    public static <S, R> RegExGenerator<S,R> castProperty(RegExGenerator<?, ?> rawProperty, Class<? extends RegExGenerator<S, R>> clazz) {
+    public static <S, R> RegExGenerator<S,R> castSetting(RegExGenerator<?, ?> rawSetting, Class<? extends RegExGenerator<S, R>> clazz) {
         try {
-            return clazz.cast(rawProperty);
+            return clazz.cast(rawSetting);
         } catch (ClassCastException e) {
             Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-            logger.log(Level.INFO, "Something went wrong by casting property: {0}", e.toString());
+            logger.log(Level.INFO, "Something went wrong by casting setting: {0}", e.toString());
         }
         return null;
     }
@@ -54,23 +54,23 @@ public class SettingsManager {
      * Method for getting all OrderRotations, all Spellings, all Dateformats, allTime Formats.
      */
     public <S, R> Set<RegExGenerator<S,R>> getSettingByClass(Class<? extends RegExGenerator<S,R>> clazz) {
-        Set<RegExGenerator<S,R>> propertySet = new LinkedHashSet<>();
-        for (RegExGenerator<?, ?> property :
+        Set<RegExGenerator<S,R>> SettingsSet = new LinkedHashSet<>();
+        for (RegExGenerator<?, ?> setting :
                 this.settingsMap.values()) {
-            if (property != null && property.getClass().equals(clazz)) {
-                propertySet.add(castProperty(property, clazz));
+            if (setting != null && setting.getClass().equals(clazz)) {
+                SettingsSet.add(castSetting(setting, clazz));
             }
         }
-        return propertySet;
+        return SettingsSet;
     }
 
     public <S, R> RegExGenerator<S,R> getSettingBySettingOption(SettingsOption settingsOption, Class<? extends RegExGenerator<S,R>> clazz) {
         for (Map.Entry<SettingsOption, RegExGenerator<?, ?>> entry : this.settingsMap.entrySet()) {
             if (entry.getKey().equals(settingsOption)) {
-                return castProperty(settingsMap.get(entry.getKey()), clazz);
+                return castSetting(settingsMap.get(entry.getKey()), clazz);
             }
         }
-        throw new NoSuchElementException("There is no property with this property option:" + settingsOption);
+        throw new NoSuchElementException("There is no setting with this setting option:" + settingsOption);
     }
 
     public boolean getSettingBySettingOption(SettingsOption settingsOption){
@@ -96,9 +96,8 @@ public class SettingsManager {
         Node root = document.getElementsByTagName("properties").item(0);
         SettingsNodeListIterator categoryIterator = new SettingsNodeListIterator(root.getChildNodes());
         for (Node categoryNode : categoryIterator) {
-            NodeList propertyCategory = categoryNode.getChildNodes();
-            SettingsNodeListIterator propertyCategoryIterator = new SettingsNodeListIterator(propertyCategory);
-            for (Node settingsNode : propertyCategoryIterator) {
+            SettingsNodeListIterator settingsCategoryIterator = new SettingsNodeListIterator(categoryNode.getChildNodes());
+            for (Node settingsNode : settingsCategoryIterator) {
                 relatedOption = SettingsOption.valueOf(settingsNode.getNodeName().toUpperCase());
                 mapBuilder.withNodeList(settingsNode.getChildNodes(), relatedOption);
             }
