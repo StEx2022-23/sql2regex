@@ -98,7 +98,7 @@ public class SettingsManager {
         Set<RegExGenerator<S,R>> propertySet = new LinkedHashSet<>();
         for (RegExGenerator<?, ?> property :
                 this.settingsMap.values()) {
-            if (property.getClass().equals(clazz)) {
+            if (property != null && property.getClass().equals(clazz)) {
                 propertySet.add(castProperty(property, clazz));
             }
         }
