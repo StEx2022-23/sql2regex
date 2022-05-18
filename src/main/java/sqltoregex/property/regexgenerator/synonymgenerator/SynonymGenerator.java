@@ -1,5 +1,6 @@
 package sqltoregex.property.regexgenerator.synonymgenerator;
 
+import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
@@ -26,7 +27,7 @@ import java.util.*;
  * @param <S> class of search objects
  */
 
-abstract class SynonymGenerator<A, S> implements RegExGenerator<A,S> {
+public abstract class SynonymGenerator<A, S> implements RegExGenerator<A,S> {
     public static final long DEFAULT_WEIGHT = 1L;
     //due to: Edges undirected (synonyms apply in both directions); Self-loops: no; Multiple edges: no; weighted: yes
     protected SimpleWeightedGraph<A, DefaultWeightedEdge> synonymsGraph;
@@ -98,6 +99,14 @@ abstract class SynonymGenerator<A, S> implements RegExGenerator<A,S> {
             addResult = synonymsGraph.addVertex(this.prepareSynonymForAdd(synFor)) || addResult;
         }
         if (addResult){
+            Optional<A> startVertex = this.synonymsGraph.vertexSet().stream().filter(synonym -> synonym.equals(this.prepareSynonymForAdd(synFor))).findAny();
+            if (startVertex.isPresent()){
+                Set<DefaultWeightedEdge> edgeSet = new HashSet<>(this.synonymsGraph.outgoingEdgesOf(startVertex.get()));
+                for (DefaultWeightedEdge edge : edgeSet){
+                    DefaultWeightedEdge e1 = synonymsGraph.addEdge(this.prepareSynonymForAdd(syn), synonymsGraph.getEdgeTarget(edge).equals(synFor) ? synonymsGraph.getEdgeSource(edge) : synonymsGraph.getEdgeTarget(edge));
+                    synonymsGraph.setEdgeWeight(e1, weight);
+                }
+            }
             DefaultWeightedEdge e1 = synonymsGraph.addEdge(this.prepareSynonymForAdd(syn), this.prepareSynonymForAdd(synFor));
             synonymsGraph.setEdgeWeight(e1, weight);
             return true;
@@ -134,25 +143,17 @@ abstract class SynonymGenerator<A, S> implements RegExGenerator<A,S> {
             return (isCapturingGroup ? '(' : "(?:") + searchSynonymToString(wordToFindSynonyms) + ')';
         }
     }
+    public Graph<A, DefaultWeightedEdge> getGraph(){
+        try{
+            return (Graph<A, DefaultWeightedEdge>) this.synonymsGraph.clone();}
+        catch(ClassCastException exception){
+            return null;
+        }
+    }
 
     @Override
-    public Set<A> getSettings() {
-        if(this.graphForSynonymsOfTwoWords){
-            Set<A> edgeList = new HashSet<>();
-            for(A fixedEdge : synonymsGraph.vertexSet()){
-                String output = synonymsGraph.outgoingEdgesOf(fixedEdge).toString()
-                    .replace("(","")
-                    .replace(")","")
-                    .replace("[","")
-                    .replace("]","")
-                    .replace(" : ", " == ");
-                try {
-                    edgeList.add((A) output);
-                } catch (ClassCastException e){
-                    throw new ClassCastException(e.toString());
-                }
-            } return edgeList;
-        } else return synonymsGraph.vertexSet();
+    public SettingsOption getSettingsOption() {
+        return this.settingsOption;
     }
 
     /**
