@@ -50,6 +50,7 @@ class SettingsMapBuilder {
                 this.propertyMap.put(settingsOption, orderRotation);
                 orderRotations.add(orderRotation);
             }
+            case NOT_AS_EXCLAMATION_AND_WORD -> this.propertyMap.put(settingsOption, null);
             default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + settingsOption);
         }
         return this;
