@@ -14,8 +14,8 @@ import java.util.Objects;
  * SELECT (?:table1\s*,\s*table2|table2\s*,\s*table1)
  */
 public class OrderRotation implements RegExGenerator<List<String>> {
-    private final StringBuilder BUFFER = new StringBuilder();
-    private final SettingsOption SETTINGS_OPTION;
+    private final StringBuilder buffer = new StringBuilder();
+    private final SettingsOption settingsOption;
     protected boolean isCapturingGroup = false;
     private SpellingMistake spellingMistake;
 
@@ -23,11 +23,11 @@ public class OrderRotation implements RegExGenerator<List<String>> {
         Assert.notNull(spellingMistake, "SpellingMistake must not be null");
         Assert.notNull(settingsOption, "SettingsOption must not be null");
         this.spellingMistake = spellingMistake;
-        this.SETTINGS_OPTION = settingsOption;
+        this.settingsOption = settingsOption;
     }
 
     public OrderRotation(SettingsOption settingsOption) {
-        this.SETTINGS_OPTION = settingsOption;
+        this.settingsOption = settingsOption;
     }
 
     /**
@@ -38,17 +38,17 @@ public class OrderRotation implements RegExGenerator<List<String>> {
      */
     public String generateRegExFor(List<String> valueList) {
         Assert.notNull(valueList, "Value list must not be null!");
-        BUFFER.append(isCapturingGroup ? '(' : "(?:");
+        buffer.append(isCapturingGroup ? '(' : "(?:");
         Integer amountOfElements = valueList.size();
         orderRotationRek(amountOfElements, valueList);
-        BUFFER.replace(BUFFER.length() - 1, BUFFER.length(), "");
-        BUFFER.append(')');
-        return BUFFER.toString();
+        buffer.replace(buffer.length() - 1, buffer.length(), "");
+        buffer.append(')');
+        return buffer.toString();
     }
 
     @Override
     public SettingsOption getSettingsOption() {
-        return SETTINGS_OPTION;
+        return settingsOption;
     }
 
     public SpellingMistake getSpellingMistake() {
@@ -81,7 +81,7 @@ public class OrderRotation implements RegExGenerator<List<String>> {
                 }
             }
             singleValue.append("|");
-            BUFFER.append(singleValue);
+            buffer.append(singleValue);
         } else {
             orderRotationRek(amount - 1, valueList);
             for (int i = 0; i < amount - 1; i++) {
@@ -115,12 +115,12 @@ public class OrderRotation implements RegExGenerator<List<String>> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OrderRotation that = (OrderRotation) o;
-        return Objects.equals(spellingMistake, that.spellingMistake) && SETTINGS_OPTION == that.SETTINGS_OPTION;
+        return Objects.equals(spellingMistake, that.spellingMistake) && settingsOption == that.settingsOption;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(spellingMistake, SETTINGS_OPTION);
+        return Objects.hash(spellingMistake, settingsOption);
     }
 
 }

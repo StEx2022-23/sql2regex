@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 @Service
 public class SettingsManager {
-    private final Map<SettingsOption, RegExGenerator<?>> SETTINGS_MAP = new EnumMap<>(SettingsOption.class);
+    private final Map<SettingsOption, RegExGenerator<?>> settingsMap = new EnumMap<>(SettingsOption.class);
 
 
     public SettingsManager() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
@@ -46,7 +46,7 @@ public class SettingsManager {
     public <S> Set<RegExGenerator<S>> getSettingByClass(Class<? extends RegExGenerator<S>> clazz) {
         Set<RegExGenerator<S>> settingsSet = new LinkedHashSet<>();
         for (RegExGenerator<?> setting :
-                this.SETTINGS_MAP.values()) {
+                this.settingsMap.values()) {
             if (setting != null && setting.getClass().equals(clazz)) {
                 settingsSet.add(castSetting(setting, clazz));
             }
@@ -55,28 +55,28 @@ public class SettingsManager {
     }
 
     public boolean getSettingBySettingsOption(SettingsOption settingsOption) {
-        return this.SETTINGS_MAP.containsKey(settingsOption);
+        return this.settingsMap.containsKey(settingsOption);
     }
 
     public <S> RegExGenerator<S> getSettingBySettingsOption(SettingsOption settingsOption,
                                                             Class<? extends RegExGenerator<S>> clazz) {
-        for (Map.Entry<SettingsOption, RegExGenerator<?>> entry : this.SETTINGS_MAP.entrySet()) {
+        for (Map.Entry<SettingsOption, RegExGenerator<?>> entry : this.settingsMap.entrySet()) {
             if (entry.getKey().equals(settingsOption)) {
-                return castSetting(SETTINGS_MAP.get(entry.getKey()), clazz);
+                return castSetting(settingsMap.get(entry.getKey()), clazz);
             }
         }
         throw new NoSuchElementException("There is no setting with this setting option:" + settingsOption);
     }
 
     public Map<SettingsOption, RegExGenerator<?>> getSettingsMap() {
-        return this.SETTINGS_MAP;
+        return this.settingsMap;
     }
 
     public <A, S> SynonymGenerator<A, S> getSynonymManagerBySettingOption(SettingsOption settingsOption,
                                                                           Class<? extends SynonymGenerator<A, S>> clazz) {
-        for (Map.Entry<SettingsOption, RegExGenerator<?>> entry : this.SETTINGS_MAP.entrySet()) {
+        for (Map.Entry<SettingsOption, RegExGenerator<?>> entry : this.settingsMap.entrySet()) {
             if (entry.getKey().equals(settingsOption)) {
-                return (SynonymGenerator<A, S>) castSetting(SETTINGS_MAP.get(entry.getKey()), clazz);
+                return (SynonymGenerator<A, S>) castSetting(settingsMap.get(entry.getKey()), clazz);
             }
         }
         throw new NoSuchElementException("There is no property with this property option:" + settingsOption);
@@ -105,7 +105,7 @@ public class SettingsManager {
                 mapBuilder.withNodeList(settingsNode.getChildNodes(), relatedOption);
             }
         }
-        this.SETTINGS_MAP.putAll(mapBuilder.build());
+        this.settingsMap.putAll(mapBuilder.build());
     }
 
     public Map<SettingsOption, RegExGenerator<?>> parseUserSettingsInput(SettingsForm form) {

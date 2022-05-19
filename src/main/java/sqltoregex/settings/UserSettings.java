@@ -7,14 +7,14 @@ import java.util.Map;
 
 public class UserSettings {
     private static UserSettings instance;
-    public final ImmutableMap<SettingsOption, RegExGenerator<?>> SETTINGS_MAP;
+    public final ImmutableMap<SettingsOption, RegExGenerator<?>> settingsMap;
 
     private UserSettings(Map<SettingsOption, RegExGenerator<?>> map) {
-        this.SETTINGS_MAP = new ImmutableMap.Builder<SettingsOption, RegExGenerator<?>>().putAll(map).build();
+        this.settingsMap = new ImmutableMap.Builder<SettingsOption, RegExGenerator<?>>().putAll(map).build();
     }
 
     private UserSettings() {
-        this.SETTINGS_MAP = new ImmutableMap.Builder<SettingsOption, RegExGenerator<?>>().build();
+        this.settingsMap = new ImmutableMap.Builder<SettingsOption, RegExGenerator<?>>().build();
     }
 
     public static UserSettings getInstance(Map<SettingsOption, RegExGenerator<?>> map) {
@@ -32,6 +32,6 @@ public class UserSettings {
     }
 
     public Map<SettingsOption, RegExGenerator<?>> getSettingsMap() {
-        return this.SETTINGS_MAP;
+        return this.settingsMap;
     }
 }

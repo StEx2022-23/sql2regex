@@ -11,11 +11,11 @@ import java.util.Objects;
  * test ↔ (?:test|est|tst|tet|tes) or (test|est|tst|tet|tes)
  */
 public class SpellingMistake implements RegExGenerator<String> {
-    private final SettingsOption SETTINGS_OPTION;
+    private final SettingsOption settingsOption;
     protected boolean isCapturingGroup = false;
 
     public SpellingMistake(SettingsOption settingsOption) {
-        this.SETTINGS_OPTION = settingsOption;
+        this.settingsOption = settingsOption;
     }
 
     /**
@@ -41,7 +41,7 @@ public class SpellingMistake implements RegExGenerator<String> {
 
     @Override
     public SettingsOption getSettingsOption() {
-        return SETTINGS_OPTION;
+        return settingsOption;
     }
 
     /**
@@ -58,12 +58,12 @@ public class SpellingMistake implements RegExGenerator<String> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SpellingMistake that)) return false;
-        return SETTINGS_OPTION == that.SETTINGS_OPTION;
+        return settingsOption == that.settingsOption;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(SETTINGS_OPTION);
+        return Objects.hash(settingsOption);
     }
 
 }

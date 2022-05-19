@@ -15,26 +15,26 @@ import java.util.*;
 class SettingsMapBuilder {
     private static final String UNSUPPORTED_BUILD_WITH = "Unsupported build with:";
     private static final String STRING_SYNONYM_DELIMITER = ";";
-    private final Set<OrderRotation> ORDER_ROTATIONS;
-    private final Map<SettingsOption, RegExGenerator<?>> SETTINGS_MAP;
-    private final Set<SpellingMistake> SPELLING_MISTAKES;
+    private final Set<OrderRotation> orderRotations;
+    private final Map<SettingsOption, RegExGenerator<?>> settingsMao;
+    private final Set<SpellingMistake> spellingMistakes;
 
     public SettingsMapBuilder() {
-        this.SETTINGS_MAP = new EnumMap<>(SettingsOption.class);
-        this.ORDER_ROTATIONS = new LinkedHashSet<>();
-        this.SPELLING_MISTAKES = new LinkedHashSet<>();
+        this.settingsMao = new EnumMap<>(SettingsOption.class);
+        this.orderRotations = new LinkedHashSet<>();
+        this.spellingMistakes = new LinkedHashSet<>();
     }
 
     public Map<SettingsOption, RegExGenerator<?>> build() {
-        for (OrderRotation orderRotation : ORDER_ROTATIONS) {
+        for (OrderRotation orderRotation : orderRotations) {
             SettingsOption settingsOption = orderRotation.getSettingsOption();
             SpellingMistake spellingMistake = new SpellingMistake(SettingsOption.valueOf(
                     settingsOption.toString().substring(0, settingsOption.toString().length() - 5) + "SPELLING"));
-            if (SPELLING_MISTAKES.contains(spellingMistake)) {
+            if (spellingMistakes.contains(spellingMistake)) {
                 orderRotation.setSpellingMistake(spellingMistake);
             }
         }
-        return this.SETTINGS_MAP;
+        return this.settingsMao;
     }
 
     public SettingsMapBuilder withNodeList(NodeList nodeList, SettingsOption settingsOption) {
@@ -79,15 +79,15 @@ class SettingsMapBuilder {
         switch (settingsOption) {
             case KEYWORDSPELLING, COLUMNNAMESPELLING, TABLENAMESPELLING -> {
                 SpellingMistake spellingMistake = new SpellingMistake(settingsOption);
-                this.SETTINGS_MAP.put(settingsOption, spellingMistake);
-                SPELLING_MISTAKES.add(spellingMistake);
+                this.settingsMao.put(settingsOption, spellingMistake);
+                spellingMistakes.add(spellingMistake);
             }
             case TABLENAMEORDER, COLUMNNAMEORDER -> {
                 OrderRotation orderRotation = new OrderRotation(settingsOption);
-                this.SETTINGS_MAP.put(settingsOption, orderRotation);
-                ORDER_ROTATIONS.add(orderRotation);
+                this.settingsMao.put(settingsOption, orderRotation);
+                orderRotations.add(orderRotation);
             }
-            case NOT_AS_EXCLAMATION_AND_WORD -> this.SETTINGS_MAP.put(settingsOption, null);
+            case NOT_AS_EXCLAMATION_AND_WORD -> this.settingsMao.put(settingsOption, null);
             default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + settingsOption);
         }
         return this;
@@ -110,7 +110,7 @@ class SettingsMapBuilder {
                 for (SimpleDateFormat format : synonyms) {
                     synonymGenerator.addSynonym(format);
                 }
-                this.SETTINGS_MAP.put(settingsOption, synonymGenerator);
+                this.settingsMao.put(settingsOption, synonymGenerator);
             }
             default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + settingsOption);
         }
@@ -126,7 +126,7 @@ class SettingsMapBuilder {
                 for (String format : synonyms) {
                     synonymGenerator.addSynonym(new SimpleDateFormat(format));
                 }
-                this.SETTINGS_MAP.put(settingsOption, synonymGenerator);
+                this.settingsMao.put(settingsOption, synonymGenerator);
             }
             case AGGREGATEFUNCTIONLANG -> {
                 if (!synonyms.isEmpty()) {
@@ -137,7 +137,7 @@ class SettingsMapBuilder {
                                 singleSynonym.split(STRING_SYNONYM_DELIMITER)[0].strip(),
                                 singleSynonym.split(STRING_SYNONYM_DELIMITER)[1].strip());
                     }
-                    this.SETTINGS_MAP.put(settingsOption, aggregateFunctionSynonymGenerator);
+                    this.settingsMao.put(settingsOption, aggregateFunctionSynonymGenerator);
                 }
             }
             default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + settingsOption);

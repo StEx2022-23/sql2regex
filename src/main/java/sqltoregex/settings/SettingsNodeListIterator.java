@@ -7,10 +7,10 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class SettingsNodeListIterator implements Iterable<Node> {
-    private final NodeList NODE_LIST;
+    private final NodeList nodeList;
 
-    public SettingsNodeListIterator(final NodeList NODE_LIST) {
-        this.NODE_LIST = NODE_LIST;
+    public SettingsNodeListIterator(final NodeList nodeList) {
+        this.nodeList = nodeList;
     }
 
     @Override
@@ -22,20 +22,20 @@ public class SettingsNodeListIterator implements Iterable<Node> {
             @Override
             public boolean hasNext() {
                 boolean isReplaced =
-                        lastNode != null && currentIndex < NODE_LIST.getLength() && lastNode != NODE_LIST.item(
+                        lastNode != null && currentIndex < nodeList.getLength() && lastNode != nodeList.item(
                         currentIndex);
-                return currentIndex + 1 < NODE_LIST.getLength() || isReplaced;
+                return currentIndex + 1 < nodeList.getLength() || isReplaced;
             }
 
             @Override
             public Node next() {
                 if (hasNext()) {
-                    if (lastNode != null && currentIndex < NODE_LIST.getLength() && lastNode != NODE_LIST.item(
+                    if (lastNode != null && currentIndex < nodeList.getLength() && lastNode != nodeList.item(
                             currentIndex)) {
-                        lastNode = NODE_LIST.item(currentIndex);
+                        lastNode = nodeList.item(currentIndex);
                     } else {
                         currentIndex++;
-                        lastNode = NODE_LIST.item(currentIndex);
+                        lastNode = nodeList.item(currentIndex);
                     }
                     return lastNode;
                 } else {
