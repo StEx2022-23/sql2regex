@@ -23,13 +23,6 @@ class OrderRotationTest {
     }
 
     @Test
-    void getSetting() {
-        OrderRotation orderRotation = new OrderRotation(SettingsOption.COLUMNNAMEORDER);
-        Assertions.assertEquals(1, orderRotation.getSettings().size());
-        Assertions.assertTrue(orderRotation.getSettings().contains(SettingsOption.COLUMNNAMEORDER));
-    }
-
-    @Test
     void testOrderRotationWithAlternativeWritingStyles() {
         SpellingMistake spellingMistake = new SpellingMistake(SettingsOption.DEFAULT);
         spellingMistake.setCapturingGroup(true);

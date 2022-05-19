@@ -1,4 +1,4 @@
-package sqltoregex;
+package sqltoregex.controller;
 
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;

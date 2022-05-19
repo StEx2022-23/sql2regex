@@ -14,12 +14,6 @@ class SpellingMistakeTest {
     }
 
     @Test
-    void testGetSetting() {
-        Assertions.assertEquals(1, spellingMistake.getSettings().size());
-        Assertions.assertTrue(spellingMistake.getSettings().contains(SettingsOption.DEFAULT));
-    }
-
-    @Test
     void testSpellingMistakeOutputEmptyTableName() {
         String input = "";
         Assertions.assertThrows(IllegalArgumentException.class, () -> {

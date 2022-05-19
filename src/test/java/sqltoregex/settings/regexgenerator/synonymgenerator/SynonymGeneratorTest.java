@@ -42,11 +42,13 @@ class SynonymGeneratorTest {
     }
 
     @Test
-    void add3VerticesAndExplicitEdges() {
+    void add5VerticesAndExplicitEdges() {
         stringSynonymGenerator.addSynonymFor("Mittelwert", "AVG");
         stringSynonymGenerator.addSynonymFor("Average", "AVG");
-        Assertions.assertEquals(3, stringSynonymGenerator.synonymsGraph.vertexSet().size());
-        Assertions.assertEquals(2, stringSynonymGenerator.synonymsGraph.edgeSet().size());
+
+        stringSynonymGenerator.addSynonymFor("Summe", "SUM");
+        Assertions.assertEquals(5, stringSynonymGenerator.synonymsGraph.vertexSet().size());
+        Assertions.assertEquals(4, stringSynonymGenerator.synonymsGraph.edgeSet().size());
     }
 
     @Test
@@ -102,7 +104,7 @@ class SynonymGeneratorTest {
         stringSynonymGenerator.addSynonym("AVG");
         stringSynonymGenerator.addSynonym("Average");
         Set<String> stringSet = new HashSet<>(List.of("Mittelwert", "AVG", "Average"));
-        Assertions.assertEquals(stringSet, stringSynonymGenerator.getSettings());
+        Assertions.assertEquals(stringSet, stringSynonymGenerator.getGraph().vertexSet());
     }
 
     @Test

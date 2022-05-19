@@ -1,4 +1,4 @@
-package sqltoregex;
+package sqltoregex.controller;
 
 import net.sf.jsqlparser.expression.Expression;
 import org.springframework.stereotype.Controller;
@@ -7,6 +7,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+
 import sqltoregex.settings.SettingsForm;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
@@ -15,6 +16,7 @@ import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
+import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
@@ -46,7 +48,7 @@ public class SqlToRegexController {
         dateFormats.add(new SimpleDateFormat("yyyy-MM-dd"));
         dateFormats.add(new SimpleDateFormat("yy-MM-dd"));
         model.addAttribute("dateFormats", dateFormats);
-        return "assets/settingsform";
+        return "assets/settingsform/form";
     }
 
     @GetMapping("/examples")
@@ -60,39 +62,40 @@ public class SqlToRegexController {
     public String home(Model model) {
         model.addAttribute(TITLE, "sql2regex");
 
-        RegExGenerator<SettingsOption, String> keywordSpelling = settingsManager.getSettingBySettingOption(
+        RegExGenerator<String> keywordSpelling = settingsManager.getSettingBySettingOption(
                 SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
-        Set<SettingsOption> spellings = new HashSet<>(keywordSpelling.getSettings());
+        Set<SettingsOption> spellings = new HashSet<>();
+        spellings.add(keywordSpelling.getSettingsOption());
         model.addAttribute("spellings", spellings);
 
-        RegExGenerator<SettingsOption, List<String>> tableNameOrder = settingsManager.getSettingBySettingOption(
+        RegExGenerator<List<String>> tableNameOrder = settingsManager.getSettingBySettingOption(
                 SettingsOption.TABLENAMEORDER, OrderRotation.class);
-        RegExGenerator<SettingsOption, List<String>> columnNameOrder = settingsManager.getSettingBySettingOption(
+        RegExGenerator<List<String>> columnNameOrder = settingsManager.getSettingBySettingOption(
                 SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
         Set<SettingsOption> orders = new HashSet<>();
-        orders.addAll(tableNameOrder.getSettings());
-        orders.addAll(columnNameOrder.getSettings());
+        orders.add(tableNameOrder.getSettingsOption());
+        orders.add(columnNameOrder.getSettingsOption());
         model.addAttribute("orders", orders);
 
-        RegExGenerator<SimpleDateFormat, Expression> dateFormats = settingsManager.getSettingBySettingOption(
+        SynonymGenerator<SimpleDateFormat, Expression> dateFormats = settingsManager.getSynonymManagerBySettingOption(
                 SettingsOption.DATESYNONYMS, DateAndTimeFormatSynonymGenerator.class);
-        model.addAttribute("dateFormats", dateFormats.getSettings());
+        model.addAttribute("dateFormats", GraphPreProcessor.getSynonymSet(dateFormats.getGraph()));
 
-        RegExGenerator<SimpleDateFormat, Expression> timeFormats = settingsManager.getSettingBySettingOption(
+        SynonymGenerator<SimpleDateFormat, Expression> timeFormats = settingsManager.getSynonymManagerBySettingOption(
                 SettingsOption.TIMESYNONYMS, DateAndTimeFormatSynonymGenerator.class);
-        model.addAttribute("timeFormats", timeFormats.getSettings());
+        model.addAttribute("timeFormats", GraphPreProcessor.getSynonymSet(dateFormats.getGraph()));
 
-        RegExGenerator<SimpleDateFormat, Expression> dateTimeFormats = settingsManager.getSettingBySettingOption(
+        SynonymGenerator<SimpleDateFormat, Expression> dateTimeFormats = settingsManager.getSynonymManagerBySettingOption(
                 SettingsOption.DATETIMESYNONYMS, DateAndTimeFormatSynonymGenerator.class);
-        model.addAttribute("dateTimeFormats", dateTimeFormats.getSettings());
+        model.addAttribute("dateTimeFormats", GraphPreProcessor.getSynonymSet(dateFormats.getGraph()));
 
-        RegExGenerator<String, String> aggregateFunctionSynonyms = settingsManager.getSettingBySettingOption(
+        SynonymGenerator<String, String> aggregateFunctionSynonyms = settingsManager.getSynonymManagerBySettingOption(
                 SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class);
-        model.addAttribute("aggregateFunctionLang", aggregateFunctionSynonyms.getSettings());
+        model.addAttribute("aggregateFunctionLang", GraphPreProcessor.getSynonymMap(aggregateFunctionSynonyms.getGraph()));
 
         model.addAttribute("settingsForm",
-                           new SettingsForm(spellings, orders, dateFormats.getSettings(), timeFormats.getSettings(),
-                                            dateTimeFormats.getSettings(), aggregateFunctionSynonyms.getSettings(),
+                           new SettingsForm(spellings, orders, GraphPreProcessor.getSynonymSet(dateFormats.getGraph()), GraphPreProcessor.getSynonymSet(timeFormats.getGraph()),
+                                            GraphPreProcessor.getSynonymSet(dateTimeFormats.getGraph()), GraphPreProcessor.getSynonymSet(aggregateFunctionSynonyms.getGraph()),
                                             "SELECT *"));
         model.addAttribute("activeConverter", true);
         return "home";
