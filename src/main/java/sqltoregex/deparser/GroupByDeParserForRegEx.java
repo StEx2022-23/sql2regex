@@ -46,14 +46,13 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
         }
 
         List<Expression> expressions = groupBy.getGroupByExpressionList().getExpressions();
-        System.out.println(expressions);
         generateGroupByOrderOptions(expressions);
 
         this.generateGroupByOrderOptions(expressions);
         buffer.append("(?:");
-        for(Integer i : groupByOrderOptionsMap.keySet()){
+        for(Map.Entry<Integer, List<Expression>> entry : groupByOrderOptionsMap.entrySet()){
             buffer.append("(");
-            Iterator<Expression> expressionIterator = groupByOrderOptionsMap.get(i).iterator();
+            Iterator<Expression> expressionIterator = groupByOrderOptionsMap.get(entry.getKey()).iterator();
             while(expressionIterator.hasNext()){
                 expressionIterator.next().accept(expressionVisitor);
                 if(expressionIterator.hasNext()){

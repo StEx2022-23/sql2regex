@@ -1,6 +1,5 @@
 package sqltoregex.settings.regexgenerator;
 
-import net.sf.jsqlparser.expression.Expression;
 import org.springframework.util.Assert;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.RegExGenerator;

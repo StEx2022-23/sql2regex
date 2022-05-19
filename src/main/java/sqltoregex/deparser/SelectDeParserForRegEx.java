@@ -26,9 +26,9 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     public static final String NOT = "NOT";
     private ExpressionVisitor expressionVisitor;
-    private boolean isKeywordSpellingMistake;
+    private final boolean isKeywordSpellingMistake;
     private RegExGenerator<String> keywordSpellingMistake;
-    private RegExGenerator<List<String>> columnNameOrder;
+    private final RegExGenerator<List<String>> columnNameOrder;
     SettingsManager settingsManager;
 
     public SelectDeParserForRegEx(SettingsManager settingsManager) {
@@ -167,7 +167,9 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
 
         if (plainSelect.getHaving() != null) {
-            buffer.append(" HAVING ");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append("HAVING");
+            buffer.append(REQUIRED_WHITE_SPACE);
             plainSelect.getHaving().accept(expressionVisitor);
         }
 
@@ -176,7 +178,11 @@ public class SelectDeParserForRegEx extends SelectDeParser {
                     plainSelect.getOrderByElements());
         }
         if (plainSelect.isEmitChanges()){
-            buffer.append(" EMIT CHANGES");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append("EMIT");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append("CHANGES");
+            buffer.append(OPTIONAL_WHITE_SPACE);
         }
         if (plainSelect.getLimit() != null) {
             new LimitDeParserForRegEx(buffer).deParse(plainSelect.getLimit());
