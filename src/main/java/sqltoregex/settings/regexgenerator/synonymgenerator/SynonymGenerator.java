@@ -5,8 +5,8 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 import org.springframework.util.Assert;
-import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.RegExGenerator;
+import sqltoregex.settings.SettingsOption;
 
 import java.util.*;
 
@@ -29,18 +29,18 @@ import java.util.*;
 
 public abstract class SynonymGenerator<A, S> implements RegExGenerator<S> {
     public static final long DEFAULT_WEIGHT = 1L;
+    private final SettingsOption SETTINGS_OPTION;
     //due to: Edges undirected (synonyms apply in both directions); Self-loops: no; Multiple edges: no; weighted: yes
     protected SimpleWeightedGraph<A, DefaultWeightedEdge> synonymsGraph;
-    private String prefix = "";
-    private String suffix = "";
-    private SettingsOption settingsOption;
     protected boolean isCapturingGroup = false;
     protected boolean graphForSynonymsOfTwoWords = false;
+    private String prefix = "";
+    private String suffix = "";
 
     protected SynonymGenerator(SettingsOption settingsOption) {
         Assert.notNull(settingsOption, "SettingsOption must not be null");
         this.synonymsGraph = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
-        this.settingsOption = settingsOption;
+        this.SETTINGS_OPTION = settingsOption;
     }
 
     /**
@@ -79,7 +79,7 @@ public abstract class SynonymGenerator<A, S> implements RegExGenerator<S> {
      * @param syn
      * @return
      */
-    public boolean addSynonymFor(A syn, A synFor){
+    public boolean addSynonymFor(A syn, A synFor) {
         return addSynonymFor(syn, synFor, DEFAULT_WEIGHT);
     }
 
@@ -89,25 +89,31 @@ public abstract class SynonymGenerator<A, S> implements RegExGenerator<S> {
      * @param syn
      * @return
      */
-    public boolean addSynonymFor(A syn, A synFor, Long weight){
+    public boolean addSynonymFor(A syn, A synFor, Long weight) {
         this.graphForSynonymsOfTwoWords = true;
         boolean addResult = false;
-        if (!synonymsGraph.containsVertex(syn)){
+        if (!synonymsGraph.containsVertex(syn)) {
             addResult = synonymsGraph.addVertex(this.prepareSynonymForAdd(syn));
         }
-        if (!synonymsGraph.containsVertex(synFor)){
+        if (!synonymsGraph.containsVertex(synFor)) {
             addResult = synonymsGraph.addVertex(this.prepareSynonymForAdd(synFor)) || addResult;
         }
-        if (addResult){
-            Optional<A> startVertex = this.synonymsGraph.vertexSet().stream().filter(synonym -> synonym.equals(this.prepareSynonymForAdd(synFor))).findAny();
-            if (startVertex.isPresent()){
+        if (addResult) {
+            Optional<A> startVertex = this.synonymsGraph.vertexSet().stream()
+                    .filter(synonym -> synonym.equals(this.prepareSynonymForAdd(synFor))).findAny();
+            if (startVertex.isPresent()) {
                 Set<DefaultWeightedEdge> edgeSet = new HashSet<>(this.synonymsGraph.outgoingEdgesOf(startVertex.get()));
-                for (DefaultWeightedEdge edge : edgeSet){
-                    DefaultWeightedEdge e1 = synonymsGraph.addEdge(this.prepareSynonymForAdd(syn), synonymsGraph.getEdgeTarget(edge).equals(synFor) ? synonymsGraph.getEdgeSource(edge) : synonymsGraph.getEdgeTarget(edge));
+                for (DefaultWeightedEdge edge : edgeSet) {
+                    DefaultWeightedEdge e1 = synonymsGraph.addEdge(this.prepareSynonymForAdd(syn),
+                                                                   synonymsGraph.getEdgeTarget(edge)
+                                                                           .equals(synFor) ?
+                                                                           synonymsGraph.getEdgeSource(
+                                                                           edge) : synonymsGraph.getEdgeTarget(edge));
                     synonymsGraph.setEdgeWeight(e1, weight);
                 }
             }
-            DefaultWeightedEdge e1 = synonymsGraph.addEdge(this.prepareSynonymForAdd(syn), this.prepareSynonymForAdd(synFor));
+            DefaultWeightedEdge e1 = synonymsGraph.addEdge(this.prepareSynonymForAdd(syn),
+                                                           this.prepareSynonymForAdd(synFor));
             synonymsGraph.setEdgeWeight(e1, weight);
             return true;
         }
@@ -133,7 +139,7 @@ public abstract class SynonymGenerator<A, S> implements RegExGenerator<S> {
                 strRegEx.append(prefix);
                 strRegEx.append(prepareVertexForRegEx(iterator.next(), wordToFindSynonyms));
                 strRegEx.append(suffix);
-                if (iterator.hasNext()){
+                if (iterator.hasNext()) {
                     strRegEx.append('|');
                 }
             }
@@ -143,18 +149,20 @@ public abstract class SynonymGenerator<A, S> implements RegExGenerator<S> {
             return (isCapturingGroup ? '(' : "(?:") + searchSynonymToString(wordToFindSynonyms) + ')';
         }
     }
-    public Graph<A, DefaultWeightedEdge> getGraph(){
-        try{
-            return (Graph<A, DefaultWeightedEdge>) this.synonymsGraph.clone();}
-        catch(ClassCastException exception){
+
+    public Graph<A, DefaultWeightedEdge> getGraph() {
+        try {
+            return (Graph<A, DefaultWeightedEdge>) this.synonymsGraph.clone();
+        } catch (ClassCastException exception) {
             return null;
         }
     }
 
     @Override
     public SettingsOption getSettingsOption() {
-        return this.settingsOption;
+        return this.SETTINGS_OPTION;
     }
+
 
     /**
      * Preprocessed input into a String that will be stored in the graph.
@@ -184,6 +192,7 @@ public abstract class SynonymGenerator<A, S> implements RegExGenerator<S> {
 
     /**
      * Removes a synonym from the graph.
+     *
      * @param syn
      * @return
      */
@@ -203,6 +212,7 @@ public abstract class SynonymGenerator<A, S> implements RegExGenerator<S> {
 
     /**
      * Sets whether there will be an enclosing non capturing group (?: ... ) around the generated regEx.
+     *
      * @param capturingGroup true for capturing group false for non-capturing group
      */
     @Override
@@ -230,6 +240,7 @@ public abstract class SynonymGenerator<A, S> implements RegExGenerator<S> {
 
     /**
      * Not using graph equals method cause wrong implementation in JGraphT
+     *
      * @param o
      * @return
      */
@@ -237,11 +248,14 @@ public abstract class SynonymGenerator<A, S> implements RegExGenerator<S> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SynonymGenerator<?, ?> that)) return false;
-        return synonymsGraph.vertexSet().equals(that.synonymsGraph.vertexSet()) && synonymsGraph.edgeSet().size() == that.synonymsGraph.edgeSet().size() && prefix.equals(that.prefix) && suffix.equals(that.suffix) && settingsOption == that.settingsOption;
+        return synonymsGraph.vertexSet().equals(that.synonymsGraph.vertexSet()) && synonymsGraph.edgeSet()
+                .size() == that.synonymsGraph.edgeSet().size() && prefix.equals(that.prefix) && suffix.equals(
+                that.suffix) && SETTINGS_OPTION == that.SETTINGS_OPTION;
     }
+
 
     @Override
     public int hashCode() {
-        return Objects.hash(synonymsGraph.vertexSet(), synonymsGraph.edgeSet().size(), prefix, suffix, settingsOption);
+        return Objects.hash(synonymsGraph.vertexSet(), synonymsGraph.edgeSet().size(), prefix, suffix, SETTINGS_OPTION);
     }
 }
