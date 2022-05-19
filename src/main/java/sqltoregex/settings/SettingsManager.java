@@ -21,14 +21,15 @@ import java.util.logging.Logger;
 
 @Service
 public class SettingsManager {
-    private final Map<SettingsOption, RegExGenerator<?>> settingsMap = new EnumMap<>(SettingsOption.class);
+    private final Map<SettingsOption, RegExGenerator<?>> SETTINGS_MAP = new EnumMap<>(SettingsOption.class);
 
 
     public SettingsManager() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
         this.parseSettings();
     }
 
-    public static <R> RegExGenerator<R> castSetting(RegExGenerator<?> rawSetting, Class<? extends RegExGenerator<R>> clazz) {
+    public static <T> RegExGenerator<T> castSetting(RegExGenerator<?> rawSetting,
+                                                    Class<? extends RegExGenerator<T>> clazz) {
         try {
             return clazz.cast(rawSetting);
         } catch (ClassCastException e) {
@@ -38,26 +39,13 @@ public class SettingsManager {
         return null;
     }
 
-    public Map<SettingsOption, RegExGenerator<?>> parseUserSettingsInput(SettingsForm form){
-        SettingsMapBuilder settingsMapBuilder = new SettingsMapBuilder();
-
-        return settingsMapBuilder
-                .withSettingsOptionSet(form.getSpellings())
-                .withSettingsOptionSet(form.getOrders())
-                .withSimpleDateFormatSet(form.getDateFormats(), SettingsOption.DATESYNONYMS)
-                .withSimpleDateFormatSet(form.getTimeFormats(), SettingsOption.TIMESYNONYMS)
-                .withSimpleDateFormatSet(form.getDateTimeFormats(), SettingsOption.DATETIMESYNONYMS)
-                .withStringSet(form.getAggregateFunctionLang(), SettingsOption.AGGREGATEFUNCTIONLANG)
-                .build();
-    }
-
     /**
      * Method for getting all OrderRotations, all Spellings, all Dateformats, allTime Formats.
      */
     public <S> Set<RegExGenerator<S>> getSettingByClass(Class<? extends RegExGenerator<S>> clazz) {
         Set<RegExGenerator<S>> settingsSet = new LinkedHashSet<>();
         for (RegExGenerator<?> setting :
-                this.settingsMap.values()) {
+                this.SETTINGS_MAP.values()) {
             if (setting != null && setting.getClass().equals(clazz)) {
                 settingsSet.add(castSetting(setting, clazz));
             }
@@ -65,33 +53,36 @@ public class SettingsManager {
         return settingsSet;
     }
 
-    public <S> RegExGenerator<S> getSettingBySettingOption(SettingsOption settingsOption, Class<? extends RegExGenerator<S>> clazz) {
-        for (Map.Entry<SettingsOption, RegExGenerator<?>> entry : this.settingsMap.entrySet()) {
+    public boolean getSettingBySettingsOption(SettingsOption settingsOption) {
+        return this.SETTINGS_MAP.containsKey(settingsOption);
+    }
+
+    public <S> RegExGenerator<S> getSettingBySettingsOption(SettingsOption settingsOption,
+                                                            Class<? extends RegExGenerator<S>> clazz) {
+        for (Map.Entry<SettingsOption, RegExGenerator<?>> entry : this.SETTINGS_MAP.entrySet()) {
             if (entry.getKey().equals(settingsOption)) {
-                return castSetting(settingsMap.get(entry.getKey()), clazz);
+                return castSetting(SETTINGS_MAP.get(entry.getKey()), clazz);
             }
         }
         throw new NoSuchElementException("There is no setting with this setting option:" + settingsOption);
     }
 
-    public boolean getSettingBySettingOption(SettingsOption settingsOption){
-        return this.settingsMap.containsKey(settingsOption);
-    }
-
     public Map<SettingsOption, RegExGenerator<?>> getSettingsMap() {
-        return this.settingsMap;
+        return this.SETTINGS_MAP;
     }
 
-    public <A, S> SynonymGenerator<A,S> getSynonymManagerBySettingOption(SettingsOption settingsOption, Class<? extends SynonymGenerator<A,S>> clazz){
-        for (Map.Entry<SettingsOption, RegExGenerator<?>> entry : this.settingsMap.entrySet()) {
+    public <A, S> SynonymGenerator<A, S> getSynonymManagerBySettingOption(SettingsOption settingsOption,
+                                                                          Class<? extends SynonymGenerator<A, S>> clazz) {
+        for (Map.Entry<SettingsOption, RegExGenerator<?>> entry : this.SETTINGS_MAP.entrySet()) {
             if (entry.getKey().equals(settingsOption)) {
-                return (SynonymGenerator<A, S>) castSetting(settingsMap.get(entry.getKey()), clazz);
+                return (SynonymGenerator<A, S>) castSetting(SETTINGS_MAP.get(entry.getKey()), clazz);
             }
         }
         throw new NoSuchElementException("There is no property with this property option:" + settingsOption);
     }
 
-    private void parseSettings() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
+    private void parseSettings() throws ParserConfigurationException, IOException, SAXException,
+            XPathExpressionException {
         SettingsOption relatedOption;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
@@ -106,17 +97,27 @@ public class SettingsManager {
         Node root = document.getElementsByTagName("properties").item(0);
         SettingsNodeListIterator categoryIterator = new SettingsNodeListIterator(root.getChildNodes());
         for (Node categoryNode : categoryIterator) {
-            SettingsNodeListIterator settingsCategoryIterator = new SettingsNodeListIterator(categoryNode.getChildNodes());
+            SettingsNodeListIterator settingsCategoryIterator = new SettingsNodeListIterator(
+                    categoryNode.getChildNodes());
             for (Node settingsNode : settingsCategoryIterator) {
                 relatedOption = SettingsOption.valueOf(settingsNode.getNodeName().toUpperCase());
                 mapBuilder.withNodeList(settingsNode.getChildNodes(), relatedOption);
             }
         }
-        this.settingsMap.putAll(mapBuilder.build());
+        this.SETTINGS_MAP.putAll(mapBuilder.build());
     }
 
-    public Set<SettingsOption> getDefaultSettings() {
-        return this.settingsMap.keySet();
+    public Map<SettingsOption, RegExGenerator<?>> parseUserSettingsInput(SettingsForm form) {
+        SettingsMapBuilder settingsMapBuilder = new SettingsMapBuilder();
+
+        return settingsMapBuilder
+                .withSettingsOptionSet(form.getSpellings())
+                .withSettingsOptionSet(form.getOrders())
+                .withSimpleDateFormatSet(form.getDateFormats(), SettingsOption.DATESYNONYMS)
+                .withSimpleDateFormatSet(form.getTimeFormats(), SettingsOption.TIMESYNONYMS)
+                .withSimpleDateFormatSet(form.getDateTimeFormats(), SettingsOption.DATETIMESYNONYMS)
+                .withStringSet(form.getAggregateFunctionLang(), SettingsOption.AGGREGATEFUNCTIONLANG)
+                .build();
     }
 
     /**
