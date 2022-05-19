@@ -13,6 +13,7 @@ import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 
 import java.util.Iterator;
@@ -29,7 +30,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     private final SettingsManager settingsManager;
     private OrderByDeParserForRegEx orderByDeParser;
-    private SelectVisitor selectVisitor = getSelectVisitor();
+    private final SelectVisitor selectVisitor = getSelectVisitor();
 
     public ExpressionDeParserForRegEx(SettingsManager settingsManager) {
         super();
@@ -465,10 +466,12 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             tableName += ')';
         }
         if (tableName != null) {
-            buffer.append(tableName).append(".");
+            buffer.append(settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING,
+                    SpellingMistake.class).generateRegExFor(tableName)).append(".");
         }
 
-        buffer.append(tableColumn.getColumnName());
+        buffer.append(settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING,
+                SpellingMistake.class).generateRegExFor(tableColumn.getColumnName()));
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
