@@ -2,10 +2,6 @@ package sqltoregex.controller;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
-import sqltoregex.property.RegExGenerator;
-import sqltoregex.property.regexgenerator.synonymgenerator.SynonymGenerator;
-
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;

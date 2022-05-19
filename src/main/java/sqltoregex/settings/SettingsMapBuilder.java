@@ -26,12 +26,11 @@ class SettingsMapBuilder {
 
     public Map<SettingsOption, RegExGenerator<?, ?>> build() {
         for (OrderRotation orderRotation : orderRotations) {
-            for (SettingsOption settingsOption : orderRotation.getSettings()) {
-                SpellingMistake spellingMistake = new SpellingMistake(SettingsOption.valueOf(
-                        settingsOption.toString().substring(0, settingsOption.toString().length() - 5) + "SPELLING"));
-                if (spellingMistakes.contains(spellingMistake)) {
-                    orderRotation.setSpellingMistake(spellingMistake);
-                }
+            SettingsOption settingsOption = orderRotation.getSettingsOption();
+            SpellingMistake spellingMistake = new SpellingMistake(SettingsOption.valueOf(
+                    settingsOption.toString().substring(0, settingsOption.toString().length() - 5) + "SPELLING"));
+            if (spellingMistakes.contains(spellingMistake)) {
+                orderRotation.setSpellingMistake(spellingMistake);
             }
         }
         return this.settingsMap;
