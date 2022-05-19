@@ -62,15 +62,15 @@ public class SqlToRegexController {
     public String home(Model model) {
         model.addAttribute(TITLE, "sql2regex");
 
-        RegExGenerator<SettingsOption, String> keywordSpelling = settingsManager.getSettingBySettingOption(
+        RegExGenerator<String> keywordSpelling = settingsManager.getSettingBySettingOption(
                 SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
         Set<SettingsOption> spellings = new HashSet<>();
         spellings.add(keywordSpelling.getSettingsOption());
         model.addAttribute("spellings", spellings);
 
-        RegExGenerator<SettingsOption, List<String>> tableNameOrder = settingsManager.getSettingBySettingOption(
+        RegExGenerator<List<String>> tableNameOrder = settingsManager.getSettingBySettingOption(
                 SettingsOption.TABLENAMEORDER, OrderRotation.class);
-        RegExGenerator<SettingsOption, List<String>> columnNameOrder = settingsManager.getSettingBySettingOption(
+        RegExGenerator<List<String>> columnNameOrder = settingsManager.getSettingBySettingOption(
                 SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
         Set<SettingsOption> orders = new HashSet<>();
         orders.add(tableNameOrder.getSettingsOption());

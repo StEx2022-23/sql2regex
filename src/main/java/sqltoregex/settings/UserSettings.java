@@ -6,17 +6,17 @@ import java.util.Map;
 
 public class UserSettings {
     private static UserSettings instance;
-    public final ImmutableMap<SettingsOption, RegExGenerator<?, ?>> settingsMap;
+    public final ImmutableMap<SettingsOption, RegExGenerator<?>> settingsMap;
 
-    private UserSettings(Map<SettingsOption, RegExGenerator<?, ?>> map){
-        this.settingsMap = new ImmutableMap.Builder<SettingsOption, RegExGenerator<?, ?>>().putAll(map).build();
+    private UserSettings(Map<SettingsOption, RegExGenerator<?>> map){
+        this.settingsMap = new ImmutableMap.Builder<SettingsOption, RegExGenerator<?>>().putAll(map).build();
     }
 
     private UserSettings(){
-        this.settingsMap = new ImmutableMap.Builder<SettingsOption, RegExGenerator<?, ?>>().build();
+        this.settingsMap = new ImmutableMap.Builder<SettingsOption, RegExGenerator<?>>().build();
     }
 
-    public static UserSettings getInstance(Map<SettingsOption, RegExGenerator<?, ?>> map) {
+    public static UserSettings getInstance(Map<SettingsOption, RegExGenerator<?>> map) {
         if (instance == null){
             instance = new UserSettings(map);
         }
@@ -30,7 +30,7 @@ public class UserSettings {
         return instance;
     }
 
-    public Map<SettingsOption, RegExGenerator<?, ?>> getSettingsMap(){
+    public Map<SettingsOption, RegExGenerator<?>> getSettingsMap(){
         return this.settingsMap;
     }
 }

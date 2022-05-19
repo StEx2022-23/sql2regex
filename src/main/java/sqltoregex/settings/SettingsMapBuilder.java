@@ -15,7 +15,7 @@ class SettingsMapBuilder {
     private static final String UNSUPPORTED_BUILD_WITH = "Unsupported build with:";
     private static final String STRING_SYNONYM_DELIMITER = ";";
     private final Set<OrderRotation> orderRotations;
-    private final Map<SettingsOption, RegExGenerator<?, ?>> settingsMap;
+    private final Map<SettingsOption, RegExGenerator<?>> settingsMap;
     private final Set<SpellingMistake> spellingMistakes;
 
     public SettingsMapBuilder() {
@@ -24,7 +24,7 @@ class SettingsMapBuilder {
         this.spellingMistakes = new LinkedHashSet<>();
     }
 
-    public Map<SettingsOption, RegExGenerator<?, ?>> build() {
+    public Map<SettingsOption, RegExGenerator<?>> build() {
         for (OrderRotation orderRotation : orderRotations) {
             SettingsOption settingsOption = orderRotation.getSettingsOption();
             SpellingMistake spellingMistake = new SpellingMistake(SettingsOption.valueOf(
