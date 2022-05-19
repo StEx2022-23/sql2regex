@@ -1,8 +1,8 @@
-package sqltoregex.property.regexgenerator;
+package sqltoregex.settings.regexgenerator;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import sqltoregex.property.SettingsOption;
+import sqltoregex.settings.SettingsOption;
 
 import java.util.Arrays;
 import java.util.List;

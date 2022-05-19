@@ -11,9 +11,9 @@ import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
-import sqltoregex.property.SettingsManager;
-import sqltoregex.property.SettingsOption;
-import sqltoregex.property.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
+import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 
 import java.util.Iterator;
 import java.util.List;

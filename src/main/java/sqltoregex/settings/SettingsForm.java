@@ -1,4 +1,4 @@
-package sqltoregex.property;
+package sqltoregex.settings;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;

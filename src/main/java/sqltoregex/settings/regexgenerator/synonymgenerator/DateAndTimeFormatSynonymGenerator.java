@@ -1,4 +1,4 @@
-package sqltoregex.property.regexgenerator.synonymgenerator;
+package sqltoregex.settings.regexgenerator.synonymgenerator;
 
 import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.Expression;
@@ -6,7 +6,7 @@ import net.sf.jsqlparser.expression.TimeValue;
 import net.sf.jsqlparser.expression.TimestampValue;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import org.springframework.util.Assert;
-import sqltoregex.property.SettingsOption;
+import sqltoregex.settings.SettingsOption;
 
 import java.text.DateFormat;
 import java.text.ParseException;

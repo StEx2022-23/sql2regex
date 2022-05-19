@@ -1,4 +1,4 @@
-package sqltoregex.property;
+package sqltoregex.settings;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

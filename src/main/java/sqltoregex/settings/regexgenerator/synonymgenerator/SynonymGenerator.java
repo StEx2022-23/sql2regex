@@ -1,12 +1,12 @@
-package sqltoregex.property.regexgenerator.synonymgenerator;
+package sqltoregex.settings.regexgenerator.synonymgenerator;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 import org.springframework.util.Assert;
-import sqltoregex.property.SettingsOption;
-import sqltoregex.property.RegExGenerator;
+import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.RegExGenerator;
 
 import java.util.*;
 

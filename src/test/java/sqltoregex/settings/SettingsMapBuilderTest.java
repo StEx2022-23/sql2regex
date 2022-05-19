@@ -1,12 +1,12 @@
-package sqltoregex.property;
+package sqltoregex.settings;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sqltoregex.property.regexgenerator.OrderRotation;
-import sqltoregex.property.regexgenerator.SpellingMistake;
-import sqltoregex.property.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
-import sqltoregex.property.regexgenerator.synonymgenerator.StringSynonymGenerator;
+import sqltoregex.settings.regexgenerator.OrderRotation;
+import sqltoregex.settings.regexgenerator.SpellingMistake;
+import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
+import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -17,8 +17,8 @@ class SettingsMapBuilderTest {
 
     @Test
     void OrderAndSpellingWithSameProp() {
-        builder.withPropertyOption(SettingsOption.COLUMNNAMEORDER);
-        builder.withPropertyOption(SettingsOption.COLUMNNAMESPELLING);
+        builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
+        builder.withSettingsOption(SettingsOption.COLUMNNAMESPELLING);
         OrderRotation orderRotation = (OrderRotation) builder.build().get(SettingsOption.COLUMNNAMEORDER);
         Assertions.assertEquals(new SpellingMistake(SettingsOption.COLUMNNAMESPELLING),
                                 orderRotation.getSpellingMistake());
@@ -31,15 +31,15 @@ class SettingsMapBuilderTest {
 
     @Test
     void buildWith2EqualObjects() {
-        builder.withPropertyOption(SettingsOption.COLUMNNAMEORDER);
-        builder.withPropertyOption(SettingsOption.COLUMNNAMEORDER);
+        builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
+        builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
         Map<SettingsOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
     }
 
     @Test
     void buildWithColumnNameOrder() {
-        builder.withPropertyOption(SettingsOption.COLUMNNAMEORDER);
+        builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
         Map<SettingsOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(SettingsOption.COLUMNNAMEORDER));
@@ -102,7 +102,7 @@ class SettingsMapBuilderTest {
 
     @Test
     void buildWithEmptySetOfPropertyOption() {
-        builder.withPropertyOptionSet(new HashSet<>());
+        builder.withSettingsOptionSet(new HashSet<>());
         Map<SettingsOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(0, map.size());
     }
@@ -118,7 +118,7 @@ class SettingsMapBuilderTest {
 
     @Test
     void buildWithKeyWordSpelling() {
-        builder.withPropertyOption(SettingsOption.KEYWORDSPELLING);
+        builder.withSettingsOption(SettingsOption.KEYWORDSPELLING);
         Map<SettingsOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(SettingsOption.KEYWORDSPELLING));
@@ -127,7 +127,7 @@ class SettingsMapBuilderTest {
 
     @Test
     void buildWithTableNameOrder() {
-        builder.withPropertyOption(SettingsOption.TABLENAMEORDER);
+        builder.withSettingsOption(SettingsOption.TABLENAMEORDER);
         Map<SettingsOption, RegExGenerator<?, ?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(SettingsOption.TABLENAMEORDER));

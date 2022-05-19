@@ -1,8 +1,8 @@
-package sqltoregex.property.regexgenerator;
+package sqltoregex.settings.regexgenerator;
 
 import org.springframework.util.Assert;
-import sqltoregex.property.SettingsOption;
-import sqltoregex.property.RegExGenerator;
+import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.RegExGenerator;
 
 import java.util.*;
 
@@ -15,18 +15,18 @@ import java.util.*;
 public class OrderRotation implements RegExGenerator<SettingsOption, List<String>> {
     private final StringBuilder orderRotationOfValueList = new StringBuilder();
     private SpellingMistake spellingMistake;
-    private final SettingsOption settingsoption;
+    private final SettingsOption settingsOption;
     protected boolean isCapturingGroup = false;
 
     public OrderRotation(SettingsOption settingsOption, SpellingMistake spellingMistake){
         Assert.notNull(spellingMistake, "SpellingMistake must not be null");
         Assert.notNull(settingsOption, "SettingsOption must not be null");
         this.spellingMistake = spellingMistake;
-        this.settingsoption = settingsOption;
+        this.settingsOption = settingsOption;
     }
 
     public OrderRotation(SettingsOption settingsOption){
-        this.settingsoption = settingsOption;
+        this.settingsOption = settingsOption;
     }
 
     /**
@@ -103,7 +103,7 @@ public class OrderRotation implements RegExGenerator<SettingsOption, List<String
 
     @Override
     public SettingsOption getSettingsOption() {
-        return settingsoption;
+        return settingsOption;
     }
 
     @Override
@@ -111,11 +111,11 @@ public class OrderRotation implements RegExGenerator<SettingsOption, List<String
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OrderRotation that = (OrderRotation) o;
-        return Objects.equals(spellingMistake, that.spellingMistake) && settingsoption == that.settingsoption;
+        return Objects.equals(spellingMistake, that.spellingMistake) && settingsOption == that.settingsOption;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(spellingMistake, settingsoption);
+        return Objects.hash(spellingMistake, settingsOption);
     }
 }

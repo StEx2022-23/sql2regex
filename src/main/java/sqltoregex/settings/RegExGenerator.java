@@ -1,4 +1,4 @@
-package sqltoregex.property;
+package sqltoregex.settings;
 
 public interface RegExGenerator<S, R> {
     String generateRegExFor(R input);

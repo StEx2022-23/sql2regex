@@ -1,7 +1,7 @@
-package sqltoregex.property.regexgenerator.synonymgenerator;
+package sqltoregex.settings.regexgenerator.synonymgenerator;
 
 import org.springframework.util.Assert;
-import sqltoregex.property.SettingsOption;
+import sqltoregex.settings.SettingsOption;
 
 /**
  * Default implementation of {@link SynonymGenerator}. Saves Strings and searches with exact representation of them.
