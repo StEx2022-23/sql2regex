@@ -16,7 +16,6 @@ import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
-import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,16 +26,16 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     public static final String NOT = "NOT";
     private ExpressionVisitor expressionVisitor;
-    private boolean isSpellingMistake;
-    private RegExGenerator<String> spellingMistake;
+    private boolean isKeywordSpellingMistake;
+    private RegExGenerator<String> keywordSpellingMistake;
     private RegExGenerator<List<String>> columnNameOrder;
 
     public SelectDeParserForRegEx(SettingsManager settingsManager) {
         super();
         this.expressionVisitor = new ExpressionDeParserForRegEx(settingsManager);
-        this.isSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING);
-        if(this.isSpellingMistake){
-            spellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
+        this.isKeywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING);
+        if(this.isKeywordSpellingMistake){
+            keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
         }
         columnNameOrder = settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
 
@@ -49,12 +48,12 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             buffer.append("(" + OPTIONAL_WHITE_SPACE);
         }
 
-        buffer.append(isSpellingMistake ? spellingMistake.generateRegExFor("SELECT") : "SELECT");
+        buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("SELECT") : "SELECT");
         buffer.append(REQUIRED_WHITE_SPACE);
 
 
         if (plainSelect.getMySqlHintStraightJoin()) {
-            buffer.append(isSpellingMistake ? spellingMistake.generateRegExFor("STRAIGHT_JOIN") : "STRAIGHT_JOIN");
+            buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("STRAIGHT_JOIN") : "STRAIGHT_JOIN");
             buffer.append(REQUIRED_WHITE_SPACE);
         }
 
@@ -75,14 +74,14 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         if (plainSelect.getDistinct() != null) {
             if (plainSelect.getDistinct().isUseUnique()) {
-                buffer.append(isSpellingMistake ? spellingMistake.generateRegExFor("UNIQUE") : "UNIQUE");
+                buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("UNIQUE") : "UNIQUE");
                 buffer.append(REQUIRED_WHITE_SPACE);
             } else {
-                buffer.append(isSpellingMistake ? spellingMistake.generateRegExFor("DISTINCT") : "DISTINCT");
+                buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("DISTINCT") : "DISTINCT");
                 buffer.append(REQUIRED_WHITE_SPACE);
             }
             if (plainSelect.getDistinct().getOnSelectItems() != null) {
-                buffer.append(isSpellingMistake ? spellingMistake.generateRegExFor("ON") : "ON");
+                buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("ON") : "ON");
                 buffer.append(REQUIRED_WHITE_SPACE);
                 buffer.append("(");
 
@@ -111,7 +110,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
 
         if (plainSelect.getMySqlSqlCalcFoundRows()) {
-            buffer.append(isSpellingMistake ? spellingMistake.generateRegExFor("SQL_CALC_FOUND_ROWS") : "SQL_CALC_FOUND_ROWS");
+            buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("SQL_CALC_FOUND_ROWS") : "SQL_CALC_FOUND_ROWS");
             buffer.append(OPTIONAL_WHITE_SPACE);
         }
 
@@ -123,7 +122,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         if (plainSelect.getIntoTables() != null) {
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(isSpellingMistake ? spellingMistake.generateRegExFor("FROM") : "FROM");
+            buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("FROM") : "FROM");
             buffer.append(REQUIRED_WHITE_SPACE);
             for (Iterator<Table> iter = plainSelect.getIntoTables().iterator(); iter.hasNext();) {
                 visit(iter.next());
@@ -135,7 +134,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         if (plainSelect.getFromItem() != null) {
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(isSpellingMistake ? spellingMistake.generateRegExFor("FROM") : "FROM");
+            buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("FROM") : "FROM");
             buffer.append(REQUIRED_WHITE_SPACE);
             plainSelect.getFromItem().accept(this);
         }
@@ -329,6 +328,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         buffer.append("))");
     }
 
+    @Override
     public void deparseOffset(Offset offset) {
         // OFFSET offset
         // or OFFSET offset (ROW | ROWS)
@@ -340,6 +340,8 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     }
 
+
+    @Override
     public void deparseFetch(Fetch fetch) {
         // FETCH (FIRST | NEXT) row_count (ROW | ROWS) ONLY
         buffer.append(" FETCH ");
@@ -357,10 +359,12 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     }
 
+    @Override
     public ExpressionVisitor getExpressionVisitor() {
         return expressionVisitor;
     }
 
+    @Override
     public void setExpressionVisitor(ExpressionVisitor visitor) {
         expressionVisitor = visitor;
     }
@@ -379,6 +383,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
     }
 
+    @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity"})
     public void deparseJoin(Join join) {
         if (join.isSimple() && join.isOuter()) {
@@ -427,7 +432,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             buffer.append(" ON ");
             onExpression.accept(expressionVisitor);
         }
-        if (join.getUsingColumns().size()>0) {
+        if (!join.getUsingColumns().isEmpty()) {
             buffer.append(" USING (");
             for (Iterator<Column> iterator = join.getUsingColumns().iterator(); iterator.hasNext();) {
                 Column column = iterator.next();
