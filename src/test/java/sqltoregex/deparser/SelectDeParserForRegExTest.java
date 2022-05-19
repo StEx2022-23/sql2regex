@@ -50,4 +50,22 @@ class SelectDeParserForRegExTest {
             Assertions.assertTrue(checkAgainstRegEx(regex, str), str + " " + regex);
         }
     }
+
+    @Test
+    void testGroupBy() throws JSQLParserException {
+        String sampleSolution = "SELECT col1, col2 FROM table1 GROUP BY col1, col2";
+
+        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
+        statement.accept(statementDeParser);
+        String regex = statementDeParser.getBuffer().toString();
+
+        List<String> toCheckedInput = List.of(
+                "SELECT col1, col2 FROM table1 GROUP BY col1, col2",
+                "SELECT col1, col2 FROM table1 GROUP BY col2,col1"
+        );
+
+        for(String str : toCheckedInput){
+            Assertions.assertTrue(checkAgainstRegEx(regex, str), str + " " + regex);
+        }
+    }
 }

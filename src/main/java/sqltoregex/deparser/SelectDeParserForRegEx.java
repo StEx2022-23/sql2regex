@@ -29,9 +29,11 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     private boolean isKeywordSpellingMistake;
     private RegExGenerator<String> keywordSpellingMistake;
     private RegExGenerator<List<String>> columnNameOrder;
+    SettingsManager settingsManager;
 
     public SelectDeParserForRegEx(SettingsManager settingsManager) {
         super();
+        this.settingsManager = settingsManager;
         this.expressionVisitor = new ExpressionDeParserForRegEx(settingsManager);
         this.isKeywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING);
         if(this.isKeywordSpellingMistake){
@@ -160,8 +162,8 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
 
         if (plainSelect.getGroupBy() != null) {
-            buffer.append(" ");
-            new GroupByDeParserForRegEx(expressionVisitor, buffer).deParse(plainSelect.getGroupBy());
+            buffer.append(REQUIRED_WHITE_SPACE);
+            new GroupByDeParserForRegEx(expressionVisitor, buffer, settingsManager).deParse(plainSelect.getGroupBy());
         }
 
         if (plainSelect.getHaving() != null) {
