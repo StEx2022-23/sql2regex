@@ -1,7 +1,6 @@
 package sqltoregex.settings.regexgenerator;
 
 import org.springframework.util.Assert;
-import sqltoregex.settings.RegExGenerator;
 import sqltoregex.settings.SettingsOption;
 
 import java.util.Iterator;

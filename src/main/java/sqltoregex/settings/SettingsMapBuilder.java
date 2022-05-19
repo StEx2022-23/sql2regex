@@ -4,6 +4,7 @@ import org.springframework.util.Assert;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import sqltoregex.settings.regexgenerator.OrderRotation;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;

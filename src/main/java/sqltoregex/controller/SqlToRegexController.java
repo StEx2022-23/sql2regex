@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import sqltoregex.settings.SettingsForm;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
-import sqltoregex.settings.RegExGenerator;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;

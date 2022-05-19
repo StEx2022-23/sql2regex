@@ -1,6 +1,5 @@
 package sqltoregex.settings.regexgenerator;
 
-import sqltoregex.settings.RegExGenerator;
 import sqltoregex.settings.SettingsOption;
 
 import java.util.Objects;

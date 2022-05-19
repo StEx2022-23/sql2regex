@@ -1,6 +1,7 @@
 package sqltoregex.settings;
 
 import com.google.common.collect.ImmutableMap;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 
 import java.util.Map;
 
