@@ -210,7 +210,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             }
         }
         if (plainSelect.getOptimizeFor() != null) {
-            deparseOptimizeFor(plainSelect.getOptimizeFor());
+            deparseOptimizeForForRegEx(plainSelect.getOptimizeFor());
         }
         if (plainSelect.getForXmlPath() != null) {
             buffer.append(" FOR XML PATH(").append(plainSelect.getForXmlPath()).append(")");
@@ -555,7 +555,8 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         new ValuesStatementDeParser(this, buffer).deParse(values);
     }
 
-    private void deparseOptimizeFor(OptimizeFor optimizeFor) {
+
+    private void deparseOptimizeForForRegEx(OptimizeFor optimizeFor) {
         buffer.append(" OPTIMIZE FOR ");
         buffer.append(optimizeFor.getRowCount());
         buffer.append(" ROWS");
