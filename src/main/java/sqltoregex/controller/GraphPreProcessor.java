@@ -7,13 +7,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class GraphPreProcessor {
+
+    private GraphPreProcessor(){
+
+    }
+
     static <T> Set<T> getSynonymSet(Graph<T,DefaultWeightedEdge> graph){
         try {
             return new LinkedHashSet<>(graph.vertexSet());
         }catch (ClassCastException e){
             Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-            logger.log(Level.WARNING, "Couldn't cast", e);
-            return null;
+            logger.log(Level.WARNING, "Could not cast", e);
+            return Collections.emptySet();
         }
     }
 
@@ -38,8 +43,8 @@ public class GraphPreProcessor {
             return map;
         }catch (ClassCastException e){
             Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-            logger.log(Level.WARNING, "Couldn't cast", e);
-            return null;
+            logger.log(Level.WARNING, "Could not cast", e);
+            return Collections.emptyMap();
         }
     }
 }

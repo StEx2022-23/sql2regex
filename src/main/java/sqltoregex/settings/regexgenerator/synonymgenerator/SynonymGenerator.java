@@ -27,7 +27,7 @@ import java.util.*;
  * @param <S> class of search objects
  */
 
-public abstract class SynonymGenerator<A, S> implements RegExGenerator<A,S> {
+public abstract class SynonymGenerator<A, S> implements RegExGenerator<S> {
     public static final long DEFAULT_WEIGHT = 1L;
     //due to: Edges undirected (synonyms apply in both directions); Self-loops: no; Multiple edges: no; weighted: yes
     protected SimpleWeightedGraph<A, DefaultWeightedEdge> synonymsGraph;

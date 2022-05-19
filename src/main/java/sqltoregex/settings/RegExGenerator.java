@@ -1,7 +1,7 @@
 package sqltoregex.settings;
 
-public interface RegExGenerator<S, R> {
-    String generateRegExFor(R input);
+public interface RegExGenerator<T> {
+    String generateRegExFor(T input);
 
     /**
      * Sets whether there will be an enclosing non capturing group (?: ... ) around the generated regEx.

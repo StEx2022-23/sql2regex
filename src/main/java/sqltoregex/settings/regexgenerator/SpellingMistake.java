@@ -11,7 +11,7 @@ import java.util.*;
  * Example:
  * test ↔ (?:test|est|tst|tet|tes) or (test|est|tst|tet|tes)
  */
-public class SpellingMistake implements RegExGenerator<SettingsOption, String> {
+public class SpellingMistake implements RegExGenerator<String> {
     private final SettingsOption settingsOption;
     protected boolean isCapturingGroup = false;
 
