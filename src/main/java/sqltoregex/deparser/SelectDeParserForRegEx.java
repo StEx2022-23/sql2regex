@@ -27,14 +27,12 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     public static final String NOT = "NOT";
     private ExpressionVisitor expressionVisitor;
-    private SettingsManager settingsManager;
     private boolean isSpellingMistake;
     private RegExGenerator<String> spellingMistake;
     private RegExGenerator<List<String>> columnNameOrder;
 
     public SelectDeParserForRegEx(SettingsManager settingsManager) {
         super();
-        this.settingsManager = settingsManager;
         this.expressionVisitor = new ExpressionDeParserForRegEx(settingsManager);
         this.isSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING);
         if(this.isSpellingMistake){
@@ -124,7 +122,9 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         buffer.append(columnNameOrder.generateRegExFor(selectedTableNamesAsStrings));
 
         if (plainSelect.getIntoTables() != null) {
-            buffer.append(OPTIONAL_WHITE_SPACE + "INTO" + REQUIRED_WHITE_SPACE);
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(isSpellingMistake ? spellingMistake.generateRegExFor("FROM") : "FROM");
+            buffer.append(REQUIRED_WHITE_SPACE);
             for (Iterator<Table> iter = plainSelect.getIntoTables().iterator(); iter.hasNext();) {
                 visit(iter.next());
                 if (iter.hasNext()) {
@@ -134,7 +134,9 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
 
         if (plainSelect.getFromItem() != null) {
-            buffer.append(OPTIONAL_WHITE_SPACE + "FROM" + REQUIRED_WHITE_SPACE);
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(isSpellingMistake ? spellingMistake.generateRegExFor("FROM") : "FROM");
+            buffer.append(REQUIRED_WHITE_SPACE);
             plainSelect.getFromItem().accept(this);
         }
 
