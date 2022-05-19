@@ -3,8 +3,11 @@ package sqltoregex.equivalentStatements;
 import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 import sqltoregex.ConverterManagement;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -31,7 +34,7 @@ class EquivalentStatementTest {
     }
 
     @Test
-    void testSelectStatements() throws IOException, JSQLParserException {
+    void testSelectStatements() throws IOException, JSQLParserException, XPathExpressionException, ParserConfigurationException, SAXException {
         ConverterManagement converterManagement = new ConverterManagement();
         this.parseTextFile(SupportedStatementType.SELECT);
         for(String key : this.equivalentStatements.keySet()){

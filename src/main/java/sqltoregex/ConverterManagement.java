@@ -12,8 +12,12 @@ import net.sf.jsqlparser.util.validation.Validation;
 import net.sf.jsqlparser.util.validation.ValidationError;
 import net.sf.jsqlparser.util.validation.feature.DatabaseType;
 import org.springframework.stereotype.Service;
+import org.xml.sax.SAXException;
 import sqltoregex.deparser.StatementDeParserForRegEx;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -116,7 +120,7 @@ public class ConverterManagement {
      * @return deparsed Statement as RegEx - String
      * @throws JSQLParserException is thrown if parsing goes wrong
      */
-    public String deparse(String sqlStatement, boolean isOnlyExpression) throws JSQLParserException {
+    public String deparse(String sqlStatement, boolean isOnlyExpression) throws JSQLParserException, XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         return deparse(sqlStatement, isOnlyExpression, true);
     }
 
@@ -128,7 +132,7 @@ public class ConverterManagement {
      * @return deparsed Statement as RegEx - String
      * @throws JSQLParserException is thrown if parsing goes wrong
      */
-    public String deparse(String sqlStatement, boolean isOnlyExpression, boolean toBeValidated) throws JSQLParserException {
+    public String deparse(String sqlStatement, boolean isOnlyExpression, boolean toBeValidated) throws JSQLParserException, XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         Statement statement;
         Expression expression;
 
