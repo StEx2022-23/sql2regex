@@ -84,7 +84,7 @@ public class ExpressionRotation implements RegExGenerator<List<Expression>> {
             return buffer.toString();
         } catch (XPathExpressionException | ParserConfigurationException | IOException | SAXException e) {
             Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-            logger.log(Level.INFO, "Generate RegEx for Expressionlist go wrong: {0}", e);
+            logger.log(Level.INFO, "Generate RegEx for Expressionlist go wrong: {0}", e.toString());
         }
         return null;
     }

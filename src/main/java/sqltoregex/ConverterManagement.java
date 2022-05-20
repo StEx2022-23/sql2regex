@@ -11,7 +11,6 @@ import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import net.sf.jsqlparser.util.validation.Validation;
 import net.sf.jsqlparser.util.validation.ValidationError;
 import net.sf.jsqlparser.util.validation.feature.DatabaseType;
-import org.jaxen.expr.Expr;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 import sqltoregex.deparser.StatementDeParserForRegEx;

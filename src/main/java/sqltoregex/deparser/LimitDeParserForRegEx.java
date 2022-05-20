@@ -1,5 +1,7 @@
 package sqltoregex.deparser;
 
+import net.sf.jsqlparser.expression.AllValue;
+import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.statement.select.Limit;
 import net.sf.jsqlparser.util.deparser.LimitDeparser;
 import sqltoregex.settings.RegExGenerator;
@@ -30,10 +32,10 @@ public class LimitDeParserForRegEx extends LimitDeparser {
         buffer.append(REQUIRED_WHITE_SPACE);
         buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("LIMIT") : "LIMIT");
         buffer.append(REQUIRED_WHITE_SPACE);
-        if (limit.isLimitNull()) {
+        if (limit.getRowCount() instanceof NullValue) {
             buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("NULL") : "NULL");
         } else {
-            if (limit.isLimitAll()) {
+            if (limit.getRowCount() instanceof AllValue) {
                 buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("ALL") : "ALL");
             } else {
                 if (null != limit.getOffset() && null != limit.getRowCount()) {
