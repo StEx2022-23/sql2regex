@@ -138,4 +138,25 @@ class SelectDeParserForRegExTest {
             Assertions.assertFalse(checkAgainstRegEx(regex, sql), sql + " " + regex);
         }
     }
+
+    @Test
+    void testSimpleInnerJoin() throws JSQLParserException {
+        String sampleSolution = "SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2";
+
+        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
+        statement.accept(statementDeParser);
+        String regex = statementDeParser.getBuffer().toString();
+
+        System.out.println(regex);
+
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2",
+                "SELECT col1 FROM table1 INNER  JOIN  table2  ON  col1 = col2",
+                "SELECT col1 FROM table1 INNER  JOIN  table2  ON  col2 = col1"
+        );
+
+        for(String sql : toCheckedInput){
+            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
+        }
+    }
 }

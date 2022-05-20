@@ -117,8 +117,8 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
 
         List<String> selectedTableNamesAsStrings = new ArrayList<>();
-        for(SelectItem si : plainSelect.getSelectItems()){
-            selectedTableNamesAsStrings.add(si.toString());
+        for(SelectItem selectItem : plainSelect.getSelectItems()){
+            selectedTableNamesAsStrings.add(selectItem.toString());
         }
         buffer.append(columnNameOrder.generateRegExFor(selectedTableNamesAsStrings));
 
@@ -168,7 +168,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         if (plainSelect.getHaving() != null) {
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append("HAVING");
+            buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("HAVING") : "HAVING");
             buffer.append(REQUIRED_WHITE_SPACE);
             plainSelect.getHaving().accept(expressionVisitor);
         }
@@ -179,9 +179,9 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
         if (plainSelect.isEmitChanges()){
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append("EMIT");
+            buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("EMIT") : "EMIT");
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append("CHANGES");
+            buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("CHANGES") : "CHANGES");
             buffer.append(OPTIONAL_WHITE_SPACE);
         }
         if (plainSelect.getLimit() != null) {
@@ -395,60 +395,86 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     @SuppressWarnings({"PMD.CyclomaticComplexity"})
     public void deparseJoin(Join join) {
         if (join.isSimple() && join.isOuter()) {
-            buffer.append(", OUTER ");
+            buffer.append(",");
+            buffer.append(OPTIONAL_WHITE_SPACE);
+            buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("OUTER") : "OUTER");
+            buffer.append(REQUIRED_WHITE_SPACE);
         } else if (join.isSimple()) {
-            buffer.append(", ");
+            buffer.append(",");
+            buffer.append(OPTIONAL_WHITE_SPACE);
         } else {
-
             if (join.isRight()) {
-                buffer.append(" RIGHT");
+                buffer.append(REQUIRED_WHITE_SPACE);
+                buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("RIGHT") : "RIGHT");
             } else if (join.isNatural()) {
-                buffer.append(" NATURAL");
+                buffer.append(REQUIRED_WHITE_SPACE);
+                buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("NATURAL") : "NATURAL");
             } else if (join.isFull()) {
-                buffer.append(" FULL");
+                buffer.append(REQUIRED_WHITE_SPACE);
+                buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("FULL") : "FULL");
             } else if (join.isLeft()) {
-                buffer.append(" LEFT");
+                buffer.append(REQUIRED_WHITE_SPACE);
+                buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("LEFT") : "LEFT");
             } else if (join.isCross()) {
-                buffer.append(" CROSS");
+                buffer.append(REQUIRED_WHITE_SPACE);
+                buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("CROSS") : "CROSS");
             }
 
             if (join.isOuter()) {
-                buffer.append(" OUTER");
+                buffer.append(REQUIRED_WHITE_SPACE);
+                buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("OUTER") : "OUTER");
             } else if (join.isInner()) {
-                buffer.append(" INNER");
+                buffer.append(REQUIRED_WHITE_SPACE);
+                buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("INNER") : "INNER");
             } else if (join.isSemi()) {
-                buffer.append(" SEMI");
+                buffer.append(REQUIRED_WHITE_SPACE);
+                buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("SEMI") : "SEMI");
             }
 
             if (join.isStraight()) {
-                buffer.append(" STRAIGHT_JOIN ");
+                buffer.append(REQUIRED_WHITE_SPACE);
+                buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("STRAIGHT_JOIN") : "STRAIGHT_JOIN");
+                buffer.append(REQUIRED_WHITE_SPACE);
             } else if (join.isApply()) {
-                buffer.append(" APPLY ");
+                buffer.append(REQUIRED_WHITE_SPACE);
+                buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("APPLY") : "APPLY");
+                buffer.append(REQUIRED_WHITE_SPACE);
             } else {
-                buffer.append(" JOIN ");
+                buffer.append(REQUIRED_WHITE_SPACE);
+                buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("JOIN") : "JOIN");
+                buffer.append(REQUIRED_WHITE_SPACE);
             }
-
         }
 
         FromItem fromItem = join.getRightItem();
         fromItem.accept(this);
         if (join.isWindowJoin()) {
-            buffer.append(" WITHIN ");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("WITHIN") : "WITHIN");
+            buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append(join.getJoinWindow().toString());
         }
         for (Expression onExpression : join.getOnExpressions()) {
-            buffer.append(" ON ");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("ON") : "ON");
+            buffer.append(REQUIRED_WHITE_SPACE);
             onExpression.accept(expressionVisitor);
         }
         if (!join.getUsingColumns().isEmpty()) {
-            buffer.append(" USING (");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("USING") : "USING");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append("(");
+            buffer.append(OPTIONAL_WHITE_SPACE);
             for (Iterator<Column> iterator = join.getUsingColumns().iterator(); iterator.hasNext();) {
                 Column column = iterator.next();
                 buffer.append(column.toString());
                 if (iterator.hasNext()) {
-                    buffer.append(", ");
+                    buffer.append(",");
+                    buffer.append(OPTIONAL_WHITE_SPACE);
                 }
             }
+            buffer.append(OPTIONAL_WHITE_SPACE);
             buffer.append(")");
         }
 
