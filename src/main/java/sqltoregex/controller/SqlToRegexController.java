@@ -46,7 +46,7 @@ public class SqlToRegexController {
     }
 
     @PostMapping("/convert")
-    public String convert(Model model, @ModelAttribute SettingsForm settingsForm) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    public String convert(Model model, @ModelAttribute SettingsForm settingsForm) {
         this.settingsManager.parseUserSettingsInput(settingsForm);
         Set<SimpleDateFormat> dateFormats = new HashSet<>();
         dateFormats.add(new SimpleDateFormat("yyyy-MM-dd"));

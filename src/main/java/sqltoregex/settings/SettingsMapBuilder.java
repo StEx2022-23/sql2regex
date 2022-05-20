@@ -16,7 +16,7 @@ class SettingsMapBuilder {
     private static final String UNSUPPORTED_BUILD_WITH = "Unsupported build with:";
     private static final String STRING_SYNONYM_DELIMITER = ";";
     private final Set<OrderRotation> orderRotations;
-    private final Set<ExpressionRotation> expressionRotation;
+    private final Set<ExpressionRotation> expressionRotations;
     private final Map<SettingsOption, RegExGenerator<?>> settingsMap;
     private final Set<SpellingMistake> spellingMistakes;
 
@@ -24,7 +24,7 @@ class SettingsMapBuilder {
         this.settingsMap = new EnumMap<>(SettingsOption.class);
         this.orderRotations = new LinkedHashSet<>();
         this.spellingMistakes = new LinkedHashSet<>();
-        this.expressionRotation = new LinkedHashSet<>();
+        this.expressionRotations = new LinkedHashSet<>();
     }
 
     public Map<SettingsOption, RegExGenerator<?>> build() {
@@ -91,7 +91,7 @@ class SettingsMapBuilder {
             case EXPRESSIONORDER -> {
                 ExpressionRotation expressionRotation = new ExpressionRotation(settingsOption);
                 this.settingsMap.put(settingsOption, expressionRotation);
-                this.expressionRotation.add(expressionRotation);
+                this.expressionRotations.add(expressionRotation);
             }
             case NOT_AS_EXCLAMATION_AND_WORD -> this.settingsMap.put(settingsOption, null);
             default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + settingsOption);

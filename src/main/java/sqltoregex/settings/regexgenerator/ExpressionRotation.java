@@ -2,7 +2,6 @@ package sqltoregex.settings.regexgenerator;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
-import org.springframework.util.Assert;
 import org.xml.sax.SAXException;
 import sqltoregex.deparser.ExpressionDeParserForRegEx;
 import sqltoregex.settings.SettingsManager;
@@ -23,16 +22,8 @@ import java.util.*;
 public class ExpressionRotation implements RegExGenerator<List<Expression>> {
     private final Map<Integer, List<Expression>> groupByOrderOptionsMap = new HashMap<>();
     private Integer groupByOrderOptionsCounter = 0;
-    private SpellingMistake spellingMistake;
     private final SettingsOption settingsOption;
     protected boolean isCapturingGroup = false;
-
-    public ExpressionRotation(SettingsOption settingsOption, SpellingMistake spellingMistake) {
-        Assert.notNull(spellingMistake, "SpellingMistake must not be null");
-        Assert.notNull(settingsOption, "SettingsOption must not be null");
-        this.spellingMistake = spellingMistake;
-        this.settingsOption = settingsOption;
-    }
 
     public ExpressionRotation(SettingsOption settingsOption) {
         this.settingsOption = settingsOption;
@@ -118,6 +109,6 @@ public class ExpressionRotation implements RegExGenerator<List<Expression>> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(spellingMistake, settingsOption);
+        return Objects.hash(settingsOption);
     }
 }
