@@ -75,19 +75,19 @@ class SelectDeParserForRegExTest {
 
     @Test
     void testGroupByTwoStatements() throws JSQLParserException {
-        String sampleSolution = "SELECT col1, col2 FROM table1 GROUP BY col1, col2";
+        String sampleSolution = "SELECT col1 GROUP BY col1, col2";
 
         Statement statement = CCJSqlParserUtil.parse(sampleSolution);
         statement.accept(statementDeParser);
         String regex = statementDeParser.getBuffer().toString();
 
         List<String> toCheckedInput = List.of(
-                "SELECT col1, col2 FROM table1 GROUP BY col1, col2",
-                "SELECT col1, col2 FROM table1 GROUP BY col2,col1",
-                "SELCT col1,col2 FROM table1 GROUP BY col1, col2",
-                "SELECT col1 ,col2 FROM table1 GROUP BY col2,col1",
-                "SELECT col1 , col2 FROM table1 GROUP BY col1 , col2",
-                "SELECT col1 , col2 FROM table1 GROUP BY col2,col1"
+                "SELECT col1 GROUP BY col1, col2",
+                "SELECT col1 GROUP BY col2,col1",
+                "SELCT col1 GROUP BY col1, col2",
+                "SELECT col1 GROUP BY col2,col1",
+                "SELECT col1 GROUP BY col1 , col2",
+                "SELECT col1 GROUP BY col2,col1"
         );
 
         for(String sql : toCheckedInput){
@@ -97,7 +97,7 @@ class SelectDeParserForRegExTest {
 
     @Test
     void testGroupByThreeStatements() throws JSQLParserException {
-        String sampleSolution = "SELECT col1, col2 FROM table1 GROUP BY col1, col2, col3";
+        String sampleSolution = "SELECT col1 GROUP BY col1, col2, col3";
 
         Statement statement = CCJSqlParserUtil.parse(sampleSolution);
         statement.accept(statementDeParser);
@@ -106,10 +106,10 @@ class SelectDeParserForRegExTest {
         System.out.println(regex);
 
         List<String> toCheckedInput = List.of(
-                "SELECT col1, col2 FROM table1 GROUP BY col1, col2, col3",
-                "SELECT col1, col2 FROM table1 GROUP BY col2,col1, col3",
-                "SELECT col1, col2 FROM table1 GROUP BY col3, col1, col2",
-                "SELECT col1, col2 FROM table1 GROUP BY col3, col2, col1"
+                "SELECT col1 GROUP BY col1, col2, col3",
+                "SELECT col1 GROUP BY col2,col1, col3",
+                "SELECT col1 GROUP BY col3, col1, col2",
+                "SELECT col1 GROUP BY col3, col2, col1"
         );
 
         for(String sql : toCheckedInput){
@@ -119,7 +119,7 @@ class SelectDeParserForRegExTest {
 
     @Test
     void testGroupByThreeStatementsFailings() throws JSQLParserException {
-        String sampleSolution = "SELECT col1, col2 FROM table1 GROUP BY col1, col2, col3";
+        String sampleSolution = "SELECT col1 GROUP BY col1, col2, col3";
 
         Statement statement = CCJSqlParserUtil.parse(sampleSolution);
         statement.accept(statementDeParser);
@@ -128,10 +128,10 @@ class SelectDeParserForRegExTest {
         System.out.println(regex);
 
         List<String> toCheckedInput = List.of(
-                "SELECT col1, col2 FROM table1 GROUP BY col1 col2, col3",
-                "SELECT col1, col2 FROM table1 GROUPBY col2,col1, col3",
-                "SELECT col1, col2 FROM table1 GROUP BYcol3, col1, col2",
-                "SELECT col1, col2 FROM table1 GROUP BY col3col2col1"
+                "SELECT col1 GROUP BY col1 col2, col3",
+                "SELECT col1 GROUPBY col2,col1, col3",
+                "SELECT col1 GROUP BYcol3, col1, col2",
+                "SELECT col1 GROUP BY col3col2col1"
         );
 
         for(String sql : toCheckedInput){

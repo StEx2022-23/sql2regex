@@ -11,6 +11,7 @@ import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import net.sf.jsqlparser.util.validation.Validation;
 import net.sf.jsqlparser.util.validation.ValidationError;
 import net.sf.jsqlparser.util.validation.feature.DatabaseType;
+import org.jaxen.expr.Expr;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 import sqltoregex.deparser.StatementDeParserForRegEx;
@@ -86,8 +87,7 @@ public class ConverterManagement {
     }
 
     private String buildOutputRegex(String regex){
-        StringBuilder outputRegex = new StringBuilder();
-        return outputRegex.append("^").append(regex).append("$").toString();
+        return "^" + regex + "$";
     }
 
     /**
@@ -113,50 +113,55 @@ public class ConverterManagement {
         return outputRegex.toString();
     }
 
-    /**
-     * (de-)parsing the given statement
-     * @param sqlStatement String
-     * @param isOnlyExpression boolean
-     * @return deparsed Statement as RegEx - String
-     * @throws JSQLParserException is thrown if parsing goes wrong
-     */
-    public String deparse(String sqlStatement, boolean isOnlyExpression) throws JSQLParserException, XPathExpressionException, ParserConfigurationException, IOException, SAXException {
-        return deparse(sqlStatement, isOnlyExpression, true);
+    private String deParseStatement(String sqlStatement, StringBuilder buffer) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, JSQLParserException {
+        Statement statement;
+        statement = this.parseStatement(sqlStatement);
+        StatementDeParser defaultStatementDeparser = new StatementDeParser(buffer);
+        statement.accept(defaultStatementDeparser);
+        String regExOne = toMaskedStrings(defaultStatementDeparser);
+        ExpressionDeParser expressionDeParser = new ExpressionDeParser();
+        StatementDeParser joinWhereStatementDeparser = new StatementDeParserForRegEx(expressionDeParser, buffer);
+        String regExTwo = toMaskedStrings(joinWhereStatementDeparser);
+        return this.buildOutputRegex(Arrays.asList(regExOne, regExTwo));
+    }
+
+    private String deParseExpression(String sqlstatement) throws JSQLParserException {
+        Expression expression;
+        expression = this.parseExpression(sqlstatement);
+        ExpressionVisitor expressionVisitor = new ExpressionVisitorAdapter();
+        expression.accept(expressionVisitor);
+        ExpressionDeParser expressionDeParser = new ExpressionDeParser();
+        expression.accept(expressionDeParser);
+        return this.buildOutputRegex(toMaskedStrings(expressionDeParser));
     }
 
     /**
      * (de-)parsing the given statement
      * @param sqlStatement String
-     * @param isOnlyExpression boolean
-     * @param toBeValidated boolean
      * @return deparsed Statement as RegEx - String
      * @throws JSQLParserException is thrown if parsing goes wrong
      */
-    public String deparse(String sqlStatement, boolean isOnlyExpression, boolean toBeValidated) throws JSQLParserException, XPathExpressionException, ParserConfigurationException, IOException, SAXException {
-        Statement statement;
-        Expression expression;
-
+    public String deparse(String sqlStatement) throws JSQLParserException, XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         StringBuilder buffer = new StringBuilder();
+        if(!this.validate(sqlStatement)){
+            throw new IllegalArgumentException();
+        }
+        return this.deParseStatement(sqlStatement, buffer);
+    }
 
+    public String deparse(String sqlStatement, boolean isOnlyExpression) throws JSQLParserException, XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        return deparse(sqlStatement, isOnlyExpression, true);
+    }
+
+    public String deparse(String sqlStatement, boolean isOnlyExpression, boolean toBeValidated) throws JSQLParserException, XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        StringBuilder buffer = new StringBuilder();
         if(isOnlyExpression){
-            expression = this.parseExpression(sqlStatement);
-            ExpressionVisitor expressionVisitor = new ExpressionVisitorAdapter();
-            expression.accept(expressionVisitor);
-            ExpressionDeParser expressionDeParser = new ExpressionDeParser();
-            expression.accept(expressionDeParser);
-            return this.buildOutputRegex(toMaskedStrings(expressionDeParser));
+            return this.deParseExpression(sqlStatement);
         } else {
             if(toBeValidated && !this.validate(sqlStatement)){
                 throw new IllegalArgumentException();
             }
-            statement = this.parseStatement(sqlStatement);
-            StatementDeParser defaultStatementDeparser = new StatementDeParser(buffer);
-            statement.accept(defaultStatementDeparser);
-            String regExOne = toMaskedStrings(defaultStatementDeparser);
-            ExpressionDeParser expressionDeParser = new ExpressionDeParser();
-            StatementDeParser joinWhereStatementDeparser = new StatementDeParserForRegEx(expressionDeParser, buffer);
-            String regExTwo = toMaskedStrings(joinWhereStatementDeparser);
-            return this.buildOutputRegex(Arrays.asList(regExOne, regExTwo));
+            return this.deParseStatement(sqlStatement, buffer);
         }
     }
 }
