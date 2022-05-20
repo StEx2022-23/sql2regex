@@ -8,6 +8,7 @@ import net.sf.jsqlparser.util.deparser.GroupByDeParser;
 import sqltoregex.settings.RegExGenerator;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.ExpressionRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import java.util.*;
@@ -15,10 +16,9 @@ import java.util.*;
 public class GroupByDeParserForRegEx extends GroupByDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
-    private Integer groupByOrderOptionsCounter = 0;
-    private final Map<Integer, List<Expression>> groupByOrderOptionsMap = new HashMap<>();
     private final boolean isKeywordSpellingMistake;
     private RegExGenerator<String> keywordSpellingMistake;
+    private final RegExGenerator<List<Expression>> expressionRotation;
     ExpressionVisitor expressionVisitor;
     StringBuilder stringBuilder;
 
@@ -30,6 +30,8 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
         if(this.isKeywordSpellingMistake){
             keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
         }
+        expressionRotation = settingsManager.getSettingBySettingOption(SettingsOption.EXPRESSIONORDER, ExpressionRotation.class);
+
     }
 
     @Override
@@ -46,24 +48,8 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
         }
 
         List<Expression> expressions = groupBy.getGroupByExpressionList().getExpressions();
-        generateGroupByOrderOptions(expressions);
-
-        this.generateGroupByOrderOptions(expressions);
-        buffer.append("(?:");
-        for(Map.Entry<Integer, List<Expression>> entry : groupByOrderOptionsMap.entrySet()){
-            buffer.append("(");
-            Iterator<Expression> expressionIterator = groupByOrderOptionsMap.get(entry.getKey()).iterator();
-            while(expressionIterator.hasNext()){
-                expressionIterator.next().accept(expressionVisitor);
-                if(expressionIterator.hasNext()){
-                    buffer.append(",");
-                }
-            }
-            buffer.append(")");
-            buffer.append("|");
-        }
-        buffer.deleteCharAt(buffer.length()-1);
-        buffer.append(")");
+        expressionRotation.setCapturingGroup(true);
+        buffer.append(expressionRotation.generateRegExFor(expressions));
 
         if (groupBy.isUsingBrackets()) {
             buffer.append(OPTIONAL_WHITE_SPACE);
@@ -94,33 +80,5 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
             buffer.append(OPTIONAL_WHITE_SPACE);
             buffer.append(")");
         }
-    }
-
-    private void generateGroupByOrderOptionsRek(Integer amount, List<Expression> valueList){
-        if (amount == 1) {
-            List<Expression> singleValue = new ArrayList<>(valueList);
-            groupByOrderOptionsMap.put(groupByOrderOptionsCounter, singleValue);
-            groupByOrderOptionsCounter++;
-        } else {
-            generateGroupByOrderOptionsRek(amount-1, valueList);
-            for(int i = 0; i < amount-1;i++){
-                if (amount % 2 == 0){
-                    Expression temp;
-                    temp = valueList.get(amount-1);
-                    valueList.set(amount-1, valueList.get(i));
-                    valueList.set(i, temp);
-                } else {
-                    Expression temp;
-                    temp = valueList.get(amount-1);
-                    valueList.set(amount-1, valueList.get(0));
-                    valueList.set(0, temp);
-                }
-                generateGroupByOrderOptionsRek(amount-1, valueList);
-            }
-        }
-    }
-
-    public void generateGroupByOrderOptions(List<Expression> valueList){
-        generateGroupByOrderOptionsRek(valueList.size(), valueList);
     }
 }

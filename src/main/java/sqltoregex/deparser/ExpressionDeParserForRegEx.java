@@ -11,11 +11,15 @@ import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
+import org.xml.sax.SAXException;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -466,12 +470,14 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             tableName += ')';
         }
         if (tableName != null) {
-            buffer.append(settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING,
-                    SpellingMistake.class).generateRegExFor(tableName)).append(".");
+                buffer.append(settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING,
+                        SpellingMistake.class).generateRegExFor(tableName)).append(".");
+
         }
 
-        buffer.append(settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING,
-                SpellingMistake.class).generateRegExFor(tableColumn.getColumnName()));
+            buffer.append(settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING,
+                    SpellingMistake.class).generateRegExFor(tableColumn.getColumnName()));
+
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
@@ -569,29 +575,35 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(DateValue dateValue) {
-        buffer.append("\\{d").append(OPTIONAL_WHITE_SPACE).append("'").append(dateValue.getValue().toString())
-                .append("'").append(OPTIONAL_WHITE_SPACE).append("\\}")
-                .append('|')
-                .append(settingsManager.getSettingBySettingOption(SettingsOption.DATESYNONYMS,
-                                                                  DateAndTimeFormatSynonymGenerator.class).generateRegExFor(dateValue));
+
+            buffer.append("\\{d").append(OPTIONAL_WHITE_SPACE).append("'").append(dateValue.getValue().toString())
+                    .append("'").append(OPTIONAL_WHITE_SPACE).append("\\}")
+                    .append('|')
+                    .append(settingsManager.getSettingBySettingOption(SettingsOption.DATESYNONYMS,
+                                                                      DateAndTimeFormatSynonymGenerator.class).generateRegExFor(dateValue));
+
     }
 
     @Override
     public void visit(TimestampValue timestampValue) {
-        buffer.append("\\{ts").append(OPTIONAL_WHITE_SPACE).append("'").append(timestampValue.getValue().toString())
-            .append(OPTIONAL_WHITE_SPACE).append("\\}")
-                .append('|')
-                .append(settingsManager.getSettingBySettingOption(SettingsOption.DATETIMESYNONYMS,
-                                                                  DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timestampValue));
+
+            buffer.append("\\{ts").append(OPTIONAL_WHITE_SPACE).append("'").append(timestampValue.getValue().toString())
+                .append(OPTIONAL_WHITE_SPACE).append("\\}")
+                    .append('|')
+                    .append(settingsManager.getSettingBySettingOption(SettingsOption.DATETIMESYNONYMS,
+                                                                      DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timestampValue));
+
     }
 
     @Override
     public void visit(TimeValue timeValue) {
-        buffer.append("\\{t").append(OPTIONAL_WHITE_SPACE).append("'").append(timeValue.getValue().toString())
-            .append(OPTIONAL_WHITE_SPACE).append("\\}")
-                .append('|')
-                .append(settingsManager.getSettingBySettingOption(SettingsOption.TIMESYNONYMS,
-                                                                  DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timeValue));
+
+            buffer.append("\\{t").append(OPTIONAL_WHITE_SPACE).append("'").append(timeValue.getValue().toString())
+                .append(OPTIONAL_WHITE_SPACE).append("\\}")
+                    .append('|')
+                    .append(settingsManager.getSettingBySettingOption(SettingsOption.TIMESYNONYMS,
+                                                                      DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timeValue));
+
     }
 
     @Override

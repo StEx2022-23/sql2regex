@@ -56,6 +56,7 @@ class SettingsManagerTest {
                 "TIMESYNONYMS",
                 "DATETIMESYNONYMS",
                 "AGGREGATEFUNCTIONLANG",
+                "EXPRESSIONORDER",
                 "NOT_AS_EXCLAMATION_AND_WORD"
         );
         for (String str : settingsOptionWhichHaveBeenSet) {

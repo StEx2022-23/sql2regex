@@ -17,6 +17,9 @@
         <columnnameorder>
             <value>true</value>
         </columnnameorder>
+        <expressionorder>
+            <value>true</value>
+        </expressionorder>
     </order>
     <synonyms>
         <datesynonyms>

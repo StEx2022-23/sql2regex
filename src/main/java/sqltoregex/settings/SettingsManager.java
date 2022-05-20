@@ -38,7 +38,7 @@ public class SettingsManager {
         return null;
     }
 
-    public Map<SettingsOption, RegExGenerator<?>> parseUserSettingsInput(SettingsForm form){
+    public Map<SettingsOption, RegExGenerator<?>> parseUserSettingsInput(SettingsForm form) {
         SettingsMapBuilder settingsMapBuilder = new SettingsMapBuilder();
 
         return settingsMapBuilder

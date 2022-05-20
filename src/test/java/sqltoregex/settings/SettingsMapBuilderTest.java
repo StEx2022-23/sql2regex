@@ -3,11 +3,15 @@ package sqltoregex.settings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -16,7 +20,7 @@ class SettingsMapBuilderTest {
     SettingsMapBuilder builder;
 
     @Test
-    void OrderAndSpellingWithSameProp() {
+    void OrderAndSpellingWithSameProp() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
         builder.withSettingsOption(SettingsOption.COLUMNNAMESPELLING);
         OrderRotation orderRotation = (OrderRotation) builder.build().get(SettingsOption.COLUMNNAMEORDER);
@@ -30,7 +34,7 @@ class SettingsMapBuilderTest {
     }
 
     @Test
-    void buildWith2EqualObjects() {
+    void buildWith2EqualObjects() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
         builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
         Map<SettingsOption, RegExGenerator<?>> map = builder.build();
@@ -38,7 +42,7 @@ class SettingsMapBuilderTest {
     }
 
     @Test
-    void buildWithColumnNameOrder() {
+    void buildWithColumnNameOrder() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
         Map<SettingsOption, RegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
@@ -101,7 +105,7 @@ class SettingsMapBuilderTest {
     }
 
     @Test
-    void buildWithEmptySetOfPropertyOption() {
+    void buildWithEmptySetOfPropertyOption() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         builder.withSettingsOptionSet(new HashSet<>());
         Map<SettingsOption, RegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(0, map.size());
@@ -117,7 +121,7 @@ class SettingsMapBuilderTest {
     }
 
     @Test
-    void buildWithKeyWordSpelling() {
+    void buildWithKeyWordSpelling() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         builder.withSettingsOption(SettingsOption.KEYWORDSPELLING);
         Map<SettingsOption, RegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
@@ -126,7 +130,7 @@ class SettingsMapBuilderTest {
     }
 
     @Test
-    void buildWithTableNameOrder() {
+    void buildWithTableNameOrder() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         builder.withSettingsOption(SettingsOption.TABLENAMEORDER);
         Map<SettingsOption, RegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(1, map.size());

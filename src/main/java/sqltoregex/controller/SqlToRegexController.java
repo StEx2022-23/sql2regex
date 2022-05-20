@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import org.xml.sax.SAXException;
 import sqltoregex.settings.SettingsForm;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
@@ -18,6 +19,9 @@ import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSyno
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
@@ -42,7 +46,7 @@ public class SqlToRegexController {
     }
 
     @PostMapping("/convert")
-    public String convert(Model model, @ModelAttribute SettingsForm settingsForm) {
+    public String convert(Model model, @ModelAttribute SettingsForm settingsForm) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         this.settingsManager.parseUserSettingsInput(settingsForm);
         Set<SimpleDateFormat> dateFormats = new HashSet<>();
         dateFormats.add(new SimpleDateFormat("yyyy-MM-dd"));

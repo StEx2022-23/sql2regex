@@ -3,6 +3,7 @@ package sqltoregex.settings;
 import org.springframework.util.Assert;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import sqltoregex.settings.regexgenerator.ExpressionRotation;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
@@ -15,6 +16,7 @@ class SettingsMapBuilder {
     private static final String UNSUPPORTED_BUILD_WITH = "Unsupported build with:";
     private static final String STRING_SYNONYM_DELIMITER = ";";
     private final Set<OrderRotation> orderRotations;
+    private final Set<ExpressionRotation> expressionRotation;
     private final Map<SettingsOption, RegExGenerator<?>> settingsMap;
     private final Set<SpellingMistake> spellingMistakes;
 
@@ -22,6 +24,7 @@ class SettingsMapBuilder {
         this.settingsMap = new EnumMap<>(SettingsOption.class);
         this.orderRotations = new LinkedHashSet<>();
         this.spellingMistakes = new LinkedHashSet<>();
+        this.expressionRotation = new LinkedHashSet<>();
     }
 
     public Map<SettingsOption, RegExGenerator<?>> build() {
@@ -36,13 +39,13 @@ class SettingsMapBuilder {
         return this.settingsMap;
     }
 
-    public SettingsMapBuilder withNodeList(NodeList nodeList, SettingsOption settingsOption) {
+    public SettingsMapBuilder withNodeList(NodeList nodeList, SettingsOption settingsOption){
         if (nodeList.item(0).getTextContent().equals("false")) {
             return this;
         }
 
         switch (settingsOption) {
-            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER -> this.withSettingsOption(
+            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, NOT_AS_EXCLAMATION_AND_WORD, EXPRESSIONORDER -> this.withSettingsOption(
                     settingsOption);
             case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
                 Set<String> valueList = new HashSet<>();
@@ -65,7 +68,6 @@ class SettingsMapBuilder {
                 }
                 this.withStringSet(pairOfSynonymList, SettingsOption.AGGREGATEFUNCTIONLANG);
             }
-            case NOT_AS_EXCLAMATION_AND_WORD -> this.withSettingsOption(SettingsOption.NOT_AS_EXCLAMATION_AND_WORD);
             case DEFAULT -> {
                 //pass because nothing needs to be needed for default
             }
@@ -74,7 +76,7 @@ class SettingsMapBuilder {
         return this;
     }
 
-    public SettingsMapBuilder withSettingsOption(SettingsOption settingsOption) {
+    public SettingsMapBuilder withSettingsOption(SettingsOption settingsOption){
         switch (settingsOption) {
             case KEYWORDSPELLING, COLUMNNAMESPELLING, TABLENAMESPELLING -> {
                 SpellingMistake spellingMistake = new SpellingMistake(settingsOption);
@@ -86,13 +88,18 @@ class SettingsMapBuilder {
                 this.settingsMap.put(settingsOption, orderRotation);
                 orderRotations.add(orderRotation);
             }
+            case EXPRESSIONORDER -> {
+                ExpressionRotation expressionRotation = new ExpressionRotation(settingsOption);
+                this.settingsMap.put(settingsOption, expressionRotation);
+                this.expressionRotation.add(expressionRotation);
+            }
             case NOT_AS_EXCLAMATION_AND_WORD -> this.settingsMap.put(settingsOption, null);
             default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + settingsOption);
         }
         return this;
     }
 
-    public SettingsMapBuilder withSettingsOptionSet(Set<SettingsOption> settingsOptions) {
+    public SettingsMapBuilder withSettingsOptionSet(Set<SettingsOption> settingsOptions){
         Assert.notNull(settingsOptions, "Set of settings options must not be null");
         for (SettingsOption settingsOption : settingsOptions) {
             withSettingsOption(settingsOption);
