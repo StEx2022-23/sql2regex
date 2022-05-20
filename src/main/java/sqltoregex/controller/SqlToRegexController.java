@@ -12,6 +12,7 @@ import sqltoregex.settings.SettingsForm;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.RegExGenerator;
+import sqltoregex.settings.regexgenerator.ExpressionRotation;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
@@ -72,9 +73,12 @@ public class SqlToRegexController {
                 SettingsOption.TABLENAMEORDER, OrderRotation.class);
         RegExGenerator<List<String>> columnNameOrder = settingsManager.getSettingBySettingOption(
                 SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
+        RegExGenerator<List<Expression>> expressionOrder = settingsManager.getSettingBySettingOption(
+                SettingsOption.EXPRESSIONORDER, ExpressionRotation.class);
         Set<SettingsOption> orders = new HashSet<>();
         orders.add(tableNameOrder.getSettingsOption());
         orders.add(columnNameOrder.getSettingsOption());
+        orders.add(expressionOrder.getSettingsOption());
         model.addAttribute("orders", orders);
 
         SynonymGenerator<SimpleDateFormat, Expression> dateFormats = settingsManager.getSynonymManagerBySettingOption(
