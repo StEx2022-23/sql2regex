@@ -12,6 +12,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The OrderRotation class allows creating a RegEx expression that takes into all possible order possibilities.
@@ -81,7 +83,8 @@ public class ExpressionRotation implements RegExGenerator<List<Expression>> {
             buffer.append(")");
             return buffer.toString();
         } catch (XPathExpressionException | ParserConfigurationException | IOException | SAXException e) {
-            e.printStackTrace();
+            Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+            logger.log(Level.INFO, "Generate RegEx for Expressionlist go wrong: {0}", e);
         }
         return null;
     }
