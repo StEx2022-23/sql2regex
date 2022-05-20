@@ -185,7 +185,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             buffer.append(OPTIONAL_WHITE_SPACE);
         }
         if (plainSelect.getLimit() != null) {
-            new LimitDeParserForRegEx(buffer).deParse(plainSelect.getLimit());
+            new LimitDeParserForRegEx(buffer, settingsManager).deParse(plainSelect.getLimit());
         }
         if (plainSelect.getOffset() != null) {
             deparseOffset(plainSelect.getOffset());
@@ -338,16 +338,15 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     @Override
     public void deparseOffset(Offset offset) {
-        // OFFSET offset
-        // or OFFSET offset (ROW | ROWS)
-        buffer.append(" OFFSET ");
+        buffer.append(REQUIRED_WHITE_SPACE);
+        buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("OFFSET") : "OFFSET");
+        buffer.append(REQUIRED_WHITE_SPACE);
         buffer.append(offset.getOffset());
+        buffer.append(REQUIRED_WHITE_SPACE);
         if (offset.getOffsetParam() != null) {
-            buffer.append(" ").append(offset.getOffsetParam());
+            buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(offset.getOffsetParam()) : offset.getOffsetParam());
         }
-
     }
-
 
     @Override
     public void deparseFetch(Fetch fetch) {

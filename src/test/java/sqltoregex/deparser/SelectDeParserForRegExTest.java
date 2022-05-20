@@ -159,4 +159,46 @@ class SelectDeParserForRegExTest {
             Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
         }
     }
+
+    @Test
+    void testLimit() throws JSQLParserException {
+        String sampleSolution = "SELECT col1 LIMIT 2, 3";
+
+        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
+        statement.accept(statementDeParser);
+        String regex = statementDeParser.getBuffer().toString();
+
+        System.out.println(regex);
+
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 LIMT 3 OFFSET 2",
+                "SELECT col1 LIMIT 3 OFFST 2",
+                "SELECT col1 LIMIT    3   OFFSET    2"
+        );
+
+        for(String sql : toCheckedInput){
+            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
+        }
+    }
+
+    @Test
+    void testOffset() throws JSQLParserException {
+        String sampleSolution = "SELECT col1 OFFSET 10 ROWS";
+
+        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
+        statement.accept(statementDeParser);
+        String regex = statementDeParser.getBuffer().toString();
+
+        System.out.println(regex);
+
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 OFFSET 10 ROWS",
+                "SELECT col1 OFFSET  10  ROWS",
+                "SELECT col1 OFFST 10 RWS"
+        );
+
+        for(String sql : toCheckedInput){
+            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
+        }
+    }
 }
