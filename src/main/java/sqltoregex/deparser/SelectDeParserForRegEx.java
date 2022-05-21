@@ -136,10 +136,17 @@ public class SelectDeParserForRegEx extends SelectDeParser {
                 temp.append(OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE);
                 temp.append(isColumnNameMistake ? columnNameMistake.generateRegExFor(selectItem.toString().split("\\(")[1].split("\\)")[0]) : selectItem.toString().split("\\(")[1].split("\\)")[0]);
                 temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
+            }
+
+            if(!selectItem.toString().contains("AS") && !selectItem.toString().contains("(") && !selectItem.toString().contains(")")){
+                temp.append(isColumnNameMistake ? columnNameMistake.generateRegExFor(selectItem.toString()) : selectItem.toString());
                 flagForOrderRotationWithOutSpellingMistake = true;
             }
 
-            if(selectItem.toString().contains("AS")){
+            if(selectItem.toString().contains("AS")) {
+                if(selectItem.toString().contains("(") && selectItem.toString().contains(")")){
+                    temp.append(selectItem.toString().split("AS")[0].replaceAll(".*\\)",""));
+                } else temp.append(selectItem.toString().split("AS")[0].replace(" ", ""));
                 temp.append(OPTIONAL_WHITE_SPACE);
                 temp.append("(?:");
                 temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("ALIAS") : "ALIAS");
@@ -151,8 +158,15 @@ public class SelectDeParserForRegEx extends SelectDeParser {
                 flagForOrderRotationWithOutSpellingMistake = true;
             }
 
-            if(!selectItem.toString().contains("AS") && !selectItem.toString().contains("(") && !selectItem.toString().contains(")")){
-                temp.append(isColumnNameMistake ? columnNameMistake.generateRegExFor(selectItem.toString()) : selectItem.toString());
+            if(!selectItem.toString().contains("AS")){
+                temp.append(OPTIONAL_WHITE_SPACE);
+                temp.append("((?:");
+                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("ALIAS") : "ALIAS");
+                temp.append("|");
+                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("AS") : "AS");
+                temp.append(")");
+                temp.append(REQUIRED_WHITE_SPACE);
+                temp.append(".*)?");
                 flagForOrderRotationWithOutSpellingMistake = true;
             }
 
@@ -314,8 +328,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         subSelect.getSelectBody().accept(this);
         buffer.append(subSelect.isUseBrackets() ? ")" : "");
         Alias alias = subSelect.getAlias();
+        String tempAlias = "(?<"+ alias +">" + alias + ")";
+        subSelect.setAlias(new Alias("\\k<" + alias + ">"));
         if (alias != null) {
-            buffer.append(alias);
+            buffer.append(tempAlias);
         }
         Pivot pivot = subSelect.getPivot();
         if (pivot != null) {
@@ -332,6 +348,8 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public void visit(Table tableName) {
         buffer.append(tableName.getFullyQualifiedName());
         Alias alias = tableName.getAlias();
+//        String tempAlias = "(?<"+alias.toString().substring(1) +">"+alias.toString().substring(1)+")";
+//        tableName.setAlias(new Alias("\\k<"+alias.toString().substring(1)+">"));
         if (alias != null) {
             buffer.append(alias);
         }

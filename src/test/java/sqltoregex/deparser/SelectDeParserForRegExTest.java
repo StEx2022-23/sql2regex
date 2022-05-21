@@ -267,4 +267,47 @@ class SelectDeParserForRegExTest {
             Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
         }
     }
+
+    @Test
+    void testTableAlias() throws JSQLParserException{
+        String sampleSolution = "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key";
+
+        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
+        statement.accept(statementDeParser);
+        String regex = statementDeParser.getBuffer().toString();
+
+        System.out.println(regex);
+
+        List<String> toCheckedInput = List.of(
+                "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
+                "SELECT col2, col1 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
+                "SELECT col2, col1 FROM table1 t1 INNER JOIN table2 t2 ON t2.key = t1.key"
+        );
+
+        for(String sql : toCheckedInput){
+            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
+        }
+    }
+
+    @Test
+    void testOptionalAliasAddedByStudent() throws JSQLParserException{
+        String sampleSolution = "SELECT col1, col2, col3 AS c3";
+
+        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
+        statement.accept(statementDeParser);
+        String regex = statementDeParser.getBuffer().toString();
+
+        System.out.println(regex);
+
+        List<String> toCheckedInput = List.of(
+                "SELECT col1, col2, col3 AS c3",
+                "SELECT col1, col2 AS c2, col3 AS c3",
+                "SELECT col1 AS c1, col2, col3 AS c3",
+                "SELECT col1 AS c1, col2 AS c2, col3 AS c3"
+        );
+
+        for(String sql : toCheckedInput){
+            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
+        }
+    }
 }

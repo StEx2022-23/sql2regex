@@ -455,24 +455,20 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     public void visit(Column tableColumn) {
         buffer.append(OPTIONAL_WHITE_SPACE);
         final Table table = tableColumn.getTable();
-        String tableName = null;
-        if (table != null) {
-            tableName = ("(?:");
-            tableName += table.getFullyQualifiedName();
-            if (table.getAlias() != null) {
-                tableName += "|";
-                tableName += table.getAlias().getName();
+        String tableName = "";
+        if(table != null) {
+            if (table.getFullyQualifiedName() != null) {
+                tableName += table.getFullyQualifiedName();
+                if (table.getAlias() != null) {
+                    tableName += table.getAlias().getName();
+                }
             }
-            tableName += ')';
         }
-        if (tableName != null) {
-                buffer.append(settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING,
-                        SpellingMistake.class).generateRegExFor(tableName)).append(".");
-
+        if(!tableName.isEmpty()) {
+            buffer.append(settingsManager.getSettingBySettingOption(SettingsOption.TABLENAMESPELLING,
+                    SpellingMistake.class).generateRegExFor(tableName)).append(".");
         }
-
-            buffer.append(settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING,
-                    SpellingMistake.class).generateRegExFor(tableColumn.getColumnName()));
+        buffer.append(settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class).generateRegExFor(tableColumn.getColumnName()));
 
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
