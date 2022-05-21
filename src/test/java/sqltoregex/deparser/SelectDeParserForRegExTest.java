@@ -243,5 +243,22 @@ class SelectDeParserForRegExTest {
         validateListAgainstRegEx("SELECT table1.* FROM table1", toCheckedInput, true);
     }
 
+    @Test
+    void testEmitChanges() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT * FROM table1 EMIT CHANGES",
+                "SELECT * FROM table1  EMIT  CHANGES",
+                "SELECT * FROM table1 EMT CHANES"
+        );
+        validateListAgainstRegEx("SELECT * FROM table1 EMIT CHANGES", toCheckedInput, true);
+    }
+//
+//    @Test
+//    void testSubSelect() throws JSQLParserException {
+//        List<String> toCheckedInput = List.of(
+//                "SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) FROM table2)"
+//        );
+//        validateListAgainstRegEx("SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) FROM table2)", toCheckedInput, true);
+//    }
 
 }
