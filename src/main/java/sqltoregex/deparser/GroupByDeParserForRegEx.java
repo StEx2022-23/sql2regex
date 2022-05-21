@@ -55,30 +55,5 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
             buffer.append(OPTIONAL_WHITE_SPACE);
             buffer.append(")");
         }
-
-        if (!groupBy.getGroupingSets().isEmpty()) {
-            buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("GROUPING") : "GROUPING");
-            buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("SETS") : "SETS");
-            buffer.append(OPTIONAL_WHITE_SPACE);
-            buffer.append("(");
-
-            boolean first = true;
-            for (Object o : groupBy.getGroupingSets()) {
-                if (first) {
-                    first = false;
-                } else {
-                    buffer.append(",");
-                    buffer.append(OPTIONAL_WHITE_SPACE);
-                }
-                if (o instanceof Expression) {
-                    buffer.append(o);
-                } else if (o instanceof ExpressionList list) {
-                    buffer.append(list.getExpressions() == null ? "()" : list.toString());
-                }
-            }
-            buffer.append(OPTIONAL_WHITE_SPACE);
-            buffer.append(")");
-        }
     }
 }

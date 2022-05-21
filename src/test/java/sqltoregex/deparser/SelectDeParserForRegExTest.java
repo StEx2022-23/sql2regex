@@ -129,6 +129,22 @@ class SelectDeParserForRegExTest {
     }
 
     @Test
+    void testLimitNull() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 LIMIT null"
+        );
+        validateListAgainstRegEx("SELECT col1 LIMIT null", toCheckedInput, true);
+    }
+
+    @Test
+    void testLimitAndOffset() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 LIMIT 3 OFFSET 2"
+        );
+        validateListAgainstRegEx("SELECT col1 LIMIT 3 OFFSET 2", toCheckedInput, true);
+    }
+
+    @Test
     void testOffset() throws JSQLParserException {
         List<String> toCheckedInput = List.of(
                 "SELECT col1 OFFSET 10 ROWS",
