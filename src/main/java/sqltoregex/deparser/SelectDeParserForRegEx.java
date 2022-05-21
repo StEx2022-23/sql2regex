@@ -26,6 +26,8 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
+    private static final String ALIAS = "ALIAS";
+    private static final String AS = "AS";
     public static final String NOT = "NOT";
     private ExpressionVisitor expressionVisitor;
     private final boolean isKeywordSpellingMistake;
@@ -128,6 +130,8 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
 
         List<String> selectedColumnNamesAsStrings = new ArrayList<>();
+
+
         boolean flagForOrderRotationWithOutSpellingMistake = false;
         for(SelectItem selectItem : plainSelect.getSelectItems()){
             StringBuilder temp = new StringBuilder();
@@ -138,32 +142,32 @@ public class SelectDeParserForRegEx extends SelectDeParser {
                 temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
             }
 
-            if(!selectItem.toString().contains("AS") && !selectItem.toString().contains("(") && !selectItem.toString().contains(")")){
+            if(!selectItem.toString().contains(AS) && !selectItem.toString().contains("(") && !selectItem.toString().contains(")")){
                 temp.append(isColumnNameMistake ? columnNameMistake.generateRegExFor(selectItem.toString()) : selectItem.toString());
                 flagForOrderRotationWithOutSpellingMistake = true;
             }
 
-            if(selectItem.toString().contains("AS")) {
+            if(selectItem.toString().contains(AS)) {
                 if(selectItem.toString().contains("(") && selectItem.toString().contains(")")){
-                    temp.append(selectItem.toString().split("AS")[0].replaceAll(".*\\)",""));
-                } else temp.append(selectItem.toString().split("AS")[0].replace(" ", ""));
+                    temp.append(selectItem.toString().split(AS)[0].replaceAll(".*\\)",""));
+                } else temp.append(selectItem.toString().split(AS)[0].replace(" ", ""));
                 temp.append(OPTIONAL_WHITE_SPACE);
                 temp.append("(?:");
-                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("ALIAS") : "ALIAS");
+                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(ALIAS) : ALIAS);
                 temp.append("|");
-                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("AS") : "AS");
+                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(AS) : AS);
                 temp.append(")");
                 temp.append(REQUIRED_WHITE_SPACE);
-                temp.append(selectItem.toString().split("AS")[1].replace(" ", ""));
+                temp.append(selectItem.toString().split(AS)[1].replace(" ", ""));
                 flagForOrderRotationWithOutSpellingMistake = true;
             }
 
-            if(!selectItem.toString().contains("AS")){
+            if(!selectItem.toString().contains(AS)){
                 temp.append(OPTIONAL_WHITE_SPACE);
                 temp.append("((?:");
-                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("ALIAS") : "ALIAS");
+                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(ALIAS) : ALIAS);
                 temp.append("|");
-                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("AS") : "AS");
+                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(AS) : AS);
                 temp.append(")");
                 temp.append(REQUIRED_WHITE_SPACE);
                 temp.append(".*)?");
@@ -348,8 +352,6 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public void visit(Table tableName) {
         buffer.append(tableName.getFullyQualifiedName());
         Alias alias = tableName.getAlias();
-//        String tempAlias = "(?<"+alias.toString().substring(1) +">"+alias.toString().substring(1)+")";
-//        tableName.setAlias(new Alias("\\k<"+alias.toString().substring(1)+">"));
         if (alias != null) {
             buffer.append(alias);
         }

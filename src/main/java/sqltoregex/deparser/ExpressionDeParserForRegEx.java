@@ -456,12 +456,10 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         buffer.append(OPTIONAL_WHITE_SPACE);
         final Table table = tableColumn.getTable();
         String tableName = "";
-        if(table != null) {
-            if (table.getFullyQualifiedName() != null) {
-                tableName += table.getFullyQualifiedName();
-                if (table.getAlias() != null) {
-                    tableName += table.getAlias().getName();
-                }
+        if(table != null && table.getFullyQualifiedName() != null) {
+            tableName += table.getFullyQualifiedName();
+            if (table.getAlias() != null) {
+                tableName += table.getAlias().getName();
             }
         }
         if(!tableName.isEmpty()) {
