@@ -224,14 +224,15 @@ class SelectDeParserForRegExTest {
         validateListAgainstRegEx("SELECT UNIQUE col1", toCheckedInput, true);
     }
 
-//    @Test
-//    void testSelectAll() throws JSQLParserException {
-//        List<String> toCheckedInput = List.of(
-//                "SELECT * FROM table1",
-//                "SELECT  *  FROM table1"
-//        );
-//        validateListAgainstRegEx("SELECT * FROM table1", toCheckedInput, true);
-//    }
+    @Test
+    void testSelectAll() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT * FROM table1",
+                "SELECT  *  FROM table1",
+                "SELECT ALL FROM table1"
+        );
+        validateListAgainstRegEx("SELECT * FROM table1", toCheckedInput, true);
+    }
 
     @Test
     void testSelectAllTableColumns() throws JSQLParserException {

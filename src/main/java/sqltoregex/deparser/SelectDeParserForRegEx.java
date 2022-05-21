@@ -129,72 +129,75 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             buffer.append(OPTIONAL_WHITE_SPACE);
         }
 
-        List<String> selectedColumnNamesAsStrings = new ArrayList<>();
 
-        boolean flagForOrderRotationWithOutSpellingMistake = false;
-        for(SelectItem selectItem : plainSelect.getSelectItems()){
-            StringBuilder temp = new StringBuilder();
-
-            if(selectItem.toString().contains("(") && selectItem.toString().contains(")")){
-                temp.append(aggregateFunctionLang.generateRegExFor(selectItem.toString().replaceAll("\\(.*", "")));
-                temp.append(OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE);
-                temp.append(isColumnNameMistake ? columnNameMistake.generateRegExFor(selectItem.toString().split("\\(")[1].split("\\)")[0]) : selectItem.toString().split("\\(")[1].split("\\)")[0]);
-                temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
-            }
-
-            if(!selectItem.toString().contains(AS) && !selectItem.toString().contains("(") && !selectItem.toString().contains(")")){
-                temp.append(isColumnNameMistake ? columnNameMistake.generateRegExFor(selectItem.toString()) : selectItem.toString());
-                flagForOrderRotationWithOutSpellingMistake = true;
-            }
-
-            if(selectItem.toString().contains(AS) && selectItem.toString().contains("(") && selectItem.toString().contains(")")) {
-                temp.append(OPTIONAL_WHITE_SPACE);
-                temp.append("(?:");
-                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(ALIAS) : ALIAS);
-                temp.append("|");
-                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(AS) : AS);
-                temp.append(")");
-                temp.append(REQUIRED_WHITE_SPACE);
-                temp.append(selectItem.toString().split(AS)[1].replace(" ", ""));
-                flagForOrderRotationWithOutSpellingMistake = true;
-            }
-
-            if(selectItem.toString().contains(AS) && !selectItem.toString().contains("(") && !selectItem.toString().contains(")")) {
-                temp.append(selectItem.toString().split(AS)[0].replace(" ", ""));
-                temp.append(OPTIONAL_WHITE_SPACE);
-                temp.append("(?:");
-                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(ALIAS) : ALIAS);
-                temp.append("|");
-                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(AS) : AS);
-                temp.append(")");
-                temp.append(REQUIRED_WHITE_SPACE);
-                temp.append(selectItem.toString().split(AS)[1].replace(" ", ""));
-                flagForOrderRotationWithOutSpellingMistake = true;
-            }
-
-            if(!selectItem.toString().contains(AS)){
-                temp.append(OPTIONAL_WHITE_SPACE);
-                temp.append("((?:");
-                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(ALIAS) : ALIAS);
-                temp.append("|");
-                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(AS) : AS);
-                temp.append(")");
-                temp.append(REQUIRED_WHITE_SPACE);
-                temp.append(".*)?");
-                flagForOrderRotationWithOutSpellingMistake = true;
-            }
-
-            selectedColumnNamesAsStrings.add(temp.toString());
-        }
-
-        if(flagForOrderRotationWithOutSpellingMistake){
-            List<String> selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake = new ArrayList<>();
-            for(String str : selectedColumnNamesAsStrings){
-                selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake.add(str.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
-            }
-            buffer.append(columnNameOrder.generateRegExFor(selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake));
+        if(plainSelect.getSelectItems().get(0) instanceof AllColumns){
+            plainSelect.getSelectItems().get(0).accept(this);
         } else {
-            buffer.append(columnNameOrder.generateRegExFor(selectedColumnNamesAsStrings));
+            List<String> selectedColumnNamesAsStrings = new ArrayList<>();
+            boolean flagForOrderRotationWithOutSpellingMistake = false;
+            for(SelectItem selectItem : plainSelect.getSelectItems()){
+                StringBuilder temp = new StringBuilder();
+                if(selectItem.toString().contains("(") && selectItem.toString().contains(")")){
+                    temp.append(aggregateFunctionLang.generateRegExFor(selectItem.toString().replaceAll("\\(.*", "")));
+                    temp.append(OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE);
+                    temp.append(isColumnNameMistake ? columnNameMistake.generateRegExFor(selectItem.toString().split("\\(")[1].split("\\)")[0]) : selectItem.toString().split("\\(")[1].split("\\)")[0]);
+                    temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
+                }
+
+                if(!selectItem.toString().contains(AS) && !selectItem.toString().contains("(") && !selectItem.toString().contains(")")){
+                    temp.append(isColumnNameMistake ? columnNameMistake.generateRegExFor(selectItem.toString()) : selectItem.toString());
+                    flagForOrderRotationWithOutSpellingMistake = true;
+                }
+
+                if(selectItem.toString().contains(AS) && selectItem.toString().contains("(") && selectItem.toString().contains(")")) {
+                    temp.append(OPTIONAL_WHITE_SPACE);
+                    temp.append("(?:");
+                    temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(ALIAS) : ALIAS);
+                    temp.append("|");
+                    temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(AS) : AS);
+                    temp.append(")");
+                    temp.append(REQUIRED_WHITE_SPACE);
+                    temp.append(selectItem.toString().split(AS)[1].replace(" ", ""));
+                    flagForOrderRotationWithOutSpellingMistake = true;
+                }
+
+                if(selectItem.toString().contains(AS) && !selectItem.toString().contains("(") && !selectItem.toString().contains(")")) {
+                    temp.append(selectItem.toString().split(AS)[0].replace(" ", ""));
+                    temp.append(OPTIONAL_WHITE_SPACE);
+                    temp.append("(?:");
+                    temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(ALIAS) : ALIAS);
+                    temp.append("|");
+                    temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(AS) : AS);
+                    temp.append(")");
+                    temp.append(REQUIRED_WHITE_SPACE);
+                    temp.append(selectItem.toString().split(AS)[1].replace(" ", ""));
+                    flagForOrderRotationWithOutSpellingMistake = true;
+                }
+
+                if(!selectItem.toString().contains(AS)){
+                    temp.append(OPTIONAL_WHITE_SPACE);
+                    temp.append("((?:");
+                    temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(ALIAS) : ALIAS);
+                    temp.append("|");
+                    temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(AS) : AS);
+                    temp.append(")");
+                    temp.append(REQUIRED_WHITE_SPACE);
+                    temp.append(".*)?");
+                    flagForOrderRotationWithOutSpellingMistake = true;
+                }
+
+                selectedColumnNamesAsStrings.add(temp.toString());
+            }
+
+            if(flagForOrderRotationWithOutSpellingMistake){
+                List<String> selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake = new ArrayList<>();
+                for(String str : selectedColumnNamesAsStrings){
+                    selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake.add(str.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+                }
+                buffer.append(columnNameOrder.generateRegExFor(selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake));
+            } else {
+                buffer.append(columnNameOrder.generateRegExFor(selectedColumnNamesAsStrings));
+            }
         }
 
         if (plainSelect.getIntoTables() != null) {

@@ -2,7 +2,6 @@ package sqltoregex.deparser;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitor;
-import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.statement.select.GroupByElement;
 import net.sf.jsqlparser.util.deparser.GroupByDeParser;
 import sqltoregex.settings.RegExGenerator;
