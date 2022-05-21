@@ -40,9 +40,11 @@ public class OrderRotation implements RegExGenerator<List<String>> {
             Iterator<String> iterator = valueList.iterator();
             while (iterator.hasNext()) {
                 if(spellingMistake != null) {
-                    singleValue.append(spellingMistake.generateRegExFor(iterator.next()));
+                    String temp = iterator.next();
+                    if(temp.contains("##########")) singleValue.append(temp.replace("##########", ""));
+                    else singleValue.append(spellingMistake.generateRegExFor(temp));
                 } else{
-                    singleValue.append(iterator.next());
+                    singleValue.append(iterator.next().replace("##########", ""));
                 }
                 if(iterator.hasNext()){
                     singleValue.append("\\s*,\\s*");

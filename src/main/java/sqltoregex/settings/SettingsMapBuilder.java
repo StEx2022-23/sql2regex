@@ -78,7 +78,7 @@ class SettingsMapBuilder {
 
     public SettingsMapBuilder withSettingsOption(SettingsOption settingsOption){
         switch (settingsOption) {
-            case KEYWORDSPELLING, COLUMNNAMESPELLING, TABLENAMESPELLING -> {
+            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING -> {
                 SpellingMistake spellingMistake = new SpellingMistake(settingsOption);
                 this.settingsMap.put(settingsOption, spellingMistake);
                 spellingMistakes.add(spellingMistake);

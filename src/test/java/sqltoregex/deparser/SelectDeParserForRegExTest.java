@@ -7,7 +7,11 @@ import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
+import sqltoregex.settings.RegExGenerator;
 import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
+import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -195,6 +199,68 @@ class SelectDeParserForRegExTest {
                 "SELECT col1 OFFSET 10 ROWS",
                 "SELECT col1 OFFSET  10  ROWS",
                 "SELECT col1 OFFST 10 RWS"
+        );
+
+        for(String sql : toCheckedInput){
+            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
+        }
+    }
+
+    @Test
+    void testFrom() throws JSQLParserException {
+        String sampleSolution = "SELECT col1 FROM table1, table2";
+
+        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
+        statement.accept(statementDeParser);
+        String regex = statementDeParser.getBuffer().toString();
+
+        System.out.println(regex);
+
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 FROM table1, table2",
+                "SELECT col1 FROM table2, table1"
+        );
+
+        for(String sql : toCheckedInput){
+            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
+        }
+    }
+
+    @Test
+    void testAliasAndAggregateOne() throws JSQLParserException{
+        String sampleSolution = "SELECT AVG(col1) AS c1 FROM table1, table2";
+
+        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
+        statement.accept(statementDeParser);
+        String regex = statementDeParser.getBuffer().toString();
+
+        System.out.println(regex);
+
+        List<String> toCheckedInput = List.of(
+                "SELECT AVG(col1) AS c1 FROM table1, table2",
+                "SELECT AVG ( col1 ) ALIAS c1 FROM table1, table2",
+                "SELECT MITTELWERT(co1) AS c1 FROM table1, table2"
+        );
+
+        for(String sql : toCheckedInput){
+            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
+        }
+    }
+
+    @Test
+    void testAliasAndAggregateTwo() throws JSQLParserException{
+        String sampleSolution = "SELECT AVG(col1) AS c1, column2 FROM table1, table2";
+
+        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
+        statement.accept(statementDeParser);
+        String regex = statementDeParser.getBuffer().toString();
+
+        System.out.println(regex);
+
+        List<String> toCheckedInput = List.of(
+                "SELECT AVG(col1) AS c1, column2 FROM table1, table2",
+                "SELECT AVG ( col1 ) ALIAS c1, column2 FROM table1, table2",
+                "SELECT column2, MITTELWERT(co1) AS c1 FROM table2, table1"
         );
 
         for(String sql : toCheckedInput){

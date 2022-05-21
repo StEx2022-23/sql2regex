@@ -16,6 +16,7 @@ import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
+import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,8 +28,12 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public static final String NOT = "NOT";
     private ExpressionVisitor expressionVisitor;
     private final boolean isKeywordSpellingMistake;
+    private final boolean isColumnNameMistake;
     private RegExGenerator<String> keywordSpellingMistake;
+    private RegExGenerator<String> columnNameMistake;
     private final RegExGenerator<List<String>> columnNameOrder;
+    private final RegExGenerator<List<String>> tableNameOrder;
+    private final RegExGenerator<String> aggregateFunctionLang;
     SettingsManager settingsManager;
 
     public SelectDeParserForRegEx(SettingsManager settingsManager) {
@@ -40,7 +45,12 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
         }
         columnNameOrder = settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
-
+        tableNameOrder = settingsManager.getSettingBySettingOption(SettingsOption.TABLENAMEORDER, OrderRotation.class);
+        aggregateFunctionLang = settingsManager.getSettingBySettingOption(SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class);
+        this.isColumnNameMistake = settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING);
+        if(this.isColumnNameMistake){
+            columnNameMistake = settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class);
+        }
     }
 
     @Override
@@ -116,35 +126,86 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             buffer.append(OPTIONAL_WHITE_SPACE);
         }
 
-        List<String> selectedTableNamesAsStrings = new ArrayList<>();
+        List<String> selectedColumnNamesAsStrings = new ArrayList<>();
+        boolean flagForOrderRotationWithOutSpellingMistake = false;
         for(SelectItem selectItem : plainSelect.getSelectItems()){
-            selectedTableNamesAsStrings.add(selectItem.toString());
+            StringBuilder temp = new StringBuilder();
+            if(selectItem.toString().contains("(") && selectItem.toString().contains(")")){
+                temp.append(aggregateFunctionLang.generateRegExFor(selectItem.toString().replaceAll("\\(.*", "")));
+                temp.append(OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE);
+                temp.append(isColumnNameMistake ? columnNameMistake.generateRegExFor(selectItem.toString().split("\\(")[1].split("\\)")[0]) : selectItem.toString().split("\\(")[1].split("\\)")[0]);
+                temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
+                flagForOrderRotationWithOutSpellingMistake = true;
+            }
+
+            if(selectItem.toString().contains("AS")){
+                temp.append(OPTIONAL_WHITE_SPACE);
+                temp.append("(?:");
+                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("ALIAS") : "ALIAS");
+                temp.append("|");
+                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("AS") : "AS");
+                temp.append(")");
+                temp.append(REQUIRED_WHITE_SPACE);
+                temp.append(selectItem.toString().split("AS")[1].replace(" ", ""));
+                flagForOrderRotationWithOutSpellingMistake = true;
+            }
+
+            if(!selectItem.toString().contains("AS") && !selectItem.toString().contains("(") && !selectItem.toString().contains(")")){
+                temp.append(isColumnNameMistake ? columnNameMistake.generateRegExFor(selectItem.toString()) : selectItem.toString());
+                flagForOrderRotationWithOutSpellingMistake = true;
+            }
+
+            selectedColumnNamesAsStrings.add(temp.toString());
         }
-        buffer.append(columnNameOrder.generateRegExFor(selectedTableNamesAsStrings));
+
+        if(flagForOrderRotationWithOutSpellingMistake){
+            List<String> selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake = new ArrayList<>();
+            for(String str : selectedColumnNamesAsStrings){
+                selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake.add(str.concat("##########"));
+            }
+            buffer.append(columnNameOrder.generateRegExFor(selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake));
+        } else {
+            buffer.append(columnNameOrder.generateRegExFor(selectedColumnNamesAsStrings));
+        }
+
 
         if (plainSelect.getIntoTables() != null) {
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("FROM") : "FROM");
             buffer.append(REQUIRED_WHITE_SPACE);
-            for (Iterator<Table> iter = plainSelect.getIntoTables().iterator(); iter.hasNext();) {
-                visit(iter.next());
-                if (iter.hasNext()) {
-                    buffer.append("," + OPTIONAL_WHITE_SPACE);
-                }
+
+            List<String> selectedTableNamesAsStrings = new ArrayList<>();
+            for (Table table : plainSelect.getIntoTables()) {
+                selectedTableNamesAsStrings.add(table.getFullyQualifiedName());
             }
+            buffer.append(tableNameOrder.generateRegExFor(selectedTableNamesAsStrings));
         }
 
-        if (plainSelect.getFromItem() != null) {
+        if (plainSelect.getFromItem() != null && plainSelect.getJoins() != null) {
+            List<String> simpleJoinElements = new ArrayList<>();
+            simpleJoinElements.add(plainSelect.getFromItem().toString());
+
+            for (Join join : plainSelect.getJoins()) {
+                if(join.isSimple()) simpleJoinElements.add(join.toString());
+            }
+
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("FROM") : "FROM");
+            buffer.append(REQUIRED_WHITE_SPACE);
+
+            if(simpleJoinElements.size() == 1){
+                buffer.append(tableNameOrder.generateRegExFor(simpleJoinElements));
+                for (Join join : plainSelect.getJoins()) {
+                    deparseJoin(join);
+                }
+            } else {
+                buffer.append(tableNameOrder.generateRegExFor(simpleJoinElements));
+            }
+        } else if (plainSelect.getFromItem() != null) {
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("FROM") : "FROM");
             buffer.append(REQUIRED_WHITE_SPACE);
             plainSelect.getFromItem().accept(this);
-        }
-
-        if (plainSelect.getJoins() != null) {
-            for (Join join : plainSelect.getJoins()) {
-                deparseJoin(join);
-            }
         }
 
         if (plainSelect.getKsqlWindow() != null) {
@@ -197,32 +258,35 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             buffer.append(plainSelect.getWithIsolation().toString());
         }
         if (plainSelect.isForUpdate()) {
-            buffer.append(" FOR UPDATE");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append("FOR");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append("UPDATE");
             if (plainSelect.getForUpdateTable() != null) {
-                buffer.append(" OF ").append(plainSelect.getForUpdateTable());
+                buffer.append(REQUIRED_WHITE_SPACE + "OF" + REQUIRED_WHITE_SPACE).append(plainSelect.getForUpdateTable());
             }
             if (plainSelect.getWait() != null) {
-                // wait's toString will do the formatting for us
                 buffer.append(plainSelect.getWait());
             }
             if (plainSelect.isNoWait()) {
-                buffer.append(" NOWAIT");
+                buffer.append(REQUIRED_WHITE_SPACE + "NOWAIT");
             }
         }
         if (plainSelect.getOptimizeFor() != null) {
             deparseOptimizeForForRegEx(plainSelect.getOptimizeFor());
         }
         if (plainSelect.getForXmlPath() != null) {
-            buffer.append(" FOR XML PATH(").append(plainSelect.getForXmlPath()).append(")");
+            buffer.append(REQUIRED_WHITE_SPACE + "FOR" + REQUIRED_WHITE_SPACE + "XML" + REQUIRED_WHITE_SPACE + "PATH(");
+            buffer.append(plainSelect.getForXmlPath()).append(OPTIONAL_WHITE_SPACE + ")");
         }
         if (plainSelect.isUseBrackets()) {
-            buffer.append(")");
+            buffer.append(OPTIONAL_WHITE_SPACE + ")");
         }
 
     }
     @Override
     public void visit(AllTableColumns allTableColumns) {
-        buffer.append(allTableColumns.getTable().getFullyQualifiedName()).append(".*");
+        buffer.append(allTableColumns.getTable().getFullyQualifiedName()).append("." + OPTIONAL_WHITE_SPACE + "*");
     }
 
     @Override
