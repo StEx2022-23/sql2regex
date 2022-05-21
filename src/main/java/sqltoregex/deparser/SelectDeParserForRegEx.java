@@ -131,10 +131,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         List<String> selectedColumnNamesAsStrings = new ArrayList<>();
 
-
         boolean flagForOrderRotationWithOutSpellingMistake = false;
         for(SelectItem selectItem : plainSelect.getSelectItems()){
             StringBuilder temp = new StringBuilder();
+
             if(selectItem.toString().contains("(") && selectItem.toString().contains(")")){
                 temp.append(aggregateFunctionLang.generateRegExFor(selectItem.toString().replaceAll("\\(.*", "")));
                 temp.append(OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE);
@@ -147,10 +147,20 @@ public class SelectDeParserForRegEx extends SelectDeParser {
                 flagForOrderRotationWithOutSpellingMistake = true;
             }
 
-            if(selectItem.toString().contains(AS)) {
-                if(selectItem.toString().contains("(") && selectItem.toString().contains(")")){
-                    temp.append(selectItem.toString().split(AS)[0].replaceAll(".*\\)",""));
-                } else temp.append(selectItem.toString().split(AS)[0].replace(" ", ""));
+            if(selectItem.toString().contains(AS) && selectItem.toString().contains("(") && selectItem.toString().contains(")")) {
+                temp.append(OPTIONAL_WHITE_SPACE);
+                temp.append("(?:");
+                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(ALIAS) : ALIAS);
+                temp.append("|");
+                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(AS) : AS);
+                temp.append(")");
+                temp.append(REQUIRED_WHITE_SPACE);
+                temp.append(selectItem.toString().split(AS)[1].replace(" ", ""));
+                flagForOrderRotationWithOutSpellingMistake = true;
+            }
+
+            if(selectItem.toString().contains(AS) && !selectItem.toString().contains("(") && !selectItem.toString().contains(")")) {
+                temp.append(selectItem.toString().split(AS)[0].replace(" ", ""));
                 temp.append(OPTIONAL_WHITE_SPACE);
                 temp.append("(?:");
                 temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(ALIAS) : ALIAS);
@@ -304,7 +314,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
     @Override
     public void visit(AllTableColumns allTableColumns) {
-        buffer.append(allTableColumns.getTable().getFullyQualifiedName()).append("." + OPTIONAL_WHITE_SPACE + "*");
+        buffer.append(allTableColumns.getTable().getFullyQualifiedName()).append("." + OPTIONAL_WHITE_SPACE + "(?:ALL|\\*);");
     }
 
     @Override
@@ -640,7 +650,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     @Override
     public void visit(AllColumns allColumns) {
-        buffer.append('*');
+        buffer.append("(?:ALL|\\*)");
     }
 
     @Override

@@ -33,14 +33,22 @@ class SelectDeParserForRegExTest {
         return matcher.matches();
     }
 
-    @Test
-    void testSelectFromWithTwoColumns() throws JSQLParserException {
-        String sampleSolution = "SELECT col1, col2 FROM table1";
-
+    String getRegEx(String sampleSolution) throws JSQLParserException {
         Statement statement = CCJSqlParserUtil.parse(sampleSolution);
         statement.accept(statementDeParser);
-        String regex = statementDeParser.getBuffer().toString();
+        return statementDeParser.getBuffer().toString();
+    }
 
+    void validateListAgainstRegEx(String sampleSolution, List<String> alternativeStatements, boolean isAssertTrue) throws JSQLParserException {
+        String regex = this.getRegEx(sampleSolution);
+        for(String str : alternativeStatements){
+            if(isAssertTrue) Assertions.assertTrue(checkAgainstRegEx(regex, str), str + " " + regex);
+            else Assertions.assertFalse(checkAgainstRegEx(regex, str), str + " " + regex);
+        }
+    }
+
+    @Test
+    void testSelectFromWithTwoColumns() throws JSQLParserException {
         List<String> toCheckedInput = List.of(
                 "SELECT col1, col2 FROM table1",
                 "SELECT col2, col1 FROM table1",
@@ -49,20 +57,11 @@ class SelectDeParserForRegExTest {
                 "SELCT col2,col1 FROM table1",
                 "SELECT col2, col1 FOM table1"
         );
-
-        for(String str : toCheckedInput){
-            Assertions.assertTrue(checkAgainstRegEx(regex, str), str + " " + regex);
-        }
+        validateListAgainstRegEx("SELECT col1, col2 FROM table1", toCheckedInput, true);
     }
 
     @Test
     void testSelectFromWithTwoColumnsFailings() throws JSQLParserException {
-        String sampleSolution = "SELECT col1, col2 FROM table1";
-
-        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
-        statement.accept(statementDeParser);
-        String regex = statementDeParser.getBuffer().toString();
-
         List<String> toCheckedInput = List.of(
                 "SELECTcol1, col2 FROM table1",
                 "SELECT col2, col1FROM table1",
@@ -71,20 +70,11 @@ class SelectDeParserForRegExTest {
                 "SELCTcol2,col1 FROM table1",
                 "SELECTcol2,col1FOMtable1"
         );
-
-        for(String str : toCheckedInput){
-            Assertions.assertFalse(checkAgainstRegEx(regex, str), str + " " + regex);
-        }
+        validateListAgainstRegEx("SELECT col1, col2 FROM table1", toCheckedInput, false);
     }
 
     @Test
     void testGroupByTwoStatements() throws JSQLParserException {
-        String sampleSolution = "SELECT col1 GROUP BY col1, col2";
-
-        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
-        statement.accept(statementDeParser);
-        String regex = statementDeParser.getBuffer().toString();
-
         List<String> toCheckedInput = List.of(
                 "SELECT col1 GROUP BY col1, col2",
                 "SELECT col1 GROUP BY col2,col1",
@@ -93,221 +83,148 @@ class SelectDeParserForRegExTest {
                 "SELECT col1 GROUP BY col1 , col2",
                 "SELECT col1 GROUP BY col2,col1"
         );
-
-        for(String sql : toCheckedInput){
-            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
-        }
+        validateListAgainstRegEx("SELECT col1 GROUP BY col1, col2", toCheckedInput, true);
     }
 
     @Test
     void testGroupByThreeStatements() throws JSQLParserException {
-        String sampleSolution = "SELECT col1 GROUP BY col1, col2, col3";
-
-        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
-        statement.accept(statementDeParser);
-        String regex = statementDeParser.getBuffer().toString();
-
-        System.out.println(regex);
-
         List<String> toCheckedInput = List.of(
                 "SELECT col1 GROUP BY col1, col2, col3",
                 "SELECT col1 GROUP BY col2,col1, col3",
                 "SELECT col1 GROUP BY col3, col1, col2",
                 "SELECT col1 GROUP BY col3, col2, col1"
         );
-
-        for(String sql : toCheckedInput){
-            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
-        }
+        validateListAgainstRegEx("SELECT col1 GROUP BY col1, col2, col3", toCheckedInput, true);
     }
 
     @Test
     void testGroupByThreeStatementsFailings() throws JSQLParserException {
-        String sampleSolution = "SELECT col1 GROUP BY col1, col2, col3";
-
-        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
-        statement.accept(statementDeParser);
-        String regex = statementDeParser.getBuffer().toString();
-
-        System.out.println(regex);
-
         List<String> toCheckedInput = List.of(
                 "SELECT col1 GROUP BY col1 col2, col3",
                 "SELECT col1 GROUPBY col2,col1, col3",
                 "SELECT col1 GROUP BYcol3, col1, col2",
                 "SELECT col1 GROUP BY col3col2col1"
         );
-
-        for(String sql : toCheckedInput){
-            Assertions.assertFalse(checkAgainstRegEx(regex, sql), sql + " " + regex);
-        }
+        validateListAgainstRegEx("SELECT col1 GROUP BY col1, col2, col3", toCheckedInput, false);
     }
 
     @Test
     void testSimpleInnerJoin() throws JSQLParserException {
-        String sampleSolution = "SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2";
-
-        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
-        statement.accept(statementDeParser);
-        String regex = statementDeParser.getBuffer().toString();
-
-        System.out.println(regex);
-
         List<String> toCheckedInput = List.of(
                 "SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2",
                 "SELECT col1 FROM table1 INNER  JOIN  table2  ON  col1 = col2",
                 "SELECT col1 FROM table1 INNER  JOIN  table2  ON  col2 = col1"
         );
-
-        for(String sql : toCheckedInput){
-            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
-        }
+        validateListAgainstRegEx("SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2", toCheckedInput, true);
     }
 
     @Test
     void testLimit() throws JSQLParserException {
-        String sampleSolution = "SELECT col1 LIMIT 2, 3";
-
-        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
-        statement.accept(statementDeParser);
-        String regex = statementDeParser.getBuffer().toString();
-
-        System.out.println(regex);
-
         List<String> toCheckedInput = List.of(
                 "SELECT col1 LIMT 3 OFFSET 2",
                 "SELECT col1 LIMIT 3 OFFST 2",
                 "SELECT col1 LIMIT    3   OFFSET    2"
         );
-
-        for(String sql : toCheckedInput){
-            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
-        }
+        validateListAgainstRegEx("SELECT col1 LIMIT 2, 3", toCheckedInput, true);
     }
 
     @Test
     void testOffset() throws JSQLParserException {
-        String sampleSolution = "SELECT col1 OFFSET 10 ROWS";
-
-        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
-        statement.accept(statementDeParser);
-        String regex = statementDeParser.getBuffer().toString();
-
-        System.out.println(regex);
-
         List<String> toCheckedInput = List.of(
                 "SELECT col1 OFFSET 10 ROWS",
                 "SELECT col1 OFFSET  10  ROWS",
                 "SELECT col1 OFFST 10 RWS"
         );
-
-        for(String sql : toCheckedInput){
-            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
-        }
+        validateListAgainstRegEx("SELECT col1 OFFSET 10 ROWS", toCheckedInput, true);
     }
 
     @Test
     void testFrom() throws JSQLParserException {
-        String sampleSolution = "SELECT col1 FROM table1, table2";
-
-        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
-        statement.accept(statementDeParser);
-        String regex = statementDeParser.getBuffer().toString();
-
-        System.out.println(regex);
-
         List<String> toCheckedInput = List.of(
                 "SELECT col1 FROM table1, table2",
                 "SELECT col1 FROM table2, table1"
         );
-
-        for(String sql : toCheckedInput){
-            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
-        }
+        validateListAgainstRegEx("SELECT col1 FROM table1, table2", toCheckedInput, true);
     }
 
     @Test
     void testAliasAndAggregateOne() throws JSQLParserException{
-        String sampleSolution = "SELECT AVG(col1) AS c1 FROM table1, table2";
-
-        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
-        statement.accept(statementDeParser);
-        String regex = statementDeParser.getBuffer().toString();
-
-        System.out.println(regex);
-
         List<String> toCheckedInput = List.of(
                 "SELECT AVG(col1) AS c1 FROM table1, table2",
                 "SELECT AVG ( col1 ) ALIAS c1 FROM table1, table2",
                 "SELECT MITTELWERT(co1) AS c1 FROM table1, table2"
         );
-
-        for(String sql : toCheckedInput){
-            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
-        }
+        validateListAgainstRegEx("SELECT AVG(col1) AS c1 FROM table1, table2", toCheckedInput, true);
     }
 
     @Test
     void testAliasAndAggregateTwo() throws JSQLParserException{
-        String sampleSolution = "SELECT AVG(col1) AS c1, column2 FROM table1, table2";
-
-        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
-        statement.accept(statementDeParser);
-        String regex = statementDeParser.getBuffer().toString();
-
-        System.out.println(regex);
-
         List<String> toCheckedInput = List.of(
                 "SELECT AVG(col1) AS c1, column2 FROM table1, table2",
                 "SELECT AVG ( col1 ) ALIAS c1, column2 FROM table1, table2",
                 "SELECT column2, MITTELWERT(co1) AS c1 FROM table2, table1"
         );
-
-        for(String sql : toCheckedInput){
-            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
-        }
+        validateListAgainstRegEx("SELECT AVG(col1) AS c1, column2 FROM table1, table2", toCheckedInput, true);
     }
 
     @Test
     void testTableAlias() throws JSQLParserException{
-        String sampleSolution = "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key";
-
-        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
-        statement.accept(statementDeParser);
-        String regex = statementDeParser.getBuffer().toString();
-
-        System.out.println(regex);
-
         List<String> toCheckedInput = List.of(
                 "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
                 "SELECT col2, col1 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
                 "SELECT col2, col1 FROM table1 t1 INNER JOIN table2 t2 ON t2.key = t1.key"
         );
-
-        for(String sql : toCheckedInput){
-            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
-        }
+        validateListAgainstRegEx("SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key", toCheckedInput, true);
     }
 
     @Test
     void testOptionalAliasAddedByStudent() throws JSQLParserException{
-        String sampleSolution = "SELECT col1, col2, col3 AS c3";
-
-        Statement statement = CCJSqlParserUtil.parse(sampleSolution);
-        statement.accept(statementDeParser);
-        String regex = statementDeParser.getBuffer().toString();
-
-        System.out.println(regex);
-
         List<String> toCheckedInput = List.of(
                 "SELECT col1, col2, col3 AS c3",
                 "SELECT col1, col2 AS c2, col3 AS c3",
                 "SELECT col1 AS c1, col2, col3 AS c3",
                 "SELECT col1 AS c1, col2 AS c2, col3 AS c3"
         );
-
-        for(String sql : toCheckedInput){
-            Assertions.assertTrue(checkAgainstRegEx(regex, sql), sql + " " + regex);
-        }
+        validateListAgainstRegEx("SELECT col1, col2, col3 AS c3", toCheckedInput, true);
     }
+
+    @Test
+    void testDistinctKeyword() throws JSQLParserException{
+        List<String> toCheckedInput = List.of(
+                "SELECT DISTINCT col1",
+                "SELECT DISTICT col1",
+                "SELECT  DISTINCT  col1"
+        );
+        validateListAgainstRegEx("SELECT DISTINCT col1", toCheckedInput, true);
+    }
+
+    @Test
+    void testUniqueKeyword() throws JSQLParserException{
+        List<String> toCheckedInput = List.of(
+                "SELECT UNIQUE col1",
+                "SELECT UNIUE col1",
+                "SELECT  UNIQUE  col1"
+        );
+        validateListAgainstRegEx("SELECT UNIQUE col1", toCheckedInput, true);
+    }
+
+//    @Test
+//    void testSelectAll() throws JSQLParserException {
+//        List<String> toCheckedInput = List.of(
+//                "SELECT * FROM table1",
+//                "SELECT  *  FROM table1"
+//        );
+//        validateListAgainstRegEx("SELECT * FROM table1", toCheckedInput, true);
+//    }
+
+    @Test
+    void testSelectAllTableColumns() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT table1.* FROM table1",
+                "SELECT  table1.*  FROM table1"
+        );
+        validateListAgainstRegEx("SELECT table1.* FROM table1", toCheckedInput, true);
+    }
+
+
 }
