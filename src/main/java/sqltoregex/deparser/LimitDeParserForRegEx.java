@@ -36,13 +36,12 @@ public class LimitDeParserForRegEx extends LimitDeparser {
         if (limit.getRowCount() instanceof NullValue) {
             buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("NULL") : "NULL");
         } else {
+            buffer.append(limit.getRowCount());
             if (limit.getRowCount() instanceof AllValue) {
                 buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("ALL") : "ALL");
             } else {
                 if (null != limit.getOffset() && null != limit.getRowCount()) {
                     buffer.append("(?:");
-                    buffer.append(OPTIONAL_WHITE_SPACE);
-                    buffer.append(limit.getRowCount());
                     buffer.append(REQUIRED_WHITE_SPACE);
                     buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("OFFSET") : "OFFSET");
                     buffer.append(REQUIRED_WHITE_SPACE);

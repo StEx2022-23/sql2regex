@@ -436,7 +436,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("OFFSET") : "OFFSET");
         buffer.append(REQUIRED_WHITE_SPACE);
         buffer.append(offset.getOffset());
-        buffer.append(REQUIRED_WHITE_SPACE);
+        buffer.append(OPTIONAL_WHITE_SPACE);
         if (offset.getOffsetParam() != null) {
             buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(offset.getOffsetParam()) : offset.getOffsetParam());
         }
