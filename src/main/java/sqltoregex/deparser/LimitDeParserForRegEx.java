@@ -28,6 +28,7 @@ public class LimitDeParserForRegEx extends LimitDeparser {
     }
 
     @Override
+    @SuppressWarnings({"PMD.CyclomaticComplexity"})
     public void deParse(Limit limit) {
         buffer.append(REQUIRED_WHITE_SPACE);
         buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("LIMIT") : "LIMIT");

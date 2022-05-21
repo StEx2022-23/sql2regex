@@ -25,6 +25,7 @@ import java.util.List;
 public class SelectDeParserForRegEx extends SelectDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
+    private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
     public static final String NOT = "NOT";
     private ExpressionVisitor expressionVisitor;
     private final boolean isKeywordSpellingMistake;
@@ -161,13 +162,12 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         if(flagForOrderRotationWithOutSpellingMistake){
             List<String> selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake = new ArrayList<>();
             for(String str : selectedColumnNamesAsStrings){
-                selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake.add(str.concat("##########"));
+                selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake.add(str.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
             }
             buffer.append(columnNameOrder.generateRegExFor(selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake));
         } else {
             buffer.append(columnNameOrder.generateRegExFor(selectedColumnNamesAsStrings));
         }
-
 
         if (plainSelect.getIntoTables() != null) {
             buffer.append(REQUIRED_WHITE_SPACE);
