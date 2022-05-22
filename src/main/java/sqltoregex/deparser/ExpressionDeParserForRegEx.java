@@ -11,15 +11,11 @@ import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
-import org.xml.sax.SAXException;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
