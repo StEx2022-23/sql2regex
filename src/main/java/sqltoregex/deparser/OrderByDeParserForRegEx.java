@@ -18,6 +18,10 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         this.regExExpressionVisitor = expressionVisitor;
     }
 
+    public ExpressionVisitor getExpressionVisitor(){
+        return this.regExExpressionVisitor;
+    }
+
     @Override
     public void deParseElement(OrderByElement orderBy) {
         orderBy.getExpression().accept(this.regExExpressionVisitor);

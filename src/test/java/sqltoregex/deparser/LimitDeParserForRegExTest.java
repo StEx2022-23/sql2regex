@@ -44,6 +44,13 @@ class LimitDeParserForRegExTest {
     }
 
     @Test
+    void testLimitDeparser(){
+        StringBuilder buffer = new StringBuilder();
+        LimitDeParserForRegEx limitDeParserForRegEx = new LimitDeParserForRegEx(buffer);
+        Assertions.assertNotNull(limitDeParserForRegEx);
+    }
+
+    @Test
     void testLimit() throws JSQLParserException {
         List<String> toCheckedInput = List.of(
                 "SELECT col1 LIMT 3 OFFSET 2",

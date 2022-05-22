@@ -44,11 +44,30 @@ class OrderByDeParserForRegExTest {
     }
 
     @Test
-    void testSimpleOrderBy() throws JSQLParserException {
+    void testSetGetExpressionVisitor() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        SettingsManager settingsManager = new SettingsManager();
+        StringBuilder buffer = new StringBuilder();
+        ExpressionDeParserForRegEx expressionDeParserForRegExOne = new ExpressionDeParserForRegEx(settingsManager);
+        ExpressionDeParserForRegEx expressionDeParserForRegExTwo = new ExpressionDeParserForRegEx(settingsManager);
+        OrderByDeParserForRegEx orderByDeParserForRegEx = new OrderByDeParserForRegEx(expressionDeParserForRegExOne, buffer);
+        orderByDeParserForRegEx.setExpressionVisitor(expressionDeParserForRegExTwo);
+        Assertions.assertEquals(expressionDeParserForRegExTwo, orderByDeParserForRegEx.getExpressionVisitor());
+    }
+
+    @Test
+    void testSimpleOrderByAsc() throws JSQLParserException {
         List<String> toCheckedInput = List.of(
                 "SELECT col1, col2 FROM table1 ORDER BY col1"
         );
-        validateListAgainstRegEx("SELECT col1, col2 FROM table1 ORDER BY col1", toCheckedInput, true);
+        validateListAgainstRegEx("SELECT col1, col2 FROM table1 ORDER BY col1 ASC", toCheckedInput, true);
+    }
+
+    @Test
+    void testSimpleOrderByDesc() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1, col2 FROM table1 ORDER BY col1"
+        );
+        validateListAgainstRegEx("SELECT col1, col2 FROM table1 ORDER BY col1 DESC", toCheckedInput, true);
     }
 
 
