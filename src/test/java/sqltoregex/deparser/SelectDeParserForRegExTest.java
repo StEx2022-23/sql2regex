@@ -256,9 +256,11 @@ class SelectDeParserForRegExTest {
     @Test
     void testSubSelect() throws JSQLParserException {
         List<String> toCheckedInput = List.of(
-                "SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) FROM table2)"
+                "SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) AS avgcol1 FROM table2)",
+                "SELECT * FROM table1 WHERE (SELECT AVG(col1) AS avgcol1 FROM table2) = col1",
+                "SELECT * FROM table1 WHERE (SELECT MITTELWERT(col1) AS avgcol1 FROM table2) = col1"
         );
-        validateListAgainstRegEx("SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) FROM table2)", toCheckedInput, true);
+        validateListAgainstRegEx("SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) AS avgcol1 FROM table2)", toCheckedInput, true);
     }
 
 }

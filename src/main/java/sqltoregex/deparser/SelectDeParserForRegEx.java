@@ -159,12 +159,11 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             buffer.append(OPTIONAL_WHITE_SPACE);
         }
 
-
+        boolean flagForOrderRotationWithOutSpellingMistake = false;
+        List<String> selectedColumnNamesAsStrings = new ArrayList<>();
         if(plainSelect.getSelectItems().get(0) instanceof AllColumns){
             plainSelect.getSelectItems().get(0).accept(this);
         } else {
-            List<String> selectedColumnNamesAsStrings = new ArrayList<>();
-            boolean flagForOrderRotationWithOutSpellingMistake = false;
             for(SelectItem selectItem : plainSelect.getSelectItems()){
                 StringBuilder temp = new StringBuilder();
                 if(selectItem.toString().contains("(") && selectItem.toString().contains(")")){
