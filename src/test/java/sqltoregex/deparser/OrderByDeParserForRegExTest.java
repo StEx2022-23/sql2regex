@@ -57,7 +57,7 @@ class OrderByDeParserForRegExTest {
     @Test
     void testSimpleOrderByAsc() throws JSQLParserException {
         List<String> toCheckedInput = List.of(
-                "SELECT col1, col2 FROM table1 ORDER BY col1"
+                "SELECT col1, col2 FROM table1 ORDER BY col1 ASC"
         );
         validateListAgainstRegEx("SELECT col1, col2 FROM table1 ORDER BY col1 ASC", toCheckedInput, true);
     }
@@ -65,7 +65,7 @@ class OrderByDeParserForRegExTest {
     @Test
     void testSimpleOrderByDesc() throws JSQLParserException {
         List<String> toCheckedInput = List.of(
-                "SELECT col1, col2 FROM table1 ORDER BY col1"
+                "SELECT col1, col2 FROM table1 ORDER BY col1 DESC"
         );
         validateListAgainstRegEx("SELECT col1, col2 FROM table1 ORDER BY col1 DESC", toCheckedInput, true);
     }
