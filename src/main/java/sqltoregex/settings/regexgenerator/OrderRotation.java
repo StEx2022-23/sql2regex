@@ -45,7 +45,7 @@ public class OrderRotation implements RegExGenerator<List<String>> {
                     if(temp.contains(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE)) singleValue.append(temp.replace(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE, ""));
                     else singleValue.append(spellingMistake.generateRegExFor(temp));
                 } else{
-                    singleValue.append(iterator.next().replace(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE, ""));
+                    singleValue.append(iterator.next());
                 }
                 if(iterator.hasNext()){
                     singleValue.append("\\s*,\\s*");
@@ -80,6 +80,7 @@ public class OrderRotation implements RegExGenerator<List<String>> {
      * @return Regex (non-capturing group)
      */
     public String generateRegExFor(List<String> valueList){
+        orderRotationOfValueList.replace(0, orderRotationOfValueList.length(), "");
         Assert.notNull(valueList, "Value list must not be null!");
         orderRotationOfValueList.append(isCapturingGroup ? '(' : "(?:");
         Integer amountOfElements = valueList.size();
