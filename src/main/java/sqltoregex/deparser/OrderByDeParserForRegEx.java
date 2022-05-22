@@ -5,21 +5,22 @@ import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.util.deparser.OrderByDeParser;
 
 public class OrderByDeParserForRegEx extends OrderByDeParser {
-    private ExpressionVisitor expressionVisitor;
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
+    private ExpressionVisitor regExExpressionVisitor;
 
     public OrderByDeParserForRegEx(ExpressionVisitor expressionVisitor, StringBuilder buffer) {
         super(expressionVisitor, buffer);
+        this.regExExpressionVisitor = expressionVisitor;
     }
 
     public void setExpressionVisitor(ExpressionVisitor expressionVisitor){
-        this.expressionVisitor = expressionVisitor;
+        this.regExExpressionVisitor = expressionVisitor;
     }
 
     @Override
     public void deParseElement(OrderByElement orderBy) {
-        orderBy.getExpression().accept(this.expressionVisitor);
+        orderBy.getExpression().accept(this.regExExpressionVisitor);
         if (!orderBy.isAsc()) {
             this.buffer.append(OPTIONAL_WHITE_SPACE).append("DESC");
         } else if (orderBy.isAscDescPresent()) {

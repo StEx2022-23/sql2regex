@@ -7,11 +7,7 @@ import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-import sqltoregex.settings.RegExGenerator;
 import sqltoregex.settings.SettingsManager;
-import sqltoregex.settings.SettingsOption;
-import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
-import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -74,41 +70,6 @@ class SelectDeParserForRegExTest {
     }
 
     @Test
-    void testGroupByTwoStatements() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT col1 GROUP BY col1, col2",
-                "SELECT col1 GROUP BY col2,col1",
-                "SELCT col1 GROUP BY col1, col2",
-                "SELECT col1 GROUP BY col2,col1",
-                "SELECT col1 GROUP BY col1 , col2",
-                "SELECT col1 GROUP BY col2,col1"
-        );
-        validateListAgainstRegEx("SELECT col1 GROUP BY col1, col2", toCheckedInput, true);
-    }
-
-    @Test
-    void testGroupByThreeStatements() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT col1 GROUP BY col1, col2, col3",
-                "SELECT col1 GROUP BY col2,col1, col3",
-                "SELECT col1 GROUP BY col3, col1, col2",
-                "SELECT col1 GROUP BY col3, col2, col1"
-        );
-        validateListAgainstRegEx("SELECT col1 GROUP BY col1, col2, col3", toCheckedInput, true);
-    }
-
-    @Test
-    void testGroupByThreeStatementsFailings() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT col1 GROUP BY col1 col2, col3",
-                "SELECT col1 GROUPBY col2,col1, col3",
-                "SELECT col1 GROUP BYcol3, col1, col2",
-                "SELECT col1 GROUP BY col3col2col1"
-        );
-        validateListAgainstRegEx("SELECT col1 GROUP BY col1, col2, col3", toCheckedInput, false);
-    }
-
-    @Test
     void testSimpleInnerJoin() throws JSQLParserException {
         List<String> toCheckedInput = List.of(
                 "SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2",
@@ -116,42 +77,6 @@ class SelectDeParserForRegExTest {
                 "SELECT col1 FROM table1 INNER  JOIN  table2  ON  col2 = col1"
         );
         validateListAgainstRegEx("SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2", toCheckedInput, true);
-    }
-
-    @Test
-    void testLimit() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT col1 LIMT 3 OFFSET 2",
-                "SELECT col1 LIMIT 3 OFFST 2",
-                "SELECT col1 LIMIT    3   OFFSET    2"
-        );
-        validateListAgainstRegEx("SELECT col1 LIMIT 2, 3", toCheckedInput, true);
-    }
-
-    @Test
-    void testLimitNull() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT col1 LIMIT null"
-        );
-        validateListAgainstRegEx("SELECT col1 LIMIT null", toCheckedInput, true);
-    }
-
-    @Test
-    void testLimitAndOffset() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT col1 LIMIT 3 OFFSET 2"
-        );
-        validateListAgainstRegEx("SELECT col1 LIMIT 3 OFFSET 2", toCheckedInput, true);
-    }
-
-    @Test
-    void testOffset() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT col1 OFFSET 10 ROWS",
-                "SELECT col1 OFFSET  10  ROWS",
-                "SELECT col1 OFFST 10 RWS"
-        );
-        validateListAgainstRegEx("SELECT col1 OFFSET 10 ROWS", toCheckedInput, true);
     }
 
     @Test

@@ -295,7 +295,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
 
         if (plainSelect.getOrderByElements() != null) {
-            new OrderByDeParserForRegEx(expressionVisitor, buffer).deParse(plainSelect.isOracleSiblings(),
+            new OrderByDeParserForRegEx(this.getExpressionVisitor(), buffer).deParse(plainSelect.isOracleSiblings(),
                     plainSelect.getOrderByElements());
         }
         if (plainSelect.isEmitChanges()){
