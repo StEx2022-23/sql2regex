@@ -49,9 +49,7 @@ public class OrderRotation implements RegExGenerator<List<String>> {
                 }
                 if(iterator.hasNext()){
                     singleValue.append("\\s*,\\s*");
-
                 }
-
             }
             singleValue.append("|");
             orderRotationOfValueList.append(singleValue);
