@@ -72,7 +72,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public SelectDeParserForRegEx(SettingsManager settingsManager) {
         super();
         this.settingsManager = settingsManager;
-        this.expressionVisitor = new ExpressionDeParserForRegEx(settingsManager);
+        this.expressionVisitor = new ExpressionDeParserForRegEx(this, buffer, settingsManager);
         this.isKeywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING);
         if(this.isKeywordSpellingMistake){
             keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);

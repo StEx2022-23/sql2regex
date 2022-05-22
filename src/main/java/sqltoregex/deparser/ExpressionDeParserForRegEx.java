@@ -11,11 +11,15 @@ import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
+import org.xml.sax.SAXException;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,7 +34,6 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     private final SettingsManager settingsManager;
     private OrderByDeParserForRegEx orderByDeParser;
-    private final SelectVisitor selectVisitor = getSelectVisitor();
 
     public ExpressionDeParserForRegEx(SettingsManager settingsManager) {
         super();
@@ -431,11 +434,11 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         if (subSelect.isUseBrackets()) {
             buffer.append("\\(");
         }
-        if (selectVisitor != null) {
+        if (this.getSelectVisitor() != null) {
             if (subSelect.getWithItemsList() != null) {
                 buffer.append("WITH" + REQUIRED_WHITE_SPACE);
                 for (Iterator<WithItem> iter = subSelect.getWithItemsList().iterator(); iter.hasNext();) {
-                    iter.next().accept(selectVisitor);
+                    iter.next().accept(this.getSelectVisitor());
                     if (iter.hasNext()) {
                         buffer.append("," + REQUIRED_WHITE_SPACE);
                     }
@@ -443,8 +446,8 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 }
                 buffer.append(REQUIRED_WHITE_SPACE);
             }
+            subSelect.getSelectBody().accept(this.getSelectVisitor());
 
-            subSelect.getSelectBody().accept(selectVisitor);
         }
         if (subSelect.isUseBrackets()) {
             buffer.append("\\)");
