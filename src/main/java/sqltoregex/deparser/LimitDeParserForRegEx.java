@@ -13,7 +13,6 @@ public class LimitDeParserForRegEx extends LimitDeparser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private RegExGenerator<String> keywordSpellingMistake;
-    boolean isKeywordSpellingMistake;
 
     public LimitDeParserForRegEx(StringBuilder buffer) {
         super(buffer);
@@ -21,29 +20,35 @@ public class LimitDeParserForRegEx extends LimitDeparser {
 
     public LimitDeParserForRegEx(StringBuilder buffer, SettingsManager settingsManager) {
         super(buffer);
-        this.isKeywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING);
-        if(this.isKeywordSpellingMistake){
-            keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
-        }
+        this.setKeywordSpellingMistake(settingsManager);
+    }
+
+    public void setKeywordSpellingMistake(SettingsManager settingsManager){
+        this.keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
+    }
+
+    public String useKeywordSpellingMistake(String str){
+        if(null != this.keywordSpellingMistake) return this.keywordSpellingMistake.generateRegExFor(str);
+        else return str;
     }
 
     @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity"})
     public void deParse(Limit limit) {
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("LIMIT") : "LIMIT");
+        buffer.append(useKeywordSpellingMistake("LIMIT"));
         buffer.append(REQUIRED_WHITE_SPACE);
         if (limit.getRowCount() instanceof NullValue) {
-            buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("NULL") : "NULL");
+            buffer.append(useKeywordSpellingMistake("NULL"));
         } else {
             buffer.append(limit.getRowCount());
             if (limit.getRowCount() instanceof AllValue) {
-                buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("ALL") : "ALL");
+                buffer.append(useKeywordSpellingMistake("ALL"));
             } else {
                 if (null != limit.getOffset() && null != limit.getRowCount()) {
                     buffer.append("(?:");
                     buffer.append(REQUIRED_WHITE_SPACE);
-                    buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("OFFSET") : "OFFSET");
+                    buffer.append(useKeywordSpellingMistake("OFFSET"));
                     buffer.append(REQUIRED_WHITE_SPACE);
                     buffer.append(limit.getOffset());
                     buffer.append(OPTIONAL_WHITE_SPACE);
@@ -58,7 +63,7 @@ public class LimitDeParserForRegEx extends LimitDeparser {
                 }
 
                 if (null != limit.getOffset() && null == limit.getRowCount()) {
-                    buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("LIMIT") : "LIMIT");
+                    buffer.append(useKeywordSpellingMistake("LIMIT"));
                     buffer.append(REQUIRED_WHITE_SPACE);
                     buffer.append(limit.getOffset());
                 }

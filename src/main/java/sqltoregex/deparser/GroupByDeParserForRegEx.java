@@ -41,10 +41,10 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
         this.expressionOrder = settingsManager.getSettingBySettingOption(SettingsOption.EXPRESSIONORDER, ExpressionRotation.class);
     }
 
-    public String useExpressionOrder(List<Expression> strlist, StringBuilder buffer){
-        if(null != this.expressionOrder) return this.expressionOrder.generateRegExFor(strlist);
+    public String useExpressionOrder(List<Expression> expressionList, StringBuilder buffer){
+        if(null != this.expressionOrder) return this.expressionOrder.generateRegExFor(expressionList);
         else {
-            Iterator<Expression> expressionIterator = strlist.iterator();
+            Iterator<Expression> expressionIterator = expressionList.iterator();
             while (expressionIterator.hasNext()){
                 expressionIterator.next().accept(expressionVisitor);
                 if(expressionIterator.hasNext()) buffer.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
