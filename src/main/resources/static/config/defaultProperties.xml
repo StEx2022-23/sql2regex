@@ -35,7 +35,7 @@
         <aggregatefunctionlang>
             <pair>SUM;SUMME</pair>
             <pair>AVG;MITTELWERT</pair>
-            <pair>Average;MITTELWERT</pair>
+            <pair>AVG;Average</pair>
         </aggregatefunctionlang>
     </synonyms>
     <specificsettings>
