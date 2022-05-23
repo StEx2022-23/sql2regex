@@ -3,6 +3,7 @@ package sqltoregex.settings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sqltoregex.settings.regexgenerator.OrderRotation;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -44,7 +44,7 @@ class SettingsManagerTest {
 
     @Test
     void testLoadDefaultProperties() {
-        Set<SettingsOption> settingsOptionSet = settingsManager.getDefaultSettings();
+        Set<SettingsOption> settingsOptionSet = settingsManager.getSettingsMap().keySet();
         List<String> settingsOptionWhichHaveBeenSet = List.of(
                 "KEYWORDSPELLING",
                 "TABLENAMESPELLING",
