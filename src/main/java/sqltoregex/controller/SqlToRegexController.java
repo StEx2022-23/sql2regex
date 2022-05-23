@@ -121,14 +121,6 @@ public class SqlToRegexController {
         model.addAttribute("aggregateFunctionLang", GraphPreProcessor.getSynonymMap(aggregateFunctionSynonyms.getGraph()));
 
         model.addAttribute("activeConverter", true);
-//
-//        Set<String> testSet = new LinkedHashSet<>();
-//        testSet.add("Test");
-//        Map<String, String> map = new HashMap<>();
-//        map.put("AVG", "testSet");
-
-        Set<String> set = new HashSet<>();
-
 
         return new SettingsForm(spellings, orders, GraphPreProcessor.getSynonymSet(dateFormats.getGraph()), GraphPreProcessor.getSynonymSet(timeFormats.getGraph()),
                                 GraphPreProcessor.getSynonymSet(dateTimeFormats.getGraph()), GraphPreProcessor.getSynonymSetWithDelimiter(
