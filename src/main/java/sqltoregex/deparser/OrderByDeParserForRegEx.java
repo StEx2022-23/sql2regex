@@ -37,29 +37,29 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         this.setColumnNameOrder(settingsManager);
     }
 
-    public void setKeywordSpellingMistake(SettingsManager settingsManager){
+    private void setKeywordSpellingMistake(SettingsManager settingsManager){
         this.keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
     }
 
-    public String useKeywordSpellingMistake(String str){
+    private String useKeywordSpellingMistake(String str){
         if(null != this.keywordSpellingMistake) return this.keywordSpellingMistake.generateRegExFor(str);
         else return str;
     }
 
-    public void setColumnNameSpellingMistake(SettingsManager settingsManager){
+    private void setColumnNameSpellingMistake(SettingsManager settingsManager){
         this.columnNameSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class);
     }
 
-    public String useColumnNameSpellingMistake(String str){
+    private String useColumnNameSpellingMistake(String str){
         if(null != this.columnNameSpellingMistake) return this.columnNameSpellingMistake.generateRegExFor(str);
         else return str;
     }
 
-    public void setColumnNameOrder(SettingsManager settingsManager){
+    private void setColumnNameOrder(SettingsManager settingsManager){
         this.columnNameOrder = settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
     }
 
-    public String useColumnNameOrder(List<String> strlist){
+    private String useColumnNameOrder(List<String> strlist){
         if(null != this.columnNameOrder) return this.columnNameOrder.generateRegExFor(strlist);
         else {
             StringBuilder str = new StringBuilder();

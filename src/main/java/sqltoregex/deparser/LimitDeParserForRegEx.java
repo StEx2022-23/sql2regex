@@ -23,11 +23,11 @@ public class LimitDeParserForRegEx extends LimitDeparser {
         this.setKeywordSpellingMistake(settingsManager);
     }
 
-    public void setKeywordSpellingMistake(SettingsManager settingsManager){
+    private void setKeywordSpellingMistake(SettingsManager settingsManager){
         this.keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
     }
 
-    public String useKeywordSpellingMistake(String str){
+    private String useKeywordSpellingMistake(String str){
         if(null != this.keywordSpellingMistake) return this.keywordSpellingMistake.generateRegExFor(str);
         else return str;
     }

@@ -28,20 +28,20 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
         this.setExpressionOrder(settingsManager);
     }
 
-    public void setKeywordSpellingMistake(SettingsManager settingsManager){
+    private void setKeywordSpellingMistake(SettingsManager settingsManager){
         this.keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
     }
 
-    public String useKeywordSpellingMistake(String str){
+    private String useKeywordSpellingMistake(String str){
         if(null != this.keywordSpellingMistake) return this.keywordSpellingMistake.generateRegExFor(str);
         else return str;
     }
 
-    public void setExpressionOrder(SettingsManager settingsManager){
+    private void setExpressionOrder(SettingsManager settingsManager){
         this.expressionOrder = settingsManager.getSettingBySettingOption(SettingsOption.EXPRESSIONORDER, ExpressionRotation.class);
     }
 
-    public String useExpressionOrder(List<Expression> expressionList, StringBuilder buffer){
+    private String useExpressionOrder(List<Expression> expressionList, StringBuilder buffer){
         if(null != this.expressionOrder) return this.expressionOrder.generateRegExFor(expressionList);
         else {
             Iterator<Expression> expressionIterator = expressionList.iterator();
