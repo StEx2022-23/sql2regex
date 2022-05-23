@@ -10,6 +10,8 @@ import java.util.logging.Logger;
 
 public class GraphPreProcessor {
 
+    public static final String COULD_NOT_CAST = "Could not cast";
+
     private GraphPreProcessor() {
 
     }
@@ -19,7 +21,7 @@ public class GraphPreProcessor {
             return new LinkedHashSet<>(graph.vertexSet());
         } catch (ClassCastException e) {
             Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-            logger.log(Level.WARNING, "Could not cast", e);
+            logger.log(Level.WARNING, COULD_NOT_CAST, e);
             return Collections.emptySet();
         }
     }
@@ -36,7 +38,7 @@ public class GraphPreProcessor {
             return new LinkedHashSet<>(graph.vertexSet());
         } catch (ClassCastException e) {
             Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-            logger.log(Level.WARNING, "Could not cast", e);
+            logger.log(Level.WARNING, COULD_NOT_CAST, e);
             return Collections.emptySet();
         }
     }
@@ -59,7 +61,7 @@ public class GraphPreProcessor {
             return stringSet;
         } catch (ClassCastException e) {
             Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-            logger.log(Level.WARNING, "Could not cast", e);
+            logger.log(Level.WARNING, COULD_NOT_CAST, e);
             return Collections.emptySet();
         }
     }
@@ -86,7 +88,7 @@ public class GraphPreProcessor {
             return map;
         } catch (ClassCastException e) {
             Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-            logger.log(Level.WARNING, "Could not cast", e);
+            logger.log(Level.WARNING, COULD_NOT_CAST, e);
             return Collections.emptyMap();
         }
     }
