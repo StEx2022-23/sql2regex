@@ -41,14 +41,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         selectDeParserForRegEx.setExpressionVisitor(expressionDeParserForRegEx);
         if (select.getWithItemsList() != null && !select.getWithItemsList().isEmpty()) {
             buffer.append("WITH ");
-            for (Iterator<WithItem> iter = select.getWithItemsList().iterator(); iter.hasNext();) {
-                WithItem withItem = iter.next();
-                withItem.accept(selectDeParserForRegEx);
-                if (iter.hasNext()) {
-                    buffer.append(",");
-                }
-                buffer.append(" ");
-            }
+            buffer.append(selectDeParserForRegEx.handleWithItemValueList(select));
         }
         select.getSelectBody().accept(selectDeParserForRegEx);
     }

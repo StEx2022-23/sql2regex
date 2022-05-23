@@ -20,10 +20,12 @@ import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerato
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 public class SelectDeParserForRegEx extends SelectDeParser {
     public static final String INNER = "INNER";
+    public static final String RECURSIVE = "RECURSIVE";
     public static final String SQL_CALC_FOUND_ROWS = "SQL_CALC_FOUND_ROWS";
     public static final String UPDATE = "UPDATE";
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
@@ -59,6 +61,8 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public static final String JOIN = "JOIN";
     public static final String WITHIN = "WITHIN";
     public static final String USING = "USING";
+    public static final String WITH = "WITH";
+    public static final String VALUES = "VALUES";
     private ExpressionVisitor expressionVisitor;
     private RegExGenerator<String> keywordSpellingMistake;
     private RegExGenerator<String> columnNameSpellingMistake;
@@ -236,38 +240,22 @@ public class SelectDeParserForRegEx extends SelectDeParser {
                 }
 
                 if(selectItem.toString().contains(AS) && selectItem.toString().contains("(") && selectItem.toString().contains(")")) {
-                    temp.append(OPTIONAL_WHITE_SPACE);
-                    temp.append("(?:");
-                    temp.append(useKeywordSpellingMistake(ALIAS));
-                    temp.append("|");
-                    temp.append(useKeywordSpellingMistake(AS));
-                    temp.append(")");
-                    temp.append(REQUIRED_WHITE_SPACE);
+                    temp.append(this.addOptionalAliasKeywords(false));
                     temp.append(selectItem.toString().split(AS)[1].replace(" ", ""));
                     flagForOrderRotationWithOutSpellingMistake = true;
                 }
 
                 if(selectItem.toString().contains(AS) && !selectItem.toString().contains("(") && !selectItem.toString().contains(")")) {
                     temp.append(selectItem.toString().split(AS)[0].replace(" ", ""));
-                    temp.append(OPTIONAL_WHITE_SPACE);
-                    temp.append("(?:");
-                    temp.append(useKeywordSpellingMistake(ALIAS));
-                    temp.append("|");
-                    temp.append(useKeywordSpellingMistake(AS));
-                    temp.append(")");
-                    temp.append(REQUIRED_WHITE_SPACE);
+                    temp.append(this.addOptionalAliasKeywords(false));
                     temp.append(selectItem.toString().split(AS)[1].replace(" ", ""));
                     flagForOrderRotationWithOutSpellingMistake = true;
                 }
 
                 if(!selectItem.toString().contains(AS)){
                     temp.append(OPTIONAL_WHITE_SPACE);
-                    temp.append("((?:");
-                    temp.append(useKeywordSpellingMistake(ALIAS));
-                    temp.append("|");
-                    temp.append(useKeywordSpellingMistake(AS));
-                    temp.append(")");
-                    temp.append(REQUIRED_WHITE_SPACE);
+                    temp.append("(");
+                    temp.append(this.addOptionalAliasKeywords(false));
                     temp.append(".*)?");
                     flagForOrderRotationWithOutSpellingMistake = true;
                 }
@@ -418,23 +406,22 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     @Override
     public void visit(SubSelect subSelect) {
-        buffer.append(subSelect.isUseBrackets() ? "(" : "");
+        buffer.append(subSelect.isUseBrackets() ? "//(" + OPTIONAL_WHITE_SPACE : OPTIONAL_WHITE_SPACE);
         if (subSelect.getWithItemsList() != null && !subSelect.getWithItemsList().isEmpty()) {
-            buffer.append("WITH ");
-            for (Iterator<WithItem> iter = subSelect.getWithItemsList().iterator(); iter.hasNext();) {
-                WithItem withItem = iter.next();
-                withItem.accept(this);
-                if (iter.hasNext()) {
-                    buffer.append(",");
-                }
-                buffer.append(" ");
-            }
+            buffer.append(useKeywordSpellingMistake(WITH));
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(this.handleWithItemValueList(subSelect));
         }
         subSelect.getSelectBody().accept(this);
-        buffer.append(subSelect.isUseBrackets() ? ")" : "");
+        buffer.append(subSelect.isUseBrackets() ? OPTIONAL_WHITE_SPACE + "\\)" : OPTIONAL_WHITE_SPACE);
         Alias alias = subSelect.getAlias();
         if (alias != null) {
-            buffer.append(alias);
+            buffer.append(addOptionalAliasKeywords(true));
+            buffer.append(useTableNameSpellingMistake(alias.toString().replace(" ", "")));
+        } else {
+            buffer.append("(");
+            buffer.append(addOptionalAliasKeywords(true));
+            buffer.append(".*)?");
         }
         Pivot pivot = subSelect.getPivot();
         if (pivot != null) {
@@ -452,23 +439,11 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         buffer.append(useTableNameSpellingMistake(tableName.getFullyQualifiedName()));
         Alias alias = tableName.getAlias();
         if (alias != null) {
-            buffer.append(OPTIONAL_WHITE_SPACE);
-            buffer.append("(?:");
-            buffer.append(useKeywordSpellingMistake(ALIAS));
-            buffer.append("|");
-            buffer.append(useKeywordSpellingMistake(AS));
-            buffer.append(")?");
-            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(addOptionalAliasKeywords(true));
             buffer.append(useTableNameSpellingMistake(alias.toString().replace(" ", "")));
         } else {
             buffer.append("(");
-            buffer.append(OPTIONAL_WHITE_SPACE);
-            buffer.append("(?:");
-            buffer.append(useKeywordSpellingMistake(ALIAS));
-            buffer.append("|");
-            buffer.append(useKeywordSpellingMistake(AS));
-            buffer.append(")?");
-            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(addOptionalAliasKeywords(true));
             buffer.append(".*)?");
         }
         Pivot pivot = tableName.getPivot();
@@ -806,5 +781,78 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     @Override
     public void visit(MultiExpressionList multiExprList) {
         buffer.append(multiExprList.toString());
+    }
+
+    public String addOptionalAliasKeywords(Boolean isOptional){
+        StringBuilder temp = new StringBuilder();
+        temp.append(OPTIONAL_WHITE_SPACE);
+        temp.append("(?:");
+        temp.append(useKeywordSpellingMistake(ALIAS));
+        temp.append("|");
+        temp.append(useKeywordSpellingMistake(AS));
+        if(isOptional) temp.append(")?");
+        else temp.append(")");
+        temp.append(REQUIRED_WHITE_SPACE);
+        return temp.toString();
+    }
+
+
+    private List<String> helperFunctionForHandleWithItemValueList(List<WithItem> listOfWithItems){
+        List<String> withItemStringList = new LinkedList<>();
+        for(WithItem withItem : listOfWithItems){
+            StringBuilder temp = new StringBuilder();
+            if (withItem.isRecursive()) {
+                temp.append(useKeywordSpellingMistake(RECURSIVE));
+                temp.append(REQUIRED_WHITE_SPACE);
+            }
+            temp.append(useColumnNameSpellingMistake(withItem.getName()));
+            if (withItem.getWithItemList() != null) {
+                temp.append(REQUIRED_WHITE_SPACE);
+                List<String> withItemStringListForSelectItem = new LinkedList<>();
+                for(SelectItem selectItem : withItem.getWithItemList()){
+                    withItemStringListForSelectItem.add(selectItem.toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+                }
+                temp.append(useColumnNameOrder(withItemStringListForSelectItem));
+            }
+
+            if (withItem.isUseValues()) {
+                ItemsList itemsList = withItem.getItemsList();
+                temp.append(useKeywordSpellingMistake(VALUES));
+                temp.append(REQUIRED_WHITE_SPACE);
+                temp.append("(VALUES ");
+                ExpressionList expressionList = (ExpressionList) itemsList;
+                Iterator<Expression> expressionIterator = expressionList.getExpressions().iterator();
+                List<String> expressionListAsStrings = new LinkedList<>();
+                while (expressionIterator.hasNext()){
+                    Expression selectItem = expressionIterator.next();
+                    expressionListAsStrings.add(selectItem.toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+                }
+                temp.append(useColumnNameOrder(expressionListAsStrings));
+                temp.append(OPTIONAL_WHITE_SPACE);
+                temp.append("\\)");
+            } else {
+                SubSelect subSelectWithItem = withItem.getSubSelect();
+                if (!subSelectWithItem.isUseBrackets()) {
+                    temp.append(OPTIONAL_WHITE_SPACE);
+                    temp.append("\\(");
+                }
+                subSelectWithItem.accept((FromItemVisitor) this);
+                if (!subSelectWithItem.isUseBrackets()) {
+                    temp.append(OPTIONAL_WHITE_SPACE);
+                    temp.append("\\)");
+                }
+            }
+            withItemStringList.add(temp.toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+        }
+        return withItemStringList;
+    }
+
+
+    public String handleWithItemValueList(Select select){
+        return useTableNameOrder(helperFunctionForHandleWithItemValueList(select.getWithItemsList()));
+    }
+
+    public String handleWithItemValueList(SubSelect select){
+        return useTableNameOrder(helperFunctionForHandleWithItemValueList(select.getWithItemsList()));
     }
 }
