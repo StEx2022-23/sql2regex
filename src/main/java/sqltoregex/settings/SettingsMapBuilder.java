@@ -16,11 +16,11 @@ class SettingsMapBuilder {
     private static final String UNSUPPORTED_BUILD_WITH = "Unsupported build with:";
     private static final String STRING_SYNONYM_DELIMITER = ";";
     private final Set<OrderRotation> orderRotations;
-    private final Map<SettingsOption, RegExGenerator<?>> settingsMao;
+    private final Map<SettingsOption, RegExGenerator<?>> settingsMap;
     private final Set<SpellingMistake> spellingMistakes;
 
     public SettingsMapBuilder() {
-        this.settingsMao = new EnumMap<>(SettingsOption.class);
+        this.settingsMap = new EnumMap<>(SettingsOption.class);
         this.orderRotations = new LinkedHashSet<>();
         this.spellingMistakes = new LinkedHashSet<>();
     }
@@ -34,7 +34,7 @@ class SettingsMapBuilder {
                 orderRotation.setSpellingMistake(spellingMistake);
             }
         }
-        return this.settingsMao;
+        return this.settingsMap;
     }
 
     public SettingsMapBuilder withNodeList(NodeList nodeList, SettingsOption settingsOption) {
@@ -79,15 +79,15 @@ class SettingsMapBuilder {
         switch (settingsOption) {
             case KEYWORDSPELLING, COLUMNNAMESPELLING, TABLENAMESPELLING -> {
                 SpellingMistake spellingMistake = new SpellingMistake(settingsOption);
-                this.settingsMao.put(settingsOption, spellingMistake);
+                this.settingsMap.put(settingsOption, spellingMistake);
                 spellingMistakes.add(spellingMistake);
             }
             case TABLENAMEORDER, COLUMNNAMEORDER -> {
                 OrderRotation orderRotation = new OrderRotation(settingsOption);
-                this.settingsMao.put(settingsOption, orderRotation);
+                this.settingsMap.put(settingsOption, orderRotation);
                 orderRotations.add(orderRotation);
             }
-            case NOT_AS_EXCLAMATION_AND_WORD -> this.settingsMao.put(settingsOption, null);
+            case NOT_AS_EXCLAMATION_AND_WORD -> this.settingsMap.put(settingsOption, null);
             default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + settingsOption);
         }
         return this;
@@ -110,7 +110,7 @@ class SettingsMapBuilder {
                 for (SimpleDateFormat format : synonyms) {
                     synonymGenerator.addSynonym(format);
                 }
-                this.settingsMao.put(settingsOption, synonymGenerator);
+                this.settingsMap.put(settingsOption, synonymGenerator);
             }
             default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + settingsOption);
         }
@@ -126,7 +126,7 @@ class SettingsMapBuilder {
                 for (String format : synonyms) {
                     synonymGenerator.addSynonym(new SimpleDateFormat(format));
                 }
-                this.settingsMao.put(settingsOption, synonymGenerator);
+                this.settingsMap.put(settingsOption, synonymGenerator);
             }
             case AGGREGATEFUNCTIONLANG -> {
                 if (!synonyms.isEmpty()) {
@@ -137,7 +137,7 @@ class SettingsMapBuilder {
                                 singleSynonym.split(STRING_SYNONYM_DELIMITER)[0].strip(),
                                 singleSynonym.split(STRING_SYNONYM_DELIMITER)[1].strip());
                     }
-                    this.settingsMao.put(settingsOption, aggregateFunctionSynonymGenerator);
+                    this.settingsMap.put(settingsOption, aggregateFunctionSynonymGenerator);
                 }
             }
             default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + settingsOption);
