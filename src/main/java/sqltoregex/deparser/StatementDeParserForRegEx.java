@@ -2,7 +2,6 @@ package sqltoregex.deparser;
 
 import net.sf.jsqlparser.statement.Statements;
 import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import net.sf.jsqlparser.util.deparser.SelectDeParser;
 import net.sf.jsqlparser.util.deparser.StatementDeParser;
@@ -12,7 +11,6 @@ import sqltoregex.settings.SettingsManager;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
-import java.util.Iterator;
 
 public class StatementDeParserForRegEx extends StatementDeParser {
     ExpressionDeParser expressionDeParserForRegEx;

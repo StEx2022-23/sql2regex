@@ -783,7 +783,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         buffer.append(multiExprList.toString());
     }
 
-    public String addOptionalAliasKeywords(Boolean isOptional){
+    public String addOptionalAliasKeywords(boolean isOptional){
         StringBuilder temp = new StringBuilder();
         temp.append(OPTIONAL_WHITE_SPACE);
         temp.append("(?:");
@@ -793,6 +793,36 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         if(isOptional) temp.append(")?");
         else temp.append(")");
         temp.append(REQUIRED_WHITE_SPACE);
+        return temp.toString();
+    }
+
+    private String handleWithGetItemList(WithItem withItem){
+        StringBuilder temp = new StringBuilder();
+        temp.append(REQUIRED_WHITE_SPACE);
+        List<String> withItemStringListForSelectItem = new LinkedList<>();
+        for(SelectItem selectItem : withItem.getWithItemList()){
+            withItemStringListForSelectItem.add(selectItem.toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+        }
+        temp.append(useColumnNameOrder(withItemStringListForSelectItem));
+        return temp.toString();
+    }
+
+    private String handleWithGetItemListIsUsingValue(WithItem withItem){
+        StringBuilder temp = new StringBuilder();
+        ItemsList itemsList = withItem.getItemsList();
+        temp.append(useKeywordSpellingMistake(VALUES));
+        temp.append(REQUIRED_WHITE_SPACE);
+        temp.append("(VALUES ");
+        ExpressionList expressionList = (ExpressionList) itemsList;
+        Iterator<Expression> expressionIterator = expressionList.getExpressions().iterator();
+        List<String> expressionListAsStrings = new LinkedList<>();
+        while (expressionIterator.hasNext()){
+            Expression selectItem = expressionIterator.next();
+            expressionListAsStrings.add(selectItem.toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+        }
+        temp.append(useColumnNameOrder(expressionListAsStrings));
+        temp.append(OPTIONAL_WHITE_SPACE);
+        temp.append("\\)");
         return temp.toString();
     }
 
@@ -807,29 +837,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             }
             temp.append(useColumnNameSpellingMistake(withItem.getName()));
             if (withItem.getWithItemList() != null) {
-                temp.append(REQUIRED_WHITE_SPACE);
-                List<String> withItemStringListForSelectItem = new LinkedList<>();
-                for(SelectItem selectItem : withItem.getWithItemList()){
-                    withItemStringListForSelectItem.add(selectItem.toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
-                }
-                temp.append(useColumnNameOrder(withItemStringListForSelectItem));
+                temp.append(this.handleWithGetItemList(withItem));
             }
-
             if (withItem.isUseValues()) {
-                ItemsList itemsList = withItem.getItemsList();
-                temp.append(useKeywordSpellingMistake(VALUES));
-                temp.append(REQUIRED_WHITE_SPACE);
-                temp.append("(VALUES ");
-                ExpressionList expressionList = (ExpressionList) itemsList;
-                Iterator<Expression> expressionIterator = expressionList.getExpressions().iterator();
-                List<String> expressionListAsStrings = new LinkedList<>();
-                while (expressionIterator.hasNext()){
-                    Expression selectItem = expressionIterator.next();
-                    expressionListAsStrings.add(selectItem.toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
-                }
-                temp.append(useColumnNameOrder(expressionListAsStrings));
-                temp.append(OPTIONAL_WHITE_SPACE);
-                temp.append("\\)");
+                temp.append(this.handleWithGetItemListIsUsingValue(withItem));
             } else {
                 SubSelect subSelectWithItem = withItem.getSubSelect();
                 if (!subSelectWithItem.isUseBrackets()) {
