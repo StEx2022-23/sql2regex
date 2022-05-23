@@ -45,8 +45,9 @@ public class GraphPreProcessor {
     static Set<String> getSynonymSetAsString(Graph<?,DefaultWeightedEdge> graph){
         try {
             Set<String> stringSet = new LinkedHashSet<>();
-            if (graph.vertexSet().stream().findFirst().isPresent()){
-                if (graph.vertexSet().stream().findFirst().get() instanceof SimpleDateFormat){
+            Optional<?> optional = graph.vertexSet().stream().findFirst()
+            if (optional.isPresent()){
+                if (optional.get() instanceof SimpleDateFormat){
                     for (Object format : graph.vertexSet()){
                         stringSet.add(((SimpleDateFormat) format).toPattern());
                     }
