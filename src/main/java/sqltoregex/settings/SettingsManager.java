@@ -5,6 +5,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -28,7 +29,8 @@ public class SettingsManager {
         this.parseSettings();
     }
 
-    public static <R> RegExGenerator<R> castSetting(RegExGenerator<?> rawSetting, Class<? extends RegExGenerator<R>> clazz) {
+    public static <T> RegExGenerator<T> castSetting(RegExGenerator<?> rawSetting,
+                                                    Class<? extends RegExGenerator<T>> clazz) {
         try {
             return clazz.cast(rawSetting);
         } catch (ClassCastException e) {
@@ -65,7 +67,12 @@ public class SettingsManager {
         return settingsSet;
     }
 
-    public <S> RegExGenerator<S> getSettingBySettingOption(SettingsOption settingsOption, Class<? extends RegExGenerator<S>> clazz) {
+    public boolean getSettingBySettingsOption(SettingsOption settingsOption) {
+        return this.settingsMap.containsKey(settingsOption);
+    }
+
+    public <S> RegExGenerator<S> getSettingBySettingsOption(SettingsOption settingsOption,
+                                                            Class<? extends RegExGenerator<S>> clazz) {
         for (Map.Entry<SettingsOption, RegExGenerator<?>> entry : this.settingsMap.entrySet()) {
             if (entry.getKey().equals(settingsOption)) {
                 return castSetting(settingsMap.get(entry.getKey()), clazz);
@@ -74,15 +81,12 @@ public class SettingsManager {
         throw new NoSuchElementException("There is no setting with this setting option:" + settingsOption);
     }
 
-    public boolean getSettingBySettingOption(SettingsOption settingsOption){
-        return this.settingsMap.containsKey(settingsOption);
-    }
-
     public Map<SettingsOption, RegExGenerator<?>> getSettingsMap() {
         return this.settingsMap;
     }
 
-    public <A, S> SynonymGenerator<A,S> getSynonymManagerBySettingOption(SettingsOption settingsOption, Class<? extends SynonymGenerator<A,S>> clazz){
+    public <A, S> SynonymGenerator<A, S> getSynonymManagerBySettingOption(SettingsOption settingsOption,
+                                                                          Class<? extends SynonymGenerator<A, S>> clazz) {
         for (Map.Entry<SettingsOption, RegExGenerator<?>> entry : this.settingsMap.entrySet()) {
             if (entry.getKey().equals(settingsOption)) {
                 return (SynonymGenerator<A, S>) castSetting(settingsMap.get(entry.getKey()), clazz);
@@ -91,7 +95,8 @@ public class SettingsManager {
         throw new NoSuchElementException("There is no property with this property option:" + settingsOption);
     }
 
-    private void parseSettings() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
+    private void parseSettings() throws ParserConfigurationException, IOException, SAXException,
+            XPathExpressionException {
         SettingsOption relatedOption;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
@@ -106,7 +111,8 @@ public class SettingsManager {
         Node root = document.getElementsByTagName("properties").item(0);
         SettingsNodeListIterator categoryIterator = new SettingsNodeListIterator(root.getChildNodes());
         for (Node categoryNode : categoryIterator) {
-            SettingsNodeListIterator settingsCategoryIterator = new SettingsNodeListIterator(categoryNode.getChildNodes());
+            SettingsNodeListIterator settingsCategoryIterator = new SettingsNodeListIterator(
+                    categoryNode.getChildNodes());
             for (Node settingsNode : settingsCategoryIterator) {
                 relatedOption = SettingsOption.valueOf(settingsNode.getNodeName().toUpperCase());
                 mapBuilder.withNodeList(settingsNode.getChildNodes(), relatedOption);
@@ -115,8 +121,17 @@ public class SettingsManager {
         this.settingsMap.putAll(mapBuilder.build());
     }
 
-    public Set<SettingsOption> getDefaultSettings() {
-        return this.settingsMap.keySet();
+    public Map<SettingsOption, RegExGenerator<?>> parseUserSettingsInput(SettingsForm form) {
+        SettingsMapBuilder settingsMapBuilder = new SettingsMapBuilder();
+
+        return settingsMapBuilder
+                .withSettingsOptionSet(form.getSpellings())
+                .withSettingsOptionSet(form.getOrders())
+                .withSimpleDateFormatSet(form.getDateFormats(), SettingsOption.DATESYNONYMS)
+                .withSimpleDateFormatSet(form.getTimeFormats(), SettingsOption.TIMESYNONYMS)
+                .withSimpleDateFormatSet(form.getDateTimeFormats(), SettingsOption.DATETIMESYNONYMS)
+                .withStringSet(form.getAggregateFunctionLang(), SettingsOption.AGGREGATEFUNCTIONLANG)
+                .build();
     }
 
     /**
