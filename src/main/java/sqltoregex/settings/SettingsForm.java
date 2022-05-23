@@ -40,11 +40,4 @@ public record SettingsForm(@NotNull Set<SettingsOption> spellings,
     public Set<SimpleDateFormat> getTimeFormats() {
         return timeFormats;
     }
-
-    public void setAggregateFunctionLang(){
-
     }
-
-
-
-}
