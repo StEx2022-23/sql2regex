@@ -99,19 +99,6 @@ public abstract class SynonymGenerator<A, S> implements RegExGenerator<S> {
             addResult = synonymsGraph.addVertex(this.prepareSynonymForAdd(synFor)) || addResult;
         }
         if (addResult) {
-            Optional<A> startVertex = this.synonymsGraph.vertexSet().stream()
-                    .filter(synonym -> synonym.equals(this.prepareSynonymForAdd(synFor))).findAny();
-            if (startVertex.isPresent()) {
-                Set<DefaultWeightedEdge> edgeSet = new HashSet<>(this.synonymsGraph.outgoingEdgesOf(startVertex.get()));
-                for (DefaultWeightedEdge edge : edgeSet) {
-                    DefaultWeightedEdge e1 = synonymsGraph.addEdge(this.prepareSynonymForAdd(syn),
-                                                                   synonymsGraph.getEdgeTarget(edge)
-                                                                           .equals(synFor) ?
-                                                                           synonymsGraph.getEdgeSource(
-                                                                           edge) : synonymsGraph.getEdgeTarget(edge));
-                    synonymsGraph.setEdgeWeight(e1, weight);
-                }
-            }
             DefaultWeightedEdge e1 = synonymsGraph.addEdge(this.prepareSynonymForAdd(syn),
                                                            this.prepareSynonymForAdd(synFor));
             synonymsGraph.setEdgeWeight(e1, weight);
