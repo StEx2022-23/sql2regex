@@ -45,6 +45,10 @@
         <NOT_AS_EXCLAMATION_AND_WORD>
             <value>true</value>
         </NOT_AS_EXCLAMATION_AND_WORD>
+        <othersynonyms>
+            <pair>ASC;aufsteigend</pair>
+            <pair>ASC;absteigend</pair>
+        </othersynonyms>
     </specificsettings>
 </properties>
 

@@ -18,8 +18,8 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
     private final boolean isKeywordSpellingMistake;
     private RegExGenerator<String> keywordSpellingMistake;
     private final RegExGenerator<List<Expression>> expressionRotation;
-    ExpressionVisitor expressionVisitor;
-    StringBuilder stringBuilder;
+    private final ExpressionVisitor expressionVisitor;
+    private final StringBuilder stringBuilder;
 
     public GroupByDeParserForRegEx(ExpressionVisitor expressionVisitor, StringBuilder buffer, SettingsManager settingsManager) {
         super(expressionVisitor, buffer);

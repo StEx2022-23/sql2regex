@@ -30,12 +30,11 @@ public class SpellingMistake implements RegExGenerator<String> {
         }
         StringBuilder alternativeWritingStyles = new StringBuilder();
         alternativeWritingStyles.append(isCapturingGroup ? '(' : "(?:");
-        alternativeWritingStyles.append(str.replace("\\(", "\\\\(").replace("\\)", "\\\\)")).append('|');
+        alternativeWritingStyles.append(str).append("|");
         for(int i = 0; i<str.length(); i++){
             String first = str.substring(0, i);
             String second = str.substring(i+1);
             String concat = first.concat(second);
-            concat = concat.replace("\\(", "\\\\(").replace("\\)", "\\\\)");
             alternativeWritingStyles.append(concat);
             alternativeWritingStyles.append("|");
         }

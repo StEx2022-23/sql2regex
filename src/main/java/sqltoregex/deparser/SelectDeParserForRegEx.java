@@ -602,7 +602,6 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             buffer.append(OPTIONAL_WHITE_SPACE);
             buffer.append(")");
         }
-
     }
 
     @Override
@@ -611,15 +610,18 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             if (i != 0) {
                 buffer.append(' ').append(list.getOperations().get(i - 1)).append(' ');
             }
+
             boolean brackets = list.getBrackets() == null || list.getBrackets().get(i);
             if (brackets) {
                 buffer.append("(");
             }
+
             list.getSelects().get(i).accept(this);
             if (brackets) {
                 buffer.append(")");
             }
         }
+
         if (list.getOrderByElements() != null) {
             new OrderByDeParserForRegEx(expressionVisitor, buffer, this.settingsManager).deParse(list.getOrderByElements());
         }
@@ -627,12 +629,15 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         if (list.getLimit() != null) {
             new LimitDeParserForRegEx(buffer).deParse(list.getLimit());
         }
+
         if (list.getOffset() != null) {
             deparseOffset(list.getOffset());
         }
+
         if (list.getFetch() != null) {
             deparseFetch(list.getFetch());
         }
+
         if (list.getWithIsolation() != null) {
             buffer.append(list.getWithIsolation().toString());
         }

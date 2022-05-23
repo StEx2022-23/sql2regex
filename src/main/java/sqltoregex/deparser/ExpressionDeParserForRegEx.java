@@ -436,7 +436,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 for (Iterator<WithItem> iter = subSelect.getWithItemsList().iterator(); iter.hasNext();) {
                     iter.next().accept(this.getSelectVisitor());
                     if (iter.hasNext()) {
-                        buffer.append("," + REQUIRED_WHITE_SPACE);
+                        buffer.append("," + OPTIONAL_WHITE_SPACE);
                     }
                     buffer.append(REQUIRED_WHITE_SPACE);
                 }

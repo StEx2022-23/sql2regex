@@ -16,7 +16,6 @@ class SettingsMapBuilder {
     private static final String UNSUPPORTED_BUILD_WITH = "Unsupported build with:";
     private static final String STRING_SYNONYM_DELIMITER = ";";
     private final Set<OrderRotation> orderRotations;
-    private final Set<ExpressionRotation> expressionRotations;
     private final Map<SettingsOption, RegExGenerator<?>> settingsMap;
     private final Set<SpellingMistake> spellingMistakes;
 
@@ -24,7 +23,6 @@ class SettingsMapBuilder {
         this.settingsMap = new EnumMap<>(SettingsOption.class);
         this.orderRotations = new LinkedHashSet<>();
         this.spellingMistakes = new LinkedHashSet<>();
-        this.expressionRotations = new LinkedHashSet<>();
     }
 
     public Map<SettingsOption, RegExGenerator<?>> build() {
@@ -55,7 +53,7 @@ class SettingsMapBuilder {
                 }
                 this.withStringSet(valueList, settingsOption);
             }
-            case AGGREGATEFUNCTIONLANG -> {
+            case AGGREGATEFUNCTIONLANG, OTHERSYNONYMS -> {
                 List<Node> valuePairsForSynonyms = new LinkedList<>();
                 SettingsNodeListIterator valueTagIterator = new SettingsNodeListIterator(nodeList);
                 for (Node node : valueTagIterator) {
@@ -66,7 +64,7 @@ class SettingsMapBuilder {
                     String valuePair = valueNode.getTextContent();
                     pairOfSynonymList.add(valuePair);
                 }
-                this.withStringSet(pairOfSynonymList, SettingsOption.AGGREGATEFUNCTIONLANG);
+                this.withStringSet(pairOfSynonymList, settingsOption);
             }
             case DEFAULT -> {
                 //pass because nothing needs to be needed for default
@@ -91,7 +89,6 @@ class SettingsMapBuilder {
             case EXPRESSIONORDER -> {
                 ExpressionRotation expressionRotation = new ExpressionRotation(settingsOption);
                 this.settingsMap.put(settingsOption, expressionRotation);
-                this.expressionRotations.add(expressionRotation);
             }
             case NOT_AS_EXCLAMATION_AND_WORD -> this.settingsMap.put(settingsOption, null);
             default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + settingsOption);
@@ -134,7 +131,7 @@ class SettingsMapBuilder {
                 }
                 this.settingsMap.put(settingsOption, synonymGenerator);
             }
-            case AGGREGATEFUNCTIONLANG -> {
+            case AGGREGATEFUNCTIONLANG, OTHERSYNONYMS -> {
                 if (!synonyms.isEmpty()) {
                     StringSynonymGenerator aggregateFunctionSynonymGenerator = new StringSynonymGenerator(
                             settingsOption);

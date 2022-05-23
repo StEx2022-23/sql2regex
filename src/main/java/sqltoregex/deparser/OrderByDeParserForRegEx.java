@@ -9,11 +9,13 @@ import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 public class OrderByDeParserForRegEx extends OrderByDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
+    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
     public static final String ORDER = "ORDER";
     public static final String SIBLINGS = "SIBLINGS";
@@ -23,24 +25,51 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     public static final String NULLS_LAST = "NULLS LAST";
     public static final String NULLS_FIRST = "NULLS FIRST";
     private ExpressionVisitor regExExpressionVisitor;
-    private final boolean isKeywordSpellingMistake;
     private RegExGenerator<String> keywordSpellingMistake;
-    private final boolean isColumnNameSpellingMistake;
     private RegExGenerator<String> columnNameSpellingMistake;
-    private final RegExGenerator<List<String>> orderRotation;
+    private RegExGenerator<List<String>> columnNameOrder;
 
     public OrderByDeParserForRegEx(ExpressionVisitor expressionVisitor, StringBuilder buffer, SettingsManager settingsManager) {
         super(expressionVisitor, buffer);
         this.regExExpressionVisitor = expressionVisitor;
-        this.isColumnNameSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING);
-        if(this.isColumnNameSpellingMistake){
-            columnNameSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
+        this.setColumnNameSpellingMistake(settingsManager);
+        this.setKeywordSpellingMistake(settingsManager);
+        this.setColumnNameOrder(settingsManager);
+    }
+
+    public void setKeywordSpellingMistake(SettingsManager settingsManager){
+        this.keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
+    }
+
+    public String useKeywordSpellingMistake(String str){
+        if(null != this.keywordSpellingMistake) return this.keywordSpellingMistake.generateRegExFor(str);
+        else return str;
+    }
+
+    public void setColumnNameSpellingMistake(SettingsManager settingsManager){
+        this.columnNameSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class);
+    }
+
+    public String useColumnNameSpellingMistake(String str){
+        if(null != this.columnNameSpellingMistake) return this.columnNameSpellingMistake.generateRegExFor(str);
+        else return str;
+    }
+
+    public void setColumnNameOrder(SettingsManager settingsManager){
+        this.columnNameOrder = settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
+    }
+
+    public String useColumnNameOrder(List<String> strlist){
+        if(null != this.columnNameOrder) return this.columnNameOrder.generateRegExFor(strlist);
+        else {
+            StringBuilder str = new StringBuilder();
+            Iterator<String> stringListIterator = strlist.iterator();
+            while (stringListIterator.hasNext()){
+                str.append(stringListIterator.next());
+                if (stringListIterator.hasNext()) str.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
+            }
+            return str.toString();
         }
-        this.isKeywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING);
-        if(this.isKeywordSpellingMistake){
-            keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
-        }
-        orderRotation = settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
     }
 
     public void setExpressionVisitor(ExpressionVisitor expressionVisitor){
@@ -54,29 +83,29 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     @Override
     public void deParse(boolean oracleSiblings, List<OrderByElement> orderByElementList) {
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(isKeywordSpellingMistake ? this.keywordSpellingMistake.generateRegExFor(ORDER) : ORDER);
+        buffer.append(useKeywordSpellingMistake(ORDER));
         buffer.append(REQUIRED_WHITE_SPACE);
         buffer.append("(?:");
-        buffer.append(isKeywordSpellingMistake ? this.keywordSpellingMistake.generateRegExFor(SIBLINGS) : SIBLINGS);
+        buffer.append(useKeywordSpellingMistake(SIBLINGS));
         buffer.append(REQUIRED_WHITE_SPACE + ")?");
-        buffer.append(isKeywordSpellingMistake ? this.keywordSpellingMistake.generateRegExFor(BY) : BY);
+        buffer.append(useKeywordSpellingMistake(BY));
         buffer.append(REQUIRED_WHITE_SPACE);
 
         List<String> orderByElementsAsStrings = new LinkedList<>();
         for(OrderByElement orderByElement : orderByElementList){
             orderByElementsAsStrings.add(deParseElementForOrderRotation(orderByElement));
         }
-        buffer.append(orderRotation.generateRegExFor(orderByElementsAsStrings));
+        buffer.append(useColumnNameOrder(orderByElementsAsStrings));
     }
 
     private String handleAscDesc(OrderByElement orderByElement){
         StringBuilder temp = new StringBuilder();
         if (!orderByElement.isAsc()) {
             temp.append(REQUIRED_WHITE_SPACE);
-            temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(DESC) : DESC);
+            temp.append(useKeywordSpellingMistake(DESC));
         } else if (orderByElement.isAscDescPresent()) {
             temp.append(REQUIRED_WHITE_SPACE);
-            temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(ASC) : ASC);
+            temp.append(useKeywordSpellingMistake(ASC));
         }
         return temp.toString();
     }
@@ -86,9 +115,9 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         if (orderByElement.getNullOrdering() != null) {
             temp.append(REQUIRED_WHITE_SPACE);
             if(orderByElement.getNullOrdering() == OrderByElement.NullOrdering.NULLS_FIRST){
-                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(NULLS_FIRST) : NULLS_FIRST);
+                temp.append(useKeywordSpellingMistake(NULLS_FIRST));
             } else {
-                temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(NULLS_LAST) : NULLS_LAST);
+                temp.append(useKeywordSpellingMistake(NULLS_LAST));
             }
         }
         return temp.toString();
@@ -96,7 +125,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
 
     public String deParseElementForOrderRotation(OrderByElement orderByElement){
         StringBuilder temp = new StringBuilder();
-        temp.append(isColumnNameSpellingMistake ? columnNameSpellingMistake.generateRegExFor(orderByElement.getExpression().toString()) : orderByElement.getExpression().toString());
+        temp.append(useColumnNameSpellingMistake(orderByElement.getExpression().toString()));
         temp.append(this.handleAscDesc(orderByElement));
         temp.append(this.handleNullFirstLast(orderByElement));
         temp.append(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE);
