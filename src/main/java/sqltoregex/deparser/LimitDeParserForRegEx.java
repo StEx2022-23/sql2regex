@@ -4,7 +4,7 @@ import net.sf.jsqlparser.expression.AllValue;
 import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.statement.select.Limit;
 import net.sf.jsqlparser.util.deparser.LimitDeparser;
-import sqltoregex.settings.RegExGenerator;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
@@ -24,7 +24,7 @@ public class LimitDeParserForRegEx extends LimitDeparser {
     }
 
     private void setKeywordSpellingMistake(SettingsManager settingsManager){
-        this.keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
+        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
     }
 
     private String useKeywordSpellingMistake(String str){

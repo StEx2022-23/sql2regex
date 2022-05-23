@@ -461,10 +461,10 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             }
         }
         if(!tableName.isEmpty()) {
-            buffer.append(settingsManager.getSettingBySettingOption(SettingsOption.TABLENAMESPELLING,
+            buffer.append(settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
                     SpellingMistake.class).generateRegExFor(tableName)).append(".");
         }
-        buffer.append(settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class).generateRegExFor(tableColumn.getColumnName()));
+        buffer.append(settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class).generateRegExFor(tableColumn.getColumnName()));
 
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
@@ -566,7 +566,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             buffer.append("\\{d").append(OPTIONAL_WHITE_SPACE).append("'").append(dateValue.getValue().toString())
                     .append("'").append(OPTIONAL_WHITE_SPACE).append("\\}")
                     .append('|')
-                    .append(settingsManager.getSettingBySettingOption(SettingsOption.DATESYNONYMS,
+                    .append(settingsManager.getSettingBySettingsOption(SettingsOption.DATESYNONYMS,
                                                                       DateAndTimeFormatSynonymGenerator.class).generateRegExFor(dateValue));
         buffer.append("\\{d").append(OPTIONAL_WHITE_SPACE).append("'").append(dateValue.getValue().toString())
                 .append("'").append(OPTIONAL_WHITE_SPACE).append("\\}")
@@ -580,7 +580,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             buffer.append("\\{ts").append(OPTIONAL_WHITE_SPACE).append("'").append(timestampValue.getValue().toString())
                 .append(OPTIONAL_WHITE_SPACE).append("\\}")
                     .append('|')
-                    .append(settingsManager.getSettingBySettingOption(SettingsOption.DATETIMESYNONYMS,
+                    .append(settingsManager.getSettingBySettingsOption(SettingsOption.DATETIMESYNONYMS,
                                                                       DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timestampValue));
         buffer.append("\\{ts").append(OPTIONAL_WHITE_SPACE).append("'").append(timestampValue.getValue().toString())
             .append(OPTIONAL_WHITE_SPACE).append("\\}")
@@ -594,7 +594,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             buffer.append("\\{t").append(OPTIONAL_WHITE_SPACE).append("'").append(timeValue.getValue().toString())
                 .append(OPTIONAL_WHITE_SPACE).append("\\}")
                     .append('|')
-                    .append(settingsManager.getSettingBySettingOption(SettingsOption.TIMESYNONYMS,
+                    .append(settingsManager.getSettingBySettingsOption(SettingsOption.TIMESYNONYMS,
                                                                       DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timeValue));
         buffer.append("\\{t").append(OPTIONAL_WHITE_SPACE).append("'").append(timeValue.getValue().toString())
             .append(OPTIONAL_WHITE_SPACE).append("\\}")

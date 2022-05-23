@@ -4,7 +4,7 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitor;
 import net.sf.jsqlparser.statement.select.GroupByElement;
 import net.sf.jsqlparser.util.deparser.GroupByDeParser;
-import sqltoregex.settings.RegExGenerator;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.ExpressionRotation;
@@ -29,7 +29,7 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
     }
 
     private void setKeywordSpellingMistake(SettingsManager settingsManager){
-        this.keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
+        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
     }
 
     private String useKeywordSpellingMistake(String str){
@@ -38,7 +38,7 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
     }
 
     private void setExpressionOrder(SettingsManager settingsManager){
-        this.expressionOrder = settingsManager.getSettingBySettingOption(SettingsOption.EXPRESSIONORDER, ExpressionRotation.class);
+        this.expressionOrder = settingsManager.getSettingBySettingsOption(SettingsOption.EXPRESSIONORDER, ExpressionRotation.class);
     }
 
     private String useExpressionOrder(List<Expression> expressionList, StringBuilder buffer){

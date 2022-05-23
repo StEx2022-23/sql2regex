@@ -3,7 +3,7 @@ package sqltoregex.deparser;
 import net.sf.jsqlparser.expression.ExpressionVisitor;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.util.deparser.OrderByDeParser;
-import sqltoregex.settings.RegExGenerator;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
@@ -38,7 +38,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     private void setKeywordSpellingMistake(SettingsManager settingsManager){
-        this.keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
+        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
     }
 
     private String useKeywordSpellingMistake(String str){
@@ -47,7 +47,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     private void setColumnNameSpellingMistake(SettingsManager settingsManager){
-        this.columnNameSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class);
+        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class);
     }
 
     private String useColumnNameSpellingMistake(String str){
@@ -56,7 +56,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     private void setColumnNameOrder(SettingsManager settingsManager){
-        this.columnNameOrder = settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
+        this.columnNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
     }
 
     private String useColumnNameOrder(List<String> strlist){

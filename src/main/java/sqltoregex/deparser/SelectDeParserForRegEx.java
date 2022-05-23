@@ -11,7 +11,7 @@ import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.values.ValuesStatement;
 import net.sf.jsqlparser.util.deparser.SelectDeParser;
 import net.sf.jsqlparser.util.deparser.ValuesStatementDeParser;
-import sqltoregex.settings.RegExGenerator;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
@@ -73,16 +73,16 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         super();
         this.settingsManager = settingsManager;
         this.expressionVisitor = new ExpressionDeParserForRegEx(this, buffer, settingsManager);
-        this.isKeywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING);
+        this.isKeywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING);
         if(this.isKeywordSpellingMistake){
-            keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
+            keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
         }
-        columnNameOrder = settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
-        tableNameOrder = settingsManager.getSettingBySettingOption(SettingsOption.TABLENAMEORDER, OrderRotation.class);
-        aggregateFunctionLang = settingsManager.getSettingBySettingOption(SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class);
-        this.isColumnNameMistake = settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING);
+        columnNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
+        tableNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMEORDER, OrderRotation.class);
+        aggregateFunctionLang = settingsManager.getSettingBySettingsOption(SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class);
+        this.isColumnNameMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING);
         if(this.isColumnNameMistake){
-            columnNameMistake = settingsManager.getSettingBySettingOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class);
+            columnNameMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class);
         }
     }
 

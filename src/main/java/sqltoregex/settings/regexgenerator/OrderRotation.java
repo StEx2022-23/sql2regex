@@ -39,6 +39,7 @@ public class OrderRotation implements RegExGenerator<List<String>> {
      */
     public String generateRegExFor(List<String> valueList) {
         Assert.notNull(valueList, "Value list must not be null!");
+        buffer.replace(0, buffer.length(),"");
         buffer.append(isCapturingGroup ? '(' : "(?:");
         Integer amountOfElements = valueList.size();
         orderRotationRek(amountOfElements, valueList);
@@ -102,31 +103,6 @@ public class OrderRotation implements RegExGenerator<List<String>> {
                 orderRotationRek(amount - 1, valueList);
             }
         }
-    }
-
-    /**
-     * combine every possible table name order to a non-capturing regex group, optional with alternative writing styles
-     * @param valueList List<String>
-     * @return Regex (non-capturing group)
-     */
-    public String generateRegExFor(List<String> valueList){
-        orderRotationOfValueList.replace(0, orderRotationOfValueList.length(), "");
-        Assert.notNull(valueList, "Value list must not be null!");
-        orderRotationOfValueList.append(isCapturingGroup ? '(' : "(?:");
-        Integer amountOfElements = valueList.size();
-        orderRotationRek(amountOfElements, valueList);
-        orderRotationOfValueList.replace(orderRotationOfValueList.length()-1, orderRotationOfValueList.length(), "");
-        orderRotationOfValueList.append(')');
-        return orderRotationOfValueList.toString();
-    }
-
-    public void setSpellingMistake(SpellingMistake spellingMistake){
-        Assert.notNull(spellingMistake, "Spelling Mistake must not be null");
-        this.spellingMistake = spellingMistake;
-    }
-
-    public SpellingMistake getSpellingMistake() {
-        return spellingMistake;
     }
 
     /**

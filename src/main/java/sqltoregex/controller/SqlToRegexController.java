@@ -99,7 +99,7 @@ public class SqlToRegexController {
                 SettingsOption.TABLENAMEORDER, OrderRotation.class);
         RegExGenerator<List<String>> columnNameOrder = settingsManager.getSettingBySettingsOption(
                 SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
-        RegExGenerator<List<Expression>> expressionOrder = settingsManager.getSettingBySettingOption(
+        RegExGenerator<List<Expression>> expressionOrder = settingsManager.getSettingBySettingsOption(
                 SettingsOption.EXPRESSIONORDER, ExpressionRotation.class);
         Set<SettingsOption> orders = new HashSet<>();
         orders.add(tableNameOrder.getSettingsOption());

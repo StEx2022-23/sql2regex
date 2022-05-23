@@ -6,7 +6,7 @@ import org.xml.sax.SAXException;
 import sqltoregex.deparser.ExpressionDeParserForRegEx;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
-import sqltoregex.settings.RegExGenerator;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
