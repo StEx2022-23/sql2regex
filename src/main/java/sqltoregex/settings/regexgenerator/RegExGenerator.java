@@ -1,4 +1,6 @@
-package sqltoregex.settings;
+package sqltoregex.settings.regexgenerator;
+
+import sqltoregex.settings.SettingsOption;
 
 public interface RegExGenerator<T> {
     String generateRegExFor(T input);

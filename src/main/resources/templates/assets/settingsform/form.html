@@ -3,69 +3,116 @@
         <label for="sqlinput" class="form-label"><strong>SQL-Input</strong></label>
         <textarea th:field="*{sql}" class="form-control inputHeight" id="sqlinput" rows="3" placeholder="Insert your SQL-Statement here!"></textarea>
     </div>
-    <div class="container">
-        <div class="row">
-            <div class="col-sm"
-                 th:each="setting : ${spellings}">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="spellingMistake1" th:value="${setting}" th:field="*{spellings}">
-                    <label class="form-check-label" for="dateFormats1" th:text="#{chk. + ${setting}}">SpellingMistakeSTATIC</label>
-                </div>
+    <div class="accordion" id="accordion">
+        <div class="accordion-item">
+            <div class="accordion-header" id="headingSpelling">
+                <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseSpellings" aria-controls="collapseSpellings" th:text="#{settingsform.spellings.heading}">
+
+                </button>
             </div>
-            <div class="row">
-                <div class="col-sm"
-                     th:each="setting : ${orders}">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="orders1" th:value="${setting}" th:field="*{orders}">
-                        <label class="form-check-label" for="orders1" th:text="#{chk. + ${setting}}">orderRotationSTATIC</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm"
-                     th:each="setting : ${dateFormats}">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="dateFormats1" th:value="${setting.toPattern()}" th:field="*{dateFormats}">
-                        <label class="form-check-label" for="dateFormats1" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm"
-                     th:each="setting : ${timeFormats}">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="timeFormats1" th:value="${setting.toPattern()}" th:field="*{timeFormats}">
-                        <label class="form-check-label" for="timeFormats1" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm"
-                     th:each="setting : ${dateTimeFormats}">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="dateTimeFormats1" th:value="${setting.toPattern()}" th:field="*{dateTimeFormats}">
-                        <label class="form-check-label" for="dateTimeFormats1" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm" th:each="setting : ${aggregateFunctionLang}">
+            <div id="collapseSpellings" class="collapse show" aria-labelledby="headingSpelling" data-parent="#accordion">
+                <div class="accordion-body">
                     <div class="row">
-                        <div th:text="${setting.getKey}"></div>
-                        <div class="col-sm" th:each="synonym : ${setting.getValue()}">
+                        <div class="col-sm"
+                             th:each="setting : ${spellings}">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="aggregateFuncLang1" th:value="${setting.getKey()} + ',' + ${synonym}" th:field="*{aggregateFunctionLang}">
-                                <label class="form-check-label" for="aggregateFuncLang1" th:text="${synonym}">Enable format: "yyyy-MM-dd"</label>
+                                <input class="form-check-input" type="checkbox" id="spellingMistake1" th:value="${setting}" th:field="*{spellings}">
+                                <label class="form-check-label" for="spellingMistake1" th:text="#{settingsform. + ${setting}}">SpellingMistakeSTATIC</label>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="d-grid gap-2">
-            <button th:text="#{conv.convert}" type="submit" id="onSubmitConvertForm" class="btn btn-primary btn-lg mb-2 mt-2 display-6"></button>
+        <div class="accordion-item">
+            <div class="accordion-header" id="headingOrders">
+                <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseOrders" aria-controls="collapseOrders" th:text="#{settingsform.orders.heading}">
+
+                </button>
+            </div>
+            <div id="collapseOrders" class="collapse show" aria-labelledby="headingOrders" data-parent="#accordion">
+                <div class="accordion-body">
+                    <div class="row">
+                        <div class="col-sm"
+                             th:each="setting : ${orders}">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="orders1" th:value="${setting}" th:field="*{orders}">
+                                <label class="form-check-label" for="orders1" th:text="#{settingsform. + ${setting}}">orderRotationSTATIC</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </form>
+        <div class="accordion-item">
+            <div class="accordion-header" id="headingDateAndTime">
+                <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseDateAndTime" aria-controls="collapseDateAndTime" th:text="#{settingsform.dateAndTime.heading}">
+
+                </button>
+            </div>
+            <div id="collapseDateAndTime" class="collapse show" aria-labelledby="headingDateAndTime" data-parent="#accordion">
+                <div class="accordion-body">
+                    <div class="row">
+                        <div class="col-sm"
+                             th:each="setting : ${dateFormats}">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" th:id="'dateFormats_' + ${setting.toPattern()}" + th:value="${setting.toPattern()}" th:name="dateFormats" th:checked="${settingsForm.getDateFormats().contains(setting)}">
+                                <label class="form-check-label" for="dateFormats1" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm"
+                             th:each="setting : ${timeFormats}">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="timeFormats1" th:value="${setting.toPattern()}" th:name="timeFormats" th:checked="${settingsForm.timeFormats.contains(setting)}">
+                                <label class="form-check-label" for="timeFormats1" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm"
+                             th:each="setting : ${dateTimeFormats}">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="dateTimeFormats1" th:value="${setting.toPattern()}" th:name="dateTimeFormats" th:checked="${settingsForm.dateTimeFormats.contains(setting)}">
+                                <label class="form-check-label" for="dateTimeFormats1" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <div class="accordion-header" id="headingAggregateFunctionLang">
+                <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseAggregateFunctionLang" aria-controls="collapseAggregateFunctionLang" th:text="#{settingsform.aggregateFunctionLang.heading}">
+
+                </button>
+            </div>
+            <div id="collapseAggregateFunctionLang" class="collapse show" aria-labelledby="headingAggregateFunctionLang" data-parent="#accordion">
+                <div class="accordion-body">
+                    <div class="row">
+                        <div class="col-sm" th:each="setting : ${aggregateFunctionLang}">
+                            <div class="row">
+                                <div th:text="#{settingsform.synonymsFor} + ':' + ${setting.getKey}"></div>
+                                <div class="row" th:each="synonym, iter : ${setting.getValue()}">
+                                    <div class="col-sm">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="aggregateFuncLang1" th:value="${setting.getKey()} + ';' + ${synonym}" th:name="aggregateFunctionLang" th:checked="${settingsForm.aggregateFunctionLang.contains(setting.getKey() + ';' + synonym)}">
+                                            <label class="form-check-label" for="aggregateFuncLang1" th:text="${synonym}">Enable format: "yyyy-MM-dd"</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-grid gap-2">
+        <button th:text="#{conv.convert}" type="submit" id="onSubmitConvertForm" class="btn btn-primary btn-lg mb-2 mt-2 display-6"></button>
+    </div>
+</form>
 <div class="mb-3">
     <label th:text="#{conv.headingregex}" for="regexoutput" class="form-label"></label>
     <textarea class="form-control inputHeight" readonly="readonly" id="regexoutput" rows="3" placeholder="Copy your generated RegEx here!"></textarea>

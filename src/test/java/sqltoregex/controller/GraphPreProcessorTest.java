@@ -13,6 +13,7 @@ import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 class GraphPreProcessorTest {
 
@@ -23,7 +24,7 @@ class GraphPreProcessorTest {
 
     @Test
     void getSynonymMap(){
-        Map<String, List<String>> map = GraphPreProcessor.getSynonymMap(settingsManager.getSynonymManagerBySettingOption(
+        Map<String, Set<String>> map = GraphPreProcessor.getSynonymMap(settingsManager.getSynonymManagerBySettingOption(
                 SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class).getGraph());
         Assertions.assertTrue(map.containsKey("AVG"));
         Assertions.assertTrue(map.containsKey("SUM"));

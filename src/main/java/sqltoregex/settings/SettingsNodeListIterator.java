@@ -6,7 +6,7 @@ import org.w3c.dom.NodeList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class SettingsNodeListIterator implements Iterable<Node>{
+public class SettingsNodeListIterator implements Iterable<Node> {
     private final NodeList nodeList;
 
     public SettingsNodeListIterator(final NodeList nodeList) {
@@ -21,14 +21,17 @@ public class SettingsNodeListIterator implements Iterable<Node>{
 
             @Override
             public boolean hasNext() {
-                boolean isReplaced = lastNode != null && currentIndex < nodeList.getLength() && lastNode != nodeList.item(currentIndex);
+                boolean isReplaced =
+                        lastNode != null && currentIndex < nodeList.getLength() && lastNode != nodeList.item(
+                        currentIndex);
                 return currentIndex + 1 < nodeList.getLength() || isReplaced;
             }
 
             @Override
             public Node next() {
                 if (hasNext()) {
-                    if (lastNode != null && currentIndex < nodeList.getLength() && lastNode != nodeList.item(currentIndex)) {
+                    if (lastNode != null && currentIndex < nodeList.getLength() && lastNode != nodeList.item(
+                            currentIndex)) {
                         lastNode = nodeList.item(currentIndex);
                     } else {
                         currentIndex++;
