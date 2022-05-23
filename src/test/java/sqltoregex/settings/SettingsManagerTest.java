@@ -12,6 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,10 +29,6 @@ class SettingsManagerTest {
 
     @BeforeEach
     void beforeEach() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
-        this.resetSets();
-    }
-
-    void resetSets() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         settingsManager = new SettingsManager();
         spellings = new HashSet<>();
         orders = new HashSet<>();
@@ -44,7 +41,7 @@ class SettingsManagerTest {
 
     @Test
     void testLoadDefaultProperties() {
-        Set<SettingsOption> settingsOptionSet = settingsManager.getSettingsMap().keySet();
+        Set<SettingsOption> settingsOptionSet = settingsManager.getDefaultSettingsMap().keySet();
         List<String> settingsOptionWhichHaveBeenSet = List.of(
                 "KEYWORDSPELLING",
                 "TABLENAMESPELLING",
@@ -66,6 +63,30 @@ class SettingsManagerTest {
     }
 
     @Test
+    void usesUserSettings(){
+        settingsManager.parseUserSettingsInput(new SettingsForm(new HashSet<>(List.of(SettingsOption.KEYWORDSPELLING)),
+                                                                Collections.emptySet(),
+                                                                Collections.emptySet(),
+                                                                Collections.emptySet(),
+                                                                Collections.emptySet(),
+                                                                Collections.emptySet(),
+                                                                ""));
+
+        for (SettingsOption settingsOption :SettingsOption.values()){
+            //catch default setted synonym manager
+            if (settingsOption.equals(SettingsOption.KEYWORDSPELLING)
+                    | settingsOption.equals(SettingsOption.DATESYNONYMS)
+                    | settingsOption.equals(SettingsOption.TIMESYNONYMS)
+                    | settingsOption.equals(SettingsOption.DATETIMESYNONYMS)
+            ){
+                Assertions.assertTrue(settingsManager.getSettingBySettingsOption(settingsOption), "Assertion failed for: " + settingsOption);
+            }else{
+                Assertions.assertFalse(settingsManager.getSettingBySettingsOption(settingsOption), "Assertion failed for: " + settingsOption);
+            }
+        }
+    }
+
+    @Test
     void testGetSettingByClazz(){
         Assertions.assertEquals(3, settingsManager.getSettingByClass(SpellingMistake.class).size());
         Assertions.assertEquals(2, settingsManager.getSettingByClass(OrderRotation.class).size());
@@ -78,11 +99,11 @@ class SettingsManagerTest {
             if(SettingsOption.DEFAULT.equals(settingsOption)){
                 continue;
             }
-            Assertions.assertTrue(settingsManager.getSettingsMap().containsKey(settingsOption), "Does not contain " + settingsOption);
+            Assertions.assertTrue(settingsManager.getDefaultSettingsMap().containsKey(settingsOption), "Does not contain " + settingsOption);
             if (settingsOption == SettingsOption.NOT_AS_EXCLAMATION_AND_WORD) {
-                Assertions.assertNull(settingsManager.getSettingsMap().get(settingsOption));
+                Assertions.assertNull(settingsManager.getDefaultSettingsMap().get(settingsOption));
             } else {
-                Assertions.assertNotNull(settingsManager.getSettingsMap().get(settingsOption));
+                Assertions.assertNotNull(settingsManager.getDefaultSettingsMap().get(settingsOption));
             }
         }
     }
