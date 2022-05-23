@@ -694,34 +694,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     @Override
     public void visit(WithItem withItem) {
-        if (withItem.isRecursive()) {
-            buffer.append("RECURSIVE ");
-        }
-        buffer.append(withItem.getName());
-        if (withItem.getWithItemList() != null) {
-            buffer.append(" ").append(PlainSelect.getStringList(withItem.getWithItemList(), true, true));
-        }
-        buffer.append(" AS ");
-
-        if (withItem.isUseValues()) {
-            ItemsList itemsList = withItem.getItemsList();
-            boolean useBracketsForValues = withItem.isUsingBracketsForValues();
-            buffer.append("(VALUES ");
-
-            ExpressionList expressionList = (ExpressionList) itemsList;
-            buffer.append(
-                    PlainSelect.getStringList(expressionList.getExpressions(), true, useBracketsForValues));
-            buffer.append(")");
-        } else {
-            SubSelect subSelect = withItem.getSubSelect();
-            if (!subSelect.isUseBrackets()) {
-                buffer.append("(");
-            }
-            subSelect.accept((FromItemVisitor) this);
-            if (!subSelect.isUseBrackets()) {
-                buffer.append(")");
-            }
-        }
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -760,13 +733,11 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         new ValuesStatementDeParser(this, buffer).deParse(values);
     }
 
-
     private void deparseOptimizeForForRegEx(OptimizeFor optimizeFor) {
         buffer.append(" OPTIMIZE FOR ");
         buffer.append(optimizeFor.getRowCount());
         buffer.append(" ROWS");
     }
-
 
     @Override
     public void visit(ExpressionList expressionList) {
