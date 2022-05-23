@@ -102,5 +102,15 @@ class OrderByDeParserForRegExTest {
         validateListAgainstRegEx("SELECT col1 FROM table1 ORDER SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST", toCheckedInput, true);
     }
 
+    @Test
+    void testComplexerOrderByWithSynonyms() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 FROM table1 ORDER BY col1 absteigend, col2 ASC",
+                "SELECT col1 FROM table1 ORDER BY col2 ASC, col1 absteigend",
+                "SELECT col1 FROM table1 ORDER BY col1  DESC , col2  aufsteigend"
+        );
+        validateListAgainstRegEx("SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC", toCheckedInput, true);
+    }
+
 
 }

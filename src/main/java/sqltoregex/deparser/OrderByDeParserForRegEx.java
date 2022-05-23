@@ -8,6 +8,7 @@ import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
+import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -28,6 +29,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     private RegExGenerator<String> keywordSpellingMistake;
     private RegExGenerator<String> columnNameSpellingMistake;
     private RegExGenerator<List<String>> columnNameOrder;
+    private RegExGenerator<String> specialSynonyms;
 
     public OrderByDeParserForRegEx(ExpressionVisitor expressionVisitor, StringBuilder buffer, SettingsManager settingsManager) {
         super(expressionVisitor, buffer);
@@ -35,6 +37,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         this.setColumnNameSpellingMistake(settingsManager);
         this.setKeywordSpellingMistake(settingsManager);
         this.setColumnNameOrder(settingsManager);
+        this.setSpecialSynonymGenerator(settingsManager);
     }
 
     private void setKeywordSpellingMistake(SettingsManager settingsManager){
@@ -52,6 +55,15 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
 
     private String useColumnNameSpellingMistake(String str){
         if(null != this.columnNameSpellingMistake) return this.columnNameSpellingMistake.generateRegExFor(str);
+        else return str;
+    }
+
+    private void setSpecialSynonymGenerator(SettingsManager settingsManager){
+        this.specialSynonyms = settingsManager.getSettingBySettingsOption(SettingsOption.OTHERSYNONYMS, StringSynonymGenerator.class);
+    }
+
+    private String useSpecialSynonymGenerator(String str){
+        if(null != this.specialSynonyms) return this.specialSynonyms.generateRegExFor(str);
         else return str;
     }
 
@@ -104,10 +116,10 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         if (orderByElement.isAscDescPresent()) {
             if (orderByElement.isAsc()) {
                 temp.append(REQUIRED_WHITE_SPACE);
-                temp.append(useKeywordSpellingMistake(ASC));
+                temp.append("(?:").append(useKeywordSpellingMistake(ASC)).append("|").append(useSpecialSynonymGenerator(ASC)).append(")");
             } else {
                 temp.append(REQUIRED_WHITE_SPACE);
-                temp.append(useKeywordSpellingMistake(DESC));
+                temp.append("(?:").append(useKeywordSpellingMistake(DESC)).append("|").append(useSpecialSynonymGenerator(DESC)).append(")");
             }
         }
 
