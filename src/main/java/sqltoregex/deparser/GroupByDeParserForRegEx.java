@@ -15,30 +15,51 @@ import java.util.*;
 public class GroupByDeParserForRegEx extends GroupByDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
-    private final boolean isKeywordSpellingMistake;
+    public static final String GROUP = "GROUP";
+    public static final String BY = "BY";
     private RegExGenerator<String> keywordSpellingMistake;
-    private final RegExGenerator<List<Expression>> expressionRotation;
+    private RegExGenerator<List<Expression>> expressionOrder;
     private final ExpressionVisitor expressionVisitor;
-    private final StringBuilder stringBuilder;
 
     public GroupByDeParserForRegEx(ExpressionVisitor expressionVisitor, StringBuilder buffer, SettingsManager settingsManager) {
         super(expressionVisitor, buffer);
         this.expressionVisitor = expressionVisitor;
-        this.stringBuilder = buffer;
-        this.isKeywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING);
-        if(this.isKeywordSpellingMistake){
-            keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
-        }
-        expressionRotation = settingsManager.getSettingBySettingOption(SettingsOption.EXPRESSIONORDER, ExpressionRotation.class);
-
+        this.setKeywordSpellingMistake(settingsManager);
+        this.setExpressionOrder(settingsManager);
     }
+
+    public void setKeywordSpellingMistake(SettingsManager settingsManager){
+        this.keywordSpellingMistake = settingsManager.getSettingBySettingOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
+    }
+
+    public String useKeywordSpellingMistake(String str){
+        if(null != this.keywordSpellingMistake) return this.keywordSpellingMistake.generateRegExFor(str);
+        else return str;
+    }
+
+    public void setExpressionOrder(SettingsManager settingsManager){
+        this.expressionOrder = settingsManager.getSettingBySettingOption(SettingsOption.EXPRESSIONORDER, ExpressionRotation.class);
+    }
+
+    public String useExpressionOrder(List<Expression> strlist, StringBuilder buffer){
+        if(null != this.expressionOrder) return this.expressionOrder.generateRegExFor(strlist);
+        else {
+            Iterator<Expression> expressionIterator = strlist.iterator();
+            while (expressionIterator.hasNext()){
+                expressionIterator.next().accept(expressionVisitor);
+                if(expressionIterator.hasNext()) buffer.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
+            }
+            return "";
+        }
+    }
+
 
     @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     public void deParse(GroupByElement groupBy) {
-        buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("GROUP") : "GROUP");
+        buffer.append(useKeywordSpellingMistake(GROUP));
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor("BY") : "BY");
+        buffer.append(useKeywordSpellingMistake(BY));
         buffer.append(REQUIRED_WHITE_SPACE);
 
         if (groupBy.isUsingBrackets()) {
@@ -47,8 +68,8 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
         }
 
         List<Expression> expressions = groupBy.getGroupByExpressionList().getExpressions();
-        expressionRotation.setCapturingGroup(true);
-        buffer.append(expressionRotation.generateRegExFor(expressions));
+        expressionOrder.setCapturingGroup(true);
+        buffer.append(useExpressionOrder(expressions, buffer));
 
         if (groupBy.isUsingBrackets()) {
             buffer.append(OPTIONAL_WHITE_SPACE);
