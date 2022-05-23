@@ -14,7 +14,6 @@ import java.util.List;
 
 public class OrderByDeParserForRegEx extends OrderByDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
-    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
     public static final String ORDER = "ORDER";
     public static final String SIBLINGS = "SIBLINGS";
@@ -70,10 +69,8 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         buffer.append(orderRotation.generateRegExFor(orderByElementsAsStrings));
     }
 
-    public String deParseElementForOrderRotation(OrderByElement orderByElement){
+    private String handleAscDesc(OrderByElement orderByElement){
         StringBuilder temp = new StringBuilder();
-        temp.append(isColumnNameSpellingMistake ? columnNameSpellingMistake.generateRegExFor(orderByElement.getExpression().toString()) : orderByElement.getExpression().toString());
-
         if (!orderByElement.isAsc()) {
             temp.append(REQUIRED_WHITE_SPACE);
             temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(DESC) : DESC);
@@ -81,7 +78,11 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
             temp.append(REQUIRED_WHITE_SPACE);
             temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(ASC) : ASC);
         }
+        return temp.toString();
+    }
 
+    private String handleNullFirstLast(OrderByElement orderByElement){
+        StringBuilder temp = new StringBuilder();
         if (orderByElement.getNullOrdering() != null) {
             temp.append(REQUIRED_WHITE_SPACE);
             if(orderByElement.getNullOrdering() == OrderByElement.NullOrdering.NULLS_FIRST){
@@ -90,11 +91,20 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
                 temp.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(NULLS_LAST) : NULLS_LAST);
             }
         }
+        return temp.toString();
+    }
 
+    public String deParseElementForOrderRotation(OrderByElement orderByElement){
+        StringBuilder temp = new StringBuilder();
+        temp.append(isColumnNameSpellingMistake ? columnNameSpellingMistake.generateRegExFor(orderByElement.getExpression().toString()) : orderByElement.getExpression().toString());
+        temp.append(this.handleAscDesc(orderByElement));
+        temp.append(this.handleNullFirstLast(orderByElement));
         temp.append(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE);
         return temp.toString();
     }
 
     @Override
-    public void deParseElement(OrderByElement orderBy) {}
+    public void deParseElement(OrderByElement orderBy) {
+        throw new UnsupportedOperationException();
+    }
 }
