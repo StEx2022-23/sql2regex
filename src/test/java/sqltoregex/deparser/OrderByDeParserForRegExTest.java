@@ -23,9 +23,9 @@ class OrderByDeParserForRegExTest {
     OrderByDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
     }
 
-    boolean checkAgainstRegEx(String regex, String toChecked) {
+    boolean checkAgainstRegEx(String regex, String toBeChecked) {
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(toChecked);
+        Matcher matcher = pattern.matcher(toBeChecked);
         return matcher.matches();
     }
 

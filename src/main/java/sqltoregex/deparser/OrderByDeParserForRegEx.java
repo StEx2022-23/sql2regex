@@ -100,13 +100,15 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
 
     private String handleAscDesc(OrderByElement orderByElement){
         StringBuilder temp = new StringBuilder();
-        if (!orderByElement.isAsc()) {
-            temp.append(REQUIRED_WHITE_SPACE);
-            temp.append(useKeywordSpellingMistake(DESC));
-        } else if (orderByElement.isAscDescPresent()) {
+
+        if (orderByElement.isAscDescPresent()) {
             temp.append(REQUIRED_WHITE_SPACE);
             temp.append(useKeywordSpellingMistake(ASC));
+        } else if(!orderByElement.isAsc()) {
+            temp.append(REQUIRED_WHITE_SPACE);
+            temp.append(useKeywordSpellingMistake(DESC));
         }
+
         return temp.toString();
     }
 

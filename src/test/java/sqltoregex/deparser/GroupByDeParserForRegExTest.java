@@ -3,7 +3,6 @@ package sqltoregex.deparser;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,9 +23,9 @@ class GroupByDeParserForRegExTest {
     GroupByDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
     }
 
-    boolean checkAgainstRegEx(String regex, String toChecked) {
+    boolean checkAgainstRegEx(String regex, String toBeChecked) {
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(toChecked);
+        Matcher matcher = pattern.matcher(toBeChecked);
         return matcher.matches();
     }
 
