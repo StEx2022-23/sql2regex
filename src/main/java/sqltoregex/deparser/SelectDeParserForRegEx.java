@@ -295,9 +295,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
 
         if (plainSelect.getOrderByElements() != null) {
-            new OrderByDeParserForRegEx(this.getExpressionVisitor(), buffer).deParse(plainSelect.isOracleSiblings(),
+            new OrderByDeParserForRegEx(this.getExpressionVisitor(), buffer, this.settingsManager).deParse(plainSelect.isOracleSiblings(),
                     plainSelect.getOrderByElements());
         }
+
         if (plainSelect.isEmitChanges()){
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append(isKeywordSpellingMistake ? keywordSpellingMistake.generateRegExFor(EMIT) : EMIT);
@@ -620,7 +621,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             }
         }
         if (list.getOrderByElements() != null) {
-            new OrderByDeParserForRegEx(expressionVisitor, buffer).deParse(list.getOrderByElements());
+            new OrderByDeParserForRegEx(expressionVisitor, buffer, this.settingsManager).deParse(list.getOrderByElements());
         }
 
         if (list.getLimit() != null) {

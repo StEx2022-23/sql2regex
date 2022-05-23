@@ -59,7 +59,7 @@ class ExpressionDeParserForRegExTest {
         SettingsManager settingsManager = new SettingsManager();
         SelectDeParserForRegEx selectDeParserForRegEx = new SelectDeParserForRegEx(settingsManager);
         ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settingsManager);
-        OrderByDeParserForRegEx orderByDeParserForRegEx = new OrderByDeParserForRegEx(expressionDeParserForRegEx, buffer);
+        OrderByDeParserForRegEx orderByDeParserForRegEx = new OrderByDeParserForRegEx(expressionDeParserForRegEx, buffer, settingsManager);
         ExpressionDeParserForRegEx expressionDeParserForRegExTwo = new ExpressionDeParserForRegEx(selectDeParserForRegEx, buffer, orderByDeParserForRegEx, settingsManager);
         Assertions.assertNotNull(expressionDeParserForRegExTwo);
     }

@@ -49,7 +49,7 @@ class OrderByDeParserForRegExTest {
         StringBuilder buffer = new StringBuilder();
         ExpressionDeParserForRegEx expressionDeParserForRegExOne = new ExpressionDeParserForRegEx(settingsManager);
         ExpressionDeParserForRegEx expressionDeParserForRegExTwo = new ExpressionDeParserForRegEx(settingsManager);
-        OrderByDeParserForRegEx orderByDeParserForRegEx = new OrderByDeParserForRegEx(expressionDeParserForRegExOne, buffer);
+        OrderByDeParserForRegEx orderByDeParserForRegEx = new OrderByDeParserForRegEx(expressionDeParserForRegExOne, buffer, settingsManager);
         orderByDeParserForRegEx.setExpressionVisitor(expressionDeParserForRegExTwo);
         Assertions.assertEquals(expressionDeParserForRegExTwo, orderByDeParserForRegEx.getExpressionVisitor());
     }
@@ -68,6 +68,38 @@ class OrderByDeParserForRegExTest {
                 "SELECT col1, col2 FROM table1 ORDER BY col1 DESC"
         );
         validateListAgainstRegEx("SELECT col1, col2 FROM table1 ORDER BY col1 DESC", toCheckedInput, true);
+    }
+
+    @Test
+    void testComplexerOrderBy() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC",
+                "SELECT col1 FROM table1 ORDER BY col2 ASC, col1 DESC",
+                "SELECT col1 FROM table1 ORDER BY col1  DESC , col2  ASC"
+        );
+        validateListAgainstRegEx("SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC", toCheckedInput, true);
+    }
+
+    @Test
+    void testComplexerOrderByWithNullFirstLast() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 FROM table1 ORDER BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
+                "SELECT col1 FROM table1 ORDER BY col2 ASC NULLS FIRST, col1 DESC NULLS LAST",
+                "SELECT col1 FROM table1 ORDER BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
+                "SELECT col1 FROM table1 ORDER BY col1 DESC NULS LAST, col2 AC NULS FIRST"
+        );
+        validateListAgainstRegEx("SELECT col1 FROM table1 ORDER BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST", toCheckedInput, true);
+    }
+
+    @Test
+    void testComplexerOrderByWithIsSibling() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 FROM table1 ORDER SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
+                "SELECT col1 FROM table1 ORDER SIBLINGS  BY col2 ASC NULLS FIRST, col1 DESC NULLS LAST",
+                "SELECT col1 FROM table1 ORDER  SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
+                "SELECT col1 FROM table1 ORDER SIBLNGS BY col1 DESC NULS LAST, col2 AC NULS FIRST"
+        );
+        validateListAgainstRegEx("SELECT col1 FROM table1 ORDER SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST", toCheckedInput, true);
     }
 
 

@@ -15,12 +15,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * The OrderRotation class allows creating a RegEx expression that takes into all possible order possibilities.
- * Example:
- * SELECT table1, table2
- * SELECT (?:table1\s*,\s*table2|table2\s*,\s*table1)
- */
 public class ExpressionRotation implements RegExGenerator<List<Expression>> {
     private final Map<Integer, List<Expression>> groupByOrderOptionsMap = new HashMap<>();
     private Integer groupByOrderOptionsCounter = 0;
