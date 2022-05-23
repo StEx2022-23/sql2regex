@@ -188,4 +188,26 @@ class SelectDeParserForRegExTest {
         validateListAgainstRegEx("SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) AS avgcol1 FROM table2)", toCheckedInput, true);
     }
 
+    @Test
+    void testTableNameAlias() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT * FROM table1 t1",
+                "SELECT * FROM table1 AS t1",
+                "SELECT * FROM table1 ALIAS t1",
+                "SELECT * FROM table1 AS t"
+        );
+        validateListAgainstRegEx("SELECT * FROM table1 t1", toCheckedInput, true);
+    }
+
+    @Test
+    void testTableNameAliasOptionalAddedByStudent() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT * FROM table1 t1",
+                "SELECT * FROM table1 AS t1",
+                "SELECT * FROM table1 ALIAS t1",
+                "SELECT * FROM table1 AS t"
+        );
+        validateListAgainstRegEx("SELECT * FROM table1", toCheckedInput, true);
+    }
+
 }

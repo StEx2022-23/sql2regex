@@ -62,6 +62,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     private ExpressionVisitor expressionVisitor;
     private RegExGenerator<String> keywordSpellingMistake;
     private RegExGenerator<String> columnNameSpellingMistake;
+    private RegExGenerator<String> tableNameSpellingMistake;
     private RegExGenerator<List<String>> columnNameOrder;
     private RegExGenerator<List<String>> tableNameOrder;
     private RegExGenerator<String> aggregateFunctionLang;
@@ -76,6 +77,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         this.setAggregateFunctionLang(settingsManager);
         this.setColumnNameOrder(settingsManager);
         this.setTableNameOrder(settingsManager);
+        this.setTableNameSpellingMistake(settingsManager);
     }
 
     private void setKeywordSpellingMistake(SettingsManager settingsManager){
@@ -93,6 +95,15 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     private String useColumnNameSpellingMistake(String str){
         if(null != this.columnNameSpellingMistake) return this.columnNameSpellingMistake.generateRegExFor(str);
+        else return str;
+    }
+
+    private void setTableNameSpellingMistake(SettingsManager settingsManager){
+        this.tableNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING, SpellingMistake.class);
+    }
+
+    private String useTableNameSpellingMistake(String str) {
+        if (null != this.tableNameSpellingMistake) return this.tableNameSpellingMistake.generateRegExFor(str);
         else return str;
     }
 
@@ -142,7 +153,6 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         buffer.append(useKeywordSpellingMistake(SELECT));
         buffer.append(REQUIRED_WHITE_SPACE);
-
 
         if (plainSelect.getMySqlHintStraightJoin()) {
             buffer.append(useKeywordSpellingMistake(STRAIGHT_JOIN));
@@ -439,10 +449,27 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     @Override
     public void visit(Table tableName) {
-        buffer.append(tableName.getFullyQualifiedName());
+        buffer.append(useTableNameSpellingMistake(tableName.getFullyQualifiedName()));
         Alias alias = tableName.getAlias();
         if (alias != null) {
-            buffer.append(alias);
+            buffer.append(OPTIONAL_WHITE_SPACE);
+            buffer.append("(?:");
+            buffer.append(useKeywordSpellingMistake(ALIAS));
+            buffer.append("|");
+            buffer.append(useKeywordSpellingMistake(AS));
+            buffer.append(")?");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(useTableNameSpellingMistake(alias.toString().replace(" ", "")));
+        } else {
+            buffer.append("(");
+            buffer.append(OPTIONAL_WHITE_SPACE);
+            buffer.append("(?:");
+            buffer.append(useKeywordSpellingMistake(ALIAS));
+            buffer.append("|");
+            buffer.append(useKeywordSpellingMistake(AS));
+            buffer.append(")?");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(".*)?");
         }
         Pivot pivot = tableName.getPivot();
         if (pivot != null) {
