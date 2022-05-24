@@ -25,7 +25,7 @@ class GraphPreProcessorTest {
     @Test
     void getSynonymMap(){
         Map<String, Set<String>> map = GraphPreProcessor.getSynonymMap(settingsManager.getSynonymManagerBySettingOption(
-                SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class).getGraph());
+                SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class, true).getGraph());
         Assertions.assertTrue(map.containsKey("AVG"));
         Assertions.assertTrue(map.containsKey("SUM"));
         Assertions.assertEquals(2, map.size());

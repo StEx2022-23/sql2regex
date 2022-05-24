@@ -1,5 +1,6 @@
 package sqltoregex.settings;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerato
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.HashSet;
@@ -88,9 +90,9 @@ class SettingsManagerTest {
 
     @Test
     void testGetSettingByClazz(){
-        Assertions.assertEquals(3, settingsManager.getSettingByClass(SpellingMistake.class).size());
-        Assertions.assertEquals(2, settingsManager.getSettingByClass(OrderRotation.class).size());
-        Assertions.assertEquals(2, settingsManager.getSettingByClass(StringSynonymGenerator.class).size());
+        Assertions.assertEquals(3, settingsManager.getSettingByClass(SpellingMistake.class, true).size());
+        Assertions.assertEquals(2, settingsManager.getSettingByClass(OrderRotation.class, true).size());
+        Assertions.assertEquals(1, settingsManager.getSettingByClass(StringSynonymGenerator.class, true).size());
     }
 
     @Test
