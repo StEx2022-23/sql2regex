@@ -40,6 +40,19 @@ public class SettingsManager {
         return null;
     }
 
+    public Map<SettingsOption, RegExGenerator<?>> parseUserSettingsInput(SettingsForm form) {
+        SettingsMapBuilder settingsMapBuilder = new SettingsMapBuilder();
+
+        return settingsMapBuilder
+                .withSettingsOptionSet(form.getSpellings())
+                .withSettingsOptionSet(form.getOrders())
+                .withSimpleDateFormatSet(form.getDateFormats(), SettingsOption.DATESYNONYMS)
+                .withSimpleDateFormatSet(form.getTimeFormats(), SettingsOption.TIMESYNONYMS)
+                .withSimpleDateFormatSet(form.getDateTimeFormats(), SettingsOption.DATETIMESYNONYMS)
+                .withStringSet(form.getAggregateFunctionLang(), SettingsOption.AGGREGATEFUNCTIONLANG)
+                .build();
+    }
+
     /**
      * Method for getting all OrderRotations, all Spellings, all Dateformats, allTime Formats.
      */
@@ -106,19 +119,6 @@ public class SettingsManager {
             }
         }
         this.settingsMap.putAll(mapBuilder.build());
-    }
-
-    public Map<SettingsOption, RegExGenerator<?>> parseUserSettingsInput(SettingsForm form) {
-        SettingsMapBuilder settingsMapBuilder = new SettingsMapBuilder();
-
-        return settingsMapBuilder
-                .withSettingsOptionSet(form.getSpellings())
-                .withSettingsOptionSet(form.getOrders())
-                .withSimpleDateFormatSet(form.getDateFormats(), SettingsOption.DATESYNONYMS)
-                .withSimpleDateFormatSet(form.getTimeFormats(), SettingsOption.TIMESYNONYMS)
-                .withSimpleDateFormatSet(form.getDateTimeFormats(), SettingsOption.DATETIMESYNONYMS)
-                .withStringSet(form.getAggregateFunctionLang(), SettingsOption.AGGREGATEFUNCTIONLANG)
-                .build();
     }
 
     /**

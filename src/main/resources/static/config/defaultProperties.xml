@@ -17,6 +17,9 @@
         <columnnameorder>
             <value>true</value>
         </columnnameorder>
+        <expressionorder>
+            <value>true</value>
+        </expressionorder>
     </order>
     <synonyms>
         <datesynonyms>
@@ -42,6 +45,10 @@
         <NOT_AS_EXCLAMATION_AND_WORD>
             <value>true</value>
         </NOT_AS_EXCLAMATION_AND_WORD>
+        <othersynonyms>
+            <pair>ASC;aufsteigend</pair>
+            <pair>DESC;absteigend</pair>
+        </othersynonyms>
     </specificsettings>
 </properties>
 

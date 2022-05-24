@@ -56,6 +56,8 @@ class SettingsManagerTest {
                 "TIMESYNONYMS",
                 "DATETIMESYNONYMS",
                 "AGGREGATEFUNCTIONLANG",
+                "EXPRESSIONORDER",
+                "OTHERSYNONYMS",
                 "NOT_AS_EXCLAMATION_AND_WORD"
         );
         for (String str : settingsOptionWhichHaveBeenSet) {
@@ -67,7 +69,7 @@ class SettingsManagerTest {
     void testGetSettingByClazz(){
         Assertions.assertEquals(3, settingsManager.getSettingByClass(SpellingMistake.class).size());
         Assertions.assertEquals(2, settingsManager.getSettingByClass(OrderRotation.class).size());
-        Assertions.assertEquals(1, settingsManager.getSettingByClass(StringSynonymGenerator.class).size());
+        Assertions.assertEquals(2, settingsManager.getSettingByClass(StringSynonymGenerator.class).size());
     }
 
     @Test

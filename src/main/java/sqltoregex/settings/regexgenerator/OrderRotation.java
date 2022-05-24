@@ -17,6 +17,7 @@ public class OrderRotation implements RegExGenerator<List<String>> {
     private final StringBuilder buffer = new StringBuilder();
     private final SettingsOption settingsOption;
     protected boolean isCapturingGroup = false;
+    private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
     private SpellingMistake spellingMistake;
 
     public OrderRotation(SettingsOption settingsOption, SpellingMistake spellingMistake) {
@@ -38,6 +39,7 @@ public class OrderRotation implements RegExGenerator<List<String>> {
      */
     public String generateRegExFor(List<String> valueList) {
         Assert.notNull(valueList, "Value list must not be null!");
+        buffer.replace(0, buffer.length(),"");
         buffer.append(isCapturingGroup ? '(' : "(?:");
         Integer amountOfElements = valueList.size();
         orderRotationRek(amountOfElements, valueList);
@@ -71,9 +73,11 @@ public class OrderRotation implements RegExGenerator<List<String>> {
         if (amount == 1) {
             Iterator<String> iterator = valueList.iterator();
             while (iterator.hasNext()) {
-                if (spellingMistake != null) {
-                    singleValue.append(spellingMistake.generateRegExFor(iterator.next()));
-                } else {
+                if(spellingMistake != null) {
+                    String temp = iterator.next();
+                    if(temp.contains(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE)) singleValue.append(temp.replace(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE, ""));
+                    else singleValue.append(spellingMistake.generateRegExFor(temp));
+                } else{
                     singleValue.append(iterator.next());
                 }
                 if (iterator.hasNext()) {

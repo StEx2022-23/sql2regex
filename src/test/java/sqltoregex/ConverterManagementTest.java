@@ -3,12 +3,17 @@ package sqltoregex;
 import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.IOException;
 
 class ConverterManagementTest {
     ConverterManagement converterManagement = new ConverterManagement();
 
     @Test
-    void testStatementDeparsingWithoutValidation() throws JSQLParserException {
+    void testStatementDeparsingWithoutValidation() throws JSQLParserException, XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         Assertions.assertEquals(
                 "^SELECT col1, col2 FROM table$",
                 converterManagement.deparse("SELECT col1, col2 FROM table", false, false)
@@ -20,7 +25,7 @@ class ConverterManagementTest {
     }
 
     @Test
-    void testStatementDeparsingWithValidation() throws JSQLParserException {
+    void testStatementDeparsingWithValidation() throws JSQLParserException, XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         Assertions.assertEquals(
                 "^SELECT col1, col2 FROM table$",
                 converterManagement.deparse("SELECT col1, col2 FROM table", false, true)
@@ -31,7 +36,7 @@ class ConverterManagementTest {
     }
 
     @Test
-    void testExpressionDeparsing() throws JSQLParserException {
+    void testExpressionDeparsing() throws JSQLParserException, XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         Assertions.assertEquals(
                 "^col1 + col2$",
                 converterManagement.deparse("col1+col2", true, false)

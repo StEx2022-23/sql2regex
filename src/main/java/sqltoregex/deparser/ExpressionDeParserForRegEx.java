@@ -13,6 +13,7 @@ import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 
 import java.util.Iterator;
@@ -29,7 +30,6 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     private final SettingsManager settingsManager;
     private OrderByDeParserForRegEx orderByDeParser;
-    private SelectVisitor selectVisitor = getSelectVisitor();
 
     public ExpressionDeParserForRegEx(SettingsManager settingsManager) {
         super();
@@ -311,7 +311,6 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             buffer.append("NOT").append(REQUIRED_WHITE_SPACE);
         }
         buffer.append("EXISTS");
-
         buffer.append(OPTIONAL_WHITE_SPACE);
         existsExpression.getRightExpression().accept(this);
         buffer.append(OPTIONAL_WHITE_SPACE);
@@ -430,20 +429,20 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         if (subSelect.isUseBrackets()) {
             buffer.append("\\(");
         }
-        if (selectVisitor != null) {
+        if (this.getSelectVisitor() != null) {
             if (subSelect.getWithItemsList() != null) {
                 buffer.append("WITH" + REQUIRED_WHITE_SPACE);
                 for (Iterator<WithItem> iter = subSelect.getWithItemsList().iterator(); iter.hasNext();) {
-                    iter.next().accept(selectVisitor);
+                    iter.next().accept(this.getSelectVisitor());
                     if (iter.hasNext()) {
-                        buffer.append("," + REQUIRED_WHITE_SPACE);
+                        buffer.append("," + OPTIONAL_WHITE_SPACE);
                     }
                     buffer.append(REQUIRED_WHITE_SPACE);
                 }
                 buffer.append(REQUIRED_WHITE_SPACE);
             }
+            subSelect.getSelectBody().accept(this.getSelectVisitor());
 
-            subSelect.getSelectBody().accept(selectVisitor);
         }
         if (subSelect.isUseBrackets()) {
             buffer.append("\\)");
@@ -454,21 +453,19 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     public void visit(Column tableColumn) {
         buffer.append(OPTIONAL_WHITE_SPACE);
         final Table table = tableColumn.getTable();
-        String tableName = null;
-        if (table != null) {
-            tableName = ("(?:");
+        String tableName = "";
+        if(table != null && table.getFullyQualifiedName() != null) {
             tableName += table.getFullyQualifiedName();
             if (table.getAlias() != null) {
-                tableName += "|";
                 tableName += table.getAlias().getName();
             }
-            tableName += ')';
         }
-        if (tableName != null) {
-            buffer.append(tableName).append(".");
+        if(!tableName.isEmpty()) {
+            buffer.append(settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
+                    SpellingMistake.class).generateRegExFor(tableName)).append(".");
         }
+        buffer.append(settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class).generateRegExFor(tableColumn.getColumnName()));
 
-        buffer.append(tableColumn.getColumnName());
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
@@ -566,6 +563,11 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(DateValue dateValue) {
+            buffer.append("\\{d").append(OPTIONAL_WHITE_SPACE).append("'").append(dateValue.getValue().toString())
+                    .append("'").append(OPTIONAL_WHITE_SPACE).append("\\}")
+                    .append('|')
+                    .append(settingsManager.getSettingBySettingsOption(SettingsOption.DATESYNONYMS,
+                                                                      DateAndTimeFormatSynonymGenerator.class).generateRegExFor(dateValue));
         buffer.append("\\{d").append(OPTIONAL_WHITE_SPACE).append("'").append(dateValue.getValue().toString())
                 .append("'").append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')
@@ -575,6 +577,11 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(TimestampValue timestampValue) {
+            buffer.append("\\{ts").append(OPTIONAL_WHITE_SPACE).append("'").append(timestampValue.getValue().toString())
+                .append(OPTIONAL_WHITE_SPACE).append("\\}")
+                    .append('|')
+                    .append(settingsManager.getSettingBySettingsOption(SettingsOption.DATETIMESYNONYMS,
+                                                                      DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timestampValue));
         buffer.append("\\{ts").append(OPTIONAL_WHITE_SPACE).append("'").append(timestampValue.getValue().toString())
             .append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')
@@ -584,6 +591,11 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(TimeValue timeValue) {
+            buffer.append("\\{t").append(OPTIONAL_WHITE_SPACE).append("'").append(timeValue.getValue().toString())
+                .append(OPTIONAL_WHITE_SPACE).append("\\}")
+                    .append('|')
+                    .append(settingsManager.getSettingBySettingsOption(SettingsOption.TIMESYNONYMS,
+                                                                      DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timeValue));
         buffer.append("\\{t").append(OPTIONAL_WHITE_SPACE).append("'").append(timeValue.getValue().toString())
             .append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')

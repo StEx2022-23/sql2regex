@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import sqltoregex.settings.SettingsForm;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.ExpressionRotation;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
@@ -98,9 +99,12 @@ public class SqlToRegexController {
                 SettingsOption.TABLENAMEORDER, OrderRotation.class);
         RegExGenerator<List<String>> columnNameOrder = settingsManager.getSettingBySettingsOption(
                 SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
+        RegExGenerator<List<Expression>> expressionOrder = settingsManager.getSettingBySettingsOption(
+                SettingsOption.EXPRESSIONORDER, ExpressionRotation.class);
         Set<SettingsOption> orders = new HashSet<>();
         orders.add(tableNameOrder.getSettingsOption());
         orders.add(columnNameOrder.getSettingsOption());
+        orders.add(expressionOrder.getSettingsOption());
         model.addAttribute("orders", orders);
 
 

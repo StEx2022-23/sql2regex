@@ -53,6 +53,17 @@ class ExpressionDeParserForRegExTest {
         Assertions.assertTrue(regEx.contains(")"));
     }
 
+    @Test
+    void testFullConstructor() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        StringBuilder buffer = new StringBuilder();
+        SettingsManager settingsManager = new SettingsManager();
+        SelectDeParserForRegEx selectDeParserForRegEx = new SelectDeParserForRegEx(settingsManager);
+        ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settingsManager);
+        OrderByDeParserForRegEx orderByDeParserForRegEx = new OrderByDeParserForRegEx(expressionDeParserForRegEx, buffer, settingsManager);
+        ExpressionDeParserForRegEx expressionDeParserForRegExTwo = new ExpressionDeParserForRegEx(selectDeParserForRegEx, buffer, orderByDeParserForRegEx, settingsManager);
+        Assertions.assertNotNull(expressionDeParserForRegExTwo);
+    }
+
     /**
      * Assertions.assertEquals("1\\s+AND\\s+2|2\\s+AND\\s+1", b.toString());
      */
