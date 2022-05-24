@@ -3,6 +3,7 @@ package sqltoregex.controller;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -11,7 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.UserSettings;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -79,5 +82,12 @@ class SqlToRegexControllerTest {
     @Test
     void testVisualizationSite() throws Exception {
         mvc.perform(get("/visualization").contentType(MediaType.TEXT_HTML)).andExpect(status().isOk());
+    }
+
+    @AfterAll
+    static void tearDown() throws Exception {
+        Field field = UserSettings.class.getDeclaredField("instance");
+        field.setAccessible(true);
+        field.set(UserSettings.getInstance(), null);
     }
 }

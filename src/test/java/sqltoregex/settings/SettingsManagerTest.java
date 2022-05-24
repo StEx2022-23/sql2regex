@@ -109,4 +109,11 @@ class SettingsManagerTest {
             }
         }
     }
+
+    @AfterAll
+    static void tearDown() throws Exception {
+        Field field = UserSettings.class.getDeclaredField("instance");
+        field.setAccessible(true);
+        field.set(UserSettings.getInstance(), null);
+    }
 }
