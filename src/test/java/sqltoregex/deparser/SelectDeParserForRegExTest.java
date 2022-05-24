@@ -32,6 +32,7 @@ class SelectDeParserForRegExTest {
     String getRegEx(String sampleSolution) throws JSQLParserException {
         Statement statement = CCJSqlParserUtil.parse(sampleSolution);
         statement.accept(statementDeParser);
+        System.out.println(statementDeParser.getBuffer().toString());
         return statementDeParser.getBuffer().toString();
     }
 
@@ -208,6 +209,24 @@ class SelectDeParserForRegExTest {
                 "SELECT * FROM table1 AS t"
         );
         validateListAgainstRegEx("SELECT * FROM table1", toCheckedInput, true);
+    }
+
+
+    @Test
+    void pivotStatement() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT * FROM (SELECT c1, p1, q FROM p) PIVOT (SUM(q) as q for p1 in ('a','b')) ORDER BY c1"
+        );
+
+
+        StringBuilder input = new StringBuilder();
+        input.append("SELECT *");
+        input.append("FROM (SELECT c1, p1, q FROM p)");
+        input.append("PIVOT (SUM(q) as q for p1 in ('a','b'))");
+        input.append("ORDER BY c1");
+
+
+        validateListAgainstRegEx(input.toString(), toCheckedInput, false);
     }
 
 }
