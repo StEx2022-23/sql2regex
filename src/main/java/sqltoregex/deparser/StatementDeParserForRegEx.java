@@ -13,6 +13,7 @@ import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 
 public class StatementDeParserForRegEx extends StatementDeParser {
+    private static final String REQUIRED_WHITE_SPACE = "\\s+";
     ExpressionDeParser expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
 
@@ -38,7 +39,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         expressionDeParserForRegEx.setBuffer(buffer);
         selectDeParserForRegEx.setExpressionVisitor(expressionDeParserForRegEx);
         if (select.getWithItemsList() != null && !select.getWithItemsList().isEmpty()) {
-            buffer.append("WITH ");
+            buffer.append("WITH" + REQUIRED_WHITE_SPACE);
             buffer.append(selectDeParserForRegEx.handleWithItemValueList(select));
         }
         select.getSelectBody().accept(selectDeParserForRegEx);
