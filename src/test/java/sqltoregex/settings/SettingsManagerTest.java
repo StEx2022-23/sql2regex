@@ -92,7 +92,7 @@ class SettingsManagerTest {
     void testGetSettingByClazz(){
         Assertions.assertEquals(3, settingsManager.getSettingByClass(SpellingMistake.class, true).size());
         Assertions.assertEquals(2, settingsManager.getSettingByClass(OrderRotation.class, true).size());
-        Assertions.assertEquals(1, settingsManager.getSettingByClass(StringSynonymGenerator.class, true).size());
+        Assertions.assertEquals(2, settingsManager.getSettingByClass(StringSynonymGenerator.class, true).size());
     }
 
     @Test
