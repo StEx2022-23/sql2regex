@@ -16,10 +16,11 @@ class UserSettingsTest {
     void MapNotMutable() {
         Map<SettingsOption, RegExGenerator<?>> map = new HashMap<>();
         UserSettings userSettings1 = UserSettings.getInstance(map);
-        Assertions.assertThrows(UnsupportedOperationException.class, () -> userSettings1.getSettingsMap().putAll(map));
+        Map<SettingsOption, RegExGenerator<?>> settingsMap = userSettings1.getSettingsMap();
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> settingsMap.putAll(map));
         OrderRotation orderRotation = new OrderRotation(SettingsOption.DEFAULT);
         Assertions.assertThrows(UnsupportedOperationException.class,
-                                () -> userSettings1.getSettingsMap().put(SettingsOption.COLUMNNAMEORDER, orderRotation));
+                                () -> settingsMap.put(SettingsOption.COLUMNNAMEORDER, orderRotation));
     }
 
     @Test
