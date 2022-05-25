@@ -58,6 +58,6 @@ public class InsertDeParserForRegEx extends InsertDeParser {
 
     @Override
     public void visit(SubSelect subSelect) {
-        super.visit(subSelect);
+        subSelect.getSelectBody().accept(this.selectDeParserForRegEx);
     }
 }
