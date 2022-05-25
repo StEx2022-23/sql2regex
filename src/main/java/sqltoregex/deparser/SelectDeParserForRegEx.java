@@ -150,7 +150,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     private String useTableNameOrder(List<String> strlist){
         if(null != this.tableNameOrder) return this.tableNameOrder.generateRegExFor(strlist);
-        else return String.join(",", strlist);
+        else return String.join(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE, strlist);
     }
 
     @Override
