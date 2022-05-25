@@ -47,8 +47,8 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     }
 
     @Override
-    public void visit(NamedExpressionList NamedExpressionList) {
-        super.visit(NamedExpressionList);
+    public void visit(NamedExpressionList namedExpressionList) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
