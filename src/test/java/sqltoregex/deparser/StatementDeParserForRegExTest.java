@@ -56,7 +56,7 @@ class StatementDeParserForRegExTest {
         ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settingsManager);
         StringBuilder buffer = new StringBuilder();
         SelectDeParserForRegEx selectDeParserForRegEx = new SelectDeParserForRegEx(settingsManager);
-        StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(expressionDeParserForRegEx, selectDeParserForRegEx, buffer);
+        StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(expressionDeParserForRegEx, selectDeParserForRegEx, buffer, settingsManager);
         Assertions.assertNotNull(statementDeParserForRegEx);
     }
 
