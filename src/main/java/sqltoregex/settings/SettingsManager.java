@@ -28,15 +28,15 @@ public class SettingsManager {
         this.parseSettings();
     }
 
-    public static <T> RegExGenerator<T> castSetting(RegExGenerator<?> rawSetting,
+    public static <T> Optional<RegExGenerator<T>> castSetting(RegExGenerator<?> rawSetting,
                                                     Class<? extends RegExGenerator<T>> clazz) {
         try {
-            return clazz.cast(rawSetting);
+            return Optional.of(clazz.cast(rawSetting));
         } catch (ClassCastException e) {
             Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
             logger.log(Level.INFO, "Something went wrong by casting setting: {0}", e.toString());
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -51,7 +51,7 @@ public class SettingsManager {
         for (RegExGenerator<?> setting :
                 (useDefault ? this.getDefaultSettingsMap().values() : this.getSettingsMap().values())) {
             if (setting != null && setting.getClass().equals(clazz)) {
-                settingsSet.add(castSetting(setting, clazz));
+                castSetting(setting, clazz).ifPresent(settingsSet::add);
             }
         }
         return settingsSet;
@@ -69,21 +69,21 @@ public class SettingsManager {
         }
     }
 
-    public <S> RegExGenerator<S> getSettingBySettingsOption(SettingsOption settingsOption,
+    public <S> Optional<RegExGenerator<S>> getSettingBySettingsOption(SettingsOption settingsOption,
                                                             Class<? extends RegExGenerator<S>> clazz) {
         return this.getSettingBySettingsOption(settingsOption, clazz, false);
     }
 
-    public <S> RegExGenerator<S> getSettingBySettingsOption(SettingsOption settingsOption,
-                                                            Class<? extends RegExGenerator<S>> clazz, boolean useDefault) {
+    public <S> Optional<RegExGenerator<S>> getSettingBySettingsOption(SettingsOption settingsOption,
+                                                            Class<? extends RegExGenerator<S>> clazz, boolean getAll) {
         for (Map.Entry<SettingsOption, RegExGenerator<?>> entry
-                : (useDefault ? this.getDefaultSettingsMap().entrySet() : this.getSettingsMap().entrySet())
+                : (getAll ? this.getDefaultSettingsMap().entrySet() : this.getSettingsMap().entrySet())
         ) {
             if (entry.getKey().equals(settingsOption)) {
                 return castSetting(settingsMap.get(entry.getKey()), clazz);
             }
         }
-        throw new NoSuchElementException("There is no setting with this setting option:" + settingsOption);
+        return Optional.empty();
     }
 
     public Map<SettingsOption, RegExGenerator<?>> getDefaultSettingsMap(){
@@ -98,19 +98,26 @@ public class SettingsManager {
         }
     }
 
-    public <A, S> SynonymGenerator<A, S> getSynonymManagerBySettingOption(SettingsOption settingsOption,
+    public <A, S> Optional<SynonymGenerator<A, S>> getSynonymManagerBySettingOption(SettingsOption settingsOption,
                                                                           Class<? extends SynonymGenerator<A, S>> clazz) {
         return this.getSynonymManagerBySettingOption(settingsOption, clazz, false);
     }
 
-    public <A, S> SynonymGenerator<A, S> getSynonymManagerBySettingOption(SettingsOption settingsOption,
+    public <A, S> Optional<SynonymGenerator<A, S>> getSynonymManagerBySettingOption(SettingsOption settingsOption,
                                                                           Class<? extends SynonymGenerator<A, S>> clazz,
                                                                           boolean useDefault) {
         for (Map.Entry<SettingsOption, RegExGenerator<?>> entry
                 : (useDefault ? this.getDefaultSettingsMap().entrySet() : this.getSettingsMap().entrySet())
         ) {
-            if (entry.getKey().equals(settingsOption)) {
-                return (SynonymGenerator<A, S>) castSetting(settingsMap.get(entry.getKey()), clazz);
+            List<SettingsOption> synonymManagerRelatedSettingsOptionsList = Arrays.asList(
+                    SettingsOption.DATESYNONYMS,
+                    SettingsOption.TIMESYNONYMS,
+                    SettingsOption.DATETIMESYNONYMS,
+                    SettingsOption.AGGREGATEFUNCTIONLANG
+            );
+            if (entry.getKey().equals(settingsOption) && synonymManagerRelatedSettingsOptionsList.contains(settingsOption)) {
+                Optional<RegExGenerator<S>> opt = castSetting(settingsMap.get(entry.getKey()), clazz);
+                return opt.map(sRegExGenerator -> (SynonymGenerator<A, S>) sRegExGenerator);
             }
         }
         throw new NoSuchElementException("There is no property with this property option:" + settingsOption);

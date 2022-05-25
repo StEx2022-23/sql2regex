@@ -2,6 +2,9 @@
     <div class="mb-3">
         <label for="sqlinput" class="form-label"><strong>SQL-Input</strong></label>
         <textarea th:field="*{sql}" class="form-control inputHeight" id="sqlinput" rows="3" placeholder="Insert your SQL-Statement here!"></textarea>
+        <div th:if="${#fields.hasErrors('sql')}" th:errors="*{sql}" th:errorclass="bg-danger">
+            title error
+        </div>
     </div>
     <div class="accordion" id="accordion">
         <div class="accordion-item">
@@ -113,9 +116,9 @@
         <button th:text="#{conv.convert}" type="submit" id="onSubmitConvertForm" class="btn btn-primary btn-lg mb-2 mt-2 display-6"></button>
     </div>
 </form>
-<div class="mb-3">
+<div th:fragment="settingsform-regex" class="mb-3">
     <label th:text="#{conv.headingregex}" for="regexoutput" class="form-label"></label>
-    <textarea class="form-control inputHeight" readonly="readonly" id="regexoutput" rows="3" placeholder="Copy your generated RegEx here!"></textarea>
+    <textarea th:text="${regex}" class="form-control inputHeight" readonly="readonly" id="regexoutput" rows="3" placeholder="Copy your generated RegEx here!"></textarea>
 </div>
 <div th:fragment="settingsform-output" class="text-end">
     <button th:text="#{saveasjson}" onclick="generateJsonFormatFile('sqlinput','regexoutput', 'jsonFeedback')" id="json_button" class="btn btn-m btn-tert copy-button mt-2">

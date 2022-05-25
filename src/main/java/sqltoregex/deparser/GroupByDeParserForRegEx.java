@@ -29,7 +29,7 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
     }
 
     private void setKeywordSpellingMistake(SettingsManager settingsManager){
-        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
+        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class).orElse(null);
     }
 
     private String useKeywordSpellingMistake(String str){
@@ -38,7 +38,7 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
     }
 
     private void setExpressionOrder(SettingsManager settingsManager){
-        this.expressionOrder = settingsManager.getSettingBySettingsOption(SettingsOption.EXPRESSIONORDER, ExpressionRotation.class);
+        this.expressionOrder = settingsManager.getSettingBySettingsOption(SettingsOption.EXPRESSIONORDER, ExpressionRotation.class).orElse(null);
     }
 
     private String useExpressionOrder(List<Expression> expressionList, StringBuilder buffer){

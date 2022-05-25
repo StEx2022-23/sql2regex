@@ -27,15 +27,15 @@ public class GraphPreProcessor {
     }
 
     static Set<String> getSynonymSetWithDelimiter(Graph<String, DefaultWeightedEdge> graph, String delimiter) {
-        StringBuilder buffer = new StringBuilder();
+        Set<String> synonymSet = new LinkedHashSet<>();
         try {
             Map<String, Set<String>> map = getSynonymMap(graph);
             for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
                 for (String setValue : entry.getValue()) {
-                    buffer.append(entry.getKey()).append(delimiter).append(setValue);
+                    synonymSet.add(entry.getKey() + delimiter + setValue);
                 }
             }
-            return new LinkedHashSet<>(graph.vertexSet());
+            return synonymSet;
         } catch (ClassCastException e) {
             Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
             logger.log(Level.WARNING, COULD_NOT_CAST, e);

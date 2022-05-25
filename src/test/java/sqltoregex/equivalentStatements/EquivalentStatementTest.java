@@ -3,8 +3,11 @@ package sqltoregex.equivalentStatements;
 import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.xml.sax.SAXException;
 import sqltoregex.ConverterManagement;
+import sqltoregex.settings.SettingsManager;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -19,6 +22,12 @@ class EquivalentStatementTest {
     Map<String, List<String>> equivalentStatements;
     private static final String DELIMITER_FOR_EQUIVALENTS = "#####";
     private static final String DELIMITER_FOR_SINGLE_STATEMENTS = ";";
+
+    ConverterManagement converterManagement;
+
+    public EquivalentStatementTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        converterManagement = new ConverterManagement(new SettingsManager());
+    }
 
     void parseTextFile(SupportedStatementType statementType) throws IOException {
         equivalentStatements = new HashMap<>();
@@ -35,10 +44,9 @@ class EquivalentStatementTest {
 
     @Test
     void testSelectStatements() throws IOException, JSQLParserException, XPathExpressionException, ParserConfigurationException, SAXException {
-        ConverterManagement converterManagement = new ConverterManagement();
         this.parseTextFile(SupportedStatementType.SELECT);
         for(String key : this.equivalentStatements.keySet()){
-            Pattern pattern = Pattern.compile(converterManagement.deparse(key, false, false));
+            Pattern pattern = Pattern.compile(this.converterManagement.deparse(key, false, false));
             for(String toValidateStatements : this.equivalentStatements.get(key)){
                 Matcher matcher = pattern.matcher(toValidateStatements);
                 Assertions.assertTrue(matcher.matches());

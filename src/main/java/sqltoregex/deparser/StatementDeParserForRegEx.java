@@ -2,45 +2,53 @@ package sqltoregex.deparser;
 
 import net.sf.jsqlparser.statement.Statements;
 import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
-import net.sf.jsqlparser.util.deparser.SelectDeParser;
 import net.sf.jsqlparser.util.deparser.StatementDeParser;
-import org.xml.sax.SAXException;
 import sqltoregex.settings.SettingsManager;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
+import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
+import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 public class StatementDeParserForRegEx extends StatementDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
-    ExpressionDeParser expressionDeParserForRegEx;
+    public static final String WITH = "WITH";
+    ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
+    RegExGenerator<String> keywordSpellingMistake;
 
-    public StatementDeParserForRegEx(StringBuilder buffer) {
-        super(buffer);
+    public StatementDeParserForRegEx(StringBuilder buffer, SettingsManager settingsManager) {
+        this(new ExpressionDeParserForRegEx(settingsManager), buffer, settingsManager);
     }
 
-    public StatementDeParserForRegEx(ExpressionDeParser expressionDeParser, SelectDeParser selectDeParser, StringBuilder buffer) {
+    public StatementDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, StringBuilder buffer, SettingsManager settingsManager) {
+        this(expressionDeParser, new SelectDeParserForRegEx(settingsManager), buffer, settingsManager);
+    }
+
+    public StatementDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, SelectDeParserForRegEx selectDeParser, StringBuilder buffer, SettingsManager settingsManager) {
         super(expressionDeParser, selectDeParser, buffer);
-    }
-
-    public StatementDeParserForRegEx(ExpressionDeParser expressionDeParser, StringBuilder buffer) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
-        super(buffer);
         this.expressionDeParserForRegEx = expressionDeParser;
-        this.selectDeParserForRegEx = new SelectDeParserForRegEx(new SettingsManager());
+        this.selectDeParserForRegEx = selectDeParser;
+        this.setKeywordSpellingMistake(settingsManager);
     }
 
+    private void setKeywordSpellingMistake(SettingsManager settingsManager){
+        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class).orElse(null);
+    }
+
+    private String useKeywordSpellingMistake(String str){
+        if(null != this.keywordSpellingMistake) return this.keywordSpellingMistake.generateRegExFor(str);
+        else return str;
+    }
 
     @Override
     public void visit(Select select) {
-        selectDeParserForRegEx.setBuffer(buffer);
-        expressionDeParserForRegEx.setSelectVisitor(selectDeParserForRegEx);
-        expressionDeParserForRegEx.setBuffer(buffer);
-        selectDeParserForRegEx.setExpressionVisitor(expressionDeParserForRegEx);
+        this.selectDeParserForRegEx.setBuffer(buffer);
+        this.expressionDeParserForRegEx.setSelectVisitor(this.selectDeParserForRegEx);
+        this.expressionDeParserForRegEx.setBuffer(buffer);
+        this.selectDeParserForRegEx.setExpressionVisitor(expressionDeParserForRegEx);
         if (select.getWithItemsList() != null && !select.getWithItemsList().isEmpty()) {
-            buffer.append("WITH" + REQUIRED_WHITE_SPACE);
-            buffer.append(selectDeParserForRegEx.handleWithItemValueList(select));
+            buffer.append(useKeywordSpellingMistake(WITH));
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(this.selectDeParserForRegEx.handleWithItemValueList(select));
         }
         select.getSelectBody().accept(selectDeParserForRegEx);
     }

@@ -23,11 +23,10 @@
                 <div class="card-body">
                     <h1 th:text="#{conv.heading}" class="pb-2 border-bottom"></h1>
                     <div id="form_response_body">
-
                         <form th:replace="assets/settingsform/form :: settingsform" action="#" th:action="@{/convert}" th:object="${settingsForm}" method="POST">
                             no form inserted
                         </form>
-                        <div class="mb-3">
+                        <div th:replace="assets/settingsform/form :: settingsform-regex" class="mb-3">
                             <label th:text="#{conv.headingregex}" for="regexoutput" class="form-label"></label>
                             <textarea class="form-control inputHeight" readonly="readonly" id="regexoutput" rows="3" placeholder="Copy your generated RegEx here!"></textarea>
                         </div>
