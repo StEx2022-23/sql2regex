@@ -84,7 +84,6 @@ public class SettingsManager {
             }
         }
         return Optional.empty();
-//        throw new NoSuchElementException("There is no setting with this setting option:" + settingsOption);
     }
 
     public Map<SettingsOption, RegExGenerator<?>> getDefaultSettingsMap(){

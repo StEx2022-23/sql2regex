@@ -2,18 +2,11 @@ package sqltoregex.deparser;
 
 import net.sf.jsqlparser.statement.Statements;
 import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
-import net.sf.jsqlparser.util.deparser.SelectDeParser;
 import net.sf.jsqlparser.util.deparser.StatementDeParser;
-import org.xml.sax.SAXException;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
 
 public class StatementDeParserForRegEx extends StatementDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
@@ -22,11 +15,11 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     SelectDeParserForRegEx selectDeParserForRegEx;
     RegExGenerator<String> keywordSpellingMistake;
 
-    public StatementDeParserForRegEx(StringBuilder buffer, SettingsManager settingsManager) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    public StatementDeParserForRegEx(StringBuilder buffer, SettingsManager settingsManager) {
         this(new ExpressionDeParserForRegEx(settingsManager), buffer, settingsManager);
     }
 
-    public StatementDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, StringBuilder buffer, SettingsManager settingsManager) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    public StatementDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, StringBuilder buffer, SettingsManager settingsManager) {
         this(expressionDeParser, new SelectDeParserForRegEx(settingsManager), buffer, settingsManager);
     }
 

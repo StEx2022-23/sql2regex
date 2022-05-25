@@ -49,7 +49,7 @@ class EquivalentStatementTest {
             Pattern pattern = Pattern.compile(this.converterManagement.deparse(key, false, false));
             for(String toValidateStatements : this.equivalentStatements.get(key)){
                 Matcher matcher = pattern.matcher(toValidateStatements);
-//                Assertions.assertTrue(matcher.matches());
+                Assertions.assertTrue(matcher.matches());
             }
         }
     }
