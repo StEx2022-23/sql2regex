@@ -477,19 +477,60 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public void visit(UnPivot unpivot) {
         boolean showOptions = unpivot.getIncludeNullsSpecified();
         boolean includeNulls = unpivot.getIncludeNulls();
+
         List<Column> unPivotClause = unpivot.getUnPivotClause();
+        List<String> unPivotClauseAsStringList = new LinkedList<>();
+        for (Column col : unPivotClause){
+            unPivotClauseAsStringList.add(col.toString());
+        }
+
         List<Column> unpivotForClause = unpivot.getUnPivotForClause();
-        buffer
-                .append(" UNPIVOT")
-                .append(showOptions && includeNulls ? " INCLUDE NULLS" : "")
-                .append(showOptions && !includeNulls ? " EXCLUDE NULLS" : "")
-                .append(" (").append(PlainSelect.getStringList(unPivotClause, true,
-                        unPivotClause != null && unPivotClause.size() > 1))
-                .append(" FOR ").append(PlainSelect.getStringList(unpivotForClause, true,
-                        unpivotForClause != null && unpivotForClause.size() > 1))
-                .append(" IN ").append(PlainSelect.getStringList(unpivot.getUnPivotInClause(), true, true)).append(")");
+        List<String> unPivotForClauseAsStringList = new LinkedList<>();
+        for (Column col : unpivotForClause){
+            unPivotForClauseAsStringList.add(col.toString());
+        }
+
+        List<SelectExpressionItem> unpivotInClause = unpivot.getUnPivotInClause();
+        List<String> unpivotInClauseAsStringList = new LinkedList<>();
+        for (SelectExpressionItem selectExpressionItem : unpivotInClause){
+            unPivotForClauseAsStringList.add(selectExpressionItem.toString());
+        }
+
+        buffer.append(REQUIRED_WHITE_SPACE);
+        buffer.append(useKeywordSpellingMistake("UNPIVOT"));
+        if(showOptions && includeNulls){
+            buffer.append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake("INCLUDE")).append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake("NULLS"));
+        } else if(showOptions){
+            buffer.append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake("EXCLUDE")).append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake("NULLS"));
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
+        buffer.append(unPivotClause.size() > 1 ? "\\(" : "");
+        buffer.append(useColumnNameOrder(unPivotClauseAsStringList));
+        buffer.append(unPivotClause.size() > 1 ? "\\)" : "");
+
+        buffer.append(unPivotClause.size() > 1 ? OPTIONAL_WHITE_SPACE : REQUIRED_WHITE_SPACE);
+        buffer.append(useKeywordSpellingMistake("FOR"));
+        buffer.append(REQUIRED_WHITE_SPACE);
+
+        buffer.append(unpivotForClause.size() > 1 ? "\\(" : "");
+        buffer.append(useColumnNameOrder(unPivotForClauseAsStringList));
+        buffer.append(unpivotForClause.size() > 1 ? "\\)" : "");
+
+        buffer.append(unpivotForClause.size() > 1 ? OPTIONAL_WHITE_SPACE : REQUIRED_WHITE_SPACE);
+        buffer.append(useKeywordSpellingMistake("IN"));
+        buffer.append(REQUIRED_WHITE_SPACE);
+
+        buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
+        buffer.append(useColumnNameOrder(unpivotInClauseAsStringList));
+        buffer.append(OPTIONAL_WHITE_SPACE).append("\\)");
+
         if (unpivot.getAlias() != null) {
+            this.addOptionalAliasKeywords(false);
             buffer.append(unpivot.getAlias().toString());
+        } else {
+            buffer.append("(");
+            buffer.append(addOptionalAliasKeywords(true));
+            buffer.append(".*)?");
         }
     }
 
