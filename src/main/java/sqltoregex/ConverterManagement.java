@@ -139,7 +139,7 @@ public class ConverterManagement {
      * @return deparsed Statement as RegEx - String
      * @throws JSQLParserException is thrown if parsing goes wrong
      */
-    public String deparse(String sqlStatement) throws JSQLParserException, XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    public String deparse(String sqlStatement) throws JSQLParserException {
         StringBuilder buffer = new StringBuilder();
         if(!this.validate(sqlStatement)){
             throw new IllegalArgumentException();
@@ -147,11 +147,11 @@ public class ConverterManagement {
         return this.deParseStatement(sqlStatement, buffer);
     }
 
-    public String deparse(String sqlStatement, boolean isOnlyExpression) throws JSQLParserException, XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    public String deparse(String sqlStatement, boolean isOnlyExpression) throws JSQLParserException {
         return deparse(sqlStatement, isOnlyExpression, true);
     }
 
-    public String deparse(String sqlStatement, boolean isOnlyExpression, boolean toBeValidated) throws JSQLParserException, XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    public String deparse(String sqlStatement, boolean isOnlyExpression, boolean toBeValidated) throws JSQLParserException {
         StringBuilder buffer = new StringBuilder();
         if(isOnlyExpression){
             return this.deParseExpression(sqlStatement);
