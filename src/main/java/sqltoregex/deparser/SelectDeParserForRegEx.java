@@ -69,6 +69,8 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public static final String INCLUDE = "INCLUDE";
     public static final String EXCLUDE = "EXCLUDE";
     public static final String NULLS = "NULLS";
+    public static final String PIVOT = "PIVOT";
+    public static final String ANY = "ANY";
     private boolean flagForOrderRotationWithOutSpellingMistake = false;
     private ExpressionVisitor expressionVisitor;
     private RegExGenerator<String> keywordSpellingMistake;
@@ -434,7 +436,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public void visit(Pivot pivot) {
         List<Column> forColumns = pivot.getForColumns();
         buffer.append(OPTIONAL_WHITE_SPACE);
-        buffer.append(useKeywordSpellingMistake("PIVOT"));
+        buffer.append(useKeywordSpellingMistake(PIVOT));
         buffer.append(OPTIONAL_WHITE_SPACE);
         buffer.append("\\(");
             List<String> functionItemList = new LinkedList<>();
@@ -540,18 +542,50 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     @Override
     public void visit(PivotXml pivot) {
+        List<String> forColumnsAsStringList = new LinkedList<>();
         List<Column> forColumns = pivot.getForColumns();
-        buffer.append(" PIVOT XML (").append(PlainSelect.getStringList(pivot.getFunctionItems())).append(" FOR ")
-                .append(PlainSelect.getStringList(forColumns, true, forColumns != null && forColumns.size() > 1))
-                .append(" IN (");
-        if (pivot.isInAny()) {
-            buffer.append("ANY");
-        } else if (pivot.getInSelect() != null) {
-            buffer.append(pivot.getInSelect());
-        } else {
-            buffer.append(PlainSelect.getStringList(pivot.getInItems()));
+        for(Column column : forColumns){
+            forColumnsAsStringList.add(column.toString());
         }
-        buffer.append("))");
+        buffer.append(REQUIRED_WHITE_SPACE);
+        buffer.append(useKeywordSpellingMistake(PIVOT));
+        buffer.append(REQUIRED_WHITE_SPACE);
+        buffer.append(useKeywordSpellingMistake(XML));
+        buffer.append(OPTIONAL_WHITE_SPACE).append("\\(");
+
+        List<String> functionItemList = new LinkedList<>();
+        for(FunctionItem functionItem : pivot.getFunctionItems()){
+            functionItemList.add(this.handleALiasAndAggregateFunction(functionItem));
+        }
+        buffer.append(this.handleOrderRotationWithExplicitNoneSpellingMistake(functionItemList));
+        buffer.append(REQUIRED_WHITE_SPACE);
+        buffer.append(useKeywordSpellingMistake(FOR));
+        buffer.append(REQUIRED_WHITE_SPACE);
+
+        buffer.append(forColumns.size() > 1 ? "\\(" : "");
+        buffer.append(useColumnNameOrder(forColumnsAsStringList));
+        buffer.append(forColumns.size() > 1 ? "\\)" : "");
+
+        buffer.append(REQUIRED_WHITE_SPACE);
+        buffer.append(useKeywordSpellingMistake(IN));
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer.append("\\(");
+
+        if (pivot.isInAny()) {
+            buffer.append(useKeywordSpellingMistake(ANY));
+        } else if (pivot.getInSelect() != null) {
+            buffer.append(useTableNameSpellingMistake(pivot.getInSelect().toString()));
+        } else {
+            List<String> inItemsAsStringList = new LinkedList<>();
+            List<?> inItems = pivot.getInItems();
+            for(Object o : inItems){
+                inItemsAsStringList.add(o.toString());
+            }
+            buffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
+            buffer.append(useColumnNameOrder(inItemsAsStringList));
+            buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE).append("\\)");
     }
 
     @Override
