@@ -215,9 +215,9 @@ class SelectDeParserForRegExTest {
     @Test
     void pivotStatement() throws JSQLParserException {
         List<String> toCheckedInput = List.of(
-                "SELECT * FROM (SELECT c1, p1, q FROM p) PIVOT (SUM(q) as q for p1 in ('a','b')) ORDER BY c1"
+                "SELECT * FROM (SELECT c1, p1, q FROM p) PIVOT (SUM(q) as q for p1 in ('a','b')) ORDER BY c1",
+                "SELECT * FROM (SELECT c1, p1, q FROM p) PIVOT (SUMME(q) as q for p1 in ('b', 'a')) ORDER BY c1"
         );
-
 
         StringBuilder input = new StringBuilder();
         input.append("SELECT *");
@@ -225,6 +225,19 @@ class SelectDeParserForRegExTest {
         input.append("PIVOT (SUM(q) as q for p1 in ('a','b'))");
         input.append("ORDER BY c1");
 
+        validateListAgainstRegEx(input.toString(), toCheckedInput, false);
+    }
+
+    @Test
+    void unPivotStatement() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT * FROM (SELECT c1, p1) UNPIVOT (q FOR p1 IN ('a','b'))"
+        );
+
+        StringBuilder input = new StringBuilder();
+        input.append("SELECT *");
+        input.append("FROM (SELECT c1, p1)");
+        input.append("UNPIVOT (q FOR p1 IN ('a','b'))");
 
         validateListAgainstRegEx(input.toString(), toCheckedInput, false);
     }

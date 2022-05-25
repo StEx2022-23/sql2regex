@@ -65,6 +65,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public static final String PATH = "PATH";
     public static final String FOR = "FOR";
     public static final String IN = "IN";
+    public static final String UNPIVOT = "UNPIVOT";
+    public static final String INCLUDE = "INCLUDE";
+    public static final String EXCLUDE = "EXCLUDE";
+    public static final String NULLS = "NULLS";
     private boolean flagForOrderRotationWithOutSpellingMistake = false;
     private ExpressionVisitor expressionVisitor;
     private RegExGenerator<String> keywordSpellingMistake;
@@ -493,15 +497,15 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         List<SelectExpressionItem> unpivotInClause = unpivot.getUnPivotInClause();
         List<String> unpivotInClauseAsStringList = new LinkedList<>();
         for (SelectExpressionItem selectExpressionItem : unpivotInClause){
-            unPivotForClauseAsStringList.add(selectExpressionItem.toString());
+            unpivotInClauseAsStringList.add(selectExpressionItem.toString());
         }
 
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(useKeywordSpellingMistake("UNPIVOT"));
+        buffer.append(useKeywordSpellingMistake(UNPIVOT));
         if(showOptions && includeNulls){
-            buffer.append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake("INCLUDE")).append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake("NULLS"));
+            buffer.append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake(INCLUDE)).append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake(NULLS));
         } else if(showOptions){
-            buffer.append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake("EXCLUDE")).append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake("NULLS"));
+            buffer.append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake(EXCLUDE)).append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake(NULLS));
         }
         buffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
         buffer.append(unPivotClause.size() > 1 ? "\\(" : "");
@@ -509,7 +513,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         buffer.append(unPivotClause.size() > 1 ? "\\)" : "");
 
         buffer.append(unPivotClause.size() > 1 ? OPTIONAL_WHITE_SPACE : REQUIRED_WHITE_SPACE);
-        buffer.append(useKeywordSpellingMistake("FOR"));
+        buffer.append(useKeywordSpellingMistake(FOR));
         buffer.append(REQUIRED_WHITE_SPACE);
 
         buffer.append(unpivotForClause.size() > 1 ? "\\(" : "");
@@ -517,7 +521,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         buffer.append(unpivotForClause.size() > 1 ? "\\)" : "");
 
         buffer.append(unpivotForClause.size() > 1 ? OPTIONAL_WHITE_SPACE : REQUIRED_WHITE_SPACE);
-        buffer.append(useKeywordSpellingMistake("IN"));
+        buffer.append(useKeywordSpellingMistake(IN));
         buffer.append(REQUIRED_WHITE_SPACE);
 
         buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
