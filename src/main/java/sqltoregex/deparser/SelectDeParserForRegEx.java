@@ -71,6 +71,12 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public static final String NULLS = "NULLS";
     public static final String PIVOT = "PIVOT";
     public static final String ANY = "ANY";
+    public static final String FETCH = "FETCH";
+    public static final String FIRST = "FIRST";
+    public static final String NEXT = "NEXT";
+    public static final String ONLY = "ONLY";
+    public static final String OPTIMIZE = "OPTIMIZE";
+    public static final String ROWS = "ROWS";
     private boolean flagForOrderRotationWithOutSpellingMistake = false;
     private ExpressionVisitor expressionVisitor;
     private RegExGenerator<String> keywordSpellingMistake;
@@ -528,7 +534,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
         buffer.append(useColumnNameOrder(unpivotInClauseAsStringList));
-        buffer.append(OPTIONAL_WHITE_SPACE).append("\\)");
+        buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE).append("\\)");
 
         if (unpivot.getAlias() != null) {
             this.addOptionalAliasKeywords(false);
@@ -602,40 +608,30 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     @Override
     public void deparseFetch(Fetch fetch) {
-        // FETCH (FIRST | NEXT) row_count (ROW | ROWS) ONLY
-        buffer.append(" FETCH ");
+        buffer.append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake(FETCH)).append(REQUIRED_WHITE_SPACE);
         if (fetch.isFetchParamFirst()) {
-            buffer.append("FIRST ");
+            buffer.append(useKeywordSpellingMistake(FIRST)).append(REQUIRED_WHITE_SPACE);
         } else {
-            buffer.append("NEXT ");
+            buffer.append(useKeywordSpellingMistake(NEXT)).append(REQUIRED_WHITE_SPACE);
         }
         if (fetch.getFetchJdbcParameter() != null) {
-            buffer.append(fetch.getFetchJdbcParameter().toString());
+            buffer.append(useColumnNameSpellingMistake(fetch.getFetchJdbcParameter().toString()));
         } else {
             buffer.append(fetch.getRowCount());
         }
-        buffer.append(" ").append(fetch.getFetchParam()).append(" ONLY");
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer.append(fetch.getFetchParam()).append(OPTIONAL_WHITE_SPACE).append(useKeywordSpellingMistake(ONLY));
 
-    }
-
-    @Override
-    public ExpressionVisitor getExpressionVisitor() {
-        return expressionVisitor;
-    }
-
-    @Override
-    public void setExpressionVisitor(ExpressionVisitor visitor) {
-        expressionVisitor = visitor;
     }
 
     @Override
     public void visit(SubJoin subjoin) {
-        buffer.append("(");
+        buffer.append("\\(");
         subjoin.getLeft().accept(this);
         for (Join join : subjoin.getJoinList()) {
             deparseJoin(join);
         }
-        buffer.append(")");
+        buffer.append("\\)");
 
         if (subjoin.getPivot() != null) {
             subjoin.getPivot().accept(this);
@@ -715,7 +711,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append(useKeywordSpellingMistake(USING));
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append("(");
+            buffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
             buffer.append(OPTIONAL_WHITE_SPACE);
             for (Iterator<Column> iterator = join.getUsingColumns().iterator(); iterator.hasNext();) {
                 Column column = iterator.next();
@@ -726,7 +722,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
                 }
             }
             buffer.append(OPTIONAL_WHITE_SPACE);
-            buffer.append(")");
+            buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
         }
     }
 
@@ -734,17 +730,17 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public void visit(SetOperationList list) {
         for (int i = 0; i < list.getSelects().size(); i++) {
             if (i != 0) {
-                buffer.append(' ').append(list.getOperations().get(i - 1)).append(' ');
+                buffer.append(REQUIRED_WHITE_SPACE).append(list.getOperations().get(i - 1)).append(REQUIRED_WHITE_SPACE);
             }
 
             boolean brackets = list.getBrackets() == null || list.getBrackets().get(i);
             if (brackets) {
-                buffer.append("(");
+                buffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
             }
 
             list.getSelects().get(i).accept(this);
             if (brackets) {
-                buffer.append(")");
+                buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
             }
         }
 
@@ -796,10 +792,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     @Override
     public void visit(ParenthesisFromItem parenthesis) {
-        buffer.append("(");
+        buffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
         parenthesis.getFromItem().accept(this);
 
-        buffer.append(")");
+        buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
         if (parenthesis.getAlias() != null) {
             buffer.append(parenthesis.getAlias().toString());
         }
@@ -811,9 +807,14 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     private void deparseOptimizeForForRegEx(OptimizeFor optimizeFor) {
-        buffer.append(" OPTIMIZE FOR ");
+        buffer.append(REQUIRED_WHITE_SPACE);
+        buffer.append(useKeywordSpellingMistake(OPTIMIZE));
+        buffer.append(REQUIRED_WHITE_SPACE);
+        buffer.append(useKeywordSpellingMistake(FOR));
+        buffer.append(REQUIRED_WHITE_SPACE);
         buffer.append(optimizeFor.getRowCount());
-        buffer.append(" ROWS");
+        buffer.append(REQUIRED_WHITE_SPACE);
+        buffer.append(useKeywordSpellingMistake(ROWS));
     }
 
     @Override
@@ -860,7 +861,8 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         ItemsList itemsList = withItem.getItemsList();
         temp.append(useKeywordSpellingMistake(VALUES));
         temp.append(REQUIRED_WHITE_SPACE);
-        temp.append("(VALUES ");
+        temp.append("\\(").append(OPTIONAL_WHITE_SPACE).append(VALUES);
+        temp.append(REQUIRED_WHITE_SPACE);
         ExpressionList expressionList = (ExpressionList) itemsList;
         Iterator<Expression> expressionIterator = expressionList.getExpressions().iterator();
         List<String> expressionListAsStrings = new LinkedList<>();
@@ -969,4 +971,15 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
         return temp.toString();
     }
+
+    @Override
+    public ExpressionVisitor getExpressionVisitor() {
+        return expressionVisitor;
+    }
+
+    @Override
+    public void setExpressionVisitor(ExpressionVisitor visitor) {
+        expressionVisitor = visitor;
+    }
+
 }
