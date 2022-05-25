@@ -111,7 +111,7 @@ public class ConverterManagement {
         return outputRegex.toString();
     }
 
-    private String deParseStatement(String sqlStatement, StringBuilder buffer) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, JSQLParserException {
+    private String deParseStatement(String sqlStatement, StringBuilder buffer) throws JSQLParserException {
         Statement statement;
         statement = this.parseStatement(sqlStatement);
         StatementDeParserForRegEx defaultStatementDeparser = new StatementDeParserForRegEx(buffer, settingsManager);
