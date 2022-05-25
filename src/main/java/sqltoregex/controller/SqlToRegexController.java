@@ -2,9 +2,13 @@ package sqltoregex.controller;
 
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleGraph;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,12 +19,10 @@ import sqltoregex.settings.SettingsForm;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.ExpressionRotation;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
-import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
-import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
+import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;;
 
 import javax.validation.Valid;
 import javax.xml.parsers.ParserConfigurationException;
@@ -37,9 +39,12 @@ public class SqlToRegexController {
     SettingsManager settingsManager;
     ConverterManagement converterManagement;
 
-    SqlToRegexController(SettingsManager settingsManager) {
-        Assert.notNull(settingsManager, "Settings manager must not be null");
+    @Autowired
+    SqlToRegexController(SettingsManager settingsManager, ConverterManagement converterManagement) {
+        Assert.notNull(settingsManager, "Settings management must not be null");
+        Assert.notNull(converterManagement, "Converter management must not be null");
         this.settingsManager = settingsManager;
+        this.converterManagement = converterManagement;
     }
 
     @GetMapping("/about")
@@ -52,6 +57,12 @@ public class SqlToRegexController {
     @PostMapping("/convert")
     public String convert(Model model, @Valid @ModelAttribute SettingsForm settingsForm, Errors result) throws XPathExpressionException, JSQLParserException, ParserConfigurationException, IOException, SAXException {
         addSettingsFormFields(model);
+        
+        if(result.hasErrors()) {
+            return "assets/settingsform/form";
+        }
+
+        this.settingsManager.parseUserSettingsInput(settingsForm);
 
         model.addAttribute("settingsForm",
                            new SettingsForm(

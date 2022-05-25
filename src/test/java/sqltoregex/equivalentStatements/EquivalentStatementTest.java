@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.xml.sax.SAXException;
 import sqltoregex.ConverterManagement;
+import sqltoregex.settings.SettingsManager;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -45,7 +46,7 @@ class EquivalentStatementTest {
     void testSelectStatements() throws IOException, JSQLParserException, XPathExpressionException, ParserConfigurationException, SAXException {
         this.parseTextFile(SupportedStatementType.SELECT);
         for(String key : this.equivalentStatements.keySet()){
-            Pattern pattern = Pattern.compile(converterManagement.deparse(key, false, false));
+            Pattern pattern = Pattern.compile(this.converterManagement.deparse(key, false, false));
             for(String toValidateStatements : this.equivalentStatements.get(key)){
                 Matcher matcher = pattern.matcher(toValidateStatements);
 //                Assertions.assertTrue(matcher.matches());

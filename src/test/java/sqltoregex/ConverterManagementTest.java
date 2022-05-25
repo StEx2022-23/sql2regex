@@ -3,14 +3,22 @@ package sqltoregex;
 import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.xml.sax.SAXException;
+import sqltoregex.settings.SettingsManager;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 
+
 class ConverterManagementTest {
-    ConverterManagement converterManagement = new ConverterManagement();
+
+    ConverterManagement converterManagement = new ConverterManagement(new SettingsManager());
+
+    ConverterManagementTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    }
 
     @Test
     void testStatementDeparsingWithoutValidation() throws JSQLParserException, XPathExpressionException, ParserConfigurationException, IOException, SAXException {

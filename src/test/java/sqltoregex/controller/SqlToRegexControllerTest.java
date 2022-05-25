@@ -32,6 +32,24 @@ class SqlToRegexControllerTest {
     }
 
     @Test
+    void testEmptySQLResult() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/convert")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .content(EntityUtils.toString(new UrlEncodedFormEntity(Arrays.asList(
+                                new BasicNameValuePair("spellings", SettingsOption.KEYWORDSPELLING.toString()),
+                                new BasicNameValuePair("orders", SettingsOption.TABLENAMEORDER.toString()),
+                                new BasicNameValuePair("dateFormats", "yyyy-MM-dd"),
+                                new BasicNameValuePair("timeFormats", "HH:MM:SS"),
+                                new BasicNameValuePair("dateTimeFormats", "YYYY-MM-DD HH:MM:SS"),
+                                new BasicNameValuePair("sql", ""),
+                                new BasicNameValuePair("aggregateFunctionLang", "Mittelwert; AVG")
+                        ))))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void testConvertingAsset() throws Exception {
         mvc.perform(MockMvcRequestBuilders
                             .post("/convert")

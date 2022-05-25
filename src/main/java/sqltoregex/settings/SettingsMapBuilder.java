@@ -122,7 +122,6 @@ class SettingsMapBuilder {
     }
 
     public SettingsMapBuilder withStringSet(Set<String> synonyms, SettingsOption settingsOption) {
-        Assert.notNull(synonyms, "Set of strings options must not be null");
         switch (settingsOption) {
             case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
                 DateAndTimeFormatSynonymGenerator synonymGenerator = new DateAndTimeFormatSynonymGenerator(
@@ -133,7 +132,7 @@ class SettingsMapBuilder {
                 this.settingsMap.put(settingsOption, synonymGenerator);
             }
             case AGGREGATEFUNCTIONLANG, OTHERSYNONYMS -> {
-                if (!synonyms.isEmpty()) {
+                if (synonyms != null && !synonyms.isEmpty()) {
                     StringSynonymGenerator aggregateFunctionSynonymGenerator = new StringSynonymGenerator(
                             settingsOption);
                     for (String singleSynonym : synonyms) {

@@ -118,7 +118,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     private void setTableNameSpellingMistake(SettingsManager settingsManager){
-        this.tableNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING, SpellingMistake.class);
+        this.tableNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING, SpellingMistake.class).orElse(null);
     }
 
     private String useTableNameSpellingMistake(String str) {

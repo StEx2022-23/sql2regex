@@ -37,9 +37,15 @@ public class ConverterManagement {
     /**
      * Validate inserted SQL-statements for oracle, mysql, sqlserver, mariadb
      * return true or false, with a console output about the error messages
-     * @param sqlstatement String
      * @return boolean
      */
+
+    @Autowired
+    public ConverterManagement(SettingsManager settingsManager){
+        Assert.notNull(settingsManager, "Settings manager must not be null");
+        this.settingsManager = settingsManager;
+    }
+
     public boolean validate(String sqlstatement){
         List<DatabaseType> supportedDBMS = new ArrayList<>();
         supportedDBMS.add(DatabaseType.ORACLE);
@@ -124,9 +130,9 @@ public class ConverterManagement {
         StatementDeParserForRegEx defaultStatementDeparser = new StatementDeParserForRegEx(buffer, settingsManager);
         statement.accept(defaultStatementDeparser);
         String regExOne = toMaskedStrings(defaultStatementDeparser);
-        ExpressionDeParser expressionDeParser = new ExpressionDeParser();
-        StatementDeParser joinWhereStatementDeparser = new StatementDeParserForRegEx(expressionDeParser, buffer);
-        String regExTwo = toMaskedStrings(joinWhereStatementDeparser);
+        ExpressionDeParserForRegEx expressionDeParser = new ExpressionDeParserForRegEx(settingsManager);
+        StatementDeParser joinWhereStatementDeParser = new StatementDeParserForRegEx(expressionDeParser, buffer, settingsManager);
+        String regExTwo = toMaskedStrings(joinWhereStatementDeParser);
         return this.buildOutputRegex(Arrays.asList(regExOne, regExTwo));
     }
 

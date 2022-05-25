@@ -13,11 +13,13 @@ import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Missing overrides: AnalyticExpression
@@ -460,9 +462,12 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 tableName += table.getAlias().getName();
             }
         }
+
         if(!tableName.isEmpty()) {
-            buffer.append(settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
-                    SpellingMistake.class).generateRegExFor(tableName)).append(".");
+            String finalTableName = tableName;
+            settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
+                    SpellingMistake.class).ifPresent(spelling -> buffer.append(spelling.generateRegExFor(finalTableName)));
+            buffer.append('.');
         }
 
         settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING,

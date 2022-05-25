@@ -37,13 +37,6 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         this.setKeywordSpellingMistake(settingsManager);
     }
 
-    public StatementDeParserForRegEx(ExpressionDeParser expressionDeParser, StringBuilder buffer) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
-        super(buffer);
-        this.expressionDeParserForRegEx = expressionDeParser;
-        this.selectDeParserForRegEx = new SelectDeParserForRegEx(new SettingsManager());
-        this.setKeywordSpellingMistake(new SettingsManager());
-    }
-
     private void setKeywordSpellingMistake(SettingsManager settingsManager){
         this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class).orElse(null);
     }
@@ -62,7 +55,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         if (select.getWithItemsList() != null && !select.getWithItemsList().isEmpty()) {
             buffer.append(useKeywordSpellingMistake(WITH));
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(selectDeParserForRegEx.handleWithItemValueList(select));
+            buffer.append(this.selectDeParserForRegEx.handleWithItemValueList(select));
         }
         select.getSelectBody().accept(selectDeParserForRegEx);
     }
