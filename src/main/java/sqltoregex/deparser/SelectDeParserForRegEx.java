@@ -141,7 +141,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     private String useColumnNameOrder(List<String> strlist){
         if(null != this.columnNameOrder) return this.columnNameOrder.generateRegExFor(strlist);
-        else return this.combineCommaDividedStringList(strlist);
+        else return String.join(",", strlist);
     }
 
     private void setTableNameOrder(SettingsManager settingsManager){
@@ -150,24 +150,14 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     private String useTableNameOrder(List<String> strlist){
         if(null != this.tableNameOrder) return this.tableNameOrder.generateRegExFor(strlist);
-        else return this.combineCommaDividedStringList(strlist);
-    }
-
-    private String combineCommaDividedStringList(List<String> strlist){
-        StringBuilder str = new StringBuilder();
-        Iterator<String> stringListIterator = strlist.iterator();
-        while (stringListIterator.hasNext()){
-            str.append(stringListIterator.next());
-            if (stringListIterator.hasNext()) str.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
-        }
-        return str.toString();
+        else return String.join(",", strlist);
     }
 
     @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.ExcessiveMethodLength", "PMD.NPathComplexity"})
     public void visit(PlainSelect plainSelect) {
         if (plainSelect.isUseBrackets()) {
-            buffer.append("(" + OPTIONAL_WHITE_SPACE);
+            buffer.append("\\(" + OPTIONAL_WHITE_SPACE);
         }
 
         buffer.append(useKeywordSpellingMistake(SELECT));
