@@ -7,6 +7,7 @@ import org.xml.sax.SAXException;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
+import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;

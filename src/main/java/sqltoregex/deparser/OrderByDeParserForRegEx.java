@@ -41,7 +41,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     private void setKeywordSpellingMistake(SettingsManager settingsManager){
-        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
+        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class).orElse(null);
     }
 
     private String useKeywordSpellingMistake(String str){
@@ -50,7 +50,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     private void setColumnNameSpellingMistake(SettingsManager settingsManager){
-        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class);
+        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class).orElse(null);
     }
 
     private String useColumnNameSpellingMistake(String str){
@@ -59,7 +59,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     private void setSpecialSynonymGenerator(SettingsManager settingsManager){
-        this.specialSynonyms = settingsManager.getSettingBySettingsOption(SettingsOption.OTHERSYNONYMS, StringSynonymGenerator.class);
+        this.specialSynonyms = settingsManager.getSettingBySettingsOption(SettingsOption.OTHERSYNONYMS, StringSynonymGenerator.class).orElse(null);
     }
 
     private String useSpecialSynonymGenerator(String str){
@@ -68,7 +68,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     private void setColumnNameOrder(SettingsManager settingsManager){
-        this.columnNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
+        this.columnNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class).orElse(null);
     }
 
     private String useColumnNameOrder(List<String> strlist){

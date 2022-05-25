@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 
 class StatementDeParserForRegExTest {
     StringBuilder buffer = new StringBuilder();
-    StatementDeParser statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(new SettingsManager()), buffer);
+    StatementDeParser statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(new SettingsManager()), buffer, new SettingsManager());
 
     StatementDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
     }
@@ -44,9 +44,10 @@ class StatementDeParserForRegExTest {
     }
 
     @Test
-    void testConstructorOne(){
+    void testConstructorOne() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        SettingsManager settingsManager = new SettingsManager();
         StringBuilder buffer = new StringBuilder();
-        StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(buffer);
+        StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(buffer, settingsManager);
         Assertions.assertNotNull(statementDeParserForRegEx);
     }
 
@@ -65,7 +66,7 @@ class StatementDeParserForRegExTest {
         SettingsManager settingsManager = new SettingsManager();
         ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settingsManager);
         StringBuilder buffer = new StringBuilder();
-        StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(expressionDeParserForRegEx, buffer);
+        StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(expressionDeParserForRegEx, buffer, settingsManager);
         Assertions.assertNotNull(statementDeParserForRegEx);
     }
 

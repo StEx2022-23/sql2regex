@@ -100,7 +100,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     private void setKeywordSpellingMistake(SettingsManager settingsManager){
-        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
+        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class).orElse(null);
     }
 
     private String useKeywordSpellingMistake(String str){
@@ -109,7 +109,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     private void setColumnNameSpellingMistake(SettingsManager settingsManager){
-        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class);
+        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class).orElse(null);
     }
 
     private String useColumnNameSpellingMistake(String str){
@@ -127,7 +127,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     private void setAggregateFunctionLang(SettingsManager settingsManager){
-        this.aggregateFunctionLang = settingsManager.getSettingBySettingsOption(SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class);
+        this.aggregateFunctionLang = settingsManager.getSettingBySettingsOption(SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class).orElse(null);
     }
 
     private String useAggregateFunctionLang(String str){
@@ -136,7 +136,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     private void setColumnNameOrder(SettingsManager settingsManager){
-        this.columnNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class);
+        this.columnNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class).orElse(null);
     }
 
     private String useColumnNameOrder(List<String> strlist){
@@ -145,7 +145,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     private void setTableNameOrder(SettingsManager settingsManager){
-        this.tableNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMEORDER, OrderRotation.class);
+        this.tableNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMEORDER, OrderRotation.class).orElse(null);
     }
 
     private String useTableNameOrder(List<String> strlist){

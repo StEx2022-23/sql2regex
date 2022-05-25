@@ -464,8 +464,9 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             buffer.append(settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
                     SpellingMistake.class).generateRegExFor(tableName)).append(".");
         }
-        buffer.append(settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class).generateRegExFor(tableColumn.getColumnName()));
 
+        settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING,
+                SpellingMistake.class).ifPresent(stringRegExGenerator -> buffer.append(stringRegExGenerator.generateRegExFor(tableColumn.getColumnName())));
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
@@ -567,26 +568,18 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                     .append("'").append(OPTIONAL_WHITE_SPACE).append("\\}")
                     .append('|')
                     .append(settingsManager.getSettingBySettingsOption(SettingsOption.DATESYNONYMS,
-                                                                      DateAndTimeFormatSynonymGenerator.class).generateRegExFor(dateValue));
-        buffer.append("\\{d").append(OPTIONAL_WHITE_SPACE).append("'").append(dateValue.getValue().toString())
-                .append("'").append(OPTIONAL_WHITE_SPACE).append("\\}")
-                .append('|')
-                .append(settingsManager.getSettingBySettingsOption(SettingsOption.DATESYNONYMS,
-                                                                   DateAndTimeFormatSynonymGenerator.class).generateRegExFor(dateValue));
+                                                                      DateAndTimeFormatSynonymGenerator.class)
+                            .map(synonymGenerator -> synonymGenerator.generateRegExFor(dateValue)).orElse(""));
     }
 
     @Override
     public void visit(TimestampValue timestampValue) {
-            buffer.append("\\{ts").append(OPTIONAL_WHITE_SPACE).append("'").append(timestampValue.getValue().toString())
-                .append(OPTIONAL_WHITE_SPACE).append("\\}")
-                    .append('|')
-                    .append(settingsManager.getSettingBySettingsOption(SettingsOption.DATETIMESYNONYMS,
-                                                                      DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timestampValue));
         buffer.append("\\{ts").append(OPTIONAL_WHITE_SPACE).append("'").append(timestampValue.getValue().toString())
             .append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')
                 .append(settingsManager.getSettingBySettingsOption(SettingsOption.DATETIMESYNONYMS,
-                                                                   DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timestampValue));
+                                DateAndTimeFormatSynonymGenerator.class)
+                        .map(synonymGenerator -> synonymGenerator.generateRegExFor(timestampValue)).orElse(""));
     }
 
     @Override
@@ -595,12 +588,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 .append(OPTIONAL_WHITE_SPACE).append("\\}")
                     .append('|')
                     .append(settingsManager.getSettingBySettingsOption(SettingsOption.TIMESYNONYMS,
-                                                                      DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timeValue));
-        buffer.append("\\{t").append(OPTIONAL_WHITE_SPACE).append("'").append(timeValue.getValue().toString())
-            .append(OPTIONAL_WHITE_SPACE).append("\\}")
-                .append('|')
-                .append(settingsManager.getSettingBySettingsOption(SettingsOption.TIMESYNONYMS,
-                                                                   DateAndTimeFormatSynonymGenerator.class).generateRegExFor(timeValue));
+                        DateAndTimeFormatSynonymGenerator.class).map(synonymGenerator -> synonymGenerator.generateRegExFor(timeValue)).orElse(""));
     }
 
     @Override

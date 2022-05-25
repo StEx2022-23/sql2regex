@@ -24,7 +24,7 @@ public class LimitDeParserForRegEx extends LimitDeparser {
     }
 
     private void setKeywordSpellingMistake(SettingsManager settingsManager){
-        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
+        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class).orElse(null);
     }
 
     private String useKeywordSpellingMistake(String str){

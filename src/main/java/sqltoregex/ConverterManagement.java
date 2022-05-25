@@ -11,9 +11,13 @@ import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import net.sf.jsqlparser.util.validation.Validation;
 import net.sf.jsqlparser.util.validation.ValidationError;
 import net.sf.jsqlparser.util.validation.feature.DatabaseType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.xml.sax.SAXException;
+import sqltoregex.deparser.ExpressionDeParserForRegEx;
 import sqltoregex.deparser.StatementDeParserForRegEx;
+import sqltoregex.settings.SettingsManager;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -28,6 +32,8 @@ import java.util.logging.Logger;
  */
 @Service
 public class ConverterManagement {
+
+    private SettingsManager settingsManager;
     /**
      * Validate inserted SQL-statements for oracle, mysql, sqlserver, mariadb
      * return true or false, with a console output about the error messages
@@ -115,7 +121,7 @@ public class ConverterManagement {
     private String deParseStatement(String sqlStatement, StringBuilder buffer) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, JSQLParserException {
         Statement statement;
         statement = this.parseStatement(sqlStatement);
-        StatementDeParser defaultStatementDeparser = new StatementDeParser(buffer);
+        StatementDeParserForRegEx defaultStatementDeparser = new StatementDeParserForRegEx(buffer, settingsManager);
         statement.accept(defaultStatementDeparser);
         String regExOne = toMaskedStrings(defaultStatementDeparser);
         ExpressionDeParser expressionDeParser = new ExpressionDeParser();

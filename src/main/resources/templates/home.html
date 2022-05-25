@@ -23,7 +23,6 @@
                 <div class="card-body">
                     <h1 th:text="#{conv.heading}" class="pb-2 border-bottom"></h1>
                     <div id="form_response_body">
-
                         <form th:replace="assets/settingsform/form :: settingsform" action="#" th:action="@{/convert}" th:object="${settingsForm}" method="POST">
                             no form inserted
                         </form>

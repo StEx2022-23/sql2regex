@@ -18,16 +18,22 @@ import java.io.IOException;
 public class StatementDeParserForRegEx extends StatementDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     public static final String WITH = "WITH";
-    ExpressionDeParser expressionDeParserForRegEx;
+    ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
     RegExGenerator<String> keywordSpellingMistake;
 
-    public StatementDeParserForRegEx(StringBuilder buffer) {
-        super(buffer);
+    public StatementDeParserForRegEx(StringBuilder buffer, SettingsManager settingsManager) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        this(new ExpressionDeParserForRegEx(settingsManager), buffer, settingsManager);
     }
 
-    public StatementDeParserForRegEx(ExpressionDeParser expressionDeParser, SelectDeParser selectDeParser, StringBuilder buffer, SettingsManager settingsManager) {
+    public StatementDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, StringBuilder buffer, SettingsManager settingsManager) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        this(expressionDeParser, new SelectDeParserForRegEx(settingsManager), buffer, settingsManager);
+    }
+
+    public StatementDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, SelectDeParserForRegEx selectDeParser, StringBuilder buffer, SettingsManager settingsManager) {
         super(expressionDeParser, selectDeParser, buffer);
+        this.expressionDeParserForRegEx = expressionDeParser;
+        this.selectDeParserForRegEx = selectDeParser;
         this.setKeywordSpellingMistake(settingsManager);
     }
 
@@ -39,7 +45,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     }
 
     private void setKeywordSpellingMistake(SettingsManager settingsManager){
-        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class);
+        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class).orElse(null);
     }
 
     private String useKeywordSpellingMistake(String str){
@@ -49,10 +55,10 @@ public class StatementDeParserForRegEx extends StatementDeParser {
 
     @Override
     public void visit(Select select) {
-        selectDeParserForRegEx.setBuffer(buffer);
-        expressionDeParserForRegEx.setSelectVisitor(selectDeParserForRegEx);
-        expressionDeParserForRegEx.setBuffer(buffer);
-        selectDeParserForRegEx.setExpressionVisitor(expressionDeParserForRegEx);
+        this.selectDeParserForRegEx.setBuffer(buffer);
+        this.expressionDeParserForRegEx.setSelectVisitor(this.selectDeParserForRegEx);
+        this.expressionDeParserForRegEx.setBuffer(buffer);
+        this.selectDeParserForRegEx.setExpressionVisitor(expressionDeParserForRegEx);
         if (select.getWithItemsList() != null && !select.getWithItemsList().isEmpty()) {
             buffer.append(useKeywordSpellingMistake(WITH));
             buffer.append(REQUIRED_WHITE_SPACE);

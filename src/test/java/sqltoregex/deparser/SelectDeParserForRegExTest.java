@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 
 class SelectDeParserForRegExTest {
     StringBuilder buffer = new StringBuilder();
-    StatementDeParser statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(new SettingsManager()), buffer);
+    StatementDeParser statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(new SettingsManager()), buffer, new SettingsManager());
 
     SelectDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
     }
