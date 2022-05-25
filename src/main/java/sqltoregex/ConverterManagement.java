@@ -84,19 +84,6 @@ public class ConverterManagement {
         return (set.size() == list.size());
     }
 
-    /**
-     * generate string from deparser objekt, masked backslashes
-     * @param statementDeParser StatementDeParser
-     * @return maskedString - String
-     */
-    private String toMaskedStrings(StatementDeParser statementDeParser){
-        return statementDeParser.getBuffer().toString().replace("\\", "\\\\");
-    }
-
-    private String toMaskedStrings(ExpressionDeParser expressionDeParser){
-        return expressionDeParser.getBuffer().toString().replace("\\", "\\\\");
-    }
-
     private String buildOutputRegex(String regex){
         return "^" + regex + "$";
     }
@@ -129,10 +116,10 @@ public class ConverterManagement {
         statement = this.parseStatement(sqlStatement);
         StatementDeParserForRegEx defaultStatementDeparser = new StatementDeParserForRegEx(buffer, settingsManager);
         statement.accept(defaultStatementDeparser);
-        String regExOne = toMaskedStrings(defaultStatementDeparser);
+        String regExOne = defaultStatementDeparser.getBuffer().toString();
         ExpressionDeParserForRegEx expressionDeParser = new ExpressionDeParserForRegEx(settingsManager);
         StatementDeParser joinWhereStatementDeParser = new StatementDeParserForRegEx(expressionDeParser, buffer, settingsManager);
-        String regExTwo = toMaskedStrings(joinWhereStatementDeParser);
+        String regExTwo = joinWhereStatementDeParser.getBuffer().toString();
         return this.buildOutputRegex(Arrays.asList(regExOne, regExTwo));
     }
 
@@ -143,7 +130,7 @@ public class ConverterManagement {
         expression.accept(expressionVisitor);
         ExpressionDeParser expressionDeParser = new ExpressionDeParser();
         expression.accept(expressionDeParser);
-        return this.buildOutputRegex(toMaskedStrings(expressionDeParser));
+        return this.buildOutputRegex(expressionDeParser.getBuffer().toString());
     }
 
     /**
