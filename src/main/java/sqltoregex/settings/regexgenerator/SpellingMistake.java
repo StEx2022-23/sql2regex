@@ -45,7 +45,7 @@ public class SpellingMistake extends RegExGenerator<String> {
             alternativeWritingStyles.append(concat);
             alternativeWritingStyles.append("|");
         }
-        if(str.length() > 1) alternativeWritingStyles.replace(alternativeWritingStyles.length() - 1, alternativeWritingStyles.length(), "");
+        alternativeWritingStyles.replace(alternativeWritingStyles.length() - 1, alternativeWritingStyles.length(), "");
         alternativeWritingStyles.append(')');
         return alternativeWritingStyles.toString();
     }
