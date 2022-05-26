@@ -2,6 +2,7 @@ package sqltoregex.deparser;
 
 import net.sf.jsqlparser.statement.Statements;
 import net.sf.jsqlparser.statement.insert.Insert;
+import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.util.deparser.StatementDeParser;
@@ -16,6 +17,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
     SettingsManager settingsManager;
+
 
     public StatementDeParserForRegEx(StringBuilder buffer, SettingsManager settingsManager) {
         this(new ExpressionDeParserForRegEx(settingsManager), buffer, settingsManager);
@@ -63,6 +65,12 @@ public class StatementDeParserForRegEx extends StatementDeParser {
                 this.buffer,
                 this.settingsManager);
         insertDeParserForRegEx.deParse(insert);
+    }
+
+    @Override
+    public void visit(CreateTable createTable) {
+        CreateTableDeParserForRegEx createTableDeParserForRegEx = new CreateTableDeParserForRegEx(this, buffer, settingsManager);
+        createTableDeParserForRegEx.deParse(createTable);
     }
 
     @Override
