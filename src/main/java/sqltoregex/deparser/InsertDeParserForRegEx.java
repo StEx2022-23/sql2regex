@@ -168,18 +168,18 @@ public class InsertDeParserForRegEx extends InsertDeParser {
             }
         }
 
-        if (insert.isReturningAllColumns()) {
-            buffer.append(" RETURNING *");
-        } else if (insert.getReturningExpressionList() != null) {
-            buffer.append(" RETURNING ");
-            for (Iterator<SelectExpressionItem> iter = insert.getReturningExpressionList().iterator(); iter
-                    .hasNext();) {
-                buffer.append(iter.next().toString());
-                if (iter.hasNext()) {
-                    buffer.append(", ");
-                }
-            }
-        }
+//        if (insert.isReturningAllColumns()) {
+//            buffer.append(" RETURNING *");
+//        } else if (insert.getReturningExpressionList() != null) {
+//            buffer.append(" RETURNING ");
+//            for (Iterator<SelectExpressionItem> iter = insert.getReturningExpressionList().iterator(); iter
+//                    .hasNext();) {
+//                buffer.append(iter.next().toString());
+//                if (iter.hasNext()) {
+//                    buffer.append(", ");
+//                }
+//            }
+//        }
     }
 
     @Override
