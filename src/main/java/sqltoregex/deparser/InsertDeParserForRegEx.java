@@ -2,11 +2,13 @@ package sqltoregex.deparser;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
+import net.sf.jsqlparser.expression.operators.relational.ItemsList;
 import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.NamedExpressionList;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
+import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.util.deparser.InsertDeParser;
@@ -122,9 +124,6 @@ public class InsertDeParserForRegEx extends InsertDeParser {
 
         if (insert.getSelect() != null) {
             buffer.append(" ");
-            if (insert.isUseSelectBrackets()) {
-                buffer.append("(");
-            }
             if (insert.getSelect().getWithItemsList() != null) {
                 buffer.append("WITH ");
                 for (WithItem with : insert.getSelect().getWithItemsList()) {
@@ -133,9 +132,6 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 buffer.append(" ");
             }
             insert.getSelect().getSelectBody().accept(this.selectDeParserForRegEx);
-            if (insert.isUseSelectBrackets()) {
-                buffer.append(")");
-            }
         }
 
         if (insert.isUseSet()) {
@@ -168,9 +164,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
             }
         }
 
-        if (insert.isReturningAllColumns()) {
-            buffer.append(" RETURNING *");
-        } else if (insert.getReturningExpressionList() != null) {
+        if (insert.getReturningExpressionList() != null) {
             buffer.append(" RETURNING ");
             for (Iterator<SelectExpressionItem> iter = insert.getReturningExpressionList().iterator(); iter
                     .hasNext();) {
