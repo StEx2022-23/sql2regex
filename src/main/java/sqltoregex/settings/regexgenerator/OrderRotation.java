@@ -13,10 +13,9 @@ import java.util.Objects;
  * SELECT table1, table2
  * SELECT (?:table1\s*,\s*table2|table2\s*,\s*table1)
  */
-public class OrderRotation implements RegExGenerator<List<String>> {
+public class OrderRotation extends RegExGenerator<List<String>> {
     private final StringBuilder buffer = new StringBuilder();
     private final SettingsOption settingsOption;
-    protected boolean isCapturingGroup = false;
     private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
     private SpellingMistake spellingMistake;
 
@@ -103,15 +102,6 @@ public class OrderRotation implements RegExGenerator<List<String>> {
                 orderRotationRek(amount - 1, valueList);
             }
         }
-    }
-
-    /**
-     * Sets whether there will be an enclosing non capturing group (?: ... ) around the generated regEx.
-     *
-     * @param capturingGroup true for capturing group false for non-capturing group
-     */
-    public void setCapturingGroup(boolean capturingGroup) {
-        isCapturingGroup = capturingGroup;
     }
 
     @Override

@@ -5,7 +5,7 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
+import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 public class StatementDeParserForRegEx extends StatementDeParser {
@@ -13,7 +13,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     public static final String WITH = "WITH";
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
-    RegExGenerator<String> keywordSpellingMistake;
+    IRegExGenerator<String> keywordSpellingMistake;
 
     public StatementDeParserForRegEx(StringBuilder buffer, SettingsManager settingsManager) {
         this(new ExpressionDeParserForRegEx(settingsManager), buffer, settingsManager);

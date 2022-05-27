@@ -4,7 +4,7 @@ import net.sf.jsqlparser.expression.AllValue;
 import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.statement.select.Limit;
 import net.sf.jsqlparser.util.deparser.LimitDeparser;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
+import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
@@ -12,7 +12,7 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
 public class LimitDeParserForRegEx extends LimitDeparser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
-    private RegExGenerator<String> keywordSpellingMistake;
+    private IRegExGenerator<String> keywordSpellingMistake;
 
     public LimitDeParserForRegEx(StringBuilder buffer) {
         super(buffer);

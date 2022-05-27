@@ -11,7 +11,7 @@ import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.values.ValuesStatement;
 import net.sf.jsqlparser.util.deparser.SelectDeParser;
 import net.sf.jsqlparser.util.deparser.ValuesStatementDeParser;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
+import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
@@ -79,12 +79,12 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public static final String ROWS = "ROWS";
     private boolean flagForOrderRotationWithOutSpellingMistake = false;
     private ExpressionVisitor expressionVisitor;
-    private final RegExGenerator<String> keywordSpellingMistake;
-    private final RegExGenerator<String> columnNameSpellingMistake;
-    private final RegExGenerator<String> tableNameSpellingMistake;
-    private final RegExGenerator<List<String>> columnNameOrder;
-    private final RegExGenerator<List<String>> tableNameOrder;
-    private final RegExGenerator<String> aggregateFunctionLang;
+    private final IRegExGenerator<String> keywordSpellingMistake;
+    private final IRegExGenerator<String> columnNameSpellingMistake;
+    private final IRegExGenerator<String> tableNameSpellingMistake;
+    private final IRegExGenerator<List<String>> columnNameOrder;
+    private final IRegExGenerator<List<String>> tableNameOrder;
+    private final IRegExGenerator<String> aggregateFunctionLang;
     SettingsManager settingsManager;
 
     public SelectDeParserForRegEx(SettingsManager settingsManager) {

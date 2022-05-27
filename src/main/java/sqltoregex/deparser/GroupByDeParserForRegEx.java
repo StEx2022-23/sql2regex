@@ -4,7 +4,7 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitor;
 import net.sf.jsqlparser.statement.select.GroupByElement;
 import net.sf.jsqlparser.util.deparser.GroupByDeParser;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
+import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.ExpressionRotation;
@@ -17,8 +17,8 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     public static final String GROUP = "GROUP";
     public static final String BY = "BY";
-    private final RegExGenerator<String> keywordSpellingMistake;
-    private final RegExGenerator<List<Expression>> expressionOrder;
+    private final IRegExGenerator<String> keywordSpellingMistake;
+    private final IRegExGenerator<List<Expression>> expressionOrder;
     private final ExpressionVisitor expressionVisitor;
 
     public GroupByDeParserForRegEx(ExpressionVisitor expressionVisitor, StringBuilder buffer, SettingsManager settingsManager) {

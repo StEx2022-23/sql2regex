@@ -7,7 +7,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
+import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -27,15 +27,15 @@ import java.util.logging.Logger;
 @Service
 public class SettingsManager {
     //refactor to a HashList of a new class "SettingsContainer" which holds Maps?
-    private final Map<SettingsType, Map<SettingsOption, RegExGenerator<?>>> settingsMap = new EnumMap<SettingsType,
-            Map<SettingsOption, RegExGenerator<?>>>(SettingsType.class);
+    private final Map<SettingsType, Map<SettingsOption, IRegExGenerator<?>>> settingsMap = new EnumMap<SettingsType,
+            Map<SettingsOption, IRegExGenerator<?>>>(SettingsType.class);
 
     public SettingsManager() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException, URISyntaxException {
         this.parseSettings();
     }
 
-    public static <T> Optional<RegExGenerator<T>> castSetting(RegExGenerator<?> rawSetting,
-                                                              Class<? extends RegExGenerator<T>> clazz) {
+    public static <T> Optional<IRegExGenerator<T>> castSetting(IRegExGenerator<?> rawSetting,
+                                                               Class<? extends IRegExGenerator<T>> clazz) {
         try {
             return Optional.of(clazz.cast(rawSetting));
         } catch (ClassCastException e) {
@@ -48,14 +48,14 @@ public class SettingsManager {
     /**
      * Method for getting all Settings of one class with are setted by the user.
      */
-    public <S> Set<RegExGenerator<S>> getSettingByClass(Class<? extends RegExGenerator<S>> clazz) {
+    public <S> Set<IRegExGenerator<S>> getSettingByClass(Class<? extends IRegExGenerator<S>> clazz) {
         return getSettingByClass(clazz, SettingsType.USER);
     }
 
-    public <S> Set<RegExGenerator<S>> getSettingByClass(Class<? extends RegExGenerator<S>> clazz,
-                                                        SettingsType settingsType) {
-        Set<RegExGenerator<S>> settingsSet = new LinkedHashSet<>();
-        for (RegExGenerator<?> setting : this.getSettingsMap(settingsType).values()) {
+    public <S> Set<IRegExGenerator<S>> getSettingByClass(Class<? extends IRegExGenerator<S>> clazz,
+                                                         SettingsType settingsType) {
+        Set<IRegExGenerator<S>> settingsSet = new LinkedHashSet<>();
+        for (IRegExGenerator<?> setting : this.getSettingsMap(settingsType).values()) {
             if (setting != null && setting.getClass().equals(clazz)) {
                 castSetting(setting, clazz).ifPresent(settingsSet::add);
             }
@@ -71,15 +71,15 @@ public class SettingsManager {
         return this.getSettingsMap(settingsType).containsKey(settingsOption);
     }
 
-    public <S> Optional<RegExGenerator<S>> getSettingBySettingsOption(SettingsOption settingsOption,
-                                                                      Class<? extends RegExGenerator<S>> clazz) {
+    public <S> Optional<IRegExGenerator<S>> getSettingBySettingsOption(SettingsOption settingsOption,
+                                                                       Class<? extends IRegExGenerator<S>> clazz) {
         return this.getSettingBySettingsOption(settingsOption, clazz, SettingsType.USER);
     }
 
-    public <S> Optional<RegExGenerator<S>> getSettingBySettingsOption(SettingsOption settingsOption,
-                                                                      Class<? extends RegExGenerator<S>> clazz,
-                                                                      SettingsType settingsType) {
-        for (Map.Entry<SettingsOption, RegExGenerator<?>> entry
+    public <S> Optional<IRegExGenerator<S>> getSettingBySettingsOption(SettingsOption settingsOption,
+                                                                       Class<? extends IRegExGenerator<S>> clazz,
+                                                                       SettingsType settingsType) {
+        for (Map.Entry<SettingsOption, IRegExGenerator<?>> entry
                 : this.getSettingsMap(settingsType).entrySet()
         ) {
             if (entry.getKey().equals(settingsOption)) {
@@ -89,11 +89,11 @@ public class SettingsManager {
         return Optional.empty();
     }
 
-    public Map<SettingsOption, RegExGenerator<?>> getSettingsMap() {
+    public Map<SettingsOption, IRegExGenerator<?>> getSettingsMap() {
         return this.getSettingsMap(SettingsType.USER);
     }
 
-    public Map<SettingsOption, RegExGenerator<?>> getSettingsMap(SettingsType settingsType) {
+    public Map<SettingsOption, IRegExGenerator<?>> getSettingsMap(SettingsType settingsType) {
         Assert.notNull(settingsType, "settingsType must not be null");
         if (settingsType == SettingsType.USER){
             return UserSettings.getInstance().getSettingsMap();
@@ -109,7 +109,7 @@ public class SettingsManager {
     public <A, S> Optional<SynonymGenerator<A, S>> getSynonymManagerBySettingOption(SettingsOption settingsOption,
                                                                                     Class<? extends SynonymGenerator<A, S>> clazz,
                                                                                     SettingsType settingsType) {
-        for (Map.Entry<SettingsOption, RegExGenerator<?>> entry : this.getSettingsMap(settingsType).entrySet()) {
+        for (Map.Entry<SettingsOption, IRegExGenerator<?>> entry : this.getSettingsMap(settingsType).entrySet()) {
             List<SettingsOption> synonymManagerRelatedSettingsOptionsList = Arrays.asList(
                     SettingsOption.DATESYNONYMS,
                     SettingsOption.TIMESYNONYMS,
@@ -118,7 +118,7 @@ public class SettingsManager {
             );
             if (entry.getKey().equals(settingsOption) && synonymManagerRelatedSettingsOptionsList.contains(
                     settingsOption)) {
-                Optional<RegExGenerator<S>> opt = castSetting(entry.getValue(), clazz);
+                Optional<IRegExGenerator<S>> opt = castSetting(entry.getValue(), clazz);
                 return opt.map(sRegExGenerator -> (SynonymGenerator<A, S>) sRegExGenerator);
             }
         }
@@ -171,10 +171,10 @@ public class SettingsManager {
     }
 
 
-    public Map<SettingsOption, RegExGenerator<?>> parseUserSettingsInput(SettingsForm form) {
+    public Map<SettingsOption, IRegExGenerator<?>> parseUserSettingsInput(SettingsForm form) {
         SettingsMapBuilder settingsMapBuilder = new SettingsMapBuilder();
 
-        Map<SettingsOption, RegExGenerator<?>> map = settingsMapBuilder
+        Map<SettingsOption, IRegExGenerator<?>> map = settingsMapBuilder
                 .withSettingsOptionSet(form.getSpellings())
                 .withSettingsOptionSet(form.getOrders())
                 .withSimpleDateFormatSet(form.getDateFormats(), SettingsOption.DATESYNONYMS)

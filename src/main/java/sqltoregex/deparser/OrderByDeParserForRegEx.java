@@ -3,7 +3,7 @@ package sqltoregex.deparser;
 import net.sf.jsqlparser.expression.ExpressionVisitor;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.util.deparser.OrderByDeParser;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
+import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
@@ -26,10 +26,10 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     public static final String NULLS_LAST = "NULLS LAST";
     public static final String NULLS_FIRST = "NULLS FIRST";
     private ExpressionVisitor regExExpressionVisitor;
-    private final RegExGenerator<String> keywordSpellingMistake;
-    private final RegExGenerator<String> columnNameSpellingMistake;
-    private final RegExGenerator<List<String>> columnNameOrder;
-    private final RegExGenerator<String> specialSynonyms;
+    private final IRegExGenerator<String> keywordSpellingMistake;
+    private final IRegExGenerator<String> columnNameSpellingMistake;
+    private final IRegExGenerator<List<String>> columnNameOrder;
+    private final IRegExGenerator<String> specialSynonyms;
 
     public OrderByDeParserForRegEx(ExpressionVisitor expressionVisitor, StringBuilder buffer, SettingsManager settingsManager) {
         super(expressionVisitor, buffer);

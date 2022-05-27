@@ -15,11 +15,10 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ExpressionRotation implements RegExGenerator<List<Expression>> {
+public class ExpressionRotation extends RegExGenerator<List<Expression>> {
     private final Map<Integer, List<Expression>> groupByOrderOptionsMap = new HashMap<>();
     private Integer groupByOrderOptionsCounter = 0;
     private final SettingsOption settingsOption;
-    protected boolean isCapturingGroup = false;
 
     public ExpressionRotation(SettingsOption settingsOption) {
         this.settingsOption = settingsOption;

@@ -5,7 +5,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import sqltoregex.settings.regexgenerator.ExpressionRotation;
 import sqltoregex.settings.regexgenerator.OrderRotation;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
+import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
@@ -17,7 +17,7 @@ class SettingsMapBuilder {
     private static final String UNSUPPORTED_BUILD_WITH = "Unsupported build with:";
     private static final String STRING_SYNONYM_DELIMITER = ";";
     private final Set<OrderRotation> orderRotations;
-    private final Map<SettingsOption, RegExGenerator<?>> settingsMap;
+    private final Map<SettingsOption, IRegExGenerator<?>> settingsMap;
     private final Set<SpellingMistake> spellingMistakes;
 
     public SettingsMapBuilder() {
@@ -26,7 +26,7 @@ class SettingsMapBuilder {
         this.spellingMistakes = new LinkedHashSet<>();
     }
 
-    public Map<SettingsOption, RegExGenerator<?>> build() {
+    public Map<SettingsOption, IRegExGenerator<?>> build() {
         for (OrderRotation orderRotation : orderRotations) {
             SettingsOption settingsOption = orderRotation.getSettingsOption();
             SpellingMistake spellingMistake = new SpellingMistake(SettingsOption.valueOf(

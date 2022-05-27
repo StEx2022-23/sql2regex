@@ -4,7 +4,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sqltoregex.settings.regexgenerator.OrderRotation;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
+import sqltoregex.settings.regexgenerator.IRegExGenerator;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -14,9 +14,9 @@ class UserSettingsTest {
 
     @Test
     void MapNotMutable() {
-        Map<SettingsOption, RegExGenerator<?>> map = new HashMap<>();
+        Map<SettingsOption, IRegExGenerator<?>> map = new HashMap<>();
         UserSettings userSettings1 = UserSettings.getInstance(map);
-        Map<SettingsOption, RegExGenerator<?>> settingsMap = userSettings1.getSettingsMap();
+        Map<SettingsOption, IRegExGenerator<?>> settingsMap = userSettings1.getSettingsMap();
         Assertions.assertThrows(UnsupportedOperationException.class, () -> settingsMap.putAll(map));
         OrderRotation orderRotation = new OrderRotation(SettingsOption.DEFAULT);
         Assertions.assertThrows(UnsupportedOperationException.class,
@@ -25,7 +25,7 @@ class UserSettingsTest {
 
     @Test
     void onlyOneInstance() {
-        Map<SettingsOption, RegExGenerator<?>> map = new HashMap<>();
+        Map<SettingsOption, IRegExGenerator<?>> map = new HashMap<>();
         UserSettings userSettings1 = UserSettings.getInstance(map);
         UserSettings userSettings2 = UserSettings.getInstance(map);
         Assertions.assertEquals(userSettings1, userSettings2);

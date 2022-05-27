@@ -3,16 +3,12 @@ package sqltoregex.settings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 import sqltoregex.settings.regexgenerator.OrderRotation;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
+import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -38,14 +34,14 @@ class SettingsMapBuilderTest {
     void buildWith2EqualObjects() {
         builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
         builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
-        Map<SettingsOption, RegExGenerator<?>> map = builder.build();
+        Map<SettingsOption, IRegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
     }
 
     @Test
     void buildWithColumnNameOrder() {
         builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
-        Map<SettingsOption, RegExGenerator<?>> map = builder.build();
+        Map<SettingsOption, IRegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(SettingsOption.COLUMNNAMEORDER));
         Assertions.assertTrue(map.containsValue(new OrderRotation(SettingsOption.COLUMNNAMEORDER)));
@@ -56,7 +52,7 @@ class SettingsMapBuilderTest {
         final String FORMAT = "yyyy-MM-dd";
         builder.withSimpleDateFormatSet(new HashSet<>(List.of(new SimpleDateFormat(FORMAT))),
                                         SettingsOption.DATESYNONYMS);
-        Map<SettingsOption, RegExGenerator<?>> map = builder.build();
+        Map<SettingsOption, IRegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         DateAndTimeFormatSynonymGenerator dateAndTimeFormatSynonymGenerator = new DateAndTimeFormatSynonymGenerator(
                 SettingsOption.DATESYNONYMS);
@@ -70,7 +66,7 @@ class SettingsMapBuilderTest {
         final String FORMAT = "yyyy-MM-dd hh:mm:ss";
         builder.withSimpleDateFormatSet(new HashSet<>(List.of(new SimpleDateFormat(FORMAT))),
                                         SettingsOption.DATETIMESYNONYMS);
-        Map<SettingsOption, RegExGenerator<?>> map = builder.build();
+        Map<SettingsOption, IRegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(SettingsOption.DATETIMESYNONYMS));
         DateAndTimeFormatSynonymGenerator dateAndTimeFormatSynonymGenerator = new DateAndTimeFormatSynonymGenerator(
@@ -82,14 +78,14 @@ class SettingsMapBuilderTest {
     @Test
     void buildWithEmptyAggregateFunctionLang() {
         builder.withStringSet(Collections.emptySet(), SettingsOption.AGGREGATEFUNCTIONLANG);
-        Map<SettingsOption, RegExGenerator<?>> map = builder.build();
+        Map<SettingsOption, IRegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(0, map.size());
     }
 
     @Test
     void buildWithEmptyDateSynonyms() {
         builder.withSimpleDateFormatSet(Collections.emptySet(), SettingsOption.DATESYNONYMS);
-        Map<SettingsOption, RegExGenerator<?>> map = builder.build();
+        Map<SettingsOption, IRegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(SettingsOption.DATESYNONYMS));
         Assertions.assertTrue(map.containsValue(new DateAndTimeFormatSynonymGenerator(SettingsOption.DATESYNONYMS)));
@@ -98,7 +94,7 @@ class SettingsMapBuilderTest {
     @Test
     void buildWithEmptyDateTimeSynonyms() {
         builder.withSimpleDateFormatSet(Collections.emptySet(), SettingsOption.DATETIMESYNONYMS);
-        Map<SettingsOption, RegExGenerator<?>> map = builder.build();
+        Map<SettingsOption, IRegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(SettingsOption.DATETIMESYNONYMS));
         Assertions.assertTrue(
@@ -108,14 +104,14 @@ class SettingsMapBuilderTest {
     @Test
     void buildWithEmptySetOfPropertyOption() {
         builder.withSettingsOptionSet(new HashSet<>());
-        Map<SettingsOption, RegExGenerator<?>> map = builder.build();
+        Map<SettingsOption, IRegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(0, map.size());
     }
 
     @Test
     void buildWithEmptyTimeSynonyms() {
         builder.withSimpleDateFormatSet(Collections.emptySet(), SettingsOption.TIMESYNONYMS);
-        Map<SettingsOption, RegExGenerator<?>> map = builder.build();
+        Map<SettingsOption, IRegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(SettingsOption.TIMESYNONYMS));
         Assertions.assertTrue(map.containsValue(new DateAndTimeFormatSynonymGenerator(SettingsOption.TIMESYNONYMS)));
@@ -124,7 +120,7 @@ class SettingsMapBuilderTest {
     @Test
     void buildWithKeyWordSpelling() {
         builder.withSettingsOption(SettingsOption.KEYWORDSPELLING);
-        Map<SettingsOption, RegExGenerator<?>> map = builder.build();
+        Map<SettingsOption, IRegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(SettingsOption.KEYWORDSPELLING));
         Assertions.assertTrue(map.containsValue(new SpellingMistake(SettingsOption.KEYWORDSPELLING)));
@@ -133,7 +129,7 @@ class SettingsMapBuilderTest {
     @Test
     void buildWithTableNameOrder() {
         builder.withSettingsOption(SettingsOption.TABLENAMEORDER);
-        Map<SettingsOption, RegExGenerator<?>> map = builder.build();
+        Map<SettingsOption, IRegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(SettingsOption.TABLENAMEORDER));
         Assertions.assertTrue(map.containsValue(new OrderRotation(SettingsOption.TABLENAMEORDER)));
@@ -144,7 +140,7 @@ class SettingsMapBuilderTest {
         final String FORMAT = "hh:mm:ss";
         builder.withSimpleDateFormatSet(new HashSet<>(List.of(new SimpleDateFormat(FORMAT))),
                                         SettingsOption.TIMESYNONYMS);
-        Map<SettingsOption, RegExGenerator<?>> map = builder.build();
+        Map<SettingsOption, IRegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         DateAndTimeFormatSynonymGenerator dateAndTimeFormatSynonymGenerator = new DateAndTimeFormatSynonymGenerator(
                 SettingsOption.TIMESYNONYMS);
@@ -166,7 +162,7 @@ class SettingsMapBuilderTest {
         aggregateFunctionLang.add(PAIR_ONE);
         aggregateFunctionLang.add(PAIR_TWO);
         builder.withStringSet(aggregateFunctionLang, SettingsOption.AGGREGATEFUNCTIONLANG);
-        Map<SettingsOption, RegExGenerator<?>> map = builder.build();
+        Map<SettingsOption, IRegExGenerator<?>> map = builder.build();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(SettingsOption.AGGREGATEFUNCTIONLANG));
         StringSynonymGenerator stringSynonymGenerator = new StringSynonymGenerator(

@@ -1,7 +1,6 @@
 package sqltoregex.settings;
 
-import com.google.common.collect.ImmutableMap;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
+import sqltoregex.settings.regexgenerator.IRegExGenerator;
 
 import java.util.Collections;
 import java.util.EnumMap;
@@ -11,13 +10,13 @@ import java.util.logging.Logger;
 
 public class UserSettings {
     private static UserSettings instance;
-    private final Map<SettingsOption, RegExGenerator<?>> settingsMap;
+    private final Map<SettingsOption, IRegExGenerator<?>> settingsMap;
 
-    private UserSettings(Map<SettingsOption, RegExGenerator<?>> map) {
+    private UserSettings(Map<SettingsOption, IRegExGenerator<?>> map) {
         this.settingsMap = Collections.unmodifiableMap(new EnumMap<>(map));
     }
 
-    public static UserSettings getInstance(Map<SettingsOption, RegExGenerator<?>> map) {
+    public static UserSettings getInstance(Map<SettingsOption, IRegExGenerator<?>> map) {
         if (instance == null) {
             instance = new UserSettings(map);
         }else{
@@ -39,7 +38,7 @@ public class UserSettings {
         return instance != null;
     }
 
-    public Map<SettingsOption, RegExGenerator<?>> getSettingsMap() {
+    public Map<SettingsOption, IRegExGenerator<?>> getSettingsMap() {
         return this.settingsMap;
     }
 }
