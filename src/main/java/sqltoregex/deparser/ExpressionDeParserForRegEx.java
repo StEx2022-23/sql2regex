@@ -475,7 +475,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, tableName));
             buffer.append('.');
         }
-        
+
         buffer.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, tableColumn.getColumnName()));
         buffer.append(OPTIONAL_WHITE_SPACE);
     }

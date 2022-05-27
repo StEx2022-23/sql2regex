@@ -1,14 +1,17 @@
 package sqltoregex.deparser;
 
 import net.sf.jsqlparser.expression.ExpressionVisitor;
+import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.util.deparser.OrderByDeParser;
 import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
+import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -26,10 +29,14 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     public static final String NULLS_LAST = "NULLS LAST";
     public static final String NULLS_FIRST = "NULLS FIRST";
     private ExpressionVisitor regExExpressionVisitor;
-    private final IRegExGenerator<String> keywordSpellingMistake;
-    private final IRegExGenerator<String> columnNameSpellingMistake;
-    private final IRegExGenerator<List<String>> columnNameOrder;
-    private final IRegExGenerator<String> specialSynonyms;
+    private final SpellingMistake keywordSpellingMistake;
+    private final SpellingMistake columnNameSpellingMistake;
+    private final OrderRotation columnNameOrder;
+    private final SynonymGenerator<?, String> specialSynonyms;
+
+    public OrderByDeParserForRegEx(SettingsManager settingsManager){
+        this(new ExpressionVisitorAdapter(), new StringBuilder(), settingsManager);
+    };
 
     public OrderByDeParserForRegEx(ExpressionVisitor expressionVisitor, StringBuilder buffer, SettingsManager settingsManager) {
         super(expressionVisitor, buffer);
@@ -38,34 +45,6 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class).orElse(null);
         this.columnNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class).orElse(null);
         this.specialSynonyms = settingsManager.getSettingBySettingsOption(SettingsOption.OTHERSYNONYMS, StringSynonymGenerator.class).orElse(null);
-    }
-
-    private String useKeywordSpellingMistake(String str){
-        if(null != this.keywordSpellingMistake) return this.keywordSpellingMistake.generateRegExFor(str);
-        else return str;
-    }
-
-    private String useColumnNameSpellingMistake(String str){
-        if(null != this.columnNameSpellingMistake) return this.columnNameSpellingMistake.generateRegExFor(str);
-        else return str;
-    }
-
-    private String useSpecialSynonymGenerator(String str){
-        if(null != this.specialSynonyms) return this.specialSynonyms.generateRegExFor(str);
-        else return str;
-    }
-
-    private String useColumnNameOrder(List<String> strlist){
-        if(null != this.columnNameOrder) return this.columnNameOrder.generateRegExFor(strlist);
-        else {
-            StringBuilder str = new StringBuilder();
-            Iterator<String> stringListIterator = strlist.iterator();
-            while (stringListIterator.hasNext()){
-                str.append(stringListIterator.next());
-                if (stringListIterator.hasNext()) str.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
-            }
-            return str.toString();
-        }
     }
 
     public void setExpressionVisitor(ExpressionVisitor expressionVisitor){
@@ -79,19 +58,19 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     @Override
     public void deParse(boolean oracleSiblings, List<OrderByElement> orderByElementList) {
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(useKeywordSpellingMistake(ORDER));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, ORDER));
         buffer.append(REQUIRED_WHITE_SPACE);
         buffer.append("(?:");
-        buffer.append(useKeywordSpellingMistake(SIBLINGS));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, SIBLINGS));
         buffer.append(REQUIRED_WHITE_SPACE + ")?");
-        buffer.append(useKeywordSpellingMistake(BY));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, BY));
         buffer.append(REQUIRED_WHITE_SPACE);
 
         List<String> orderByElementsAsStrings = new LinkedList<>();
         for(OrderByElement orderByElement : orderByElementList){
             orderByElementsAsStrings.add(deParseElementForOrderRotation(orderByElement));
         }
-        buffer.append(useColumnNameOrder(orderByElementsAsStrings));
+        buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, orderByElementsAsStrings));
     }
 
     private String handleAscDesc(OrderByElement orderByElement){
@@ -100,10 +79,10 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         if (orderByElement.isAscDescPresent()) {
             if (orderByElement.isAsc()) {
                 temp.append(REQUIRED_WHITE_SPACE);
-                temp.append("(?:").append(useKeywordSpellingMistake(ASC)).append("|").append(useSpecialSynonymGenerator(ASC)).append(")");
+                temp.append("(?:").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, ASC)).append("|").append(RegExGenerator.useStringSynonymGenerator(this.specialSynonyms, ASC)).append(")");
             } else {
                 temp.append(REQUIRED_WHITE_SPACE);
-                temp.append("(?:").append(useKeywordSpellingMistake(DESC)).append("|").append(useSpecialSynonymGenerator(DESC)).append(")");
+                temp.append("(?:").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, DESC)).append("|").append(RegExGenerator.useStringSynonymGenerator(this.specialSynonyms, DESC)).append(")");
             }
         }
 
@@ -115,9 +94,9 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         if (orderByElement.getNullOrdering() != null) {
             temp.append(REQUIRED_WHITE_SPACE);
             if(orderByElement.getNullOrdering() == OrderByElement.NullOrdering.NULLS_FIRST){
-                temp.append(useKeywordSpellingMistake(NULLS_FIRST));
+                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, NULLS_FIRST));
             } else {
-                temp.append(useKeywordSpellingMistake(NULLS_LAST));
+                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, NULLS_LAST));
             }
         }
         return temp.toString();
@@ -125,7 +104,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
 
     public String deParseElementForOrderRotation(OrderByElement orderByElement){
         StringBuilder temp = new StringBuilder();
-        temp.append(useColumnNameSpellingMistake(orderByElement.getExpression().toString()));
+        temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, orderByElement.getExpression().toString()));
         temp.append(this.handleAscDesc(orderByElement));
         temp.append(this.handleNullFirstLast(orderByElement));
         temp.append(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE);

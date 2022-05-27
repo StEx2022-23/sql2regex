@@ -34,8 +34,8 @@ public class SettingsManager {
         this.parseSettings();
     }
 
-    public static <T> Optional<IRegExGenerator<T>> castSetting(IRegExGenerator<?> rawSetting,
-                                                               Class<? extends IRegExGenerator<T>> clazz) {
+    public static <T, C extends IRegExGenerator<T>> Optional<C> castSetting(IRegExGenerator<?> rawSetting,
+                                                               Class<C> clazz) {
         try {
             return Optional.of(clazz.cast(rawSetting));
         } catch (ClassCastException e) {
@@ -71,13 +71,13 @@ public class SettingsManager {
         return this.getSettingsMap(settingsType).containsKey(settingsOption);
     }
 
-    public <S> Optional<IRegExGenerator<S>> getSettingBySettingsOption(SettingsOption settingsOption,
-                                                                       Class<? extends IRegExGenerator<S>> clazz) {
+    public <S, C extends IRegExGenerator<S>> Optional<C> getSettingBySettingsOption(SettingsOption settingsOption,
+                                                                       Class<C> clazz) {
         return this.getSettingBySettingsOption(settingsOption, clazz, SettingsType.USER);
     }
 
-    public <S> Optional<IRegExGenerator<S>> getSettingBySettingsOption(SettingsOption settingsOption,
-                                                                       Class<? extends IRegExGenerator<S>> clazz,
+    public <S, C extends IRegExGenerator<S>> Optional<C> getSettingBySettingsOption(SettingsOption settingsOption,
+                                                                       Class<C> clazz,
                                                                        SettingsType settingsType) {
         for (Map.Entry<SettingsOption, IRegExGenerator<?>> entry
                 : this.getSettingsMap(settingsType).entrySet()
@@ -100,31 +100,7 @@ public class SettingsManager {
         }
         return this.settingsMap.get(settingsType);
     }
-
-    public <A, S> Optional<SynonymGenerator<A, S>> getSynonymManagerBySettingOption(SettingsOption settingsOption,
-                                                                                    Class<? extends SynonymGenerator<A, S>> clazz) {
-        return this.getSynonymManagerBySettingOption(settingsOption, clazz, SettingsType.USER);
-    }
-
-    public <A, S> Optional<SynonymGenerator<A, S>> getSynonymManagerBySettingOption(SettingsOption settingsOption,
-                                                                                    Class<? extends SynonymGenerator<A, S>> clazz,
-                                                                                    SettingsType settingsType) {
-        for (Map.Entry<SettingsOption, IRegExGenerator<?>> entry : this.getSettingsMap(settingsType).entrySet()) {
-            List<SettingsOption> synonymManagerRelatedSettingsOptionsList = Arrays.asList(
-                    SettingsOption.DATESYNONYMS,
-                    SettingsOption.TIMESYNONYMS,
-                    SettingsOption.DATETIMESYNONYMS,
-                    SettingsOption.AGGREGATEFUNCTIONLANG
-            );
-            if (entry.getKey().equals(settingsOption) && synonymManagerRelatedSettingsOptionsList.contains(
-                    settingsOption)) {
-                Optional<IRegExGenerator<S>> opt = castSetting(entry.getValue(), clazz);
-                return opt.map(sRegExGenerator -> (SynonymGenerator<A, S>) sRegExGenerator);
-            }
-        }
-        throw new NoSuchElementException("There is no property with this property option:" + settingsOption);
-    }
-
+    
     private void parseSettings() throws ParserConfigurationException, IOException, SAXException,
             XPathExpressionException, URISyntaxException {
         SettingsOption relatedOption;
