@@ -27,11 +27,18 @@ class InsertDeParserForRegExTest {
     void oneValueList() throws JSQLParserException {
         List<String> toCheckedInput = List.of(
                 "INSERT INTO table (col1, col2) VALUES ('1', '2')",
-                "INSERT INTO table (col1, col2) VALUES ('2', '1')", //this should not match
                 "INSERT INTO table (col2, col1) VALUES ('2', '1')",
                 "INSERT INTO table (col2, col1) VALUE ('2', '1')"
         );
         testUtils.validateListAgainstRegEx("INSERT INTO table (col1, col2) VALUES ('1', '2')", toCheckedInput, true);
+    }
+
+    @Test
+    void oneValueListFailing() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "INSERT INTO table (col1, col2) VALUES ('2', '1')"
+        );
+        testUtils.validateListAgainstRegEx("INSERT INTO table (col1, col2) VALUES ('1', '2')", toCheckedInput, false);
     }
 
     @Test

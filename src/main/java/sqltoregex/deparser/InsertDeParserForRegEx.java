@@ -105,22 +105,79 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         }
 
         buffer.append(useKeywordSpellingMistake(INTO)).append(REQUIRED_WHITE_SPACE);
-        buffer.append(useTableNameSpellingMistake(insert.getTable().toString()));
+        buffer.append(useTableNameSpellingMistake(insert.getTable().toString())).append(REQUIRED_WHITE_SPACE);
 
-        if (insert.getColumns() != null) {
-             buffer.append(REQUIRED_WHITE_SPACE);
-             buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
-             List<String> columnsAsStringList = new ArrayList<>();
-             for (Column column : insert.getColumns()) {
-                columnsAsStringList.add(column.toString());
-             }
-             buffer.append(useTableNameOrder(columnsAsStringList));
-             buffer.append(OPTIONAL_WHITE_SPACE).append("\\)");
-        }
+        if (insert.getColumns() != null && insert.getItemsList() != null && insert.getItemsList() instanceof ExpressionList) {
+            Map<String, String> mappedColumnsAndRelatedValues = new HashMap<>();
+            for (int i = 0; i < insert.getColumns().size(); i++) {
+                mappedColumnsAndRelatedValues.put(
+                        insert.getColumns().get(i).toString(),
+                        ((ExpressionList) insert.getItemsList()).getExpressions().get(i).toString()
+                );
+            }
+            List<String> mappedColumnsAndRelatedValuesKeySet = new ArrayList<>();
+            for(String string : mappedColumnsAndRelatedValues.keySet()){
+                mappedColumnsAndRelatedValuesKeySet.add(string.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+            }
+            String columnsRotated = useTableNameOrder(mappedColumnsAndRelatedValuesKeySet);
+            columnsRotated = columnsRotated.replace(OPTIONAL_WHITE_SPACE, "").replace("(?:", "").replace(")", "");
+            String[] columnsOrderOptionsAsStringSet = columnsRotated.split("\\|");
 
-        if (insert.getItemsList() != null) {
+            buffer.append("(?:");
+            Iterator<String> columnsOrderOptionsIterator = Arrays.stream(columnsOrderOptionsAsStringSet).iterator();
+            while (columnsOrderOptionsIterator.hasNext()) {
+                String singleColumnOrderOption = columnsOrderOptionsIterator.next();
+                buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
+                buffer.append(singleColumnOrderOption.replace(",", OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE));
+                buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
+                buffer.append(useKeywordSpellingMistake(VALUE)).append("S?").append(OPTIONAL_WHITE_SPACE).append("\\(");
+                String[] extractedColumnsInOrderOption = singleColumnOrderOption.replace(" ", "").split(",");
+
+                Iterator<String> extractedColumnsIterator = Arrays.stream(extractedColumnsInOrderOption).iterator();
+
+                buffer.append(OPTIONAL_WHITE_SPACE);
+                while (extractedColumnsIterator.hasNext()) {
+                    buffer.append(mappedColumnsAndRelatedValues.get(extractedColumnsIterator.next()));
+                    if (extractedColumnsIterator.hasNext()) {
+                        buffer.append(OPTIONAL_WHITE_SPACE);
+                        buffer.append(",");
+                        buffer.append(OPTIONAL_WHITE_SPACE);
+                    }
+                }
+                buffer.append(OPTIONAL_WHITE_SPACE);
+                buffer.append("\\)");
+                buffer.append("|");
+            }
+
+            buffer.append(")");
+
+        } else if (insert.getColumns() == null && insert.getItemsList() != null) {
             insert.getItemsList().accept(this);
+        } else if (insert.getColumns() != null && insert.getItemsList() == null){
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
+            List<String> columnsAsStringList = new ArrayList<>();
+            for (Column column : insert.getColumns()) {
+                columnsAsStringList.add(column.toString());
+            }
+            buffer.append(useTableNameOrder(columnsAsStringList));
+            buffer.append(OPTIONAL_WHITE_SPACE).append("\\)");
         }
+
+//        if (insert.getColumns() != null) {
+//             buffer.append(REQUIRED_WHITE_SPACE);
+//             buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
+//             List<String> columnsAsStringList = new ArrayList<>();
+//             for (Column column : insert.getColumns()) {
+//                columnsAsStringList.add(column.toString());
+//             }
+//             buffer.append(useTableNameOrder(columnsAsStringList));
+//             buffer.append(OPTIONAL_WHITE_SPACE).append("\\)");
+//        }
+//
+//        if (insert.getItemsList() != null) {
+//            insert.getItemsList().accept(this);
+//        }
 
         if (insert.getSelect() != null) {
             buffer.append(" ");
