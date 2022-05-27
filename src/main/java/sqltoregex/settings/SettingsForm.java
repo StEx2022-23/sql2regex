@@ -15,6 +15,14 @@ public class SettingsForm {
     Set<String> aggregateFunctionLang;
     @NotEmpty(message = "{settingsForm.sql.NotEmpty}") String sql;
 
+    public static final SettingsForm EMPTY_FORM = new SettingsForm(Collections.emptySet(),
+                                                                   Collections.emptySet(),
+                                                                   Collections.emptySet(),
+                                                                   Collections.emptySet(),
+                                                                   Collections.emptySet(),
+                                                                   Collections.emptySet(),
+                                                                   "EMPTY");
+
     public SettingsForm(Set<SettingsOption> spellings,
                         Set<SettingsOption> orders,
                         Set<SimpleDateFormat> dateFormats,
