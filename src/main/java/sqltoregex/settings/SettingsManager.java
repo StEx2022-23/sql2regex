@@ -100,7 +100,7 @@ public class SettingsManager {
         }
         return this.settingsMap.get(settingsType);
     }
-    
+
     private void parseSettings() throws ParserConfigurationException, IOException, SAXException,
             XPathExpressionException, URISyntaxException {
         SettingsOption relatedOption;
@@ -178,6 +178,4 @@ public class SettingsManager {
             node.getParentNode().removeChild(node);
         }
     }
-
-
 }

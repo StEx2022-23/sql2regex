@@ -29,7 +29,7 @@ class GraphPreProcessorTest {
 
     @Test
     void getSynonymMap(){
-        Map<String, Set<String>> map = GraphPreProcessor.getSynonymMap(settingsManager.getSynonymManagerBySettingOption(
+        Map<String, Set<String>> map = GraphPreProcessor.getSynonymMap(settingsManager.getSettingBySettingsOption(
                 SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class, SettingsType.ALL).map(SynonymGenerator::getGraph).orElse(new SimpleGraph<>(DefaultWeightedEdge.class)));
         Assertions.assertTrue(map.containsKey("AVG"));
         Assertions.assertTrue(map.containsKey("SUM"));

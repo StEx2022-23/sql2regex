@@ -45,7 +45,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
             throw new IllegalArgumentException(MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE);
         }
 
-        DateAndTimeExpressionDeparser deParser = new DateAndTimeExpressionDeparser();
+        DateAndTimeExpressionDeParser deParser = new DateAndTimeExpressionDeParser();
         wordToFindSynonyms.accept(deParser);
         String stringToCheck = deParser.getBuffer().toString();
 
@@ -69,7 +69,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
         //O(n^2) is okay, cause elements will be <<100 for dateFormats
         for (DateFormat vertexSyn : this.synonymsGraph.vertexSet()) {
             try {
-                DateAndTimeExpressionDeparser deParser = new DateAndTimeExpressionDeparser();
+                DateAndTimeExpressionDeParser deParser = new DateAndTimeExpressionDeParser();
                 wordToFindSynonyms.accept(deParser);
                 date = vertexSyn.parse(deParser.getBuffer().toString());
                 return syn.format(date);
@@ -86,12 +86,12 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
         if (!(wordToFindSynonyms instanceof DateValue) && !(wordToFindSynonyms instanceof TimeValue) && !(wordToFindSynonyms instanceof TimestampValue)) {
             throw new IllegalArgumentException(MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE);
         }
-        DateAndTimeExpressionDeparser deParser = new DateAndTimeExpressionDeparser();
+        DateAndTimeExpressionDeParser deParser = new DateAndTimeExpressionDeParser();
         wordToFindSynonyms.accept(deParser);
         return deParser.getBuffer().toString();
     }
 
-    class DateAndTimeExpressionDeparser extends ExpressionDeParser {
+    class DateAndTimeExpressionDeParser extends ExpressionDeParser {
         @Override
         public void visit(DateValue value) {
             getBuffer().append(value.getRawValue());

@@ -139,7 +139,7 @@ public class SqlToRegexController {
     }
 
     private <T, S> Set<T> getSynonymGenerators(Class<? extends SynonymGenerator<T, S>> synonymGenerator, SettingsOption settingsOption , SettingsType settingsType){
-        return settingsManager.getSynonymManagerBySettingOption(settingsOption, synonymGenerator, settingsType)
+        return settingsManager.getSettingBySettingsOption(settingsOption, synonymGenerator, settingsType)
                 .map(generator -> GraphPreProcessor.getSynonymSet(generator.getGraph()))
                 .orElse(new LinkedHashSet<>());
     }
@@ -151,7 +151,7 @@ public class SqlToRegexController {
         model.addAttribute("timeFormats", getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class, SettingsOption.TIMESYNONYMS, SettingsType.ALL));
         model.addAttribute("dateTimeFormats",getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class, SettingsOption.DATETIMESYNONYMS, SettingsType.ALL));
         //special preprocessing to render comfortably on frontend
-        Map<String, Set<String>> aggregateFunctionSynonymsMap = settingsManager.getSynonymManagerBySettingOption(SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class, SettingsType.ALL)
+        Map<String, Set<String>> aggregateFunctionSynonymsMap = settingsManager.getSettingBySettingsOption(SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class, SettingsType.ALL)
                 .map(synonymGenerator -> GraphPreProcessor.getSynonymMap(synonymGenerator.getGraph()))
                 .orElse(new HashMap<>());
         model.addAttribute("aggregateFunctionLang", aggregateFunctionSynonymsMap);
