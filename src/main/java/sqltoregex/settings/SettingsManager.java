@@ -1,7 +1,9 @@
 package sqltoregex.settings;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -24,14 +26,16 @@ import java.util.logging.Logger;
 
 @Service
 public class SettingsManager {
-    private final Map<SettingsOption, RegExGenerator<?>> settingsMap = new EnumMap<>(SettingsOption.class);
+    //refactor to a HashList of a new class "SettingsContainer" which holds Maps?
+    private final Map<SettingsType, Map<SettingsOption, RegExGenerator<?>>> settingsMap = new EnumMap<SettingsType,
+            Map<SettingsOption, RegExGenerator<?>>>(SettingsType.class);
 
     public SettingsManager() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException, URISyntaxException {
         this.parseSettings();
     }
 
     public static <T> Optional<RegExGenerator<T>> castSetting(RegExGenerator<?> rawSetting,
-                                                    Class<? extends RegExGenerator<T>> clazz) {
+                                                              Class<? extends RegExGenerator<T>> clazz) {
         try {
             return Optional.of(clazz.cast(rawSetting));
         } catch (ClassCastException e) {
@@ -42,16 +46,16 @@ public class SettingsManager {
     }
 
     /**
-     * Method for getting all OrderRotations, all Spellings, all Dateformats, allTime Formats.
+     * Method for getting all Settings of one class with are setted by the user.
      */
     public <S> Set<RegExGenerator<S>> getSettingByClass(Class<? extends RegExGenerator<S>> clazz) {
-        return getSettingByClass(clazz, false);
+        return getSettingByClass(clazz, SettingsType.USER);
     }
 
-    public <S> Set<RegExGenerator<S>> getSettingByClass(Class<? extends RegExGenerator<S>> clazz, boolean useDefault) {
+    public <S> Set<RegExGenerator<S>> getSettingByClass(Class<? extends RegExGenerator<S>> clazz,
+                                                        SettingsType settingsType) {
         Set<RegExGenerator<S>> settingsSet = new LinkedHashSet<>();
-        for (RegExGenerator<?> setting :
-                (useDefault ? this.getDefaultSettingsMap().values() : this.getSettingsMap().values())) {
+        for (RegExGenerator<?> setting : this.getSettingsMap(settingsType).values()) {
             if (setting != null && setting.getClass().equals(clazz)) {
                 castSetting(setting, clazz).ifPresent(settingsSet::add);
             }
@@ -60,65 +64,61 @@ public class SettingsManager {
     }
 
     public boolean getSettingBySettingsOption(SettingsOption settingsOption) {
-        return this.getSettingBySettingsOption(settingsOption, false);
+        return this.getSettingBySettingsOption(settingsOption, SettingsType.USER);
     }
 
-    public boolean getSettingBySettingsOption(SettingsOption settingsOption, boolean useDefault) {
-        if (useDefault){
-            return this.getDefaultSettingsMap().containsKey(settingsOption);
-        }else {
-            return this.getSettingsMap().containsKey(settingsOption);
-        }
+    public boolean getSettingBySettingsOption(SettingsOption settingsOption, SettingsType settingsType) {
+        return this.getSettingsMap(settingsType).containsKey(settingsOption);
     }
 
     public <S> Optional<RegExGenerator<S>> getSettingBySettingsOption(SettingsOption settingsOption,
-                                                            Class<? extends RegExGenerator<S>> clazz) {
-        return this.getSettingBySettingsOption(settingsOption, clazz, false);
+                                                                      Class<? extends RegExGenerator<S>> clazz) {
+        return this.getSettingBySettingsOption(settingsOption, clazz, SettingsType.USER);
     }
 
     public <S> Optional<RegExGenerator<S>> getSettingBySettingsOption(SettingsOption settingsOption,
-                                                            Class<? extends RegExGenerator<S>> clazz, boolean getAll) {
+                                                                      Class<? extends RegExGenerator<S>> clazz,
+                                                                      SettingsType settingsType) {
         for (Map.Entry<SettingsOption, RegExGenerator<?>> entry
-                : (getAll ? this.getDefaultSettingsMap().entrySet() : this.getSettingsMap().entrySet())
+                : this.getSettingsMap(settingsType).entrySet()
         ) {
             if (entry.getKey().equals(settingsOption)) {
-                return castSetting(settingsMap.get(entry.getKey()), clazz);
+                return castSetting(entry.getValue(), clazz);
             }
         }
         return Optional.empty();
     }
 
-    public Map<SettingsOption, RegExGenerator<?>> getDefaultSettingsMap(){
-        return this.settingsMap;
-    }
-
     public Map<SettingsOption, RegExGenerator<?>> getSettingsMap() {
-        if (UserSettings.areSet()){
+        return this.getSettingsMap(SettingsType.USER);
+    }
+
+    public Map<SettingsOption, RegExGenerator<?>> getSettingsMap(SettingsType settingsType) {
+        Assert.notNull(settingsType, "settingsType must not be null");
+        if (settingsType == SettingsType.USER){
             return UserSettings.getInstance().getSettingsMap();
-        }else{
-            return this.settingsMap;
         }
+        return this.settingsMap.get(settingsType);
     }
 
     public <A, S> Optional<SynonymGenerator<A, S>> getSynonymManagerBySettingOption(SettingsOption settingsOption,
-                                                                          Class<? extends SynonymGenerator<A, S>> clazz) {
-        return this.getSynonymManagerBySettingOption(settingsOption, clazz, false);
+                                                                                    Class<? extends SynonymGenerator<A, S>> clazz) {
+        return this.getSynonymManagerBySettingOption(settingsOption, clazz, SettingsType.USER);
     }
 
     public <A, S> Optional<SynonymGenerator<A, S>> getSynonymManagerBySettingOption(SettingsOption settingsOption,
-                                                                          Class<? extends SynonymGenerator<A, S>> clazz,
-                                                                          boolean useDefault) {
-        for (Map.Entry<SettingsOption, RegExGenerator<?>> entry
-                : (useDefault ? this.getDefaultSettingsMap().entrySet() : this.getSettingsMap().entrySet())
-        ) {
+                                                                                    Class<? extends SynonymGenerator<A, S>> clazz,
+                                                                                    SettingsType settingsType) {
+        for (Map.Entry<SettingsOption, RegExGenerator<?>> entry : this.getSettingsMap(settingsType).entrySet()) {
             List<SettingsOption> synonymManagerRelatedSettingsOptionsList = Arrays.asList(
                     SettingsOption.DATESYNONYMS,
                     SettingsOption.TIMESYNONYMS,
                     SettingsOption.DATETIMESYNONYMS,
                     SettingsOption.AGGREGATEFUNCTIONLANG
             );
-            if (entry.getKey().equals(settingsOption) && synonymManagerRelatedSettingsOptionsList.contains(settingsOption)) {
-                Optional<RegExGenerator<S>> opt = castSetting(settingsMap.get(entry.getKey()), clazz);
+            if (entry.getKey().equals(settingsOption) && synonymManagerRelatedSettingsOptionsList.contains(
+                    settingsOption)) {
+                Optional<RegExGenerator<S>> opt = castSetting(entry.getValue(), clazz);
                 return opt.map(sRegExGenerator -> (SynonymGenerator<A, S>) sRegExGenerator);
             }
         }
@@ -138,7 +138,12 @@ public class SettingsManager {
         document.getDocumentElement().normalize();
 
         stripWhitespaces(document);
-        SettingsMapBuilder mapBuilder = new SettingsMapBuilder();
+
+        Map<SettingsType, SettingsMapBuilder> settingsMapBuilderMap = new EnumMap<SettingsType, SettingsMapBuilder>(
+                SettingsType.class);
+        for (SettingsType settingsType : Arrays.stream(SettingsType.values()).filter(settingsType -> settingsType != SettingsType.USER).toList()) {
+            settingsMapBuilderMap.put(settingsType, new SettingsMapBuilder());
+        }
 
         Node root = document.getElementsByTagName("properties").item(0);
         SettingsNodeListIterator categoryIterator = new SettingsNodeListIterator(root.getChildNodes());
@@ -147,10 +152,22 @@ public class SettingsManager {
                     categoryNode.getChildNodes());
             for (Node settingsNode : settingsCategoryIterator) {
                 relatedOption = SettingsOption.valueOf(settingsNode.getNodeName().toUpperCase());
-                mapBuilder.withNodeList(settingsNode.getChildNodes(), relatedOption);
+                if (settingsNode instanceof Element settingsElement) {
+                    String[] settingTypes = settingsElement
+                            .getElementsByTagName("settingstype")
+                            .item(0)
+                            .getTextContent()
+                            .split(",");
+                    for (String settingsTypeString : settingTypes) {
+                        settingsMapBuilderMap.get(SettingsType.valueOf(settingsTypeString.toUpperCase()))
+                                .withNodeList(settingsElement.getElementsByTagName("value"), relatedOption);
+                    }
+                }
             }
         }
-        this.settingsMap.putAll(mapBuilder.build());
+        for (SettingsType settingsType : Arrays.stream(SettingsType.values()).filter(settingsType -> settingsType != SettingsType.USER).toList()) {
+            this.settingsMap.put(settingsType, settingsMapBuilderMap.get(settingsType).build());
+        }
     }
 
 

@@ -7,6 +7,7 @@ import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
+import sqltoregex.settings.SettingsForm;
 import sqltoregex.settings.SettingsManager;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,7 +20,8 @@ import java.util.regex.Pattern;
 
 class LimitDeParserForRegExTest {
     StringBuilder buffer = new StringBuilder();
-    StatementDeParser statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(new SettingsManager()), buffer, new SettingsManager());
+    StatementDeParser statementDeParser;
+    SettingsManager settingsManager = new SettingsManager();
 
     LimitDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
     }

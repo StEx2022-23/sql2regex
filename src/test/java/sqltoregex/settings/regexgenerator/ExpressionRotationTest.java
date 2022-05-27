@@ -3,9 +3,16 @@ package sqltoregex.settings.regexgenerator;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Column;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
+import sqltoregex.settings.SettingsForm;
+import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,18 +20,23 @@ class ExpressionRotationTest {
     ExpressionRotation expressionRotation = new ExpressionRotation(SettingsOption.DEFAULT);
     List<Expression> testListOne = Arrays.asList(new Column("table1"), new Column("table2"));
     List<Expression> testListTwo = List.of(new Column("table1"));
+    SettingsManager settingsManager = new SettingsManager();
+
+    ExpressionRotationTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        settingsManager.parseUserSettingsInput(SettingsForm.EMPTY_FORM);
+    }
 
     @Test
     void testExpressionRotationWithoutCapturingGroupTwoElements(){
         Assertions.assertEquals(
-                "((\\s*(?:table1|able1|tble1|tale1|tabe1|tabl1|table)\\s*,\\s*(?:table2|able2|tble2|tale2|tabe2|tabl2|table)\\s*)|(\\s*(?:table2|able2|tble2|tale2|tabe2|tabl2|table)\\s*,\\s*(?:table1|able1|tble1|tale1|tabe1|tabl1|table)\\s*))",
+                "((\\s*table1\\s*,\\s*table2\\s*)|(\\s*table2\\s*,\\s*table1\\s*))",
                 expressionRotation.generateRegExFor(testListOne));
     }
 
     @Test
     void testExpressionRotationWithoutCapturingGroupOneElement(){
         Assertions.assertEquals(
-                "((\\s*(?:table1|able1|tble1|tale1|tabe1|tabl1|table)\\s*))",
+                "((\\s*table1\\s*))",
                 expressionRotation.generateRegExFor(testListTwo));
     }
 
@@ -32,7 +44,7 @@ class ExpressionRotationTest {
     void testExpressionRotationWithCapturingGroupOneElement(){
         expressionRotation.setCapturingGroup(true);
         Assertions.assertEquals(
-                "(?:(\\s*(?:table1|able1|tble1|tale1|tabe1|tabl1|table)\\s*))",
+                "(?:(\\s*table1\\s*))",
                 expressionRotation.generateRegExFor(testListTwo));
     }
 }

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.SettingsType;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
@@ -29,7 +30,7 @@ class GraphPreProcessorTest {
     @Test
     void getSynonymMap(){
         Map<String, Set<String>> map = GraphPreProcessor.getSynonymMap(settingsManager.getSynonymManagerBySettingOption(
-                SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class, true).map(SynonymGenerator::getGraph).orElse(new SimpleGraph<>(DefaultWeightedEdge.class)));
+                SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class, SettingsType.ALL).map(SynonymGenerator::getGraph).orElse(new SimpleGraph<>(DefaultWeightedEdge.class)));
         Assertions.assertTrue(map.containsKey("AVG"));
         Assertions.assertTrue(map.containsKey("SUM"));
         Assertions.assertEquals(2, map.size());
