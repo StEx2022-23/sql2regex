@@ -26,22 +26,18 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     public static final String NULLS_LAST = "NULLS LAST";
     public static final String NULLS_FIRST = "NULLS FIRST";
     private ExpressionVisitor regExExpressionVisitor;
-    private RegExGenerator<String> keywordSpellingMistake;
-    private RegExGenerator<String> columnNameSpellingMistake;
-    private RegExGenerator<List<String>> columnNameOrder;
-    private RegExGenerator<String> specialSynonyms;
+    private final RegExGenerator<String> keywordSpellingMistake;
+    private final RegExGenerator<String> columnNameSpellingMistake;
+    private final RegExGenerator<List<String>> columnNameOrder;
+    private final RegExGenerator<String> specialSynonyms;
 
     public OrderByDeParserForRegEx(ExpressionVisitor expressionVisitor, StringBuilder buffer, SettingsManager settingsManager) {
         super(expressionVisitor, buffer);
         this.regExExpressionVisitor = expressionVisitor;
-        this.setColumnNameSpellingMistake(settingsManager);
-        this.setKeywordSpellingMistake(settingsManager);
-        this.setColumnNameOrder(settingsManager);
-        this.setSpecialSynonymGenerator(settingsManager);
-    }
-
-    private void setKeywordSpellingMistake(SettingsManager settingsManager){
+        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class).orElse(null);
         this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class).orElse(null);
+        this.columnNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class).orElse(null);
+        this.specialSynonyms = settingsManager.getSettingBySettingsOption(SettingsOption.OTHERSYNONYMS, StringSynonymGenerator.class).orElse(null);
     }
 
     private String useKeywordSpellingMistake(String str){
@@ -49,26 +45,14 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         else return str;
     }
 
-    private void setColumnNameSpellingMistake(SettingsManager settingsManager){
-        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class).orElse(null);
-    }
-
     private String useColumnNameSpellingMistake(String str){
         if(null != this.columnNameSpellingMistake) return this.columnNameSpellingMistake.generateRegExFor(str);
         else return str;
     }
 
-    private void setSpecialSynonymGenerator(SettingsManager settingsManager){
-        this.specialSynonyms = settingsManager.getSettingBySettingsOption(SettingsOption.OTHERSYNONYMS, StringSynonymGenerator.class).orElse(null);
-    }
-
     private String useSpecialSynonymGenerator(String str){
         if(null != this.specialSynonyms) return this.specialSynonyms.generateRegExFor(str);
         else return str;
-    }
-
-    private void setColumnNameOrder(SettingsManager settingsManager){
-        this.columnNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class).orElse(null);
     }
 
     private String useColumnNameOrder(List<String> strlist){

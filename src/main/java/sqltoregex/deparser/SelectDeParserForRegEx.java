@@ -79,28 +79,24 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public static final String ROWS = "ROWS";
     private boolean flagForOrderRotationWithOutSpellingMistake = false;
     private ExpressionVisitor expressionVisitor;
-    private RegExGenerator<String> keywordSpellingMistake;
-    private RegExGenerator<String> columnNameSpellingMistake;
-    private RegExGenerator<String> tableNameSpellingMistake;
-    private RegExGenerator<List<String>> columnNameOrder;
-    private RegExGenerator<List<String>> tableNameOrder;
-    private RegExGenerator<String> aggregateFunctionLang;
+    private final RegExGenerator<String> keywordSpellingMistake;
+    private final RegExGenerator<String> columnNameSpellingMistake;
+    private final RegExGenerator<String> tableNameSpellingMistake;
+    private final RegExGenerator<List<String>> columnNameOrder;
+    private final RegExGenerator<List<String>> tableNameOrder;
+    private final RegExGenerator<String> aggregateFunctionLang;
     SettingsManager settingsManager;
 
     public SelectDeParserForRegEx(SettingsManager settingsManager) {
         super();
         this.settingsManager = settingsManager;
         this.expressionVisitor = new ExpressionDeParserForRegEx(this, buffer, settingsManager);
-        this.setKeywordSpellingMistake(settingsManager);
-        this.setColumnNameSpellingMistake(settingsManager);
-        this.setAggregateFunctionLang(settingsManager);
-        this.setColumnNameOrder(settingsManager);
-        this.setTableNameOrder(settingsManager);
-        this.setTableNameSpellingMistake(settingsManager);
-    }
-
-    private void setKeywordSpellingMistake(SettingsManager settingsManager){
         this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class).orElse(null);
+        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class).orElse(null);
+        this.aggregateFunctionLang = settingsManager.getSettingBySettingsOption(SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class).orElse(null);
+        this.columnNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class).orElse(null);
+        this.tableNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMEORDER, OrderRotation.class).orElse(null);
+        this.tableNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING, SpellingMistake.class).orElse(null);
     }
 
     private String useKeywordSpellingMistake(String str){
@@ -108,17 +104,9 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         else return str;
     }
 
-    private void setColumnNameSpellingMistake(SettingsManager settingsManager){
-        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class).orElse(null);
-    }
-
     private String useColumnNameSpellingMistake(String str){
         if(null != this.columnNameSpellingMistake) return this.columnNameSpellingMistake.generateRegExFor(str);
         else return str;
-    }
-
-    private void setTableNameSpellingMistake(SettingsManager settingsManager){
-        this.tableNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING, SpellingMistake.class).orElse(null);
     }
 
     private String useTableNameSpellingMistake(String str) {
@@ -126,26 +114,14 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         else return str;
     }
 
-    private void setAggregateFunctionLang(SettingsManager settingsManager){
-        this.aggregateFunctionLang = settingsManager.getSettingBySettingsOption(SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class).orElse(null);
-    }
-
     private String useAggregateFunctionLang(String str){
         if(null != this.aggregateFunctionLang) return this.aggregateFunctionLang.generateRegExFor(str);
         else return str;
     }
 
-    private void setColumnNameOrder(SettingsManager settingsManager){
-        this.columnNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class).orElse(null);
-    }
-
     private String useColumnNameOrder(List<String> strlist){
         if(null != this.columnNameOrder) return this.columnNameOrder.generateRegExFor(strlist);
         else return String.join(",", strlist);
-    }
-
-    private void setTableNameOrder(SettingsManager settingsManager){
-        this.tableNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMEORDER, OrderRotation.class).orElse(null);
     }
 
     private String useTableNameOrder(List<String> strlist){

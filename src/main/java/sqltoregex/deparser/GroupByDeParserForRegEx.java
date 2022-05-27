@@ -17,28 +17,20 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     public static final String GROUP = "GROUP";
     public static final String BY = "BY";
-    private RegExGenerator<String> keywordSpellingMistake;
-    private RegExGenerator<List<Expression>> expressionOrder;
+    private final RegExGenerator<String> keywordSpellingMistake;
+    private final RegExGenerator<List<Expression>> expressionOrder;
     private final ExpressionVisitor expressionVisitor;
 
     public GroupByDeParserForRegEx(ExpressionVisitor expressionVisitor, StringBuilder buffer, SettingsManager settingsManager) {
         super(expressionVisitor, buffer);
         this.expressionVisitor = expressionVisitor;
-        this.setKeywordSpellingMistake(settingsManager);
-        this.setExpressionOrder(settingsManager);
-    }
-
-    private void setKeywordSpellingMistake(SettingsManager settingsManager){
         this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class).orElse(null);
+        this.expressionOrder = settingsManager.getSettingBySettingsOption(SettingsOption.EXPRESSIONORDER, ExpressionRotation.class).orElse(null);
     }
 
     private String useKeywordSpellingMistake(String str){
         if(null != this.keywordSpellingMistake) return this.keywordSpellingMistake.generateRegExFor(str);
         else return str;
-    }
-
-    private void setExpressionOrder(SettingsManager settingsManager){
-        this.expressionOrder = settingsManager.getSettingBySettingsOption(SettingsOption.EXPRESSIONORDER, ExpressionRotation.class).orElse(null);
     }
 
     private String useExpressionOrder(List<Expression> expressionList, StringBuilder buffer){

@@ -20,10 +20,6 @@ public class LimitDeParserForRegEx extends LimitDeparser {
 
     public LimitDeParserForRegEx(StringBuilder buffer, SettingsManager settingsManager) {
         super(buffer);
-        this.setKeywordSpellingMistake(settingsManager);
-    }
-
-    private void setKeywordSpellingMistake(SettingsManager settingsManager){
         this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class).orElse(null);
     }
 
