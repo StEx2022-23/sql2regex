@@ -3,16 +3,18 @@ package sqltoregex.settings;
 import com.google.common.collect.ImmutableMap;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class UserSettings {
     private static UserSettings instance;
-    private final ImmutableMap<SettingsOption, RegExGenerator<?>> settingsMap;
+    private final Map<SettingsOption, RegExGenerator<?>> settingsMap;
 
     private UserSettings(Map<SettingsOption, RegExGenerator<?>> map) {
-        this.settingsMap = new ImmutableMap.Builder<SettingsOption, RegExGenerator<?>>().putAll(map).build();
+        this.settingsMap = Collections.unmodifiableMap(new EnumMap<>(map));
     }
 
     public static UserSettings getInstance(Map<SettingsOption, RegExGenerator<?>> map) {
