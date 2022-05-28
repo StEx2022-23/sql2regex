@@ -108,12 +108,12 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         buffer.append(useTableNameSpellingMistake(insert.getTable().toString())).append(REQUIRED_WHITE_SPACE);
 
         // handle statement with single value list like: INSERT INTO table (col1, col2) VALUES (val1, val2);
-        if (insert.getColumns() != null && insert.getItemsList() != null && insert.getItemsList() instanceof ExpressionList) {
+        if (insert.getColumns() != null && insert.getItemsList(ExpressionList.class) != null) {
             Map<String, String> mappedColumnsAndRelatedValues = new HashMap<>();
             for (int i = 0; i < insert.getColumns().size(); i++) {
                 mappedColumnsAndRelatedValues.put(
                         insert.getColumns().get(i).toString(),
-                        ((ExpressionList) insert.getItemsList()).getExpressions().get(i).toString()
+                        insert.getItemsList(ExpressionList.class).getExpressions().get(i).toString()
                 );
             }
             List<String> mappedColumnsAndRelatedValuesKeySet = new ArrayList<>();
@@ -152,11 +152,11 @@ public class InsertDeParserForRegEx extends InsertDeParser {
             buffer.append(")");
 
         // handle statement with multiple value list like: INSERT INTO table (col1, col2) VALUES (val1, val2), (val3, val4);
-        } else if (insert.getColumns() != null && insert.getItemsList() != null && insert.getItemsList() instanceof MultiExpressionList) {
+        } else if (insert.getColumns() != null && insert.getItemsList(MultiExpressionList.class) != null) {
             Map<String, List<String>> mappedColumnsAndRelatedValuesForMultipleValueLists = new HashMap<>();
             for (int i = 0; i < insert.getColumns().size(); i++) {
                 List<String> multipleValues = new ArrayList<>();
-                for(ExpressionList expressionList : ((MultiExpressionList) insert.getItemsList()).getExpressionLists()){
+                for(ExpressionList expressionList : insert.getItemsList(MultiExpressionList.class).getExpressionLists()){
                     multipleValues.add(expressionList.getExpressions().get(i).toString());
                 }
 
@@ -204,10 +204,11 @@ public class InsertDeParserForRegEx extends InsertDeParser {
             }
             buffer.append(")");
         // handle case, when column list is not given
-        } else if (insert.getColumns() == null && insert.getItemsList() != null) {
-            insert.getItemsList().accept(this);
+        } else if (insert.getColumns() == null && (insert.getItemsList(MultiExpressionList.class) != null && insert.getItemsList(ExpressionList.class) != null)) {
+            insert.getItemsList(MultiExpressionList.class).accept(this);
+            insert.getItemsList(ExpressionList.class).accept(this);
         // handle case, when items list is not given, this should propably not happens, if valid sql is given
-        } else if (insert.getColumns() != null && insert.getItemsList() == null){
+        } else if (insert.getColumns() != null && (insert.getItemsList(MultiExpressionList.class) == null && insert.getItemsList(ExpressionList.class) == null)){
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
             List<String> columnsAsStringList = new ArrayList<>();
@@ -234,7 +235,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
 //        }
 
         if (insert.getSelect() != null) {
-            buffer.append(" ");
+            buffer.append(OPTIONAL_WHITE_SPACE);
             if (insert.getSelect().getWithItemsList() != null) {
                 buffer.append("WITH ");
                 for (WithItem with : insert.getSelect().getWithItemsList()) {
@@ -242,7 +243,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 }
                 buffer.append(" ");
             }
-            insert.getSelect().getSelectBody().accept(this.selectDeParserForRegEx);
+//            insert.getSelect().getSelectBody().accept(this.selectDeParserForRegEx);
         }
 
         if (insert.isUseSet()) {
@@ -277,7 +278,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
 
         if (insert.getReturningExpressionList() != null) {
             buffer.append(" RETURNING ");
-            for (Iterator<SelectExpressionItem> iter = insert.getReturningExpressionList().iterator(); iter
+            for (Iterator<SelectItem> iter = insert.getReturningExpressionList().iterator(); iter
                     .hasNext();) {
                 buffer.append(iter.next().toString());
                 if (iter.hasNext()) {
@@ -294,63 +295,63 @@ public class InsertDeParserForRegEx extends InsertDeParser {
 
     @Override
     public void visit(ExpressionList expressionList) {
-        buffer.append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake(VALUE)).append("S?").append(REQUIRED_WHITE_SPACE);
-        List<String> expressionListAsString = new ArrayList<>();
-        for (Expression expression : expressionList.getExpressions()) {
-            String expressionFixed = expression.toString();
-            boolean hasQuotationMarks = false;
-            for(String str : this.quotationMarkList){
-                if (expressionFixed.contains(str)) {
-                    hasQuotationMarks = true;
-                    break;
-                }
-            }
-            if(hasQuotationMarks){
-                expressionFixed = this.generateRegExForQuotationMarks()
-                        + useTableNameSpellingMistake(expressionFixed.replaceAll(this.generateRegExForQuotationMarks(), ""))
-                        + this.generateRegExForQuotationMarks();
-            } else {
-                expressionFixed = this.generateRegExForQuotationMarks()
-                        + useTableNameSpellingMistake(expressionFixed)
-                        + this.generateRegExForQuotationMarks();
-            }
-            expressionListAsString.add(expressionFixed.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
-        }
-        buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
-        buffer.append(useTableNameOrder(expressionListAsString));
-        buffer.append(OPTIONAL_WHITE_SPACE).append("\\)");
+//        buffer.append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake(VALUE)).append("S?").append(REQUIRED_WHITE_SPACE);
+//        List<String> expressionListAsString = new ArrayList<>();
+//        for (Expression expression : expressionList.getExpressions()) {
+//            String expressionFixed = expression.toString();
+//            boolean hasQuotationMarks = false;
+//            for(String str : this.quotationMarkList){
+//                if (expressionFixed.contains(str)) {
+//                    hasQuotationMarks = true;
+//                    break;
+//                }
+//            }
+//            if(hasQuotationMarks){
+//                expressionFixed = this.generateRegExForQuotationMarks()
+//                        + useTableNameSpellingMistake(expressionFixed.replaceAll(this.generateRegExForQuotationMarks(), ""))
+//                        + this.generateRegExForQuotationMarks();
+//            } else {
+//                expressionFixed = this.generateRegExForQuotationMarks()
+//                        + useTableNameSpellingMistake(expressionFixed)
+//                        + this.generateRegExForQuotationMarks();
+//            }
+//            expressionListAsString.add(expressionFixed.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+//        }
+//        buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
+//        buffer.append(useTableNameOrder(expressionListAsString));
+//        buffer.append(OPTIONAL_WHITE_SPACE).append("\\)");
     }
 
     @Override
     public void visit(MultiExpressionList multiExprList) {
-        buffer.append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake(VALUE)).append("S?").append(REQUIRED_WHITE_SPACE);
-        List<String> multiExpressionListAsString  = new ArrayList<>();
-        for (ExpressionList expressionList : multiExprList.getExpressionLists()) {
-            List<String> expressionListAsString = new ArrayList<>();
-            for (Expression expression : expressionList.getExpressions()) {
-                String expressionFixed = expression.toString();
-                boolean hasQuotationMarks = false;
-                for(String str : this.quotationMarkList){
-                    if (expressionFixed.contains(str)) {
-                        hasQuotationMarks = true;
-                        break;
-                    }
-                }
-                if(hasQuotationMarks){
-                    expressionFixed = this.generateRegExForQuotationMarks()
-                            + useTableNameSpellingMistake(expressionFixed.replaceAll(this.generateRegExForQuotationMarks(), ""))
-                            + this.generateRegExForQuotationMarks();
-                } else {
-                    expressionFixed = this.generateRegExForQuotationMarks()
-                            + useTableNameSpellingMistake(expressionFixed)
-                            + this.generateRegExForQuotationMarks();
-                }
-                expressionListAsString.add(expressionFixed.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
-            }
-            String singleValueListLine = OPTIONAL_WHITE_SPACE + "\\(" + useTableNameOrder(expressionListAsString) + "\\)" + OPTIONAL_WHITE_SPACE;
-            multiExpressionListAsString.add(singleValueListLine.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
-        }
-        buffer.append(useTableNameOrder(multiExpressionListAsString));
+//        buffer.append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake(VALUE)).append("S?").append(REQUIRED_WHITE_SPACE);
+//        List<String> multiExpressionListAsString  = new ArrayList<>();
+//        for (ExpressionList expressionList : multiExprList.getExpressionLists()) {
+//            List<String> expressionListAsString = new ArrayList<>();
+//            for (Expression expression : expressionList.getExpressions()) {
+//                String expressionFixed = expression.toString();
+//                boolean hasQuotationMarks = false;
+//                for(String str : this.quotationMarkList){
+//                    if (expressionFixed.contains(str)) {
+//                        hasQuotationMarks = true;
+//                        break;
+//                    }
+//                }
+//                if(hasQuotationMarks){
+//                    expressionFixed = this.generateRegExForQuotationMarks()
+//                            + useTableNameSpellingMistake(expressionFixed.replaceAll(this.generateRegExForQuotationMarks(), ""))
+//                            + this.generateRegExForQuotationMarks();
+//                } else {
+//                    expressionFixed = this.generateRegExForQuotationMarks()
+//                            + useTableNameSpellingMistake(expressionFixed)
+//                            + this.generateRegExForQuotationMarks();
+//                }
+//                expressionListAsString.add(expressionFixed.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+//            }
+//            String singleValueListLine = OPTIONAL_WHITE_SPACE + "\\(" + useTableNameOrder(expressionListAsString) + "\\)" + OPTIONAL_WHITE_SPACE;
+//            multiExpressionListAsString.add(singleValueListLine.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+//        }
+//        buffer.append(useTableNameOrder(multiExpressionListAsString));
     }
 
     @Override

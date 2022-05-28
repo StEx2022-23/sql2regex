@@ -9,16 +9,17 @@ import sqltoregex.settings.SettingsManager;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 class InsertDeParserForRegExTest {
     TestUtils testUtils = new TestUtils(new SettingsManager());
 
-    InsertDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    InsertDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
     }
 
     @Test
-    void testInsertDeParserForRegExConstructor() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    void testInsertDeParserForRegExConstructor() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         InsertDeParserForRegEx insertDeParserForRegEx = new InsertDeParserForRegEx(new SettingsManager());
         Assertions.assertNotNull(insertDeParserForRegEx);
     }
