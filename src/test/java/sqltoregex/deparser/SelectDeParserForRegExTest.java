@@ -23,7 +23,7 @@ class SelectDeParserForRegExTest extends UserSettingsTestCase {
     StringBuilder buffer = new StringBuilder();
     StatementDeParser statementDeParser;
 
-    SelectDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    SelectDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         super(SettingsType.ALL);
         this.statementDeParser  = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(this.settingsManager), buffer, this.settingsManager);
     }

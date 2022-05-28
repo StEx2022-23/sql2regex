@@ -21,7 +21,7 @@ class GroupByDeParserForRegExTest extends UserSettingsTestCase {
     StringBuilder buffer = new StringBuilder();
     StatementDeParser statementDeParser;
 
-    GroupByDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    GroupByDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         super(SettingsType.ALL);
         statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(this.settingsManager), buffer, this.settingsManager);
     }

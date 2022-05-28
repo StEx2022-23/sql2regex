@@ -12,6 +12,7 @@ import sqltoregex.settings.SettingsType;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,7 +21,7 @@ class ExpressionRotationTest extends UserSettingsTestCase {
     List<Expression> testListOne = Arrays.asList(new Column("table1"), new Column("table2"));
     List<Expression> testListTwo = List.of(new Column("table1"));
 
-    ExpressionRotationTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    ExpressionRotationTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         super(SettingsType.USER);
     }
 

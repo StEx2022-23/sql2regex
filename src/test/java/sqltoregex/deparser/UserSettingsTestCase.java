@@ -11,12 +11,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URISyntaxException;
 
 public class UserSettingsTestCase {
 
     protected final SettingsManager settingsManager = new SettingsManager();
 
-    public UserSettingsTestCase(SettingsType settingsType) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    public UserSettingsTestCase(SettingsType settingsType) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         if (settingsType == SettingsType.USER){
             this.settingsManager.parseUserSettingsInput(SettingsForm.EMPTY_FORM);
         }else{

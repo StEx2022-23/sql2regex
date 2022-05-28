@@ -17,13 +17,14 @@ import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerato
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
 public class RegExGeneratorTest extends UserSettingsTestCase {
 
-    public RegExGeneratorTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    public RegExGeneratorTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         super(SettingsType.USER);
     }
 
@@ -84,7 +85,7 @@ public class RegExGeneratorTest extends UserSettingsTestCase {
     }
 
     @Test
-    void useExpressionRotation() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    void useExpressionRotation() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         ExpressionRotation expressionRotation = new ExpressionRotation(SettingsOption.DEFAULT);
 
         List<Expression> expressionList = new LinkedList<>(List.of(new Column("a"), new Column("b")));

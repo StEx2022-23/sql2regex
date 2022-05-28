@@ -27,8 +27,8 @@ class EquivalentStatementTest extends UserSettingsTestCase {
     private static final String DELIMITER_FOR_SINGLE_STATEMENTS = ";";
 
     ConverterManagement converterManagement;
-    
-    public EquivalentStatementTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+
+    public EquivalentStatementTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         super(SettingsType.ALL);
         converterManagement = new ConverterManagement(this.settingsManager);
     }

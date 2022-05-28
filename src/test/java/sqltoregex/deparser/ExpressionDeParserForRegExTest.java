@@ -24,7 +24,7 @@ import static org.junit.Assert.fail;
 
 class ExpressionDeParserForRegExTest extends UserSettingsTestCase {
 
-    public ExpressionDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    public ExpressionDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         super(SettingsType.ALL);
     }
 

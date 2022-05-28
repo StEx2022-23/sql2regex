@@ -22,9 +22,8 @@ import java.util.regex.Pattern;
 class LimitDeParserForRegExTest extends UserSettingsTestCase{
     StringBuilder buffer = new StringBuilder();
     StatementDeParser statementDeParser;
-    SettingsManager settingsManager = new SettingsManager();
 
-    LimitDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    LimitDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         super(SettingsType.ALL);
         this.statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(this.settingsManager), buffer, this.settingsManager);
     }

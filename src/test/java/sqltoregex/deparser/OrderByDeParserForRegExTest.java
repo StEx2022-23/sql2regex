@@ -23,7 +23,7 @@ class OrderByDeParserForRegExTest extends UserSettingsTestCase{
     StringBuilder buffer = new StringBuilder();
     StatementDeParser statementDeParser;
 
-    OrderByDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    OrderByDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         super(SettingsType.ALL);
         this.statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(settingsManager), buffer, settingsManager);
     }
