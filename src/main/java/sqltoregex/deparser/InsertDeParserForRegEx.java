@@ -107,6 +107,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         buffer.append(useKeywordSpellingMistake(INTO)).append(REQUIRED_WHITE_SPACE);
         buffer.append(useTableNameSpellingMistake(insert.getTable().toString())).append(REQUIRED_WHITE_SPACE);
 
+        // handle statement with single value list like: INSERT INTO table (col1, col2) VALUES (val1, val2);
         if (insert.getColumns() != null && insert.getItemsList() != null && insert.getItemsList() instanceof ExpressionList) {
             Map<String, String> mappedColumnsAndRelatedValues = new HashMap<>();
             for (int i = 0; i < insert.getColumns().size(); i++) {
@@ -116,7 +117,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 );
             }
             List<String> mappedColumnsAndRelatedValuesKeySet = new ArrayList<>();
-            for(String string : mappedColumnsAndRelatedValues.keySet()){
+            for (String string : mappedColumnsAndRelatedValues.keySet()) {
                 mappedColumnsAndRelatedValuesKeySet.add(string.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
             }
             String columnsRotated = useTableNameOrder(mappedColumnsAndRelatedValuesKeySet);
@@ -151,8 +152,32 @@ public class InsertDeParserForRegEx extends InsertDeParser {
 
             buffer.append(")");
 
+        // handle statement with multiple value list like: INSERT INTO table (col1, col2) VALUES (val1, val2), (val3, val4);
+        } else if (insert.getColumns() != null && insert.getItemsList() != null && insert.getItemsList() instanceof MultiExpressionList) {
+            Map<String, List<String>> mappedColumnsAndRelatedValuesForMultipleValueLists = new HashMap<>();
+            for (int i = 0; i < insert.getColumns().size(); i++) {
+                List<String> multipleValues = new ArrayList<>();
+                for(ExpressionList expressionList : ((MultiExpressionList) insert.getItemsList()).getExpressionLists()){
+                    multipleValues.add(expressionList.getExpressions().get(i).toString());
+                }
+
+                mappedColumnsAndRelatedValuesForMultipleValueLists.put(
+                        insert.getColumns().get(i).toString(),
+                        multipleValues
+                );
+            }
+            List<String> mappedColumnsAndRelatedValuesKeySet = new ArrayList<>();
+            for (String string : mappedColumnsAndRelatedValuesForMultipleValueLists.keySet()) {
+                mappedColumnsAndRelatedValuesKeySet.add(string.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+            }
+            String columnsRotated = useTableNameOrder(mappedColumnsAndRelatedValuesKeySet);
+            columnsRotated = columnsRotated.replace(OPTIONAL_WHITE_SPACE, "").replace("(?:", "").replace(")", "");
+            String[] columnsOrderOptionsAsStringSet = columnsRotated.split("\\|");
+
+        // handle case, when column list is not given
         } else if (insert.getColumns() == null && insert.getItemsList() != null) {
             insert.getItemsList().accept(this);
+        // handle case, when items list is not given, this should propably not happens, if valid sql is given
         } else if (insert.getColumns() != null && insert.getItemsList() == null){
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
