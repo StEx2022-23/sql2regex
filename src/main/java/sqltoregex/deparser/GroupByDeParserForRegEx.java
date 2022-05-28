@@ -12,13 +12,11 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
 import java.util.List;
 
 public class GroupByDeParserForRegEx extends GroupByDeParser {
-    public static final String GROUP = "GROUP";
-    public static final String BY = "BY";
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
-    private final ExpressionDeParserForRegEx expressionDeParserForRegEx;
-    private final ExpressionRotation expressionOrder;
-    private final SpellingMistake keywordSpellingMistake;
+    private RegExGenerator<String> keywordSpellingMistake;
+    private RegExGenerator<List<Expression>> expressionOrder;
+    private final ExpressionVisitor expressionVisitor;
 
     public GroupByDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, StringBuilder buffer,
                                    SettingsManager settingsManager) {
