@@ -147,9 +147,8 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 }
                 buffer.append(OPTIONAL_WHITE_SPACE);
                 buffer.append("\\)");
-                buffer.append("|");
+                buffer.append(columnsOrderOptionsIterator.hasNext() ? "|" : "");
             }
-
             buffer.append(")");
 
         // handle statement with multiple value list like: INSERT INTO table (col1, col2) VALUES (val1, val2), (val3, val4);
@@ -174,6 +173,36 @@ public class InsertDeParserForRegEx extends InsertDeParser {
             columnsRotated = columnsRotated.replace(OPTIONAL_WHITE_SPACE, "").replace("(?:", "").replace(")", "");
             String[] columnsOrderOptionsAsStringSet = columnsRotated.split("\\|");
 
+            buffer.append("(?:");
+            Iterator<String> columnsOrderOptionsIterator = Arrays.stream(columnsOrderOptionsAsStringSet).iterator();
+            while (columnsOrderOptionsIterator.hasNext()) {
+                String singleColumnOrderOption = columnsOrderOptionsIterator.next();
+                buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
+                buffer.append(singleColumnOrderOption.replace(",", OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE));
+                buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
+                buffer.append(useKeywordSpellingMistake(VALUE)).append("S?").append(OPTIONAL_WHITE_SPACE).append("\\(");
+                String[] extractedColumnsInOrderOption = singleColumnOrderOption.replace(" ", "").split(",");
+
+                Iterator<String> extractedColumnsIterator = Arrays.stream(extractedColumnsInOrderOption).iterator();
+
+//                buffer.append(OPTIONAL_WHITE_SPACE);
+//                while (extractedColumnsIterator.hasNext()) {
+//                    List<String> relatedValues = mappedColumnsAndRelatedValuesForMultipleValueLists.get(extractedColumnsIterator.next());
+//                    buffer.append();
+//                    int depth =
+//                    if (extractedColumnsIterator.hasNext()) {
+//                        buffer.append(OPTIONAL_WHITE_SPACE);
+//                        buffer.append(",");
+//                        buffer.append(OPTIONAL_WHITE_SPACE);
+//                    }
+//                }
+
+
+                buffer.append(OPTIONAL_WHITE_SPACE);
+                buffer.append("\\)");
+                buffer.append(columnsOrderOptionsIterator.hasNext() ? "|" : "");
+            }
+            buffer.append(")");
         // handle case, when column list is not given
         } else if (insert.getColumns() == null && insert.getItemsList() != null) {
             insert.getItemsList().accept(this);
