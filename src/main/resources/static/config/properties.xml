@@ -1,35 +1,35 @@
 <properties>
     <spelling>
         <keywordspelling>
-            <settingstype>ALL</settingstype>
+            <settingstype>ALL,DEFAULT_SCHOOL</settingstype>
             <value>true</value>
         </keywordspelling>
         <tablenamespelling>
-            <settingstype>ALL</settingstype>
+            <settingstype>ALL,DEFAULT_SCHOOL</settingstype>
             <value>true</value>
         </tablenamespelling>
         <columnnamespelling>
-            <settingstype>ALL</settingstype>
+            <settingstype>ALL,DEFAULT_SCHOOL</settingstype>
             <value>true</value>
         </columnnamespelling>
     </spelling>
     <order>
         <tablenameorder>
-            <settingstype>ALL</settingstype>
+            <settingstype>ALL,DEFAULT_SCHOOL</settingstype>
             <value>true</value>
         </tablenameorder>
         <columnnameorder>
-            <settingstype>ALL</settingstype>
+            <settingstype>ALL,DEFAULT_SCHOOL</settingstype>
             <value>true</value>
         </columnnameorder>
         <expressionorder>
-            <settingstype>ALL</settingstype>
+            <settingstype>ALL,DEFAULT_SCHOOL</settingstype>
             <value>true</value>
         </expressionorder>
     </order>
     <synonyms>
         <datesynonyms>
-            <settingstype>ALL</settingstype>
+            <settingstype>ALL,DEFAULT_SCHOOL</settingstype>
             <value>yyyy-MM-dd</value>
             <value>yy-MM-dd</value>
             <value>yyyy-MM-dd</value>
@@ -37,28 +37,28 @@
             <value>yyyyMMdd</value>
         </datesynonyms>
         <timesynonyms>
-            <settingstype>ALL</settingstype>
+            <settingstype>ALL,DEFAULT_SCHOOL</settingstype>
             <value>hh:mm:ss</value>
         </timesynonyms>
         <datetimesynonyms>
-            <settingstype>ALL</settingstype>
+            <settingstype>ALL,DEFAULT_SCHOOL</settingstype>
             <value>yyyy-MM-dd hh:mm:ss</value>
         </datetimesynonyms>
         <aggregatefunctionlang>
-            <settingstype>ALL</settingstype>
+            <settingstype>ALL,DEFAULT_SCHOOL</settingstype>
             <value>SUM;SUMME</value>
             <value>AVG;MITTELWERT</value>
             <value>AVG;Average</value>
         </aggregatefunctionlang>
         <othersynonyms>
-            <settingstype>ALL</settingstype>
+            <settingstype>ALL,DEFAULT_SCHOOL</settingstype>
             <value>ASC;aufsteigend</value>
             <value>DESC;absteigend</value>
         </othersynonyms>
     </synonyms>
     <specificsettings>
         <NOT_AS_EXCLAMATION_AND_WORD>
-            <settingstype>ALL</settingstype>
+            <settingstype>ALL,DEFAULT_SCHOOL</settingstype>
             <value>true</value>
         </NOT_AS_EXCLAMATION_AND_WORD>
     </specificsettings>

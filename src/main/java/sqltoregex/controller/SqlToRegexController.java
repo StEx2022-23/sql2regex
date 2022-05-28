@@ -77,8 +77,11 @@ public class SqlToRegexController {
                                      SettingsType.DEFAULT_SCHOOL),
                 getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class, SettingsOption.DATETIMESYNONYMS,
                                      SettingsType.DEFAULT_SCHOOL),
-                getSynonymGenerators(StringSynonymGenerator.class, SettingsOption.AGGREGATEFUNCTIONLANG,
-                                     SettingsType.DEFAULT_SCHOOL),
+                //special preprocessing to render comfortably on frontend
+                settingsManager.getSettingBySettingsOption(
+                                SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class, SettingsType.ALL)
+                        .map(synonymGenerator -> GraphPreProcessor.getSynonymSetWithDelimiter(synonymGenerator.getGraph(), ";"))
+                        .orElse(new HashSet<>()),
                 ""
         );
     }
