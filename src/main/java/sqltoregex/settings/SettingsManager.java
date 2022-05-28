@@ -108,7 +108,7 @@ public class SettingsManager {
         factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
         factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         DocumentBuilder builder = factory.newDocumentBuilder();
-        URL ressource = getClass().getClassLoader().getResource("static/config/defaultProperties.xml");
+        URL ressource = getClass().getClassLoader().getResource("static/config/properties.xml");
         assert ressource != null;
         Document document = builder.parse(String.valueOf(ressource.toURI()));
         document.getDocumentElement().normalize();
