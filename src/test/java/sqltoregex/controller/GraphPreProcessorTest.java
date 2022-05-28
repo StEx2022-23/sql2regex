@@ -14,6 +14,7 @@ import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +23,7 @@ class GraphPreProcessorTest {
 
     private final SettingsManager settingsManager = new SettingsManager();
 
-    GraphPreProcessorTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    GraphPreProcessorTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
     }
 
     @Test

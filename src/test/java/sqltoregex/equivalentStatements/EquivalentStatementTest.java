@@ -12,6 +12,7 @@ import sqltoregex.settings.SettingsManager;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -25,7 +26,7 @@ class EquivalentStatementTest {
 
     ConverterManagement converterManagement;
 
-    public EquivalentStatementTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    public EquivalentStatementTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         converterManagement = new ConverterManagement(new SettingsManager());
     }
 

@@ -10,6 +10,7 @@ import sqltoregex.settings.SettingsOption;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -75,7 +76,7 @@ public class ExpressionRotation implements RegExGenerator<List<Expression>> {
             buffer.deleteCharAt(buffer.length()-1);
             buffer.append(")");
             return buffer.toString();
-        } catch (XPathExpressionException | ParserConfigurationException | IOException | SAXException e) {
+        } catch (XPathExpressionException | ParserConfigurationException | IOException | SAXException | URISyntaxException e) {
             Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
             logger.log(Level.INFO, "Generate RegEx for Expressionlist go wrong: {0}", e.toString());
         }

@@ -12,6 +12,7 @@ import sqltoregex.settings.SettingsManager;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +21,7 @@ class StatementDeParserForRegExTest {
     StringBuilder buffer = new StringBuilder();
     StatementDeParser statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(new SettingsManager()), buffer, new SettingsManager());
 
-    StatementDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    StatementDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
     }
 
     boolean checkAgainstRegEx(String regex, String toChecked) {
@@ -44,7 +45,7 @@ class StatementDeParserForRegExTest {
     }
 
     @Test
-    void testConstructorOne() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    void testConstructorOne() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         SettingsManager settingsManager = new SettingsManager();
         StringBuilder buffer = new StringBuilder();
         StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(buffer, settingsManager);
@@ -52,7 +53,7 @@ class StatementDeParserForRegExTest {
     }
 
     @Test
-    void testConstructorTwo() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    void testConstructorTwo() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         SettingsManager settingsManager = new SettingsManager();
         ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settingsManager);
         StringBuilder buffer = new StringBuilder();
@@ -62,7 +63,7 @@ class StatementDeParserForRegExTest {
     }
 
     @Test
-    void testConstructorThree() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    void testConstructorThree() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         SettingsManager settingsManager = new SettingsManager();
         ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settingsManager);
         StringBuilder buffer = new StringBuilder();

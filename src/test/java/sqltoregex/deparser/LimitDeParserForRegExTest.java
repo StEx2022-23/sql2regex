@@ -12,6 +12,7 @@ import sqltoregex.settings.SettingsManager;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +21,7 @@ class LimitDeParserForRegExTest {
     StringBuilder buffer = new StringBuilder();
     StatementDeParser statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(new SettingsManager()), buffer, new SettingsManager());
 
-    LimitDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    LimitDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
     }
 
     boolean checkAgainstRegEx(String regex, String toBeChecked) {

@@ -11,6 +11,7 @@ import sqltoregex.settings.SettingsManager;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -22,7 +23,7 @@ class ExpressionDeParserForRegExTest {
 
     private final SettingsManager settingsManager = new SettingsManager();
 
-    public ExpressionDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    public ExpressionDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
     }
 
     private String testDeParsedExpressionVsStringLists(String expressionString, List<String> matchingStrings, List<String> notMatchingStrings){
@@ -54,7 +55,7 @@ class ExpressionDeParserForRegExTest {
     }
 
     @Test
-    void testFullConstructor() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    void testFullConstructor() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         StringBuilder buffer = new StringBuilder();
         SettingsManager settingsManager = new SettingsManager();
         SelectDeParserForRegEx selectDeParserForRegEx = new SelectDeParserForRegEx(settingsManager);
