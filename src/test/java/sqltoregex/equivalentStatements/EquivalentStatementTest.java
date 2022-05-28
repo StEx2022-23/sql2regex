@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.xml.sax.SAXException;
 import sqltoregex.ConverterManagement;
+import sqltoregex.deparser.UserSettingsTestCase;
 import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsType;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -19,15 +21,16 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class EquivalentStatementTest {
+class EquivalentStatementTest extends UserSettingsTestCase {
     Map<String, List<String>> equivalentStatements;
     private static final String DELIMITER_FOR_EQUIVALENTS = "#####";
     private static final String DELIMITER_FOR_SINGLE_STATEMENTS = ";";
 
     ConverterManagement converterManagement;
-
-    public EquivalentStatementTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
-        converterManagement = new ConverterManagement(new SettingsManager());
+    
+    public EquivalentStatementTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        super(SettingsType.ALL);
+        converterManagement = new ConverterManagement(this.settingsManager);
     }
 
     void parseTextFile(SupportedStatementType statementType) throws IOException {

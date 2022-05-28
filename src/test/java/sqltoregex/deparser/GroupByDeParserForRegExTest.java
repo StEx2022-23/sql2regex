@@ -7,7 +7,7 @@ import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsType;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -17,11 +17,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class GroupByDeParserForRegExTest {
+class GroupByDeParserForRegExTest extends UserSettingsTestCase {
     StringBuilder buffer = new StringBuilder();
-    StatementDeParser statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(new SettingsManager()), buffer, new SettingsManager());
+    StatementDeParser statementDeParser;
 
-    GroupByDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
+    GroupByDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        super(SettingsType.ALL);
+        statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(this.settingsManager), buffer, this.settingsManager);
     }
 
     boolean checkAgainstRegEx(String regex, String toBeChecked) {

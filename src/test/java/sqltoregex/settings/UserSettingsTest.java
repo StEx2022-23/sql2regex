@@ -15,6 +15,7 @@ class UserSettingsTest {
     @Test
     void MapNotMutable() {
         Map<SettingsOption, IRegExGenerator<?>> map = new HashMap<>();
+        map.put(SettingsOption.DEFAULT, null);
         UserSettings userSettings1 = UserSettings.getInstance(map);
         Map<SettingsOption, IRegExGenerator<?>> settingsMap = userSettings1.getSettingsMap();
         Assertions.assertThrows(UnsupportedOperationException.class, () -> settingsMap.putAll(map));
@@ -26,6 +27,7 @@ class UserSettingsTest {
     @Test
     void onlyOneInstance() {
         Map<SettingsOption, IRegExGenerator<?>> map = new HashMap<>();
+        map.put(SettingsOption.DEFAULT, null);
         UserSettings userSettings1 = UserSettings.getInstance(map);
         UserSettings userSettings2 = UserSettings.getInstance(map);
         Assertions.assertEquals(userSettings1, userSettings2);

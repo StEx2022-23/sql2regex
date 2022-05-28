@@ -22,11 +22,10 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.fail;
 
-class ExpressionDeParserForRegExTest {
+class ExpressionDeParserForRegExTest extends UserSettingsTestCase {
 
-    private final SettingsManager settingsManager = new SettingsManager();
-
-    public ExpressionDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
+    public ExpressionDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        super(SettingsType.ALL);
     }
 
     private String testDeParsedExpressionVsStringLists(String expressionString, List<String> matchingStrings, List<String> notMatchingStrings){
@@ -265,9 +264,4 @@ class ExpressionDeParserForRegExTest {
         matching.add("NOT  EXISTS  b");
         testDeParsedExpressionVsStringLists("NOT EXISTS b", matching, notMatching);
     }
-
-
-
-
-
 }

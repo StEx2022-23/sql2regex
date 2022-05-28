@@ -3,12 +3,11 @@ package sqltoregex.settings.regexgenerator;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Column;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-import sqltoregex.settings.SettingsForm;
-import sqltoregex.settings.SettingsManager;
+import sqltoregex.deparser.UserSettingsTestCase;
 import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.SettingsType;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -16,14 +15,13 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-class ExpressionRotationTest {
+class ExpressionRotationTest extends UserSettingsTestCase {
     ExpressionRotation expressionRotation = new ExpressionRotation(SettingsOption.DEFAULT);
     List<Expression> testListOne = Arrays.asList(new Column("table1"), new Column("table2"));
     List<Expression> testListTwo = List.of(new Column("table1"));
-    SettingsManager settingsManager = new SettingsManager();
 
     ExpressionRotationTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
-        settingsManager.parseUserSettingsInput(SettingsForm.EMPTY_FORM);
+        super(SettingsType.USER);
     }
 
     @Test

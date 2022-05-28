@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 import sqltoregex.settings.SettingsForm;
 import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsType;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -18,12 +19,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class LimitDeParserForRegExTest {
+class LimitDeParserForRegExTest extends UserSettingsTestCase{
     StringBuilder buffer = new StringBuilder();
     StatementDeParser statementDeParser;
     SettingsManager settingsManager = new SettingsManager();
 
-    LimitDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
+    LimitDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+        super(SettingsType.ALL);
+        this.statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(this.settingsManager), buffer, this.settingsManager);
     }
 
     boolean checkAgainstRegEx(String regex, String toBeChecked) {
