@@ -10,7 +10,7 @@ import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 public class StatementDeParserForRegEx extends StatementDeParser {
-    public static final String WITH = "WITH";
+    private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private final SettingsManager settingsManager;
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
@@ -53,7 +53,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         this.expressionDeParserForRegEx.setBuffer(buffer);
         this.selectDeParserForRegEx.setExpressionVisitor(expressionDeParserForRegEx);
         if (select.getWithItemsList() != null && !select.getWithItemsList().isEmpty()) {
-            buffer.append(useKeywordSpellingMistake(WITH));
+            buffer.append(useKeywordSpellingMistake("WITH"));
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append(this.selectDeParserForRegEx.handleWithItemValueList(select));
         }

@@ -13,14 +13,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-class StatementDeParserForRegExTest {
-    TestUtils testUtils = new TestUtils(new SettingsManager());
+class StatementDeParserForRegExTest extends UserSettingsPreparer{
+    TestUtils testUtils = new TestUtils();
 
     StatementDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException,
             SAXException, URISyntaxException {
         super(SettingsType.ALL);
-        this.statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(this.settingsManager),
-                                                               buffer, this.settingsManager);
     }
 
     @Test
@@ -54,15 +52,6 @@ class StatementDeParserForRegExTest {
                                                                                             selectDeParserForRegEx,
                                                                                             buffer, settingsManager);
         Assertions.assertNotNull(statementDeParserForRegEx);
-    }
-
-    void validateListAgainstRegEx(String sampleSolution, List<String> alternativeStatements,
-                                  boolean isAssertTrue) throws JSQLParserException {
-        String regex = this.getRegEx(sampleSolution);
-        for (String str : alternativeStatements) {
-            if (isAssertTrue) Assertions.assertTrue(checkAgainstRegEx(regex, str), str + " " + regex);
-            else Assertions.assertFalse(checkAgainstRegEx(regex, str), str + " " + regex);
-        }
     }
 
     @Test

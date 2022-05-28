@@ -13,14 +13,13 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-class OrderByDeParserForRegExTest {
-    TestUtils testUtils = new TestUtils(new SettingsManager());
+class OrderByDeParserForRegExTest extends UserSettingsPreparer{
+    TestUtils testUtils = new TestUtils();
 
     OrderByDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException,
             SAXException, URISyntaxException {
         super(SettingsType.ALL);
-        this.statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(settingsManager), buffer,
-                                                               settingsManager);
+
     }
 
     @Test
@@ -92,38 +91,6 @@ class OrderByDeParserForRegExTest {
                 "SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC",
                 "SELECT col1 FROM table1 ORDER BY col2 ASC, col1 DESC",
                 "SELECT col1 FROM table1 ORDER BY col1  DESC , col2  ASC"
-        );
-        testUtils.validateListAgainstRegEx("SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC", toCheckedInput, true);
-    }
-
-    @Test
-    void testComplexerOrderByWithNullFirstLast() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT col1 FROM table1 ORDER BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
-                "SELECT col1 FROM table1 ORDER BY col2 ASC NULLS FIRST, col1 DESC NULLS LAST",
-                "SELECT col1 FROM table1 ORDER BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
-                "SELECT col1 FROM table1 ORDER BY col1 DESC NULS LAST, col2 AC NULS FIRST"
-        );
-        testUtils.validateListAgainstRegEx("SELECT col1 FROM table1 ORDER BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST", toCheckedInput, true);
-    }
-
-    @Test
-    void testComplexerOrderByWithIsSibling() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT col1 FROM table1 ORDER SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
-                "SELECT col1 FROM table1 ORDER SIBLINGS  BY col2 ASC NULLS FIRST, col1 DESC NULLS LAST",
-                "SELECT col1 FROM table1 ORDER  SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
-                "SELECT col1 FROM table1 ORDER SIBLNGS BY col1 DESC NULS LAST, col2 AC NULS FIRST"
-        );
-        testUtils.validateListAgainstRegEx("SELECT col1 FROM table1 ORDER SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST", toCheckedInput, true);
-    }
-
-    @Test
-    void testComplexerOrderByWithSynonyms() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT col1 FROM table1 ORDER BY col1 absteigend, col2 ASC",
-                "SELECT col1 FROM table1 ORDER BY col2 ASC, col1 absteigend",
-                "SELECT col1 FROM table1 ORDER BY col1  DESC , col2  aufsteigend"
         );
         testUtils.validateListAgainstRegEx("SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC", toCheckedInput, true);
     }

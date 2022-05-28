@@ -3,6 +3,7 @@ package sqltoregex.deparser;
 import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
+import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsType;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -11,14 +12,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-class SelectDeParserForRegExTest {
-    TestUtils testUtils = new TestUtils(new SettingsManager());
+class SelectDeParserForRegExTest extends UserSettingsPreparer{
+    TestUtils testUtils = new TestUtils();
 
     SelectDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException,
             SAXException, URISyntaxException {
         super(SettingsType.ALL);
-        this.statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(this.settingsManager),
-                                                               buffer, this.settingsManager);
     }
 
     @Test
@@ -186,18 +185,6 @@ class SelectDeParserForRegExTest {
                 "SELECT * FROM table1 AS t"
         );
         testUtils.validateListAgainstRegEx("SELECT * FROM table1", toCheckedInput, true);
-    }
-
-    @Test
-    void testUniqueKeyword() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT UNIQUE col1",
-                "SELECT UNIUE col1",
-                "SELECT  UNIQUE  col1"
-        );
-
-        String input = "SELECT * FROM (SELECT c1, p1, q FROM p) PIVOT (SUM(q) as q for p1 in ('a','b')) ORDER BY c1";
-        testUtils.validateListAgainstRegEx(input, toCheckedInput, false);
     }
 
     @Test

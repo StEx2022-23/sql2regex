@@ -3,7 +3,7 @@ package sqltoregex.settings;
 import org.springframework.util.Assert;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import sqltoregex.settings.regexgenerator.ExpressionRotation;
+import sqltoregex.settings.regexgenerator.GroupByElementRotation;
 import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;

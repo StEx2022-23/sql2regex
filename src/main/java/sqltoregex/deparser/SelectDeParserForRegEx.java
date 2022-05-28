@@ -18,7 +18,6 @@ import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
-import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,21 +29,19 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
     private boolean flagForOrderRotationWithOutSpellingMistake = false;
-    private ExpressionVisitor expressionVisitor;
-    private RegExGenerator<String> keywordSpellingMistake;
-    private RegExGenerator<String> columnNameSpellingMistake;
-    private RegExGenerator<String> tableNameSpellingMistake;
-    private RegExGenerator<List<String>> columnNameOrder;
-    private RegExGenerator<List<String>> tableNameOrder;
-    private RegExGenerator<String> aggregateFunctionLang;
+    private final SpellingMistake keywordSpellingMistake;
+    private final SpellingMistake columnNameSpellingMistake;
+    private final SpellingMistake tableNameSpellingMistake;
+    private final OrderRotation columnNameOrder;
+    private final OrderRotation tableNameOrder;
+    private final StringSynonymGenerator aggregateFunctionLang;
     SettingsManager settingsManager;
-    private ExpressionDeParserForRegEx expressionVisitor;
-    private boolean flagForOrderRotationWithOutSpellingMistake = false;
+    private ExpressionDeParserForRegEx expressionDeParserForRegEx;
 
     public SelectDeParserForRegEx(SettingsManager settingsManager) {
         super();
         this.settingsManager = settingsManager;
-        this.expressionVisitor = new ExpressionDeParserForRegEx(this, buffer, settingsManager);
+        this.expressionDeParserForRegEx = new ExpressionDeParserForRegEx(this, buffer, settingsManager);
         this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING,
                                                                                  SpellingMistake.class).orElse(null);
         this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING,
@@ -64,37 +61,13 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         StringBuilder temp = new StringBuilder();
         temp.append(OPTIONAL_WHITE_SPACE);
         temp.append("(?:");
-        temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, ALIAS));
+        temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ALIAS"));
         temp.append("|");
-        temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, AS));
+        temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "AS"));
         if (isOptional) temp.append(")?");
         else temp.append(")");
         temp.append(REQUIRED_WHITE_SPACE);
         return temp.toString();
-    }
-
-    @Override
-    public void deparseFetch(Fetch fetch) {
-        buffer.append(REQUIRED_WHITE_SPACE)
-                .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, FETCH))
-                .append(REQUIRED_WHITE_SPACE);
-        if (fetch.isFetchParamFirst()) {
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, FIRST))
-                    .append(REQUIRED_WHITE_SPACE);
-        } else {
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, NEXT))
-                    .append(REQUIRED_WHITE_SPACE);
-        }
-        if (fetch.getFetchJdbcParameter() != null) {
-            buffer.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake,
-                                                            fetch.getFetchJdbcParameter().toString()));
-        } else {
-            buffer.append(fetch.getRowCount());
-        }
-        buffer.append(OPTIONAL_WHITE_SPACE);
-        buffer.append(fetch.getFetchParam()).append(OPTIONAL_WHITE_SPACE)
-                .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, ONLY));
-
     }
 
     @Override
@@ -103,7 +76,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         if (join.isSimple() && join.isOuter()) {
             buffer.append(",");
             buffer.append(OPTIONAL_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, OUTER));
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "OUTER"));
             buffer.append(REQUIRED_WHITE_SPACE);
         } else if (join.isSimple()) {
             buffer.append(",");
@@ -111,43 +84,43 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         } else {
             if (join.isRight()) {
                 buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, RIGHT));
+                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "RIGHT"));
             } else if (join.isNatural()) {
                 buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, NATURAL));
+                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "NATURAL"));
             } else if (join.isFull()) {
                 buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, FULL));
+                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FULL"));
             } else if (join.isLeft()) {
                 buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, LEFT));
+                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "LEFT"));
             } else if (join.isCross()) {
                 buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, CROSS));
+                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "CROSS"));
             }
 
             if (join.isOuter()) {
                 buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, OUTER));
+                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "OUTER"));
             } else if (join.isInner()) {
                 buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, INNER));
+                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "INNER"));
             } else if (join.isSemi()) {
                 buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, SEMI));
+                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "SEMI"));
             }
 
             if (join.isStraight()) {
                 buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, STRAIGHT_JOIN));
+                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "STRAIGHT_JOIN"));
                 buffer.append(REQUIRED_WHITE_SPACE);
             } else if (join.isApply()) {
                 buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, APPLY));
+                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "APPLY"));
                 buffer.append(REQUIRED_WHITE_SPACE);
             } else {
                 buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, JOIN));
+                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "JOIN"));
                 buffer.append(REQUIRED_WHITE_SPACE);
             }
         }
@@ -156,19 +129,19 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         fromItem.accept(this);
         if (join.isWindowJoin()) {
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, WITHIN));
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "WITHIN"));
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append(join.getJoinWindow().toString());
         }
         for (Expression onExpression : join.getOnExpressions()) {
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, ON));
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ON"));
             buffer.append(REQUIRED_WHITE_SPACE);
-            onExpression.accept(expressionVisitor);
+            onExpression.accept(expressionDeParserForRegEx);
         }
         if (!join.getUsingColumns().isEmpty()) {
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, USING));
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "USING"));
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
             buffer.append(OPTIONAL_WHITE_SPACE);
@@ -188,7 +161,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     @Override
     public void deparseOffset(Offset offset) {
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, OFFSET));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "OFFSET"));
         buffer.append(REQUIRED_WHITE_SPACE);
         buffer.append(offset.getOffset());
         buffer.append(OPTIONAL_WHITE_SPACE);
@@ -199,18 +172,18 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     private void deparseOptimizeForForRegEx(OptimizeFor optimizeFor) {
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, OPTIMIZE));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "OPTIMIZE"));
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, FOR));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FOR"));
         buffer.append(REQUIRED_WHITE_SPACE);
         buffer.append(optimizeFor.getRowCount());
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, ROWS));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ROWS"));
     }
 
     @Override
     public ExpressionVisitor getExpressionVisitor() {
-        return expressionVisitor;
+        return expressionDeParserForRegEx;
     }
 
     @Override
@@ -219,7 +192,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             throw new IllegalArgumentException(
                     "ExpressionVisitor must be of type ExpressionDeParserForRegex for this implementation");
         }
-        expressionVisitor = (ExpressionDeParserForRegEx) visitor;
+        expressionDeParserForRegEx = (ExpressionDeParserForRegEx) visitor;
     }
 
     private String handleALiasAndAggregateFunction(Object o) {
@@ -233,25 +206,25 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
         }
 
-        if (!o.toString().contains(AS) && !o.toString().contains("(") && !o.toString().contains(")")) {
+        if (!o.toString().contains("AS") && !o.toString().contains("(") && !o.toString().contains(")")) {
             temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, o.toString()));
             this.setFlagForOrderRotationWithOutSpellingMistake(true);
         }
 
-        if (o.toString().contains(AS) && o.toString().contains("(") && o.toString().contains(")")) {
+        if (o.toString().contains("AS") && o.toString().contains("(") && o.toString().contains(")")) {
             temp.append(this.addOptionalAliasKeywords(false));
-            temp.append(o.toString().split(AS)[1].replace(" ", ""));
+            temp.append(o.toString().split("AS")[1].replace(" ", ""));
             this.setFlagForOrderRotationWithOutSpellingMistake(true);
         }
 
-        if (o.toString().contains(AS) && !o.toString().contains("(") && !o.toString().contains(")")) {
-            temp.append(o.toString().split(AS)[0].replace(" ", ""));
+        if (o.toString().contains("AS") && !o.toString().contains("(") && !o.toString().contains(")")) {
+            temp.append(o.toString().split("AS")[0].replace(" ", ""));
             temp.append(this.addOptionalAliasKeywords(false));
-            temp.append(o.toString().split(AS)[1].replace(" ", ""));
+            temp.append(o.toString().split("AS")[1].replace(" ", ""));
             this.setFlagForOrderRotationWithOutSpellingMistake(true);
         }
 
-        if (!o.toString().contains(AS)) {
+        if (!o.toString().contains("AS")) {
             temp.append(OPTIONAL_WHITE_SPACE);
             temp.append("(");
             temp.append(this.addOptionalAliasKeywords(false));
@@ -285,9 +258,9 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     private String handleWithGetItemListIsUsingValue(WithItem withItem) {
         StringBuilder temp = new StringBuilder();
         ItemsList itemsList = withItem.getItemsList();
-        temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, VALUES));
+        temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "VALUES"));
         temp.append(REQUIRED_WHITE_SPACE);
-        temp.append("\\(").append(OPTIONAL_WHITE_SPACE).append(VALUES);
+        temp.append("\\(").append(OPTIONAL_WHITE_SPACE).append("VALUES");
         temp.append(REQUIRED_WHITE_SPACE);
         ExpressionList expressionList = (ExpressionList) itemsList;
         Iterator<Expression> expressionIterator = expressionList.getExpressions().iterator();
@@ -318,7 +291,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         for (WithItem withItem : listOfWithItems) {
             StringBuilder temp = new StringBuilder();
             if (withItem.isRecursive()) {
-                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, RECURSIVE));
+                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "RECURSIVE"));
                 temp.append(REQUIRED_WHITE_SPACE);
             }
             temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, withItem.getName()));
@@ -349,17 +322,41 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     @Override
+    public void deparseFetch(Fetch fetch) {
+        buffer.append(REQUIRED_WHITE_SPACE)
+                .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FETCH"))
+                .append(REQUIRED_WHITE_SPACE);
+        if (fetch.isFetchParamFirst()) {
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FIRST"))
+                    .append(REQUIRED_WHITE_SPACE);
+        } else {
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "NEXT"))
+                    .append(REQUIRED_WHITE_SPACE);
+        }
+        if (fetch.getFetchJdbcParameter() != null) {
+            buffer.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake,
+                    fetch.getFetchJdbcParameter().toString()));
+        } else {
+            buffer.append(fetch.getRowCount());
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer.append(fetch.getFetchParam()).append(OPTIONAL_WHITE_SPACE)
+                .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ONLY"));
+
+    }
+
+    @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.ExcessiveMethodLength", "PMD.NPathComplexity"})
     public void visit(PlainSelect plainSelect) {
         if (plainSelect.isUseBrackets()) {
             buffer.append("\\(" + OPTIONAL_WHITE_SPACE);
         }
 
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, SELECT));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "SELECT"));
         buffer.append(REQUIRED_WHITE_SPACE);
 
         if (plainSelect.getMySqlHintStraightJoin()) {
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, STRAIGHT_JOIN));
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "STRAIGHT_JOIN"));
             buffer.append(REQUIRED_WHITE_SPACE);
         }
 
@@ -380,14 +377,14 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         if (plainSelect.getDistinct() != null) {
             if (plainSelect.getDistinct().isUseUnique()) {
-                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, UNIQUE));
+                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "UNIQUE"));
                 buffer.append(REQUIRED_WHITE_SPACE);
             } else {
-                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, DISTINCT));
+                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "DISTINCT"));
                 buffer.append(REQUIRED_WHITE_SPACE);
             }
             if (plainSelect.getDistinct().getOnSelectItems() != null) {
-                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, ON));
+                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ON"));
                 buffer.append(REQUIRED_WHITE_SPACE);
                 buffer.append("(").append(OPTIONAL_WHITE_SPACE);
 
@@ -416,7 +413,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
 
         if (plainSelect.getMySqlSqlCalcFoundRows()) {
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, SQL_CALC_FOUND_ROWS));
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "SQL_CALC_FOUND_ROWS"));
             buffer.append(OPTIONAL_WHITE_SPACE);
         }
 
@@ -432,13 +429,13 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
         if (plainSelect.getIntoTables() != null) {
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, FROM));
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FROM"));
             buffer.append(REQUIRED_WHITE_SPACE);
 
             List<String> selectedTableNamesAsStrings = new ArrayList<>();
             for (Table table : plainSelect.getIntoTables()) {
-                String temp = useTableNameSpellingMistake(table.getFullyQualifiedName());
-                temp = temp + (table.getAlias() != null ? REQUIRED_WHITE_SPACE + useTableNameSpellingMistake(table.getAlias().toString()) + DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE : "");
+                String temp = RegExGenerator.useTableNameSpellingMistake(this.tableNameSpellingMistake, table.getFullyQualifiedName());
+                temp = temp + (table.getAlias() != null ? REQUIRED_WHITE_SPACE + RegExGenerator.useTableNameSpellingMistake(this.tableNameSpellingMistake, table.getAlias().toString()) + DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE : "");
                 selectedTableNamesAsStrings.add(temp);
             }
             buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrder, selectedTableNamesAsStrings));
@@ -453,7 +450,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             }
 
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, FROM));
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FROM"));
             buffer.append(REQUIRED_WHITE_SPACE);
 
             if (simpleJoinElements.size() == 1) {
@@ -466,7 +463,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             }
         } else if (plainSelect.getFromItem() != null) {
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, FROM));
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FROM"));
             buffer.append(REQUIRED_WHITE_SPACE);
             plainSelect.getFromItem().accept(this);
         }
@@ -482,19 +479,19 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
 
         if (plainSelect.getOracleHierarchical() != null) {
-            plainSelect.getOracleHierarchical().accept(expressionVisitor);
+            plainSelect.getOracleHierarchical().accept(expressionDeParserForRegEx);
         }
 
         if (plainSelect.getGroupBy() != null) {
             buffer.append(REQUIRED_WHITE_SPACE);
-            new GroupByDeParserForRegEx(expressionVisitor, buffer, settingsManager).deParse(plainSelect.getGroupBy());
+            new GroupByDeParserForRegEx(this.expressionDeParserForRegEx, buffer, settingsManager).deParse(plainSelect.getGroupBy());
         }
 
         if (plainSelect.getHaving() != null) {
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, HAVING));
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "HAVING"));
             buffer.append(REQUIRED_WHITE_SPACE);
-            plainSelect.getHaving().accept(expressionVisitor);
+            plainSelect.getHaving().accept(expressionDeParserForRegEx);
         }
 
         if (plainSelect.getOrderByElements() != null) {
@@ -504,9 +501,9 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         if (plainSelect.isEmitChanges()) {
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, EMIT));
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "EMIT"));
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, CHANGES));
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "CHANGES"));
             buffer.append(OPTIONAL_WHITE_SPACE);
         }
         if (plainSelect.getLimit() != null) {
@@ -542,9 +539,9 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
         if (plainSelect.getForXmlPath() != null) {
             buffer.append(REQUIRED_WHITE_SPACE)
-                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, FOR));
-            buffer.append(REQUIRED_WHITE_SPACE).append(XML).append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, PATH)).append("\\(");
+                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FOR"));
+            buffer.append(REQUIRED_WHITE_SPACE).append("XML").append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "PATH")).append("\\(");
             buffer.append(plainSelect.getForXmlPath()).append(OPTIONAL_WHITE_SPACE + "\\)");
         }
         if (plainSelect.isUseBrackets()) {
@@ -561,7 +558,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     @Override
     public void visit(SelectExpressionItem selectExpressionItem) {
-        selectExpressionItem.getExpression().accept(expressionVisitor);
+        selectExpressionItem.getExpression().accept(expressionDeParserForRegEx);
         if (selectExpressionItem.getAlias() != null) {
             buffer.append(selectExpressionItem.getAlias().toString());
         }
@@ -571,7 +568,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public void visit(SubSelect subSelect) {
         buffer.append(subSelect.isUseBrackets() ? "\\(" + OPTIONAL_WHITE_SPACE : OPTIONAL_WHITE_SPACE);
         if (subSelect.getWithItemsList() != null && !subSelect.getWithItemsList().isEmpty()) {
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, WITH));
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "WITH"));
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append(this.handleWithItemValueList(subSelect));
         }
@@ -635,7 +632,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public void visit(Pivot pivot) {
         List<Column> forColumns = pivot.getForColumns();
         buffer.append(OPTIONAL_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, PIVOT));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "PIVOT"));
         buffer.append(OPTIONAL_WHITE_SPACE);
         buffer.append("\\(");
         List<String> functionItemList = new LinkedList<>();
@@ -644,7 +641,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
         buffer.append(this.handleOrderRotationWithExplicitNoneSpellingMistake(functionItemList));
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, FOR));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FOR"));
         buffer.append(REQUIRED_WHITE_SPACE);
 
         List<String> forColumnsList = new LinkedList<>();
@@ -658,7 +655,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
                 forColumnsList.size() > 1 ? OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE : OPTIONAL_WHITE_SPACE);
 
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, IN));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "IN"));
         buffer.append(REQUIRED_WHITE_SPACE);
 
         buffer.append(
@@ -706,17 +703,17 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
 
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, UNPIVOT));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "UNPIVOT"));
         if (showOptions && includeNulls) {
             buffer.append(REQUIRED_WHITE_SPACE)
-                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, INCLUDE))
+                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "INCLUDE"))
                     .append(REQUIRED_WHITE_SPACE)
-                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, NULLS));
+                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "NULLS"));
         } else if (showOptions) {
             buffer.append(REQUIRED_WHITE_SPACE)
-                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, EXCLUDE))
+                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "EXCLUDE"))
                     .append(REQUIRED_WHITE_SPACE)
-                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, NULLS));
+                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "NULLS"));
         }
         buffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
         buffer.append(unPivotClause.size() > 1 ? "\\(" : "");
@@ -724,7 +721,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         buffer.append(unPivotClause.size() > 1 ? "\\)" : "");
 
         buffer.append(unPivotClause.size() > 1 ? OPTIONAL_WHITE_SPACE : REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, FOR));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FOR"));
         buffer.append(REQUIRED_WHITE_SPACE);
 
         buffer.append(unpivotForClause.size() > 1 ? "\\(" : "");
@@ -732,7 +729,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         buffer.append(unpivotForClause.size() > 1 ? "\\)" : "");
 
         buffer.append(unpivotForClause.size() > 1 ? OPTIONAL_WHITE_SPACE : REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, IN));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "IN"));
         buffer.append(REQUIRED_WHITE_SPACE);
 
         buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
@@ -757,9 +754,9 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             forColumnsAsStringList.add(column.toString());
         }
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, PIVOT));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "PIVOT"));
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, XML));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "XML"));
         buffer.append(OPTIONAL_WHITE_SPACE).append("\\(");
 
         List<String> functionItemList = new LinkedList<>();
@@ -768,7 +765,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
         buffer.append(this.handleOrderRotationWithExplicitNoneSpellingMistake(functionItemList));
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, FOR));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FOR"));
         buffer.append(REQUIRED_WHITE_SPACE);
 
         buffer.append(forColumns.size() > 1 ? "\\(" : "");
@@ -776,12 +773,12 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         buffer.append(forColumns.size() > 1 ? "\\)" : "");
 
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, IN));
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "IN"));
         buffer.append(OPTIONAL_WHITE_SPACE);
         buffer.append("\\(");
 
         if (pivot.isInAny()) {
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, ANY));
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ANY"));
         } else if (pivot.getInSelect() != null) {
             buffer.append(
                     RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, pivot.getInSelect().toString()));
@@ -799,36 +796,6 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     @Override
-    public void deparseOffset(Offset offset) {
-        buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(useKeywordSpellingMistake("OFFSET"));
-        buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(offset.getOffset());
-        buffer.append(OPTIONAL_WHITE_SPACE);
-        if (offset.getOffsetParam() != null) {
-            buffer.append(useKeywordSpellingMistake(offset.getOffsetParam()));
-        }
-    }
-
-    @Override
-    public void deparseFetch(Fetch fetch) {
-        buffer.append(REQUIRED_WHITE_SPACE).append(useKeywordSpellingMistake("FETCH")).append(REQUIRED_WHITE_SPACE);
-        if (fetch.isFetchParamFirst()) {
-            buffer.append(useKeywordSpellingMistake("FIRST")).append(REQUIRED_WHITE_SPACE);
-        } else {
-            buffer.append(useKeywordSpellingMistake("NEXT")).append(REQUIRED_WHITE_SPACE);
-        }
-        if (fetch.getFetchJdbcParameter() != null) {
-            buffer.append(useColumnNameSpellingMistake(fetch.getFetchJdbcParameter().toString()));
-        } else {
-            buffer.append(fetch.getRowCount());
-        }
-        buffer.append(OPTIONAL_WHITE_SPACE);
-        buffer.append(fetch.getFetchParam()).append(OPTIONAL_WHITE_SPACE).append(useKeywordSpellingMistake("ONLY"));
-
-    }
-
-    @Override
     public void visit(SubJoin subjoin) {
         buffer.append("\\(");
         subjoin.getLeft().accept(this);
@@ -842,93 +809,6 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
     }
 
-    @Override
-    @SuppressWarnings({"PMD.CyclomaticComplexity"})
-    public void deparseJoin(Join join) {
-        if (join.isSimple() && join.isOuter()) {
-            buffer.append(",");
-            buffer.append(OPTIONAL_WHITE_SPACE);
-            buffer.append(useKeywordSpellingMistake("OUTER"));
-            buffer.append(REQUIRED_WHITE_SPACE);
-        } else if (join.isSimple()) {
-            buffer.append(",");
-            buffer.append(OPTIONAL_WHITE_SPACE);
-        } else {
-            if (join.isRight()) {
-                buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(useKeywordSpellingMistake("RIGHT"));
-            } else if (join.isNatural()) {
-                buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(useKeywordSpellingMistake("NATURAL"));
-            } else if (join.isFull()) {
-                buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(useKeywordSpellingMistake("FULL"));
-            } else if (join.isLeft()) {
-                buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(useKeywordSpellingMistake("LEFT"));
-            } else if (join.isCross()) {
-                buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(useKeywordSpellingMistake("CROSS"));
-            }
-
-            if (join.isOuter()) {
-                buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(useKeywordSpellingMistake("OUTER"));
-            } else if (join.isInner()) {
-                buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(useKeywordSpellingMistake("INNER"));
-            } else if (join.isSemi()) {
-                buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(useKeywordSpellingMistake("SEMI"));
-            }
-
-            if (join.isStraight()) {
-                buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(useKeywordSpellingMistake("STRAIGHT_JOIN"));
-                buffer.append(REQUIRED_WHITE_SPACE);
-            } else if (join.isApply()) {
-                buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(useKeywordSpellingMistake("APPLY"));
-                buffer.append(REQUIRED_WHITE_SPACE);
-            } else {
-                buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(useKeywordSpellingMistake("JOIN"));
-                buffer.append(REQUIRED_WHITE_SPACE);
-            }
-        }
-
-        FromItem fromItem = join.getRightItem();
-        fromItem.accept(this);
-        if (join.isWindowJoin()) {
-            buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(useKeywordSpellingMistake("WITHIN"));
-            buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(join.getJoinWindow().toString());
-        }
-        for (Expression onExpression : join.getOnExpressions()) {
-            buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(useKeywordSpellingMistake("ON"));
-            buffer.append(REQUIRED_WHITE_SPACE);
-            onExpression.accept(expressionVisitor);
-        }
-        if (!join.getUsingColumns().isEmpty()) {
-            buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(useKeywordSpellingMistake("USING"));
-            buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
-            buffer.append(OPTIONAL_WHITE_SPACE);
-            for (Iterator<Column> iterator = join.getUsingColumns().iterator(); iterator.hasNext();) {
-                Column column = iterator.next();
-                buffer.append(column.toString());
-                if (iterator.hasNext()) {
-                    buffer.append(",");
-                    buffer.append(OPTIONAL_WHITE_SPACE);
-                }
-            }
-            buffer.append(OPTIONAL_WHITE_SPACE);
-            buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
-        }
-    }
 
     @Override
     public void visit(SetOperationList list) {
@@ -950,7 +830,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
 
         if (list.getOrderByElements() != null) {
-            new OrderByDeParserForRegEx(expressionVisitor, buffer, this.settingsManager).deParse(
+            new OrderByDeParserForRegEx(expressionDeParserForRegEx, buffer, this.settingsManager).deParse(
                     list.getOrderByElements());
         }
 
@@ -1012,17 +892,6 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         new ValuesStatementDeParser(this, buffer).deParse(values);
     }
 
-    private void deparseOptimizeForForRegEx(OptimizeFor optimizeFor) {
-        buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(useKeywordSpellingMistake("OPTIMIZE"));
-        buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(useKeywordSpellingMistake("FOR"));
-        buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(optimizeFor.getRowCount());
-        buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(useKeywordSpellingMistake("ROWS"));
-    }
-
     @Override
     public void visit(ExpressionList expressionList) {
         buffer.append(expressionList.toString());
@@ -1038,19 +907,19 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         buffer.append(multiExprList.toString());
     }
 
-    public String addOptionalAliasKeywords(boolean isOptional){
-        StringBuilder temp = new StringBuilder();
-        temp.append(OPTIONAL_WHITE_SPACE);
-        temp.append("(?:");
-        temp.append(useKeywordSpellingMistake("ALIAS"));
-        temp.append("|");
-        temp.append(useKeywordSpellingMistake("AS"));
-        if(isOptional) temp.append(")?");
-        else temp.append(")");
-        temp.append(REQUIRED_WHITE_SPACE);
-        return temp.toString();
-    }
-
+//    public String addOptionalAliasKeywords(boolean isOptional){
+//        StringBuilder temp = new StringBuilder();
+//        temp.append(OPTIONAL_WHITE_SPACE);
+//        temp.append("(?:");
+//        temp.append(useKeywordSpellingMistake("ALIAS"));
+//        temp.append("|");
+//        temp.append(useKeywordSpellingMistake("AS"));
+//        if(isOptional) temp.append(")?");
+//        else temp.append(")");
+//        temp.append(REQUIRED_WHITE_SPACE);
+//        return temp.toString();
+//    }
+//
     private String handleWithGetItemList(WithItem withItem){
         StringBuilder temp = new StringBuilder();
         temp.append(REQUIRED_WHITE_SPACE);
@@ -1061,135 +930,135 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         temp.append(useColumnNameOrder(withItemStringListForSelectItem));
         return temp.toString();
     }
-
-    private String handleWithGetItemListIsUsingValue(WithItem withItem){
-        StringBuilder temp = new StringBuilder();
-        ItemsList itemsList = withItem.getItemsList();
-        temp.append(useKeywordSpellingMistake("VALUES"));
-        temp.append(REQUIRED_WHITE_SPACE);
-        temp.append("\\(").append(OPTIONAL_WHITE_SPACE).append("VALUES");
-        temp.append(REQUIRED_WHITE_SPACE);
-        ExpressionList expressionList = (ExpressionList) itemsList;
-        Iterator<Expression> expressionIterator = expressionList.getExpressions().iterator();
-        List<String> expressionListAsStrings = new LinkedList<>();
-        while (expressionIterator.hasNext()){
-            Expression selectItem = expressionIterator.next();
-            expressionListAsStrings.add(selectItem.toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
-        }
-        temp.append(useColumnNameOrder(expressionListAsStrings));
-        temp.append(OPTIONAL_WHITE_SPACE);
-        temp.append("\\)");
-        return temp.toString();
-    }
-
-
-    private List<String> helperFunctionForHandleWithItemValueList(List<WithItem> listOfWithItems){
-        List<String> withItemStringList = new LinkedList<>();
-        for(WithItem withItem : listOfWithItems){
-            StringBuilder temp = new StringBuilder();
-            if (withItem.isRecursive()) {
-                temp.append(useKeywordSpellingMistake("RECURSIVE"));
-                temp.append(REQUIRED_WHITE_SPACE);
-            }
-            temp.append(useColumnNameSpellingMistake(withItem.getName()));
-            if (withItem.getWithItemList() != null) {
-                temp.append(this.handleWithGetItemList(withItem));
-            }
-            if (withItem.isUseValues()) {
-                temp.append(this.handleWithGetItemListIsUsingValue(withItem));
-            } else {
-                SubSelect subSelectWithItem = withItem.getSubSelect();
-                if (!subSelectWithItem.isUseBrackets()) {
-                    temp.append(OPTIONAL_WHITE_SPACE);
-                    temp.append("\\(");
-                }
-                subSelectWithItem.accept((FromItemVisitor) this);
-                if (!subSelectWithItem.isUseBrackets()) {
-                    temp.append(OPTIONAL_WHITE_SPACE);
-                    temp.append("\\)");
-                }
-            }
-            withItemStringList.add(temp.toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
-        }
-        return withItemStringList;
-    }
-
-
-    public String handleWithItemValueList(Select select){
-        return useTableNameOrder(helperFunctionForHandleWithItemValueList(select.getWithItemsList()));
-    }
-
-    public String handleWithItemValueList(SubSelect select){
-        return useTableNameOrder(helperFunctionForHandleWithItemValueList(select.getWithItemsList()));
-    }
-
+//
+//    private String handleWithGetItemListIsUsingValue(WithItem withItem){
+//        StringBuilder temp = new StringBuilder();
+//        ItemsList itemsList = withItem.getItemsList();
+//        temp.append(useKeywordSpellingMistake("VALUES"));
+//        temp.append(REQUIRED_WHITE_SPACE);
+//        temp.append("\\(").append(OPTIONAL_WHITE_SPACE).append("VALUES");
+//        temp.append(REQUIRED_WHITE_SPACE);
+//        ExpressionList expressionList = (ExpressionList) itemsList;
+//        Iterator<Expression> expressionIterator = expressionList.getExpressions().iterator();
+//        List<String> expressionListAsStrings = new LinkedList<>();
+//        while (expressionIterator.hasNext()){
+//            Expression selectItem = expressionIterator.next();
+//            expressionListAsStrings.add(selectItem.toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+//        }
+//        temp.append(useColumnNameOrder(expressionListAsStrings));
+//        temp.append(OPTIONAL_WHITE_SPACE);
+//        temp.append("\\)");
+//        return temp.toString();
+//    }
+//
+//
+//    private List<String> helperFunctionForHandleWithItemValueList(List<WithItem> listOfWithItems){
+//        List<String> withItemStringList = new LinkedList<>();
+//        for(WithItem withItem : listOfWithItems){
+//            StringBuilder temp = new StringBuilder();
+//            if (withItem.isRecursive()) {
+//                temp.append(useKeywordSpellingMistake("RECURSIVE"));
+//                temp.append(REQUIRED_WHITE_SPACE);
+//            }
+//            temp.append(useColumnNameSpellingMistake(withItem.getName()));
+//            if (withItem.getWithItemList() != null) {
+//                temp.append(this.handleWithGetItemList(withItem));
+//            }
+//            if (withItem.isUseValues()) {
+//                temp.append(this.handleWithGetItemListIsUsingValue(withItem));
+//            } else {
+//                SubSelect subSelectWithItem = withItem.getSubSelect();
+//                if (!subSelectWithItem.isUseBrackets()) {
+//                    temp.append(OPTIONAL_WHITE_SPACE);
+//                    temp.append("\\(");
+//                }
+//                subSelectWithItem.accept((FromItemVisitor) this);
+//                if (!subSelectWithItem.isUseBrackets()) {
+//                    temp.append(OPTIONAL_WHITE_SPACE);
+//                    temp.append("\\)");
+//                }
+//            }
+//            withItemStringList.add(temp.toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+//        }
+//        return withItemStringList;
+//    }
+//
+//
+//    public String handleWithItemValueList(Select select){
+//        return useTableNameOrder(helperFunctionForHandleWithItemValueList(select.getWithItemsList()));
+//    }
+//
+//    public String handleWithItemValueList(SubSelect select){
+//        return useTableNameOrder(helperFunctionForHandleWithItemValueList(select.getWithItemsList()));
+//    }
+//
     public String handleWithItemValueList(Insert insert){
-        return useTableNameOrder(helperFunctionForHandleWithItemValueList(insert.getWithItemsList()));
+        return RegExGenerator.useOrderRotation(this.columnNameOrder, helperFunctionForHandleWithItemValueList(insert.getWithItemsList()));
     }
-
-    private String handleALiasAndAggregateFunction(Object o){
-        StringBuilder temp = new StringBuilder();
-        if(o.toString().contains("(") && o.toString().contains(")")){
-            temp.append(useAggregateFunctionLang(o.toString().replaceAll("\\(.*", "")));
-            temp.append(OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE);
-            temp.append(useColumnNameSpellingMistake(o.toString().split("\\(")[1].split("\\)")[0]));
-            temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
-        }
-
-        if(!o.toString().contains("AS") && !o.toString().contains("(") && !o.toString().contains(")")){
-            temp.append(useColumnNameSpellingMistake(o.toString()));
-            this.setFlagForOrderRotationWithOutSpellingMistake(true);
-        }
-
-        if(o.toString().contains("AS") && o.toString().contains("(") && o.toString().contains(")")) {
-            temp.append(this.addOptionalAliasKeywords(false));
-            temp.append(o.toString().split("AS")[1].replace(" ", ""));
-            this.setFlagForOrderRotationWithOutSpellingMistake(true);
-        }
-
-        if(o.toString().contains("AS") && !o.toString().contains("(") && !o.toString().contains(")")) {
-            temp.append(o.toString().split("AS")[0].replace(" ", ""));
-            temp.append(this.addOptionalAliasKeywords(false));
-            temp.append(o.toString().split("AS")[1].replace(" ", ""));
-            this.setFlagForOrderRotationWithOutSpellingMistake(true);
-        }
-
-        if(!o.toString().contains("AS")){
-            temp.append(OPTIONAL_WHITE_SPACE);
-            temp.append("(");
-            temp.append(this.addOptionalAliasKeywords(false));
-            temp.append(".*)?");
-            this.setFlagForOrderRotationWithOutSpellingMistake(true);
-        }
-        return temp.toString();
-    }
-
-    private void setFlagForOrderRotationWithOutSpellingMistake(boolean flag){
-        this.flagForOrderRotationWithOutSpellingMistake = flag;
-    }
-
-    private String handleOrderRotationWithExplicitNoneSpellingMistake(List<String> stringList){
-        StringBuilder temp = new StringBuilder();
-        if(this.flagForOrderRotationWithOutSpellingMistake){
-            List<String> selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake = new ArrayList<>();
-            for(String str : stringList){
-                selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake.add(str.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
-            }
-            temp.append(useColumnNameOrder(selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake));
-        } else {
-            temp.append(useColumnNameOrder(stringList));
-        }
-        return temp.toString();
-    }
-
-    @Override
-    public ExpressionVisitor getExpressionVisitor() {
-        return expressionVisitor;
-    }
-
-    @Override
-    public void setExpressionVisitor(ExpressionVisitor visitor) {
-        expressionVisitor = visitor;
-    }
+//
+//    private String handleALiasAndAggregateFunction(Object o){
+//        StringBuilder temp = new StringBuilder();
+//        if(o.toString().contains("(") && o.toString().contains(")")){
+//            temp.append(useAggregateFunctionLang(o.toString().replaceAll("\\(.*", "")));
+//            temp.append(OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE);
+//            temp.append(useColumnNameSpellingMistake(o.toString().split("\\(")[1].split("\\)")[0]));
+//            temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
+//        }
+//
+//        if(!o.toString().contains("AS") && !o.toString().contains("(") && !o.toString().contains(")")){
+//            temp.append(useColumnNameSpellingMistake(o.toString()));
+//            this.setFlagForOrderRotationWithOutSpellingMistake(true);
+//        }
+//
+//        if(o.toString().contains("AS") && o.toString().contains("(") && o.toString().contains(")")) {
+//            temp.append(this.addOptionalAliasKeywords(false));
+//            temp.append(o.toString().split("AS")[1].replace(" ", ""));
+//            this.setFlagForOrderRotationWithOutSpellingMistake(true);
+//        }
+//
+//        if(o.toString().contains("AS") && !o.toString().contains("(") && !o.toString().contains(")")) {
+//            temp.append(o.toString().split("AS")[0].replace(" ", ""));
+//            temp.append(this.addOptionalAliasKeywords(false));
+//            temp.append(o.toString().split("AS")[1].replace(" ", ""));
+//            this.setFlagForOrderRotationWithOutSpellingMistake(true);
+//        }
+//
+//        if(!o.toString().contains("AS")){
+//            temp.append(OPTIONAL_WHITE_SPACE);
+//            temp.append("(");
+//            temp.append(this.addOptionalAliasKeywords(false));
+//            temp.append(".*)?");
+//            this.setFlagForOrderRotationWithOutSpellingMistake(true);
+//        }
+//        return temp.toString();
+//    }
+//
+//    private void setFlagForOrderRotationWithOutSpellingMistake(boolean flag){
+//        this.flagForOrderRotationWithOutSpellingMistake = flag;
+//    }
+//
+//    private String handleOrderRotationWithExplicitNoneSpellingMistake(List<String> stringList){
+//        StringBuilder temp = new StringBuilder();
+//        if(this.flagForOrderRotationWithOutSpellingMistake){
+//            List<String> selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake = new ArrayList<>();
+//            for(String str : stringList){
+//                selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake.add(str.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+//            }
+//            temp.append(useColumnNameOrder(selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake));
+//        } else {
+//            temp.append(useColumnNameOrder(stringList));
+//        }
+//        return temp.toString();
+//    }
+//
+//    @Override
+//    public ExpressionVisitor getExpressionVisitor() {
+//        return expressionDeParserForRegEx;
+//    }
+//
+//    @Override
+//    public void setExpressionVisitor(ExpressionVisitor visitor) {
+//        expressionDeParserForRegEx = visitor;
+//    }
 
 }

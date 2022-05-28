@@ -6,20 +6,27 @@ import net.sf.jsqlparser.statement.Statement;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.xml.sax.SAXException;
 import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsType;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
-public class TestUtils {
+public class TestUtils extends UserSettingsPreparer{
     StatementDeParserForRegEx statementDeParserForRegEx;
 
     @Autowired
-    public TestUtils(SettingsManager settingsManager) {
+    public TestUtils() throws XPathExpressionException, ParserConfigurationException, IOException, URISyntaxException, SAXException {
+        super(SettingsType.ALL);
         StringBuilder buffer = new StringBuilder();
-        this.statementDeParserForRegEx = new StatementDeParserForRegEx(buffer, settingsManager);
+        this.statementDeParserForRegEx = new StatementDeParserForRegEx(buffer, this.settingsManager);
     }
 
     private boolean checkAgainstRegEx(String regex, String toBeChecked) {

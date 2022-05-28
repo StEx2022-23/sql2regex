@@ -3,6 +3,7 @@ package sqltoregex.deparser;
 import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
+import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsType;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -11,14 +12,11 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-class GroupByDeParserForRegExTest {
-    TestUtils testUtils = new TestUtils(new SettingsManager());
+class GroupByDeParserForRegExTest extends UserSettingsPreparer{
+    TestUtils testUtils = new TestUtils();
 
-    GroupByDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException,
-            SAXException, URISyntaxException {
+    GroupByDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, URISyntaxException, SAXException {
         super(SettingsType.ALL);
-        statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(this.settingsManager), buffer,
-                                                          this.settingsManager);
     }
 
     @Test

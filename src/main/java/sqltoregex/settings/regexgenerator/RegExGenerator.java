@@ -20,6 +20,11 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
         else return str;
     }
 
+    public static String useTableNameSpellingMistake(SpellingMistake spellingMistake, String str) {
+        if (null != spellingMistake) return spellingMistake.generateRegExFor(str);
+        else return str;
+    }
+
     public static <T> String useStringSynonymGenerator(SynonymGenerator<?, T> synonymGenerator, T str) {
         if (null != synonymGenerator) return synonymGenerator.generateRegExFor(str);
         else return str.toString();
@@ -41,7 +46,7 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
         return String.join(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE, stringList);
     }
 
-    public static String useExpressionRotation(ExpressionRotation expressionRotation,
+    public static String useExpressionRotation(GroupByElementRotation expressionRotation,
                                                ExpressionDeParserForRegEx expressionDeParserForRegEx,
                                                List<Expression> expressionList) {
         if (null != expressionRotation) return expressionRotation.generateRegExFor(expressionList);

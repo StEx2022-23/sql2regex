@@ -92,7 +92,7 @@ class RegExGeneratorTest extends UserSettingsPreparer {
     @Test
     void useExpressionRotation() throws XPathExpressionException, ParserConfigurationException, IOException,
             SAXException, URISyntaxException {
-        ExpressionRotation expressionRotation = new ExpressionRotation(SettingsOption.DEFAULT);
+        GroupByElementRotation expressionRotation = new GroupByElementRotation(SettingsOption.DEFAULT);
 
         List<Expression> expressionList = new LinkedList<>(List.of(new Column("a"), new Column("b")));
         StringBuilder buffer = new StringBuilder();
