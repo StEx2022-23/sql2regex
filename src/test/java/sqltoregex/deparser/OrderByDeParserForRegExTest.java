@@ -136,5 +136,34 @@ class OrderByDeParserForRegExTest {
         testUtils.validateListAgainstRegEx("SELECT col1 FROM table1 t1 ORDER BY t1.col1, t1.col2", toCheckedInput, true);
     }
 
+    @Test
+    void testComplexerOrderByWithAggregateFunction() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 FROM table1 t1 ORDER BY SUM(col1)",
+                "SELECT col1 FROM table1 t1 ORDER BY SUMME(col1)"
+        );
+        testUtils.validateListAgainstRegEx("SELECT col1 FROM table1 t1 ORDER BY SUM(col1)", toCheckedInput, true);
+    }
+
+    @Test
+    void testComplexerOrderByWithAggregateFunctionAndTwoArguments() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 FROM table1 t1 ORDER BY SUM(col1), col2",
+                "SELECT col1 FROM table1 t1 ORDER BY col2, SUM(col1)",
+                "SELECT col1 FROM table1 t1 ORDER BY col2, SUMME(col1)"
+        );
+        testUtils.validateListAgainstRegEx("SELECT col1 FROM table1 t1 ORDER BY SUM(col1), col2", toCheckedInput, true);
+    }
+
+    @Test
+    void testComplexerOrderByWithAggregateFunctionAndTwoArgumentsAndTableNameAlias() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 FROM table1 t1 ORDER BY SUM(t1.col1), t1.col2",
+                "SELECT col1 FROM table1 t1 ORDER BY t1.col2, SUM(col1)",
+                "SELECT col1 FROM table1 t1 ORDER BY col2, SUMME(col1)"
+        );
+        testUtils.validateListAgainstRegEx("SELECT col1 FROM table1 t1 ORDER BY SUM(t1.col1), t1.col2", toCheckedInput, true);
+    }
+
 
 }

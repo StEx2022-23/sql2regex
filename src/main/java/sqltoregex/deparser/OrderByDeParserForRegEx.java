@@ -32,6 +32,11 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     private final SpellingMistake keywordSpellingMistake;
     private final SynonymGenerator<?, String> specialSynonyms;
     private ExpressionVisitor regExExpressionVisitor;
+    private RegExGenerator<String> keywordSpellingMistake;
+    private RegExGenerator<String> columnNameSpellingMistake;
+    private RegExGenerator<List<String>> columnNameOrder;
+    private RegExGenerator<String> specialSynonyms;
+    private RegExGenerator<String> aggregateFunctionLang;
 
     public OrderByDeParserForRegEx(SettingsManager settingsManager) {
         this(new ExpressionVisitorAdapter(), new StringBuilder(), settingsManager);
@@ -73,10 +78,26 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         throw new UnsupportedOperationException();
     }
 
-    public String deParseElementForOrderRotation(OrderByElement orderByElement) {
+    public String deParseElementForOrderRotation(OrderByElement orderByElement, FromItem fromItem){
         StringBuilder temp = new StringBuilder();
-        temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake,
-                                                      orderByElement.getExpression().toString()));
+        if(orderByElement.getExpression().toString().contains("(") && orderByElement.getExpression().toString().contains(")")){
+            temp.append(useAggregateFunctionLang(orderByElement.getExpression().toString().replaceAll("\\(.*", "")));
+            temp.append(OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE);
+
+            String tempColumn = orderByElement.getExpression().toString().split("\\(")[1].split("\\)")[0];
+            if(tempColumn.contains(".")){
+                temp.append(this.handleTableNameAlias(fromItem, tempColumn));
+            } else {
+                temp.append(useColumnNameSpellingMistake(tempColumn));
+            }
+            temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
+        } else{
+            if(orderByElement.getExpression().toString().contains(".")){
+                temp.append(this.handleTableNameAlias(fromItem, orderByElement.getExpression().toString()));
+            } else {
+                temp.append(useColumnNameSpellingMistake(orderByElement.getExpression().toString()));
+            }
+        }
         temp.append(this.handleAscDesc(orderByElement));
         temp.append(this.handleNullFirstLast(orderByElement));
         temp.append(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE);
@@ -121,6 +142,16 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
                 temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, NULLS_LAST));
             }
         }
+
+    private String handleTableNameAlias(FromItem fromItem, String tempColumn){
+        StringBuilder temp = new StringBuilder();
+        String columnName = tempColumn.split("\\.")[1];
+        temp.append("(?:");
+        temp.append(fromItem.toString().split(" ")[0]);
+        temp.append("|");
+        temp.append(fromItem.getAlias().toString().replace(" ", ""));
+        temp.append(")?\\.?");
+        temp.append(useColumnNameSpellingMistake(columnName));
         return temp.toString();
     }
 }
