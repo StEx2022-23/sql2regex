@@ -43,7 +43,7 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
         if (this.expressionOrder != null){
             this.expressionOrder.setCapturingGroup(true);
         }
-        buffer.append(RegExGenerator.useExpressionRotation(this.expressionOrder, this.expressionDeParserForRegEx, expressions, buffer));
+        buffer.append(RegExGenerator.useExpressionRotation(this.expressionOrder, this.expressionDeParserForRegEx, expressions));
 
         if (groupBy.isUsingBrackets()) {
             buffer.append(OPTIONAL_WHITE_SPACE);
