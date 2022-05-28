@@ -99,25 +99,10 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         buffer.append(useKeywordSpellingMistake("INTO")).append(REQUIRED_WHITE_SPACE);
         buffer.append(useTableNameSpellingMistake(insert.getTable().toString())).append(REQUIRED_WHITE_SPACE);
 
-        // handle statement with single value list like: INSERT INTO table (col1, col2) VALUES (val1, val2);
         if (insert.getColumns() != null && insert.getItemsList(ExpressionList.class) != null) {
             Map<String, String> mappedColumnsAndRelatedValues = new HashMap<>();
-            for (int i = 0; i < insert.getColumns().size(); i++) {
-                mappedColumnsAndRelatedValues.put(
-                        insert.getColumns().get(i).toString(),
-                        insert.getItemsList(ExpressionList.class).getExpressions().get(i).toString()
-                );
-            }
-            List<String> mappedColumnsAndRelatedValuesKeySet = new ArrayList<>();
-            for (String string : mappedColumnsAndRelatedValues.keySet()) {
-                mappedColumnsAndRelatedValuesKeySet.add(string.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
-            }
-            String columnsRotated = useTableNameOrder(mappedColumnsAndRelatedValuesKeySet);
-            columnsRotated = columnsRotated.replace(OPTIONAL_WHITE_SPACE, "").replace("(?:", "").replace(")", "");
-            String[] columnsOrderOptionsAsStringSet = columnsRotated.split("\\|");
-
             buffer.append("(?:");
-            Iterator<String> columnsOrderOptionsIterator = Arrays.stream(columnsOrderOptionsAsStringSet).iterator();
+            Iterator<String> columnsOrderOptionsIterator = Arrays.stream(this.generateListOfColumnsOrderOption(mappedColumnsAndRelatedValues, insert)).iterator();
             while (columnsOrderOptionsIterator.hasNext()) {
                 String singleColumnOrderOption = columnsOrderOptionsIterator.next();
                 buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
@@ -144,31 +129,10 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 buffer.append(columnsOrderOptionsIterator.hasNext() ? "|" : "");
             }
             buffer.append(")");
-
-        // handle statement with multiple value list like: INSERT INTO table (col1, col2) VALUES (val1, val2), (val3, val4);
         } else if (insert.getColumns() != null && insert.getItemsList(MultiExpressionList.class) != null) {
-            Map<String, List<String>> mappedColumnsAndRelatedValuesForMultipleValueLists = new HashMap<>();
-            for (int i = 0; i < insert.getColumns().size(); i++) {
-                List<String> multipleValues = new ArrayList<>();
-                for(ExpressionList expressionList : insert.getItemsList(MultiExpressionList.class).getExpressionLists()){
-                    multipleValues.add(expressionList.getExpressions().get(i).toString());
-                }
-
-                mappedColumnsAndRelatedValuesForMultipleValueLists.put(
-                        insert.getColumns().get(i).toString(),
-                        multipleValues
-                );
-            }
-            List<String> mappedColumnsAndRelatedValuesKeySet = new ArrayList<>();
-            for (String string : mappedColumnsAndRelatedValuesForMultipleValueLists.keySet()) {
-                mappedColumnsAndRelatedValuesKeySet.add(string.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
-            }
-            String columnsRotated = useTableNameOrder(mappedColumnsAndRelatedValuesKeySet);
-            columnsRotated = columnsRotated.replace(OPTIONAL_WHITE_SPACE, "").replace("(?:", "").replace(")", "");
-            String[] columnsOrderOptionsAsStringSet = columnsRotated.split("\\|");
-
+            Map<String, String> mappedColumnsAndRelatedValues = new HashMap<>();
             buffer.append("(?:");
-            Iterator<String> columnsOrderOptionsIterator = Arrays.stream(columnsOrderOptionsAsStringSet).iterator();
+            Iterator<String> columnsOrderOptionsIterator = Arrays.stream(this.generateListOfColumnsOrderOption(mappedColumnsAndRelatedValues, insert)).iterator();
             while (columnsOrderOptionsIterator.hasNext()) {
                 String singleColumnOrderOption = columnsOrderOptionsIterator.next();
                 buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
@@ -182,11 +146,9 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 buffer.append(columnsOrderOptionsIterator.hasNext() ? "|" : "");
             }
             buffer.append(")");
-        // handle case, when column list is not given
         } else if (insert.getColumns() == null && (insert.getItemsList(MultiExpressionList.class) != null && insert.getItemsList(ExpressionList.class) != null)) {
             insert.getItemsList(MultiExpressionList.class).accept(this);
             insert.getItemsList(ExpressionList.class).accept(this);
-        // handle case, when items list is not given, this should propably not happens, if valid sql is given
         } else if (insert.getColumns() != null && (insert.getItemsList(MultiExpressionList.class) == null && insert.getItemsList(ExpressionList.class) == null)){
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
@@ -320,5 +282,21 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     @Override
     public void visit(SubSelect subSelect) {
         subSelect.getSelectBody().accept(this.selectDeParserForRegEx);
+    }
+
+    public String[] generateListOfColumnsOrderOption(Map<String, String> mappedColumnsAndRelatedValues, Insert insert){
+        for (int i = 0; i < insert.getColumns().size(); i++) {
+            mappedColumnsAndRelatedValues.put(
+                    insert.getColumns().get(i).toString(),
+                    insert.getItemsList(ExpressionList.class).getExpressions().get(i).toString()
+            );
+        }
+        List<String> mappedColumnsAndRelatedValuesKeySet = new ArrayList<>();
+        for (String string : mappedColumnsAndRelatedValues.keySet()) {
+            mappedColumnsAndRelatedValuesKeySet.add(string.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+        }
+        String columnsRotated = useTableNameOrder(mappedColumnsAndRelatedValuesKeySet);
+        columnsRotated = columnsRotated.replace(OPTIONAL_WHITE_SPACE, "").replace("(?:", "").replace(")", "");
+        return columnsRotated.split("\\|");
     }
 }
