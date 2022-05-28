@@ -23,6 +23,13 @@
 			${project.basedir}/target/site/jacoco/jacoco.xml
 		</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
+	<repositories>
+		<repository>
+			<id>external-local</id>
+			<name>external-local</name>
+			<url>file://${pom.basedir}/src/main/resources/lib</url>
+		</repository>
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
@@ -74,11 +81,9 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>com.github.jsqlparser</groupId>
+			<groupId>net.sf.jsqlparser</groupId>
 			<artifactId>jsqlparser</artifactId>
 			<version>4.5</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/jsqlparser-4.5.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.sonarsource.scanner.maven</groupId>
