@@ -1,10 +1,8 @@
 package sqltoregex.deparser;
 
-import ch.qos.logback.classic.db.names.TableName;
 import net.sf.jsqlparser.expression.ExpressionVisitor;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.OrderByElement;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.util.deparser.OrderByDeParser;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
@@ -18,19 +16,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class OrderByDeParserForRegEx extends OrderByDeParser {
-    public static final String ORDER = "ORDER";
-    public static final String SIBLINGS = "SIBLINGS";
-    public static final String BY = "BY";
-    public static final String DESC = "DESC";
-    public static final String ASC = "ASC";
-    public static final String NULLS_LAST = "NULLS LAST";
-    public static final String NULLS_FIRST = "NULLS FIRST";
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
+    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
-    private final OrderRotation columnNameOrder;
-    private final SpellingMistake columnNameSpellingMistake;
-    private final SpellingMistake keywordSpellingMistake;
-    private final SynonymGenerator<?, String> specialSynonyms;
     private ExpressionVisitor regExExpressionVisitor;
     private RegExGenerator<String> keywordSpellingMistake;
     private RegExGenerator<String> columnNameSpellingMistake;
@@ -73,9 +61,33 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, orderByElementsAsStrings));
     }
 
-    @Override
-    public void deParseElement(OrderByElement orderBy) {
-        throw new UnsupportedOperationException();
+    private String handleAscDesc(OrderByElement orderByElement){
+        StringBuilder temp = new StringBuilder();
+
+        if (orderByElement.isAscDescPresent()) {
+            if (orderByElement.isAsc()) {
+                temp.append(REQUIRED_WHITE_SPACE);
+                temp.append("(?:").append(useKeywordSpellingMistake("ASC")).append("|").append(useSpecialSynonymGenerator("ASC")).append(")");
+            } else {
+                temp.append(REQUIRED_WHITE_SPACE);
+                temp.append("(?:").append(useKeywordSpellingMistake("DESC")).append("|").append(useSpecialSynonymGenerator("DESC")).append(")");
+            }
+        }
+
+        return temp.toString();
+    }
+
+    private String handleNullFirstLast(OrderByElement orderByElement){
+        StringBuilder temp = new StringBuilder();
+        if (orderByElement.getNullOrdering() != null) {
+            temp.append(REQUIRED_WHITE_SPACE);
+            if(orderByElement.getNullOrdering() == OrderByElement.NullOrdering.NULLS_FIRST){
+                temp.append(useKeywordSpellingMistake("NULLS FIRST"));
+            } else {
+                temp.append(useKeywordSpellingMistake("NULLS LAST"));
+            }
+        }
+        return temp.toString();
     }
 
     public String deParseElementForOrderRotation(OrderByElement orderByElement, FromItem fromItem){
