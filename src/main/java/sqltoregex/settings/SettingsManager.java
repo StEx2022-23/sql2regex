@@ -16,6 +16,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,7 +26,7 @@ import java.util.logging.Logger;
 public class SettingsManager {
     private final Map<SettingsOption, RegExGenerator<?>> settingsMap = new EnumMap<>(SettingsOption.class);
 
-    public SettingsManager() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
+    public SettingsManager() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException, URISyntaxException {
         this.parseSettings();
     }
 
@@ -124,13 +126,15 @@ public class SettingsManager {
     }
 
     private void parseSettings() throws ParserConfigurationException, IOException, SAXException,
-            XPathExpressionException {
+            XPathExpressionException, URISyntaxException {
         SettingsOption relatedOption;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
         factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse("src/main/resources/static/config/defaultProperties.xml");
+        URL ressource = getClass().getClassLoader().getResource("static/config/defaultProperties.xml");
+        assert ressource != null;
+        Document document = builder.parse(String.valueOf(ressource.toURI()));
         document.getDocumentElement().normalize();
 
         stripWhitespaces(document);

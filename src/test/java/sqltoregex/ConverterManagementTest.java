@@ -11,13 +11,14 @@ import sqltoregex.settings.SettingsManager;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 
 class ConverterManagementTest {
 
     ConverterManagement converterManagement = new ConverterManagement(new SettingsManager());
 
-    ConverterManagementTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    ConverterManagementTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
     }
 
     @Test

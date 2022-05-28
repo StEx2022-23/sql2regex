@@ -13,6 +13,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.HashSet;
@@ -30,7 +31,7 @@ class SettingsManagerTest {
     static String sql;
 
     @BeforeEach
-    void beforeEach() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    void beforeEach() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         settingsManager = new SettingsManager();
         spellings = new HashSet<>();
         orders = new HashSet<>();
