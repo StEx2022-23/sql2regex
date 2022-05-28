@@ -57,24 +57,10 @@ class GroupByDeParserForRegExTest {
     }
 
     @Test
-    void testGroupByTwoStatements() throws JSQLParserException {
+    void testGroupByThreeStatementsWithTableNameAlias() throws JSQLParserException {
         List<String> toCheckedInput = List.of(
-                "SELECT col1 GROUP BY col1, col2",
-                "SELECT col1 GROUP BY col2,col1",
-                "SELCT col1 GROUP BY col1, col2",
-                "SELECT col1 GROUP BY col2,col1",
-                "SELECT col1 GROUP BY col1 , col2",
-                "SELECT col1 GROUP BY col2,col1"
+                "SELECT col1 FROM table1 t1 GROUP BY t1.col1, t1.col2"
         );
-        validateListAgainstRegEx("SELECT col1 GROUP BY col1, col2", toCheckedInput, true);
-    }
-
-    void validateListAgainstRegEx(String sampleSolution, List<String> alternativeStatements,
-                                  boolean isAssertTrue) throws JSQLParserException {
-        String regex = this.getRegEx(sampleSolution);
-        for (String str : alternativeStatements) {
-            if (isAssertTrue) Assertions.assertTrue(checkAgainstRegEx(regex, str), str + " " + regex);
-            else Assertions.assertFalse(checkAgainstRegEx(regex, str), str + " " + regex);
-        }
+        testUtils.validateListAgainstRegEx("SELECT col1 FROM table1 t1 GROUP BY t1.col1, t1.col2", toCheckedInput, true);
     }
 }

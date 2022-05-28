@@ -443,12 +443,13 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         if (table != null && table.getFullyQualifiedName() != null) {
             tableName += table.getFullyQualifiedName();
             if (table.getAlias() != null) {
-                tableName += table.getAlias().getName();
+                tableName += table.getAlias().toString();
             }
         }
-
-        if (!tableName.isEmpty()) {
-            buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, tableName));
+        if(!tableName.isEmpty()) {
+            String finalTableName = tableName;
+            settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
+                    SpellingMistake.class).ifPresent(spelling -> buffer.append(spelling.generateRegExFor(finalTableName)));
             buffer.append('.');
         }
 

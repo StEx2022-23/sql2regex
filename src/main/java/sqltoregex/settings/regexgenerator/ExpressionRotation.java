@@ -24,6 +24,75 @@ public class ExpressionRotation extends RegExGenerator<List<Expression>> {
         this.settingsOption = settingsOption;
     }
 
+    /**
+     * helper function for recursive tablename order concatenation
+     * @param amount Integer
+     * @param valueList List<String>
+     */
+    private void generateGroupByOrderOptionsRek(Integer amount, List<Expression> valueList){
+        if (amount == 1) {
+            List<Expression> singleValue = new ArrayList<>(valueList);
+            groupByOrderOptionsMap.put(groupByOrderOptionsCounter, singleValue);
+            groupByOrderOptionsCounter++;
+        } else {
+            generateGroupByOrderOptionsRek(amount-1, valueList);
+            for(int i = 0; i < amount-1;i++){
+                if (amount % 2 == 0){
+                    Expression temp;
+                    temp = valueList.get(amount-1);
+                    valueList.set(amount-1, valueList.get(i));
+                    valueList.set(i, temp);
+                } else {
+                    Expression temp;
+                    temp = valueList.get(amount-1);
+                    valueList.set(amount-1, valueList.get(0));
+                    valueList.set(0, temp);
+                }
+                generateGroupByOrderOptionsRek(amount-1, valueList);
+            }
+        }
+    }
+
+    @Override
+    public String generateRegExFor(List<Expression> input) {
+        try{
+            generateGroupByOrderOptionsRek(input.size(), input);
+            StringBuilder buffer = new StringBuilder();
+            ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(new SelectVisitorAdapter(), buffer, new SettingsManager());
+            buffer.append(isCapturingGroup ? "(?:" : "(");
+            for(Map.Entry<Integer, List<Expression>> entry : groupByOrderOptionsMap.entrySet()){
+                Iterator<Expression> expressionIterator = groupByOrderOptionsMap.get(entry.getKey()).iterator();
+                while(expressionIterator.hasNext()){
+                    expressionIterator.next().accept(expressionDeParserForRegEx);
+                    if(expressionIterator.hasNext()){
+                        buffer.append(",");
+                    }
+                }
+                buffer.append("|");
+            }
+            buffer.deleteCharAt(buffer.length()-1);
+            buffer.append(")");
+            return buffer.toString();
+        } catch (XPathExpressionException | ParserConfigurationException | IOException | SAXException | URISyntaxException e) {
+            Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+            logger.log(Level.INFO, "Generate RegEx for Expressionlist go wrong: {0}", e.toString());
+        }
+        return null;
+    }
+
+    /**
+     * Sets whether there will be an enclosing non capturing group (?: ... ) around the generated regEx.
+     * @param capturingGroup true for capturing group false for non-capturing group
+     */
+    public void setCapturingGroup(boolean capturingGroup) {
+        this.isCapturingGroup = capturingGroup;
+    }
+
+    @Override
+    public SettingsOption getSettingsOption() {
+        return settingsOption;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

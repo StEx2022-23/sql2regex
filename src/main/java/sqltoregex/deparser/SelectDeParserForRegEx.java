@@ -485,7 +485,9 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
             List<String> selectedTableNamesAsStrings = new ArrayList<>();
             for (Table table : plainSelect.getIntoTables()) {
-                selectedTableNamesAsStrings.add(table.getFullyQualifiedName());
+                String temp = useTableNameSpellingMistake(table.getFullyQualifiedName());
+                temp = temp + (table.getAlias() != null ? REQUIRED_WHITE_SPACE + useTableNameSpellingMistake(table.getAlias().toString()) + DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE : "");
+                selectedTableNamesAsStrings.add(temp);
             }
             buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrder, selectedTableNamesAsStrings));
         }
@@ -544,9 +546,8 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
 
         if (plainSelect.getOrderByElements() != null) {
-            new OrderByDeParserForRegEx(this.getExpressionVisitor(), buffer, this.settingsManager).deParse(
-                    plainSelect.isOracleSiblings(),
-                    plainSelect.getOrderByElements());
+            new OrderByDeParserForRegEx(this.getExpressionVisitor(), buffer, this.settingsManager).deParse(plainSelect.isOracleSiblings(),
+                    plainSelect.getOrderByElements(), plainSelect.getFromItem());
         }
 
         if (plainSelect.isEmitChanges()) {

@@ -128,5 +128,13 @@ class OrderByDeParserForRegExTest {
         testUtils.validateListAgainstRegEx("SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC", toCheckedInput, true);
     }
 
+    @Test
+    void testComplexerOrderByWithTableNameAlias() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 FROM table1 t1 ORDER BY t1.col1, t1.col2"
+        );
+        testUtils.validateListAgainstRegEx("SELECT col1 FROM table1 t1 ORDER BY t1.col1, t1.col2", toCheckedInput, true);
+    }
+
 
 }

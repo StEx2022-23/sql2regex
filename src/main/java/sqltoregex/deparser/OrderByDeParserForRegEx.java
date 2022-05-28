@@ -1,8 +1,10 @@
 package sqltoregex.deparser;
 
+import ch.qos.logback.classic.db.names.TableName;
 import net.sf.jsqlparser.expression.ExpressionVisitor;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
+import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.OrderByElement;
+import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.util.deparser.OrderByDeParser;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
@@ -49,8 +51,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
                                                                           StringSynonymGenerator.class).orElse(null);
     }
 
-    @Override
-    public void deParse(boolean oracleSiblings, List<OrderByElement> orderByElementList) {
+    public void deParse(boolean oracleSiblings, List<OrderByElement> orderByElementList, FromItem fromItem) {
         buffer.append(REQUIRED_WHITE_SPACE);
         buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, ORDER));
         buffer.append(REQUIRED_WHITE_SPACE);
