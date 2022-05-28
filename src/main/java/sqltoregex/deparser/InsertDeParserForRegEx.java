@@ -2,12 +2,10 @@ package sqltoregex.deparser;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.ItemsList;
 import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.NamedExpressionList;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.insert.Insert;
-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.select.WithItem;
@@ -23,13 +21,7 @@ import java.util.*;
 public class InsertDeParserForRegEx extends InsertDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
-    public static final String INSERT = "INSERT";
-    public static final String IGNORE = "IGNORE";
-    public static final String INTO = "INTO";
-    public static final String WITH = "WITH";
     private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
-    public static final String VALUES = "VALUES";
-    public static final String VALUE = "VALUE";
     List<String> quotationMarkList = Arrays.asList("'", "`", "\"");
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
@@ -91,20 +83,20 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.ExcessiveMethodLength", "PMD.NPathComplexity"})
     public void deParse(Insert insert) {
         if (insert.getWithItemsList() != null && !insert.getWithItemsList().isEmpty()) {
-            buffer.append(useKeywordSpellingMistake(WITH));
+            buffer.append(useKeywordSpellingMistake("WITH"));
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append(this.selectDeParserForRegEx.handleWithItemValueList(insert));
         }
 
-        buffer.append(useKeywordSpellingMistake(INSERT)).append(REQUIRED_WHITE_SPACE);
+        buffer.append(useKeywordSpellingMistake("INSERT")).append(REQUIRED_WHITE_SPACE);
         if (insert.getModifierPriority() != null) {
             buffer.append(insert.getModifierPriority()).append(REQUIRED_WHITE_SPACE);
         }
         if (insert.isModifierIgnore()) {
-            buffer.append(useKeywordSpellingMistake(IGNORE)).append(REQUIRED_WHITE_SPACE);
+            buffer.append(useKeywordSpellingMistake("IGNORE")).append(REQUIRED_WHITE_SPACE);
         }
 
-        buffer.append(useKeywordSpellingMistake(INTO)).append(REQUIRED_WHITE_SPACE);
+        buffer.append(useKeywordSpellingMistake("INTO")).append(REQUIRED_WHITE_SPACE);
         buffer.append(useTableNameSpellingMistake(insert.getTable().toString())).append(REQUIRED_WHITE_SPACE);
 
         // handle statement with single value list like: INSERT INTO table (col1, col2) VALUES (val1, val2);
@@ -131,7 +123,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
                 buffer.append(singleColumnOrderOption.replace(",", OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE));
                 buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
-                buffer.append(useKeywordSpellingMistake(VALUE)).append("S?").append(OPTIONAL_WHITE_SPACE).append("\\(");
+                buffer.append(useKeywordSpellingMistake("VALUE")).append("S?").append(OPTIONAL_WHITE_SPACE).append("\\(");
                 String[] extractedColumnsInOrderOption = singleColumnOrderOption.replace(" ", "").split(",");
 
                 Iterator<String> extractedColumnsIterator = Arrays.stream(extractedColumnsInOrderOption).iterator();
@@ -180,7 +172,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
                 buffer.append(singleColumnOrderOption.replace(",", OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE));
                 buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
-                buffer.append(useKeywordSpellingMistake(VALUE)).append("S?").append(OPTIONAL_WHITE_SPACE).append("\\(");
+                buffer.append(useKeywordSpellingMistake("VALUE")).append("S?").append(OPTIONAL_WHITE_SPACE).append("\\(");
                 String[] extractedColumnsInOrderOption = singleColumnOrderOption.replace(" ", "").split(",");
 
                 Iterator<String> extractedColumnsIterator = Arrays.stream(extractedColumnsInOrderOption).iterator();
