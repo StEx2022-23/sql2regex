@@ -14,11 +14,9 @@ import java.util.Locale;
 
 @Configuration
 public class InternationalizationController implements WebMvcConfigurer {
-    @Bean
-    public LocaleResolver localeResolver() {
-        SessionLocaleResolver slr = new SessionLocaleResolver();
-        slr.setDefaultLocale(Locale.US);
-        return slr;
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(this.localeChangeInterceptor());
     }
 
     @Bean
@@ -28,9 +26,11 @@ public class InternationalizationController implements WebMvcConfigurer {
         return lci;
     }
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(this.localeChangeInterceptor());
+    @Bean
+    public LocaleResolver localeResolver() {
+        SessionLocaleResolver slr = new SessionLocaleResolver();
+        slr.setDefaultLocale(Locale.US);
+        return slr;
     }
 
     @Bean("messageSource")

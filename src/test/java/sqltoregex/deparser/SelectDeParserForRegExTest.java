@@ -7,8 +7,6 @@ import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-import sqltoregex.settings.SettingsForm;
-import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsType;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,19 +17,31 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class SelectDeParserForRegExTest extends UserSettingsTestCase {
+class SelectDeParserForRegExTest extends UserSettingsPreparer {
     StringBuilder buffer = new StringBuilder();
     StatementDeParser statementDeParser;
 
-    SelectDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
+    SelectDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException,
+            SAXException, URISyntaxException {
         super(SettingsType.ALL);
-        this.statementDeParser  = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(this.settingsManager), buffer, this.settingsManager);
+        this.statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(this.settingsManager),
+                                                               buffer, this.settingsManager);
     }
 
     boolean checkAgainstRegEx(String regex, String toBeChecked) {
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(toBeChecked);
         return matcher.matches();
+    }
+
+    @Test
+    void fetchStatement() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT * FROM table FETCH NEXT 1 ROWS ONLY",
+                "SELECT * FROM table  FTCH  NEXT  1  ROWS  ONLY"
+        );
+
+        validateListAgainstRegEx("SELECT * FROM table FETCH NEXT 1 ROWS ONLY", toCheckedInput, true);
     }
 
     String getRegEx(String sampleSolution) throws JSQLParserException {
@@ -41,12 +51,95 @@ class SelectDeParserForRegExTest extends UserSettingsTestCase {
         return statementDeParser.getBuffer().toString();
     }
 
-    void validateListAgainstRegEx(String sampleSolution, List<String> alternativeStatements, boolean isAssertTrue) throws JSQLParserException {
-        String regex = this.getRegEx(sampleSolution);
-        for(String str : alternativeStatements){
-            if(isAssertTrue) Assertions.assertTrue(checkAgainstRegEx(regex, str), str + " " + regex);
-            else Assertions.assertFalse(checkAgainstRegEx(regex, str), str + " " + regex);
-        }
+    @Test
+    void pivotStatement() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT * FROM (SELECT c1, p1, q FROM p) PIVOT (SUM(q) as q for p1 in ('a','b')) ORDER BY c1",
+                "SELECT * FROM (SELECT c1, p1, q FROM p) PIVOT (SUMME(q) as q for p1 in ('b', 'a')) ORDER BY c1"
+        );
+
+        String input = "SELECT * FROM (SELECT c1, p1, q FROM p) PIVOT (SUM(q) as q for p1 in ('a','b')) ORDER BY c1";
+
+        validateListAgainstRegEx(input, toCheckedInput, false);
+    }
+
+    @Test
+    void testAliasAndAggregateOne() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT AVG(col1) AS c1 FROM table1, table2",
+                "SELECT AVG ( col1 ) ALIAS c1 FROM table1, table2",
+                "SELECT MITTELWERT(co1) AS c1 FROM table1, table2"
+        );
+        validateListAgainstRegEx("SELECT AVG(col1) AS c1 FROM table1, table2", toCheckedInput, true);
+    }
+
+    @Test
+    void testAliasAndAggregateTwo() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT AVG(col1) AS c1, column2 FROM table1, table2",
+                "SELECT AVG ( col1 ) ALIAS c1, column2 FROM table1, table2",
+                "SELECT column2, MITTELWERT(co1) AS c1 FROM table2, table1"
+        );
+        validateListAgainstRegEx("SELECT AVG(col1) AS c1, column2 FROM table1, table2", toCheckedInput, true);
+    }
+
+    @Test
+    void testDistinctKeyword() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT DISTINCT col1",
+                "SELECT DISTICT col1",
+                "SELECT  DISTINCT  col1"
+        );
+        validateListAgainstRegEx("SELECT DISTINCT col1", toCheckedInput, true);
+    }
+
+    @Test
+    void testEmitChanges() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT * FROM table1 EMIT CHANGES",
+                "SELECT * FROM table1  EMIT  CHANGES",
+                "SELECT * FROM table1 EMT CHANES"
+        );
+        validateListAgainstRegEx("SELECT * FROM table1 EMIT CHANGES", toCheckedInput, true);
+    }
+
+    @Test
+    void testFrom() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 FROM table1, table2",
+                "SELECT col1 FROM table2, table1"
+        );
+        validateListAgainstRegEx("SELECT col1 FROM table1, table2", toCheckedInput, true);
+    }
+
+    @Test
+    void testOptionalAliasAddedByStudent() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1, col2, col3 AS c3",
+                "SELECT col1, col2 AS c2, col3 AS c3",
+                "SELECT col1 AS c1, col2, col3 AS c3",
+                "SELECT col1 AS c1, col2 AS c2, col3 AS c3"
+        );
+        validateListAgainstRegEx("SELECT col1, col2, col3 AS c3", toCheckedInput, true);
+    }
+
+    @Test
+    void testSelectAll() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT * FROM table1",
+                "SELECT  *  FROM table1",
+                "SELECT ALL FROM table1"
+        );
+        validateListAgainstRegEx("SELECT * FROM table1", toCheckedInput, true);
+    }
+
+    @Test
+    void testSelectAllTableColumns() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT table1.* FROM table1",
+                "SELECT  table1.*  FROM table1"
+        );
+        validateListAgainstRegEx("SELECT table1.* FROM table1", toCheckedInput, true);
     }
 
     @Test
@@ -86,112 +179,25 @@ class SelectDeParserForRegExTest extends UserSettingsTestCase {
     }
 
     @Test
-    void testFrom() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT col1 FROM table1, table2",
-                "SELECT col1 FROM table2, table1"
-        );
-        validateListAgainstRegEx("SELECT col1 FROM table1, table2", toCheckedInput, true);
-    }
-
-    @Test
-    void testAliasAndAggregateOne() throws JSQLParserException{
-        List<String> toCheckedInput = List.of(
-                "SELECT AVG(col1) AS c1 FROM table1, table2",
-                "SELECT AVG ( col1 ) ALIAS c1 FROM table1, table2",
-                "SELECT MITTELWERT(co1) AS c1 FROM table1, table2"
-        );
-        validateListAgainstRegEx("SELECT AVG(col1) AS c1 FROM table1, table2", toCheckedInput, true);
-    }
-
-    @Test
-    void testAliasAndAggregateTwo() throws JSQLParserException{
-        List<String> toCheckedInput = List.of(
-                "SELECT AVG(col1) AS c1, column2 FROM table1, table2",
-                "SELECT AVG ( col1 ) ALIAS c1, column2 FROM table1, table2",
-                "SELECT column2, MITTELWERT(co1) AS c1 FROM table2, table1"
-        );
-        validateListAgainstRegEx("SELECT AVG(col1) AS c1, column2 FROM table1, table2", toCheckedInput, true);
-    }
-
-    @Test
-    void testTableAlias() throws JSQLParserException{
-        List<String> toCheckedInput = List.of(
-                "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
-                "SELECT col2, col1 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
-                "SELECT col2, col1 FROM table1 t1 INNER JOIN table2 t2 ON t2.key = t1.key"
-        );
-        validateListAgainstRegEx("SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key", toCheckedInput, true);
-    }
-
-    @Test
-    void testOptionalAliasAddedByStudent() throws JSQLParserException{
-        List<String> toCheckedInput = List.of(
-                "SELECT col1, col2, col3 AS c3",
-                "SELECT col1, col2 AS c2, col3 AS c3",
-                "SELECT col1 AS c1, col2, col3 AS c3",
-                "SELECT col1 AS c1, col2 AS c2, col3 AS c3"
-        );
-        validateListAgainstRegEx("SELECT col1, col2, col3 AS c3", toCheckedInput, true);
-    }
-
-    @Test
-    void testDistinctKeyword() throws JSQLParserException{
-        List<String> toCheckedInput = List.of(
-                "SELECT DISTINCT col1",
-                "SELECT DISTICT col1",
-                "SELECT  DISTINCT  col1"
-        );
-        validateListAgainstRegEx("SELECT DISTINCT col1", toCheckedInput, true);
-    }
-
-    @Test
-    void testUniqueKeyword() throws JSQLParserException{
-        List<String> toCheckedInput = List.of(
-                "SELECT UNIQUE col1",
-                "SELECT UNIUE col1",
-                "SELECT  UNIQUE  col1"
-        );
-        validateListAgainstRegEx("SELECT UNIQUE col1", toCheckedInput, true);
-    }
-
-    @Test
-    void testSelectAll() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT * FROM table1",
-                "SELECT  *  FROM table1",
-                "SELECT ALL FROM table1"
-        );
-        validateListAgainstRegEx("SELECT * FROM table1", toCheckedInput, true);
-    }
-
-    @Test
-    void testSelectAllTableColumns() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT table1.* FROM table1",
-                "SELECT  table1.*  FROM table1"
-        );
-        validateListAgainstRegEx("SELECT table1.* FROM table1", toCheckedInput, true);
-    }
-
-    @Test
-    void testEmitChanges() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT * FROM table1 EMIT CHANGES",
-                "SELECT * FROM table1  EMIT  CHANGES",
-                "SELECT * FROM table1 EMT CHANES"
-        );
-        validateListAgainstRegEx("SELECT * FROM table1 EMIT CHANGES", toCheckedInput, true);
-    }
-
-    @Test
     void testSubSelect() throws JSQLParserException {
         List<String> toCheckedInput = List.of(
                 "SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) AS avgcol1 FROM table2)",
                 "SELECT * FROM table1 WHERE (SELECT AVG(col1) AS avgcol1 FROM table2) = col1",
                 "SELECT * FROM table1 WHERE (SELECT MITTELWERT(col1) AS avgcol1 FROM table2) = col1"
         );
-        validateListAgainstRegEx("SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) AS avgcol1 FROM table2)", toCheckedInput, true);
+        validateListAgainstRegEx("SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) AS avgcol1 FROM table2)",
+                                 toCheckedInput, true);
+    }
+
+    @Test
+    void testTableAlias() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
+                "SELECT col2, col1 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
+                "SELECT col2, col1 FROM table1 t1 INNER JOIN table2 t2 ON t2.key = t1.key"
+        );
+        validateListAgainstRegEx("SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
+                                 toCheckedInput, true);
     }
 
     @Test
@@ -216,17 +222,14 @@ class SelectDeParserForRegExTest extends UserSettingsTestCase {
         validateListAgainstRegEx("SELECT * FROM table1", toCheckedInput, true);
     }
 
-
     @Test
-    void pivotStatement() throws JSQLParserException {
+    void testUniqueKeyword() throws JSQLParserException {
         List<String> toCheckedInput = List.of(
-                "SELECT * FROM (SELECT c1, p1, q FROM p) PIVOT (SUM(q) as q for p1 in ('a','b')) ORDER BY c1",
-                "SELECT * FROM (SELECT c1, p1, q FROM p) PIVOT (SUMME(q) as q for p1 in ('b', 'a')) ORDER BY c1"
+                "SELECT UNIQUE col1",
+                "SELECT UNIUE col1",
+                "SELECT  UNIQUE  col1"
         );
-
-        String input = "SELECT * FROM (SELECT c1, p1, q FROM p) PIVOT (SUM(q) as q for p1 in ('a','b')) ORDER BY c1";
-
-        validateListAgainstRegEx(input, toCheckedInput, false);
+        validateListAgainstRegEx("SELECT UNIQUE col1", toCheckedInput, true);
     }
 
     @Test
@@ -240,13 +243,12 @@ class SelectDeParserForRegExTest extends UserSettingsTestCase {
         validateListAgainstRegEx(input, toCheckedInput, true);
     }
 
-    @Test
-    void fetchStatement() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT * FROM table FETCH NEXT 1 ROWS ONLY",
-                "SELECT * FROM table  FTCH  NEXT  1  ROWS  ONLY"
-        );
-
-        validateListAgainstRegEx("SELECT * FROM table FETCH NEXT 1 ROWS ONLY", toCheckedInput, true);
+    void validateListAgainstRegEx(String sampleSolution, List<String> alternativeStatements,
+                                  boolean isAssertTrue) throws JSQLParserException {
+        String regex = this.getRegEx(sampleSolution);
+        for (String str : alternativeStatements) {
+            if (isAssertTrue) Assertions.assertTrue(checkAgainstRegEx(regex, str), str + " " + regex);
+            else Assertions.assertFalse(checkAgainstRegEx(regex, str), str + " " + regex);
+        }
     }
 }

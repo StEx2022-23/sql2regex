@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 @Service
 public class ConverterManagement {
 
-    private SettingsManager settingsManager;
+    private final SettingsManager settingsManager;
 
     /**
      * Validate inserted SQL-statements for oracle, mysql, sqlserver, mariadb
@@ -161,7 +161,7 @@ public class ConverterManagement {
         } else {
             for (ValidationError va : validationErrors) {
                 Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-                logger.log(Level.WARNING, String.format("Error while validating the statement: %s", sqlstatement), va);
+                logger.log(Level.WARNING, "Error while validating the statement: {0}", va);
             }
             return false;
         }

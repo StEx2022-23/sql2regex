@@ -13,14 +13,16 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 
-public class UserSettingsTestCase {
+public class UserSettingsPreparer {
 
     protected final SettingsManager settingsManager = new SettingsManager();
 
-    public UserSettingsTestCase(SettingsType settingsType) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
-        if (settingsType == SettingsType.USER){
+    public UserSettingsPreparer(
+            SettingsType settingsType) throws XPathExpressionException, ParserConfigurationException, IOException,
+            SAXException, URISyntaxException {
+        if (settingsType == SettingsType.USER) {
             this.settingsManager.parseUserSettingsInput(SettingsForm.EMPTY_FORM);
-        }else{
+        } else {
             UserSettings.getInstance(settingsManager.getSettingsMap(settingsType));
         }
     }

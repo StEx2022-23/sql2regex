@@ -23,7 +23,7 @@ public class SettingsNodeListIterator implements Iterable<Node> {
             public boolean hasNext() {
                 boolean isReplaced =
                         lastNode != null && currentIndex < nodeList.getLength() && lastNode != nodeList.item(
-                        currentIndex);
+                                currentIndex);
                 return currentIndex + 1 < nodeList.getLength() || isReplaced;
             }
 

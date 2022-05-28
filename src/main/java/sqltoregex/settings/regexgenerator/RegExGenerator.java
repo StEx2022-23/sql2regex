@@ -1,17 +1,11 @@
 package sqltoregex.settings.regexgenerator;
 
 import net.sf.jsqlparser.expression.Expression;
-import org.xml.sax.SAXException;
 import sqltoregex.deparser.ExpressionDeParserForRegEx;
-import sqltoregex.deparser.SelectDeParserForRegEx;
-import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;

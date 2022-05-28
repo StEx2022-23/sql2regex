@@ -5,11 +5,12 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 import org.springframework.util.Assert;
-import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * Common Interface for all synonym managers. Provides functionality for adding, removing synonyms of a generic Type T.
@@ -108,6 +109,21 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     }
 
     /**
+     * Not using graph equals method cause wrong implementation in JGraphT
+     *
+     * @param o
+     * @return
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SynonymGenerator<?, ?> that)) return false;
+        return synonymsGraph.vertexSet().equals(that.synonymsGraph.vertexSet()) && synonymsGraph.edgeSet()
+                .size() == that.synonymsGraph.edgeSet().size() && prefix.equals(that.prefix) && suffix.equals(
+                that.suffix) && settingsOption == that.settingsOption;
+    }
+
+    /**
      * Generates a regular expression part String with the pre-/ and suffixes set <b>including</b> the param.
      *
      * @param wordToFindSynonyms
@@ -150,6 +166,10 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
         return this.settingsOption;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(synonymsGraph.vertexSet(), synonymsGraph.edgeSet().size(), prefix, suffix, settingsOption);
+    }
 
     /**
      * Preprocessed input into a String that will be stored in the graph.
@@ -213,26 +233,5 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
      */
     public void setSuffix(String suffix) {
         this.suffix = suffix;
-    }
-
-    /**
-     * Not using graph equals method cause wrong implementation in JGraphT
-     *
-     * @param o
-     * @return
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SynonymGenerator<?, ?> that)) return false;
-        return synonymsGraph.vertexSet().equals(that.synonymsGraph.vertexSet()) && synonymsGraph.edgeSet()
-                .size() == that.synonymsGraph.edgeSet().size() && prefix.equals(that.prefix) && suffix.equals(
-                that.suffix) && settingsOption == that.settingsOption;
-    }
-
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(synonymsGraph.vertexSet(), synonymsGraph.edgeSet().size(), prefix, suffix, settingsOption);
     }
 }

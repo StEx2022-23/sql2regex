@@ -17,13 +17,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class GroupByDeParserForRegExTest extends UserSettingsTestCase {
+class GroupByDeParserForRegExTest extends UserSettingsPreparer {
     StringBuilder buffer = new StringBuilder();
     StatementDeParser statementDeParser;
 
-    GroupByDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
+    GroupByDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException,
+            SAXException, URISyntaxException {
         super(SettingsType.ALL);
-        statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(this.settingsManager), buffer, this.settingsManager);
+        statementDeParser = new StatementDeParserForRegEx(new ExpressionDeParserForRegEx(this.settingsManager), buffer,
+                                                          this.settingsManager);
     }
 
     boolean checkAgainstRegEx(String regex, String toBeChecked) {
@@ -36,27 +38,6 @@ class GroupByDeParserForRegExTest extends UserSettingsTestCase {
         Statement statement = CCJSqlParserUtil.parse(sampleSolution);
         statement.accept(statementDeParser);
         return statementDeParser.getBuffer().toString();
-    }
-
-    void validateListAgainstRegEx(String sampleSolution, List<String> alternativeStatements, boolean isAssertTrue) throws JSQLParserException {
-        String regex = this.getRegEx(sampleSolution);
-        for(String str : alternativeStatements){
-            if(isAssertTrue) Assertions.assertTrue(checkAgainstRegEx(regex, str), str + " " + regex);
-            else Assertions.assertFalse(checkAgainstRegEx(regex, str), str + " " + regex);
-        }
-    }
-
-    @Test
-    void testGroupByTwoStatements() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT col1 GROUP BY col1, col2",
-                "SELECT col1 GROUP BY col2,col1",
-                "SELCT col1 GROUP BY col1, col2",
-                "SELECT col1 GROUP BY col2,col1",
-                "SELECT col1 GROUP BY col1 , col2",
-                "SELECT col1 GROUP BY col2,col1"
-        );
-        validateListAgainstRegEx("SELECT col1 GROUP BY col1, col2", toCheckedInput, true);
     }
 
     @Test
@@ -79,5 +60,27 @@ class GroupByDeParserForRegExTest extends UserSettingsTestCase {
                 "SELECT col1 GROUP BY col3col2col1"
         );
         validateListAgainstRegEx("SELECT col1 GROUP BY col1, col2, col3", toCheckedInput, false);
+    }
+
+    @Test
+    void testGroupByTwoStatements() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 GROUP BY col1, col2",
+                "SELECT col1 GROUP BY col2,col1",
+                "SELCT col1 GROUP BY col1, col2",
+                "SELECT col1 GROUP BY col2,col1",
+                "SELECT col1 GROUP BY col1 , col2",
+                "SELECT col1 GROUP BY col2,col1"
+        );
+        validateListAgainstRegEx("SELECT col1 GROUP BY col1, col2", toCheckedInput, true);
+    }
+
+    void validateListAgainstRegEx(String sampleSolution, List<String> alternativeStatements,
+                                  boolean isAssertTrue) throws JSQLParserException {
+        String regex = this.getRegEx(sampleSolution);
+        for (String str : alternativeStatements) {
+            if (isAssertTrue) Assertions.assertTrue(checkAgainstRegEx(regex, str), str + " " + regex);
+            else Assertions.assertFalse(checkAgainstRegEx(regex, str), str + " " + regex);
+        }
     }
 }

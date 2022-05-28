@@ -8,7 +8,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import sqltoregex.settings.regexgenerator.IRegExGenerator;
-import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,12 +29,13 @@ public class SettingsManager {
     private final Map<SettingsType, Map<SettingsOption, IRegExGenerator<?>>> settingsMap = new EnumMap<SettingsType,
             Map<SettingsOption, IRegExGenerator<?>>>(SettingsType.class);
 
-    public SettingsManager() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException, URISyntaxException {
+    public SettingsManager() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException
+            , URISyntaxException {
         this.parseSettings();
     }
 
     public static <T, C extends IRegExGenerator<T>> Optional<C> castSetting(IRegExGenerator<?> rawSetting,
-                                                               Class<C> clazz) {
+                                                                            Class<C> clazz) {
         try {
             return Optional.of(clazz.cast(rawSetting));
         } catch (ClassCastException e) {
@@ -72,13 +72,13 @@ public class SettingsManager {
     }
 
     public <S, C extends IRegExGenerator<S>> Optional<C> getSettingBySettingsOption(SettingsOption settingsOption,
-                                                                       Class<C> clazz) {
+                                                                                    Class<C> clazz) {
         return this.getSettingBySettingsOption(settingsOption, clazz, SettingsType.USER);
     }
 
     public <S, C extends IRegExGenerator<S>> Optional<C> getSettingBySettingsOption(SettingsOption settingsOption,
-                                                                       Class<C> clazz,
-                                                                       SettingsType settingsType) {
+                                                                                    Class<C> clazz,
+                                                                                    SettingsType settingsType) {
         for (Map.Entry<SettingsOption, IRegExGenerator<?>> entry
                 : this.getSettingsMap(settingsType).entrySet()
         ) {
@@ -95,7 +95,7 @@ public class SettingsManager {
 
     public Map<SettingsOption, IRegExGenerator<?>> getSettingsMap(SettingsType settingsType) {
         Assert.notNull(settingsType, "settingsType must not be null");
-        if (settingsType == SettingsType.USER){
+        if (settingsType == SettingsType.USER) {
             return UserSettings.getInstance().getSettingsMap();
         }
         return this.settingsMap.get(settingsType);
@@ -117,7 +117,8 @@ public class SettingsManager {
 
         Map<SettingsType, SettingsMapBuilder> settingsMapBuilderMap = new EnumMap<SettingsType, SettingsMapBuilder>(
                 SettingsType.class);
-        for (SettingsType settingsType : Arrays.stream(SettingsType.values()).filter(settingsType -> settingsType != SettingsType.USER).toList()) {
+        for (SettingsType settingsType : Arrays.stream(SettingsType.values())
+                .filter(settingsType -> settingsType != SettingsType.USER).toList()) {
             settingsMapBuilderMap.put(settingsType, new SettingsMapBuilder());
         }
 
@@ -141,7 +142,8 @@ public class SettingsManager {
                 }
             }
         }
-        for (SettingsType settingsType : Arrays.stream(SettingsType.values()).filter(settingsType -> settingsType != SettingsType.USER).toList()) {
+        for (SettingsType settingsType : Arrays.stream(SettingsType.values())
+                .filter(settingsType -> settingsType != SettingsType.USER).toList()) {
             this.settingsMap.put(settingsType, settingsMapBuilderMap.get(settingsType).build());
         }
     }

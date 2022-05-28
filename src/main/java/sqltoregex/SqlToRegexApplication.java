@@ -5,9 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class SqlToRegexApplication {
-	public static void main(String[] args){
-		SpringApplication.run(SqlToRegexApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(SqlToRegexApplication.class, args);
+    }
 }
 
 

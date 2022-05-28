@@ -4,8 +4,8 @@ import org.springframework.util.Assert;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import sqltoregex.settings.regexgenerator.ExpressionRotation;
-import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.IRegExGenerator;
+import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
@@ -38,13 +38,14 @@ class SettingsMapBuilder {
         return this.settingsMap;
     }
 
-    public SettingsMapBuilder withNodeList(NodeList nodeList, SettingsOption settingsOption){
+    public SettingsMapBuilder withNodeList(NodeList nodeList, SettingsOption settingsOption) {
         if (nodeList.item(0).getTextContent().equals("false")) {
             return this;
         }
 
         switch (settingsOption) {
-            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, NOT_AS_EXCLAMATION_AND_WORD, EXPRESSIONORDER -> this.withSettingsOption(
+            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER,
+                    NOT_AS_EXCLAMATION_AND_WORD, EXPRESSIONORDER -> this.withSettingsOption(
                     settingsOption);
             case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
                 Set<String> valueList = new HashSet<>();
@@ -75,7 +76,7 @@ class SettingsMapBuilder {
         return this;
     }
 
-    public SettingsMapBuilder withSettingsOption(SettingsOption settingsOption){
+    public SettingsMapBuilder withSettingsOption(SettingsOption settingsOption) {
         switch (settingsOption) {
             case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING -> {
                 SpellingMistake spellingMistake = new SpellingMistake(settingsOption);
@@ -97,7 +98,7 @@ class SettingsMapBuilder {
         return this;
     }
 
-    public SettingsMapBuilder withSettingsOptionSet(Set<SettingsOption> settingsOptions){
+    public SettingsMapBuilder withSettingsOptionSet(Set<SettingsOption> settingsOptions) {
         Assert.notNull(settingsOptions, "Set of settings options must not be null");
         for (SettingsOption settingsOption : settingsOptions) {
             withSettingsOption(settingsOption);

@@ -14,9 +14,9 @@ import java.util.Objects;
  * SELECT (?:table1\s*,\s*table2|table2\s*,\s*table1)
  */
 public class OrderRotation extends RegExGenerator<List<String>> {
+    private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
     private final StringBuilder buffer = new StringBuilder();
     private final SettingsOption settingsOption;
-    private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
     private SpellingMistake spellingMistake;
 
     public OrderRotation(SettingsOption settingsOption, SpellingMistake spellingMistake) {
@@ -30,6 +30,14 @@ public class OrderRotation extends RegExGenerator<List<String>> {
         this.settingsOption = settingsOption;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OrderRotation that = (OrderRotation) o;
+        return Objects.equals(spellingMistake, that.spellingMistake) && settingsOption == that.settingsOption;
+    }
+
     /**
      * combine every possible table name order to a non-capturing regex group, optional with alternative writing styles
      *
@@ -38,7 +46,7 @@ public class OrderRotation extends RegExGenerator<List<String>> {
      */
     public String generateRegExFor(List<String> valueList) {
         Assert.notNull(valueList, "Value list must not be null!");
-        buffer.replace(0, buffer.length(),"");
+        buffer.replace(0, buffer.length(), "");
         buffer.append(isCapturingGroup ? '(' : "(?:");
         Integer amountOfElements = valueList.size();
         orderRotationRek(amountOfElements, valueList);
@@ -61,6 +69,11 @@ public class OrderRotation extends RegExGenerator<List<String>> {
         this.spellingMistake = spellingMistake;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(spellingMistake, settingsOption);
+    }
+
     /**
      * helper function for recursive tablename order concatenation
      *
@@ -72,11 +85,12 @@ public class OrderRotation extends RegExGenerator<List<String>> {
         if (amount == 1) {
             Iterator<String> iterator = valueList.iterator();
             while (iterator.hasNext()) {
-                if(spellingMistake != null) {
+                if (spellingMistake != null) {
                     String temp = iterator.next();
-                    if(temp.contains(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE)) singleValue.append(temp.replace(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE, ""));
+                    if (temp.contains(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE))
+                        singleValue.append(temp.replace(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE, ""));
                     else singleValue.append(spellingMistake.generateRegExFor(temp));
-                } else{
+                } else {
                     singleValue.append(iterator.next());
                 }
                 if (iterator.hasNext()) {
@@ -102,19 +116,6 @@ public class OrderRotation extends RegExGenerator<List<String>> {
                 orderRotationRek(amount - 1, valueList);
             }
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        OrderRotation that = (OrderRotation) o;
-        return Objects.equals(spellingMistake, that.spellingMistake) && settingsOption == that.settingsOption;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(spellingMistake, settingsOption);
     }
 
 }

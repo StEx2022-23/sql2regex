@@ -17,6 +17,13 @@ public class SpellingMistake extends RegExGenerator<String> {
         this.settingsOption = settingsOption;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SpellingMistake that)) return false;
+        return settingsOption == that.settingsOption;
+    }
+
     /**
      * Iterates through each letter of the word, storing all spelling variations assuming a letter is forgotten
      *
@@ -30,9 +37,9 @@ public class SpellingMistake extends RegExGenerator<String> {
         StringBuilder alternativeWritingStyles = new StringBuilder();
         alternativeWritingStyles.append(isCapturingGroup ? '(' : "(?:");
         alternativeWritingStyles.append(str).append("|");
-        for(int i = 0; i<str.length(); i++){
+        for (int i = 0; i < str.length(); i++) {
             String first = str.substring(0, i);
-            String second = str.substring(i+1);
+            String second = str.substring(i + 1);
             String concat = first.concat(second);
             alternativeWritingStyles.append(concat);
             alternativeWritingStyles.append("|");
@@ -45,13 +52,6 @@ public class SpellingMistake extends RegExGenerator<String> {
     @Override
     public SettingsOption getSettingsOption() {
         return settingsOption;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SpellingMistake that)) return false;
-        return settingsOption == that.settingsOption;
     }
 
     @Override

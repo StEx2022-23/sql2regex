@@ -19,9 +19,10 @@ public class UserSettings {
     public static UserSettings getInstance(Map<SettingsOption, IRegExGenerator<?>> map) {
         if (instance == null) {
             instance = new UserSettings(map);
-        }else{
-            if (!instance.getSettingsMap().equals(map)){
-                Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).log(Level.INFO, "Wanted to create another instance with other settings");
+        } else {
+            if (!instance.getSettingsMap().equals(map)) {
+                Logger.getLogger(Logger.GLOBAL_LOGGER_NAME)
+                        .log(Level.INFO, "Wanted to create another instance with other settings");
             }
         }
         return instance;
@@ -34,7 +35,7 @@ public class UserSettings {
         return instance;
     }
 
-    public static boolean areSet(){
+    public static boolean areSet() {
         return instance != null;
     }
 

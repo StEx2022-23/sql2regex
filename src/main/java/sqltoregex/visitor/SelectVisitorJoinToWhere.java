@@ -28,7 +28,7 @@ public class SelectVisitorJoinToWhere extends SelectVisitorAdapter {
                 continue;
             }
             if (plainSelect.getWhere() == null) {
-                if(join.getOnExpressions().stream().findFirst().isEmpty()){
+                if (join.getOnExpressions().stream().findFirst().isEmpty()) {
                     throw new NoSuchElementException();
                 }
                 plainSelect.setWhere(join.getOnExpressions().stream().findFirst().get());
