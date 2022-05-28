@@ -31,7 +31,6 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     private final SpellingMistake columnNameSpellingMistake;
     private final DateAndTimeFormatSynonymGenerator dateSynonyms;
     private final SettingsManager settingsManager;
-    private final SpellingMistake tableNameSpellingMistake;
     private final DateAndTimeFormatSynonymGenerator timeStampSynonyms;
     private final DateAndTimeFormatSynonymGenerator timeSynonyms;
     private final OrderByDeParserForRegEx orderByDeParser;
@@ -50,8 +49,6 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         super(selectVisitor, buffer);
         this.orderByDeParser = orderByDeParser;
         this.settingsManager = settingsManager;
-        this.tableNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
-                                                                                   SpellingMistake.class).orElse(null);
         this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING,
                                                                                     SpellingMistake.class).orElse(null);
         this.dateSynonyms = settingsManager.getSettingBySettingsOption(SettingsOption.DATESYNONYMS,

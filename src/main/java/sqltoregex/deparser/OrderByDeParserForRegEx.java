@@ -46,7 +46,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
                 StringSynonymGenerator.class).orElse(null);
     }
 
-    public void deParse(boolean oracleSiblings, List<OrderByElement> orderByElementList, FromItem fromItem) {
+    public void deParse(List<OrderByElement> orderByElementList, FromItem fromItem) {
         buffer.append(REQUIRED_WHITE_SPACE);
         buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ORDER"));
         buffer.append(REQUIRED_WHITE_SPACE);
