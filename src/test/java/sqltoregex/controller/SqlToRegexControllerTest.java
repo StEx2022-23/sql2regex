@@ -26,27 +26,16 @@ class SqlToRegexControllerTest {
     @Autowired
     MockMvc mvc;
 
-    @Test
-    void testAboutSite() throws Exception {
-        mvc.perform(get("/about").contentType(MediaType.TEXT_HTML)).andExpect(status().isOk());
+    @AfterAll
+    static void tearDown() throws Exception {
+        Field field = UserSettings.class.getDeclaredField("instance");
+        field.setAccessible(true);
+        field.set(UserSettings.getInstance(), null);
     }
 
     @Test
-    void testEmptySQLResult() throws Exception {
-        mvc.perform(MockMvcRequestBuilders
-                        .post("/convert")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .content(EntityUtils.toString(new UrlEncodedFormEntity(Arrays.asList(
-                                new BasicNameValuePair("spellings", SettingsOption.KEYWORDSPELLING.toString()),
-                                new BasicNameValuePair("orders", SettingsOption.TABLENAMEORDER.toString()),
-                                new BasicNameValuePair("dateFormats", "yyyy-MM-dd"),
-                                new BasicNameValuePair("timeFormats", "HH:MM:SS"),
-                                new BasicNameValuePair("dateTimeFormats", "YYYY-MM-DD HH:MM:SS"),
-                                new BasicNameValuePair("sql", ""),
-                                new BasicNameValuePair("aggregateFunctionLang", "Mittelwert; AVG")
-                        ))))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+    void testAboutSite() throws Exception {
+        mvc.perform(get("/about").contentType(MediaType.TEXT_HTML)).andExpect(status().isOk());
     }
 
     @Test
@@ -61,6 +50,24 @@ class SqlToRegexControllerTest {
                                     new BasicNameValuePair("timeFormats", "HH:MM:SS"),
                                     new BasicNameValuePair("dateTimeFormats", "YYYY-MM-DD HH:MM:SS"),
                                     new BasicNameValuePair("sql", "SELECT *"),
+                                    new BasicNameValuePair("aggregateFunctionLang", "Mittelwert; AVG")
+                            ))))
+                            .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testEmptySQLResult() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                            .post("/convert")
+                            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                            .content(EntityUtils.toString(new UrlEncodedFormEntity(Arrays.asList(
+                                    new BasicNameValuePair("spellings", SettingsOption.KEYWORDSPELLING.toString()),
+                                    new BasicNameValuePair("orders", SettingsOption.TABLENAMEORDER.toString()),
+                                    new BasicNameValuePair("dateFormats", "yyyy-MM-dd"),
+                                    new BasicNameValuePair("timeFormats", "HH:MM:SS"),
+                                    new BasicNameValuePair("dateTimeFormats", "YYYY-MM-DD HH:MM:SS"),
+                                    new BasicNameValuePair("sql", ""),
                                     new BasicNameValuePair("aggregateFunctionLang", "Mittelwert; AVG")
                             ))))
                             .accept(MediaType.APPLICATION_JSON))
@@ -100,12 +107,5 @@ class SqlToRegexControllerTest {
     @Test
     void testVisualizationSite() throws Exception {
         mvc.perform(get("/visualization").contentType(MediaType.TEXT_HTML)).andExpect(status().isOk());
-    }
-
-    @AfterAll
-    static void tearDown() throws Exception {
-        Field field = UserSettings.class.getDeclaredField("instance");
-        field.setAccessible(true);
-        field.set(UserSettings.getInstance(), null);
     }
 }

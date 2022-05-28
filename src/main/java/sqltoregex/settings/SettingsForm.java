@@ -7,6 +7,13 @@ import java.util.Set;
 
 public class SettingsForm {
 
+    public static final SettingsForm EMPTY_FORM = new SettingsForm(Collections.emptySet(),
+                                                                   Collections.emptySet(),
+                                                                   Collections.emptySet(),
+                                                                   Collections.emptySet(),
+                                                                   Collections.emptySet(),
+                                                                   Collections.emptySet(),
+                                                                   "EMPTY");
     Set<SettingsOption> spellings;
     Set<SettingsOption> orders;
     Set<SimpleDateFormat> dateFormats;
@@ -21,13 +28,13 @@ public class SettingsForm {
                         Set<SimpleDateFormat> timeFormats,
                         Set<SimpleDateFormat> dateTimeFormats,
                         Set<String> aggregateFunctionLang,
-                        String sql){
+                        String sql) {
         this.spellings = spellings == null ? Collections.emptySet() : spellings;
-        this.orders = orders == null ? Collections.emptySet() :orders;
-        this.dateFormats = dateFormats == null ? Collections.emptySet() :dateFormats;
-        this.timeFormats = timeFormats == null ? Collections.emptySet() :timeFormats;
-        this.dateTimeFormats = dateTimeFormats == null ? Collections.emptySet() :dateTimeFormats;
-        this.aggregateFunctionLang = aggregateFunctionLang == null ? Collections.emptySet() :aggregateFunctionLang;
+        this.orders = orders == null ? Collections.emptySet() : orders;
+        this.dateFormats = dateFormats == null ? Collections.emptySet() : dateFormats;
+        this.timeFormats = timeFormats == null ? Collections.emptySet() : timeFormats;
+        this.dateTimeFormats = dateTimeFormats == null ? Collections.emptySet() : dateTimeFormats;
+        this.aggregateFunctionLang = aggregateFunctionLang == null ? Collections.emptySet() : aggregateFunctionLang;
         this.sql = sql;
     }
 
@@ -58,4 +65,4 @@ public class SettingsForm {
     public Set<SimpleDateFormat> getTimeFormats() {
         return timeFormats;
     }
-    }
+}

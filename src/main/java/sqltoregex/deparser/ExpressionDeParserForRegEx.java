@@ -13,6 +13,7 @@ import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 
@@ -23,44 +24,45 @@ import java.util.List;
  * Missing overrides: AnalyticExpression
  */
 public class ExpressionDeParserForRegEx extends ExpressionDeParser {
-    private static final String REQUIRED_WHITE_SPACE = "\\s+";
-    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     public static final String NOT = "NOT";
     public static final String OLD_ORACLE_JOIN = "\\(\\+\\)";
-
+    private static final String REQUIRED_WHITE_SPACE = "\\s+";
+    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
+    private final SpellingMistake columnNameSpellingMistake;
+    private final DateAndTimeFormatSynonymGenerator dateSynonyms;
     private final SettingsManager settingsManager;
-    private OrderByDeParserForRegEx orderByDeParser;
+    private final SpellingMistake tableNameSpellingMistake;
+    private final DateAndTimeFormatSynonymGenerator timeStampSynonyms;
+    private final DateAndTimeFormatSynonymGenerator timeSynonyms;
+    private final OrderByDeParserForRegEx orderByDeParser;
 
     public ExpressionDeParserForRegEx(SettingsManager settingsManager) {
-        super();
-        this.settingsManager = settingsManager;
+        this(new SelectDeParserForRegEx(settingsManager), new StringBuilder(), settingsManager);
     }
 
-    public ExpressionDeParserForRegEx(SelectVisitor selectVisitor, StringBuilder buffer, SettingsManager settingsManager) {
-        super(selectVisitor, buffer);
-        this.settingsManager = settingsManager;
+    public ExpressionDeParserForRegEx(SelectVisitor selectVisitor, StringBuilder buffer,
+                                      SettingsManager settingsManager) {
+        this(selectVisitor, buffer, new OrderByDeParserForRegEx(settingsManager), settingsManager);
     }
 
-    ExpressionDeParserForRegEx(SelectVisitor selectVisitor, StringBuilder buffer, OrderByDeParserForRegEx orderByDeParser, SettingsManager settingsManager) {
+    ExpressionDeParserForRegEx(SelectVisitor selectVisitor, StringBuilder buffer,
+                               OrderByDeParserForRegEx orderByDeParser, SettingsManager settingsManager) {
         super(selectVisitor, buffer);
         this.orderByDeParser = orderByDeParser;
         this.settingsManager = settingsManager;
-    }
-
-    protected void visitCommutativeBinaryExpression(BinaryExpression binaryExpression, String operator){
-        buffer.append("(?:");
-        buffer.append(OPTIONAL_WHITE_SPACE);
-        binaryExpression.getLeftExpression().accept(this);
-        buffer.append(operator);
-        binaryExpression.getRightExpression().accept(this);
-
-        buffer.append("|");
-
-        binaryExpression.getRightExpression().accept(this);
-        buffer.append(operator);
-        binaryExpression.getLeftExpression().accept(this);
-        buffer.append(OPTIONAL_WHITE_SPACE);
-        buffer.append(")");
+        this.tableNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
+                                                                                   SpellingMistake.class).orElse(null);
+        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING,
+                                                                                    SpellingMistake.class).orElse(null);
+        this.dateSynonyms = settingsManager.getSettingBySettingsOption(SettingsOption.DATESYNONYMS,
+                                                                       DateAndTimeFormatSynonymGenerator.class)
+                .orElse(null);
+        this.timeSynonyms = settingsManager.getSettingBySettingsOption(SettingsOption.TIMESYNONYMS,
+                                                                       DateAndTimeFormatSynonymGenerator.class)
+                .orElse(null);
+        this.timeStampSynonyms = settingsManager.getSettingBySettingsOption(SettingsOption.DATETIMESYNONYMS,
+                                                                            DateAndTimeFormatSynonymGenerator.class)
+                .orElse(null);
     }
 
     @Override
@@ -70,7 +72,10 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(AndExpression andExpression) {
-        visitCommutativeBinaryExpression(andExpression, andExpression.isUseOperator() ? OPTIONAL_WHITE_SPACE + "&&" + OPTIONAL_WHITE_SPACE : OPTIONAL_WHITE_SPACE + "AND" + OPTIONAL_WHITE_SPACE);
+        visitCommutativeBinaryExpression(andExpression,
+                                         andExpression.isUseOperator() ?
+                                                 OPTIONAL_WHITE_SPACE + "&&" + OPTIONAL_WHITE_SPACE :
+                                                 OPTIONAL_WHITE_SPACE + "AND" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
@@ -97,7 +102,8 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 new EqualsTo()
                         .withLeftExpression(equalsTo.getRightExpression())
                         .withRightExpression(equalsTo.getLeftExpression())
-                        .withOldOracleJoinSyntax((equalsTo.getOldOracleJoinSyntax()+equalsTo.getOldOracleJoinSyntax()) % 3)
+                        .withOldOracleJoinSyntax(
+                                (equalsTo.getOldOracleJoinSyntax() + equalsTo.getOldOracleJoinSyntax()) % 3)
                         .withOraclePriorPosition(equalsTo.getOraclePriorPosition())
                 , OPTIONAL_WHITE_SPACE + "=" + OPTIONAL_WHITE_SPACE);
         buffer.append(")");
@@ -136,7 +142,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             buffer.append("|");
             buffer.append(OPTIONAL_WHITE_SPACE + NOT + OPTIONAL_WHITE_SPACE);
             buffer.append(")");
-        }else{
+        } else {
             if (notExpr.isExclamationMark()) {
                 buffer.append("!").append(OPTIONAL_WHITE_SPACE);
             } else {
@@ -155,22 +161,6 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     @Override
     public void visit(BitwiseLeftShift expr) {
         visitBinaryExpression(expr, OPTIONAL_WHITE_SPACE + "<<" + OPTIONAL_WHITE_SPACE);
-    }
-
-    @Override
-    public void visitOldOracleJoinBinaryExpression(OldOracleJoinBinaryExpression expression, String operator) {
-        buffer.append(OPTIONAL_WHITE_SPACE);
-
-        expression.getLeftExpression().accept(this);
-        if (expression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_RIGHT) {
-            buffer.append(OLD_ORACLE_JOIN + OPTIONAL_WHITE_SPACE);
-        }
-        buffer.append(operator);
-        expression.getRightExpression().accept(this);
-        if (expression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_LEFT) {
-            buffer.append(OLD_ORACLE_JOIN + OPTIONAL_WHITE_SPACE);
-        }
-        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
@@ -216,11 +206,12 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             }
         }
         buffer.append("MATCH" + OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE)
-                .append(columnsListCommaSeperated).append(OPTIONAL_WHITE_SPACE).append("\\)").append(REQUIRED_WHITE_SPACE)
+                .append(columnsListCommaSeperated).append(OPTIONAL_WHITE_SPACE).append("\\)")
+                .append(REQUIRED_WHITE_SPACE)
                 .append("AGAINST").append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE)
                 .append("['|\"]")
                 .append(fullTextSearch.getAgainstValue().toString(), 1,
-                        fullTextSearch.getAgainstValue().toString().length()-1)
+                        fullTextSearch.getAgainstValue().toString().length() - 1)
                 .append("['|\"]")
                 .append(fullTextSearch.getSearchModifier() != null ?
                                 OPTIONAL_WHITE_SPACE + fullTextSearch.getSearchModifier() : "")
@@ -329,11 +320,11 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         visitOldOracleJoinBinaryExpression(minorThan, OPTIONAL_WHITE_SPACE + "<" + OPTIONAL_WHITE_SPACE);
         buffer.append('|');
         visitOldOracleJoinBinaryExpression(new GreaterThan()
-                .withLeftExpression(minorThan.getRightExpression())
-                .withRightExpression(minorThan.getLeftExpression())
-                .withOldOracleJoinSyntax(minorThan.getOldOracleJoinSyntax())
-                .withOraclePriorPosition(minorThan.getOraclePriorPosition())
-        , OPTIONAL_WHITE_SPACE + ">" + OPTIONAL_WHITE_SPACE);
+                                                   .withLeftExpression(minorThan.getRightExpression())
+                                                   .withRightExpression(minorThan.getLeftExpression())
+                                                   .withOldOracleJoinSyntax(minorThan.getOldOracleJoinSyntax())
+                                                   .withOraclePriorPosition(minorThan.getOraclePriorPosition())
+                , OPTIONAL_WHITE_SPACE + ">" + OPTIONAL_WHITE_SPACE);
         buffer.append(")");
     }
 
@@ -359,12 +350,14 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
         buffer.append("(?:");
-        visitOldOracleJoinBinaryExpression(notEqualsTo, OPTIONAL_WHITE_SPACE + notEqualsTo.getStringExpression() + OPTIONAL_WHITE_SPACE);
+        visitOldOracleJoinBinaryExpression(notEqualsTo,
+                                           OPTIONAL_WHITE_SPACE + notEqualsTo.getStringExpression() + OPTIONAL_WHITE_SPACE);
         buffer.append('|');
         visitOldOracleJoinBinaryExpression(new NotEqualsTo()
                                                    .withLeftExpression(notEqualsTo.getRightExpression())
                                                    .withRightExpression(notEqualsTo.getLeftExpression())
-                                                   .withOldOracleJoinSyntax((notEqualsTo.getOldOracleJoinSyntax()+notEqualsTo.getOldOracleJoinSyntax()) % 3)
+                                                   .withOldOracleJoinSyntax(
+                                                           (notEqualsTo.getOldOracleJoinSyntax() + notEqualsTo.getOldOracleJoinSyntax()) % 3)
                                                    .withOraclePriorPosition(notEqualsTo.getOraclePriorPosition())
                 , OPTIONAL_WHITE_SPACE + notEqualsTo.getStringExpression() + OPTIONAL_WHITE_SPACE);
         buffer.append(")");
@@ -414,14 +407,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         visitBinaryExpression(new Addition()
                                       .withLeftExpression(subtraction.getLeftExpression())
                                       .withRightExpression(subtraction.getRightExpression())
-        , "+");
-    }
-
-    @Override
-    protected void visitBinaryExpression(BinaryExpression binaryExpression, String operator) {
-        buffer.append(OPTIONAL_WHITE_SPACE);
-        super.visitBinaryExpression(binaryExpression, operator);
-        buffer.append(OPTIONAL_WHITE_SPACE);
+                , "+");
     }
 
     @Override
@@ -432,7 +418,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         if (this.getSelectVisitor() != null) {
             if (subSelect.getWithItemsList() != null) {
                 buffer.append("WITH" + REQUIRED_WHITE_SPACE);
-                for (Iterator<WithItem> iter = subSelect.getWithItemsList().iterator(); iter.hasNext();) {
+                for (Iterator<WithItem> iter = subSelect.getWithItemsList().iterator(); iter.hasNext(); ) {
                     iter.next().accept(this.getSelectVisitor());
                     if (iter.hasNext()) {
                         buffer.append("," + OPTIONAL_WHITE_SPACE);
@@ -454,22 +440,19 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         buffer.append(OPTIONAL_WHITE_SPACE);
         final Table table = tableColumn.getTable();
         String tableName = "";
-        if(table != null && table.getFullyQualifiedName() != null) {
+        if (table != null && table.getFullyQualifiedName() != null) {
             tableName += table.getFullyQualifiedName();
             if (table.getAlias() != null) {
                 tableName += table.getAlias().getName();
             }
         }
 
-        if(!tableName.isEmpty()) {
-            String finalTableName = tableName;
-            settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
-                    SpellingMistake.class).ifPresent(spelling -> buffer.append(spelling.generateRegExFor(finalTableName)));
+        if (!tableName.isEmpty()) {
+            buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, tableName));
             buffer.append('.');
         }
 
-        settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING,
-                SpellingMistake.class).ifPresent(stringRegExGenerator -> buffer.append(stringRegExGenerator.generateRegExFor(tableColumn.getColumnName())));
+        buffer.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, tableColumn.getColumnName()));
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
@@ -535,7 +518,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         if (expressionList.isUsingBrackets()) {
             buffer.append("(").append(OPTIONAL_WHITE_SPACE);
         }
-        for (Iterator<Expression> iter = expressionList.getExpressions().iterator(); iter.hasNext();) {
+        for (Iterator<Expression> iter = expressionList.getExpressions().iterator(); iter.hasNext(); ) {
             Expression expression = iter.next();
             expression.accept(this);
             if (iter.hasNext()) {
@@ -567,36 +550,32 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(DateValue dateValue) {
-            buffer.append("\\{d").append(OPTIONAL_WHITE_SPACE).append("'").append(dateValue.getValue().toString())
-                    .append("'").append(OPTIONAL_WHITE_SPACE).append("\\}")
-                    .append('|')
-                    .append(settingsManager.getSettingBySettingsOption(SettingsOption.DATESYNONYMS,
-                                                                      DateAndTimeFormatSynonymGenerator.class)
-                            .map(synonymGenerator -> synonymGenerator.generateRegExFor(dateValue)).orElse(""));
+        buffer.append("\\{d").append(OPTIONAL_WHITE_SPACE).append("'").append(dateValue.getValue().toString())
+                .append("'").append(OPTIONAL_WHITE_SPACE).append("\\}")
+                .append('|')
+                .append(RegExGenerator.useExpressionSynonymGenerator(this.dateSynonyms, dateValue));
     }
 
     @Override
     public void visit(TimestampValue timestampValue) {
         buffer.append("\\{ts").append(OPTIONAL_WHITE_SPACE).append("'").append(timestampValue.getValue().toString())
-            .append(OPTIONAL_WHITE_SPACE).append("\\}")
+                .append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')
-                .append(settingsManager.getSettingBySettingsOption(SettingsOption.DATETIMESYNONYMS,
-                                DateAndTimeFormatSynonymGenerator.class)
-                        .map(synonymGenerator -> synonymGenerator.generateRegExFor(timestampValue)).orElse(""));
+                .append(RegExGenerator.useExpressionSynonymGenerator(this.timeStampSynonyms, timestampValue));
     }
 
     @Override
     public void visit(TimeValue timeValue) {
-            buffer.append("\\{t").append(OPTIONAL_WHITE_SPACE).append("'").append(timeValue.getValue().toString())
+        buffer.append("\\{t").append(OPTIONAL_WHITE_SPACE).append("'").append(timeValue.getValue().toString())
                 .append(OPTIONAL_WHITE_SPACE).append("\\}")
-                    .append('|')
-                    .append(settingsManager.getSettingBySettingsOption(SettingsOption.TIMESYNONYMS,
-                        DateAndTimeFormatSynonymGenerator.class).map(synonymGenerator -> synonymGenerator.generateRegExFor(timeValue)).orElse(""));
+                .append('|')
+                .append(RegExGenerator.useExpressionSynonymGenerator(this.timeSynonyms, timeValue));
     }
 
     @Override
     public void visit(CaseExpression caseExpression) {
-        buffer.append(caseExpression.isUsingBrackets() ? "(" : "").append(OPTIONAL_WHITE_SPACE).append("CASE").append(OPTIONAL_WHITE_SPACE);
+        buffer.append(caseExpression.isUsingBrackets() ? "(" : "").append(OPTIONAL_WHITE_SPACE).append("CASE")
+                .append(OPTIONAL_WHITE_SPACE);
         Expression switchExp = caseExpression.getSwitchExpression();
         if (switchExp != null) {
             switchExp.accept(this);
@@ -629,15 +608,17 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(AnyComparisonExpression anyComparisonExpression) {
-        buffer.append(anyComparisonExpression.getAnyType().name()).append(OPTIONAL_WHITE_SPACE).append("(").append(OPTIONAL_WHITE_SPACE);
+        buffer.append(anyComparisonExpression.getAnyType().name()).append(OPTIONAL_WHITE_SPACE).append("(")
+                .append(OPTIONAL_WHITE_SPACE);
         SubSelect subSelect = anyComparisonExpression.getSubSelect();
-        if (subSelect!=null) {
+        if (subSelect != null) {
             subSelect.accept((ExpressionVisitor) this);
         } else {
             ExpressionList expressionList = (ExpressionList) anyComparisonExpression.getItemsList();
             buffer.append("VALUES").append(OPTIONAL_WHITE_SPACE);
             buffer.append(
-                    PlainSelect.getStringList(expressionList.getExpressions(), true, anyComparisonExpression.isUsingBracketsForValues()));
+                    PlainSelect.getStringList(expressionList.getExpressions(), true,
+                                              anyComparisonExpression.isUsingBracketsForValues()));
         }
         buffer.append(OPTIONAL_WHITE_SPACE).append(")").append(OPTIONAL_WHITE_SPACE);
     }
@@ -649,12 +630,12 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(Matches matches) {
-        visitOldOracleJoinBinaryExpression(matches,OPTIONAL_WHITE_SPACE+ "@@" + OPTIONAL_WHITE_SPACE);
+        visitOldOracleJoinBinaryExpression(matches, OPTIONAL_WHITE_SPACE + "@@" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
     public void visit(BitwiseAnd bitwiseAnd) {
-        visitBinaryExpression(bitwiseAnd, OPTIONAL_WHITE_SPACE+ "&" + OPTIONAL_WHITE_SPACE);
+        visitBinaryExpression(bitwiseAnd, OPTIONAL_WHITE_SPACE + "&" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
@@ -674,7 +655,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             buffer.append("CAST(");
             cast.getLeftExpression().accept(this);
             buffer.append(OPTIONAL_WHITE_SPACE).append("AS").append(OPTIONAL_WHITE_SPACE);
-            buffer.append( cast.getRowConstructor()!=null ? cast.getRowConstructor() : cast.getType() );
+            buffer.append(cast.getRowConstructor() != null ? cast.getRowConstructor() : cast.getType());
             buffer.append(")");
         } else {
             cast.getLeftExpression().accept(this);
@@ -691,7 +672,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             buffer.append("TRY_CAST(");
             cast.getLeftExpression().accept(this);
             buffer.append(OPTIONAL_WHITE_SPACE).append("AS").append(OPTIONAL_WHITE_SPACE);
-            buffer.append( cast.getRowConstructor()!=null ? cast.getRowConstructor() : cast.getType() );
+            buffer.append(cast.getRowConstructor() != null ? cast.getRowConstructor() : cast.getType());
             buffer.append(")");
         } else {
             cast.getLeftExpression().accept(this);
@@ -719,7 +700,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     @Override
     public void visit(MultiExpressionList multiExprList) {
         buffer.append(OPTIONAL_WHITE_SPACE);
-        for (Iterator<ExpressionList> it = multiExprList.getExpressionLists().iterator(); it.hasNext();) {
+        for (Iterator<ExpressionList> it = multiExprList.getExpressionLists().iterator(); it.hasNext(); ) {
             it.next().accept(this);
             if (it.hasNext()) {
                 buffer.append(",").append(OPTIONAL_WHITE_SPACE);
@@ -816,8 +797,8 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         if (rowConstructor.getColumnDefinitions().isEmpty()) {
             buffer.append("(");
             int i = 0;
-            for (ColumnDefinition columnDefinition:rowConstructor.getColumnDefinitions()) {
-                buffer.append(i>0 ? "," + OPTIONAL_WHITE_SPACE : "").append(columnDefinition.toString());
+            for (ColumnDefinition columnDefinition : rowConstructor.getColumnDefinitions()) {
+                buffer.append(i > 0 ? "," + OPTIONAL_WHITE_SPACE : "").append(columnDefinition.toString());
                 i++;
             }
             buffer.append(")");
@@ -866,8 +847,8 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     @Override
     public void visit(NextValExpression nextVal) {
         buffer.append(OPTIONAL_WHITE_SPACE);
-        buffer.append(nextVal.isUsingNextValueFor()  ? "NEXT"+ REQUIRED_WHITE_SPACE +"VALUE" +
-                REQUIRED_WHITE_SPACE+ "FOR" + OPTIONAL_WHITE_SPACE : "NEXTVAL"+ REQUIRED_WHITE_SPACE + "FOR"
+        buffer.append(nextVal.isUsingNextValueFor() ? "NEXT" + REQUIRED_WHITE_SPACE + "VALUE" +
+                REQUIRED_WHITE_SPACE + "FOR" + OPTIONAL_WHITE_SPACE : "NEXTVAL" + REQUIRED_WHITE_SPACE + "FOR"
                 + OPTIONAL_WHITE_SPACE).append(nextVal.getName());
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
@@ -916,9 +897,9 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         buffer.append("xmlserialize(xmlagg(xmltext(");
         expr.getExpression().accept(this);
         buffer.append(")");
-        if (expr.getOrderByElements() != null){
+        if (expr.getOrderByElements() != null) {
             buffer.append(OPTIONAL_WHITE_SPACE).append("ORDER BY").append(OPTIONAL_WHITE_SPACE);
-            for (Iterator<OrderByElement> i = expr.getOrderByElements().iterator(); i.hasNext();) {
+            for (Iterator<OrderByElement> i = expr.getOrderByElements().iterator(); i.hasNext(); ) {
                 buffer.append(i.next().toString());
                 if (i.hasNext()) {
                     buffer.append(",").append(OPTIONAL_WHITE_SPACE);
@@ -1004,6 +985,46 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(GeometryDistance geometryDistance) {
-        visitOldOracleJoinBinaryExpression(geometryDistance, OPTIONAL_WHITE_SPACE + geometryDistance.getStringExpression() + OPTIONAL_WHITE_SPACE);
+        visitOldOracleJoinBinaryExpression(geometryDistance,
+                                           OPTIONAL_WHITE_SPACE + geometryDistance.getStringExpression() + OPTIONAL_WHITE_SPACE);
+    }
+
+    @Override
+    protected void visitBinaryExpression(BinaryExpression binaryExpression, String operator) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        super.visitBinaryExpression(binaryExpression, operator);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+    }
+
+    protected void visitCommutativeBinaryExpression(BinaryExpression binaryExpression, String operator) {
+        buffer.append("(?:");
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        binaryExpression.getLeftExpression().accept(this);
+        buffer.append(operator);
+        binaryExpression.getRightExpression().accept(this);
+
+        buffer.append("|");
+
+        binaryExpression.getRightExpression().accept(this);
+        buffer.append(operator);
+        binaryExpression.getLeftExpression().accept(this);
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer.append(")");
+    }
+
+    @Override
+    public void visitOldOracleJoinBinaryExpression(OldOracleJoinBinaryExpression expression, String operator) {
+        buffer.append(OPTIONAL_WHITE_SPACE);
+
+        expression.getLeftExpression().accept(this);
+        if (expression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_RIGHT) {
+            buffer.append(OLD_ORACLE_JOIN + OPTIONAL_WHITE_SPACE);
+        }
+        buffer.append(operator);
+        expression.getRightExpression().accept(this);
+        if (expression.getOldOracleJoinSyntax() == SupportsOldOracleJoinSyntax.ORACLE_JOIN_LEFT) {
+            buffer.append(OLD_ORACLE_JOIN + OPTIONAL_WHITE_SPACE);
+        }
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 }

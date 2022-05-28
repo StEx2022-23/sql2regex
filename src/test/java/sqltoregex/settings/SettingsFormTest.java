@@ -14,37 +14,7 @@ class SettingsFormTest {
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    void validFormCreation(){
-        Set<ConstraintViolation<SettingsForm>> constraintViolations = validator.validate(new SettingsForm(
-                Collections.emptySet(),
-                Collections.emptySet(),
-                Collections.emptySet(),
-                Collections.emptySet(),
-                Collections.emptySet(),
-                Collections.emptySet(),
-                "SQL STRING"
-        ));
-
-        Assertions.assertTrue(constraintViolations.isEmpty(), "Form constraint validation should be empty");
-    }
-
-    @Test
-    void validFormCreationAllBoxesUnchecked(){
-        Set<ConstraintViolation<SettingsForm>> constraintViolations = validator.validate(new SettingsForm(
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                "SQL STRING"
-        ));
-
-        Assertions.assertTrue(constraintViolations.isEmpty(), "Form constraint validation should be empty");
-    }
-
-    @Test
-    void emptySql(){
+    void emptySql() {
         Set<ConstraintViolation<SettingsForm>> constraintViolations = validator.validate(new SettingsForm(
                 Collections.emptySet(),
                 Collections.emptySet(),
@@ -54,9 +24,40 @@ class SettingsFormTest {
                 Collections.emptySet(),
                 ""
         ));
-        Assertions.assertEquals(1, constraintViolations.size(), "Form constraint validation should contain 1 violation");
+        Assertions.assertEquals(1, constraintViolations.size(),
+                                "Form constraint validation should contain 1 violation");
         Assertions.assertEquals("sql",
-                constraintViolations.iterator().next().getPropertyPath().toString(),
-                "Property with constraint violation must be sql");
+                                constraintViolations.iterator().next().getPropertyPath().toString(),
+                                "Property with constraint violation must be sql");
+    }
+
+    @Test
+    void validFormCreation() {
+        Set<ConstraintViolation<SettingsForm>> constraintViolations = validator.validate(new SettingsForm(
+                Collections.emptySet(),
+                Collections.emptySet(),
+                Collections.emptySet(),
+                Collections.emptySet(),
+                Collections.emptySet(),
+                Collections.emptySet(),
+                "SQL STRING"
+        ));
+
+        Assertions.assertTrue(constraintViolations.isEmpty(), "Form constraint validation should be empty");
+    }
+
+    @Test
+    void validFormCreationAllBoxesUnchecked() {
+        Set<ConstraintViolation<SettingsForm>> constraintViolations = validator.validate(new SettingsForm(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "SQL STRING"
+        ));
+
+        Assertions.assertTrue(constraintViolations.isEmpty(), "Form constraint validation should be empty");
     }
 }

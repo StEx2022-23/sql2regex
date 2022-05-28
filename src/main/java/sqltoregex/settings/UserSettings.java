@@ -1,26 +1,28 @@
 package sqltoregex.settings;
 
-import com.google.common.collect.ImmutableMap;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
+import sqltoregex.settings.regexgenerator.IRegExGenerator;
 
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class UserSettings {
     private static UserSettings instance;
-    private final ImmutableMap<SettingsOption, RegExGenerator<?>> settingsMap;
+    private final Map<SettingsOption, IRegExGenerator<?>> settingsMap;
 
-    private UserSettings(Map<SettingsOption, RegExGenerator<?>> map) {
-        this.settingsMap = new ImmutableMap.Builder<SettingsOption, RegExGenerator<?>>().putAll(map).build();
+    private UserSettings(Map<SettingsOption, IRegExGenerator<?>> map) {
+        this.settingsMap = Collections.unmodifiableMap(new EnumMap<>(map));
     }
 
-    public static UserSettings getInstance(Map<SettingsOption, RegExGenerator<?>> map) {
+    public static UserSettings getInstance(Map<SettingsOption, IRegExGenerator<?>> map) {
         if (instance == null) {
             instance = new UserSettings(map);
-        }else{
-            if (!instance.getSettingsMap().equals(map)){
-                Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).log(Level.INFO, "Wanted to create another instance with other settings");
+        } else {
+            if (!instance.getSettingsMap().equals(map)) {
+                Logger.getLogger(Logger.GLOBAL_LOGGER_NAME)
+                        .log(Level.INFO, "Wanted to create another instance with other settings");
             }
         }
         return instance;
@@ -33,11 +35,11 @@ public class UserSettings {
         return instance;
     }
 
-    public static boolean areSet(){
+    public static boolean areSet() {
         return instance != null;
     }
 
-    public Map<SettingsOption, RegExGenerator<?>> getSettingsMap() {
+    public Map<SettingsOption, IRegExGenerator<?>> getSettingsMap() {
         return this.settingsMap;
     }
 }

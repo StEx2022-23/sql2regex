@@ -22,7 +22,7 @@ class SpellingMistakeTest {
     }
 
     @Test
-    void testSpellingMistakeOutputWitCapturingGroup() {
+    void testSpellingMistakeOutputWithCapturingGroup() {
         String input = "test";
         spellingMistake.setCapturingGroup(true);
         String alternativeStyles = spellingMistake.generateRegExFor(input);

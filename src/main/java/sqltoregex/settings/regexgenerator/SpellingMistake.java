@@ -10,12 +10,18 @@ import java.util.Objects;
  * Example:
  * test ↔ (?:test|est|tst|tet|tes) or (test|est|tst|tet|tes)
  */
-public class SpellingMistake implements RegExGenerator<String> {
+public class SpellingMistake extends RegExGenerator<String> {
     private final SettingsOption settingsOption;
-    protected boolean isCapturingGroup = false;
 
     public SpellingMistake(SettingsOption settingsOption) {
         this.settingsOption = settingsOption;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SpellingMistake that)) return false;
+        return settingsOption == that.settingsOption;
     }
 
     /**
@@ -31,9 +37,9 @@ public class SpellingMistake implements RegExGenerator<String> {
         StringBuilder alternativeWritingStyles = new StringBuilder();
         alternativeWritingStyles.append(isCapturingGroup ? '(' : "(?:");
         alternativeWritingStyles.append(str).append("|");
-        for(int i = 0; i<str.length(); i++){
+        for (int i = 0; i < str.length(); i++) {
             String first = str.substring(0, i);
-            String second = str.substring(i+1);
+            String second = str.substring(i + 1);
             String concat = first.concat(second);
             alternativeWritingStyles.append(concat);
             alternativeWritingStyles.append("|");
@@ -46,23 +52,6 @@ public class SpellingMistake implements RegExGenerator<String> {
     @Override
     public SettingsOption getSettingsOption() {
         return settingsOption;
-    }
-
-    /**
-     * Sets whether there will be an enclosing non capturing group (?: ... ) around the generated regEx.
-     *
-     * @param capturingGroup true for capturing group false for non-capturing group
-     */
-    @Override
-    public void setCapturingGroup(boolean capturingGroup) {
-        this.isCapturingGroup = capturingGroup;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SpellingMistake that)) return false;
-        return settingsOption == that.settingsOption;
     }
 
     @Override

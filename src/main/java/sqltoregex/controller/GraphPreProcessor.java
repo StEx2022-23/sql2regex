@@ -17,13 +17,7 @@ public class GraphPreProcessor {
     }
 
     static <T> Set<T> getSynonymSet(Graph<T, DefaultWeightedEdge> graph) {
-        try {
-            return new LinkedHashSet<>(graph.vertexSet());
-        } catch (ClassCastException e) {
-            Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-            logger.log(Level.WARNING, COULD_NOT_CAST, e);
-            return Collections.emptySet();
-        }
+        return new LinkedHashSet<>(graph.vertexSet());
     }
 
     static Set<String> getSynonymSetWithDelimiter(Graph<String, DefaultWeightedEdge> graph, String delimiter) {

@@ -5,37 +5,41 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
+import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 public class StatementDeParserForRegEx extends StatementDeParser {
-    private static final String REQUIRED_WHITE_SPACE = "\\s+";
     public static final String WITH = "WITH";
+    private static final String REQUIRED_WHITE_SPACE = "\\s+";
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
-    RegExGenerator<String> keywordSpellingMistake;
+    IRegExGenerator<String> keywordSpellingMistake;
 
     public StatementDeParserForRegEx(StringBuilder buffer, SettingsManager settingsManager) {
         this(new ExpressionDeParserForRegEx(settingsManager), buffer, settingsManager);
     }
 
-    public StatementDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, StringBuilder buffer, SettingsManager settingsManager) {
+    public StatementDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, StringBuilder buffer,
+                                     SettingsManager settingsManager) {
         this(expressionDeParser, new SelectDeParserForRegEx(settingsManager), buffer, settingsManager);
     }
 
-    public StatementDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, SelectDeParserForRegEx selectDeParser, StringBuilder buffer, SettingsManager settingsManager) {
+    public StatementDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser,
+                                     SelectDeParserForRegEx selectDeParser, StringBuilder buffer,
+                                     SettingsManager settingsManager) {
         super(expressionDeParser, selectDeParser, buffer);
         this.expressionDeParserForRegEx = expressionDeParser;
         this.selectDeParserForRegEx = selectDeParser;
         this.setKeywordSpellingMistake(settingsManager);
     }
 
-    private void setKeywordSpellingMistake(SettingsManager settingsManager){
-        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class).orElse(null);
+    private void setKeywordSpellingMistake(SettingsManager settingsManager) {
+        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING,
+                                                                                 SpellingMistake.class).orElse(null);
     }
 
-    private String useKeywordSpellingMistake(String str){
-        if(null != this.keywordSpellingMistake) return this.keywordSpellingMistake.generateRegExFor(str);
+    private String useKeywordSpellingMistake(String str) {
+        if (null != this.keywordSpellingMistake) return this.keywordSpellingMistake.generateRegExFor(str);
         else return str;
     }
 

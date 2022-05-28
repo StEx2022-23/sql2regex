@@ -5,10 +5,12 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 import org.springframework.util.Assert;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * Common Interface for all synonym managers. Provides functionality for adding, removing synonyms of a generic Type T.
@@ -27,12 +29,11 @@ import java.util.*;
  * @param <S> class of search objects
  */
 
-public abstract class SynonymGenerator<A, S> implements RegExGenerator<S> {
+public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     public static final long DEFAULT_WEIGHT = 1L;
     private final SettingsOption settingsOption;
     //due to: Edges undirected (synonyms apply in both directions); Self-loops: no; Multiple edges: no; weighted: yes
     protected SimpleWeightedGraph<A, DefaultWeightedEdge> synonymsGraph;
-    protected boolean isCapturingGroup = false;
     protected boolean graphForSynonymsOfTwoWords = false;
     private String prefix = "";
     private String suffix = "";
@@ -108,6 +109,21 @@ public abstract class SynonymGenerator<A, S> implements RegExGenerator<S> {
     }
 
     /**
+     * Not using graph equals method cause wrong implementation in JGraphT
+     *
+     * @param o
+     * @return
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SynonymGenerator<?, ?> that)) return false;
+        return synonymsGraph.vertexSet().equals(that.synonymsGraph.vertexSet()) && synonymsGraph.edgeSet()
+                .size() == that.synonymsGraph.edgeSet().size() && prefix.equals(that.prefix) && suffix.equals(
+                that.suffix) && settingsOption == that.settingsOption;
+    }
+
+    /**
      * Generates a regular expression part String with the pre-/ and suffixes set <b>including</b> the param.
      *
      * @param wordToFindSynonyms
@@ -150,6 +166,10 @@ public abstract class SynonymGenerator<A, S> implements RegExGenerator<S> {
         return this.settingsOption;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(synonymsGraph.vertexSet(), synonymsGraph.edgeSet().size(), prefix, suffix, settingsOption);
+    }
 
     /**
      * Preprocessed input into a String that will be stored in the graph.
@@ -198,16 +218,6 @@ public abstract class SynonymGenerator<A, S> implements RegExGenerator<S> {
     }
 
     /**
-     * Sets whether there will be an enclosing non capturing group (?: ... ) around the generated regEx.
-     *
-     * @param capturingGroup true for capturing group false for non-capturing group
-     */
-    @Override
-    public void setCapturingGroup(boolean capturingGroup) {
-        this.isCapturingGroup = capturingGroup;
-    }
-
-    /**
      * Sets a common prefix for all concatenations of {@link #generateRegExFor}
      *
      * @param prefix prefix to add
@@ -223,26 +233,5 @@ public abstract class SynonymGenerator<A, S> implements RegExGenerator<S> {
      */
     public void setSuffix(String suffix) {
         this.suffix = suffix;
-    }
-
-    /**
-     * Not using graph equals method cause wrong implementation in JGraphT
-     *
-     * @param o
-     * @return
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SynonymGenerator<?, ?> that)) return false;
-        return synonymsGraph.vertexSet().equals(that.synonymsGraph.vertexSet()) && synonymsGraph.edgeSet()
-                .size() == that.synonymsGraph.edgeSet().size() && prefix.equals(that.prefix) && suffix.equals(
-                that.suffix) && settingsOption == that.settingsOption;
-    }
-
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(synonymsGraph.vertexSet(), synonymsGraph.edgeSet().size(), prefix, suffix, settingsOption);
     }
 }

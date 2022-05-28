@@ -15,10 +15,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 class SettingsManagerTest {
     static SettingsManager settingsManager;
@@ -30,8 +27,16 @@ class SettingsManagerTest {
     static Set<String> aggregateFunctionLang;
     static String sql;
 
+    @AfterAll
+    static void tearDown() throws Exception {
+        Field field = UserSettings.class.getDeclaredField("instance");
+        field.setAccessible(true);
+        field.set(UserSettings.getInstance(), null);
+    }
+
     @BeforeEach
-    void beforeEach() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
+    void beforeEach() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException,
+            URISyntaxException {
         settingsManager = new SettingsManager();
         spellings = new HashSet<>();
         orders = new HashSet<>();
@@ -43,30 +48,41 @@ class SettingsManagerTest {
     }
 
     @Test
-    void testLoadDefaultProperties() {
-        Set<SettingsOption> settingsOptionSet = settingsManager.getDefaultSettingsMap().keySet();
-        List<String> settingsOptionWhichHaveBeenSet = List.of(
-                "KEYWORDSPELLING",
-                "TABLENAMESPELLING",
-                "TABLENAMEORDER",
-                "COLUMNNAMESPELLING",
-                "KEYWORDSPELLING",
-                "COLUMNNAMEORDER",
-                "DATESYNONYMS",
-                "TIMESYNONYMS",
-                "DATETIMESYNONYMS",
-                "AGGREGATEFUNCTIONLANG",
-                "EXPRESSIONORDER",
-                "OTHERSYNONYMS",
-                "NOT_AS_EXCLAMATION_AND_WORD"
-        );
-        for (String str : settingsOptionWhichHaveBeenSet) {
-            Assertions.assertTrue(settingsOptionSet.toString().contains(str));
+    void testGetSetting() {
+        for (SettingsOption settingsOption : SettingsOption.values()) {
+            if (SettingsOption.DEFAULT.equals(settingsOption)) {
+                continue;
+            }
+            Assertions.assertTrue(settingsManager.getSettingsMap(SettingsType.ALL).containsKey(settingsOption),
+                                  "Does not contain " + settingsOption);
+            if (settingsOption == SettingsOption.NOT_AS_EXCLAMATION_AND_WORD) {
+                Assertions.assertNull(settingsManager.getSettingsMap(SettingsType.ALL).get(settingsOption));
+            } else {
+                Assertions.assertNotNull(settingsManager.getSettingsMap(SettingsType.ALL).get(settingsOption));
+            }
         }
     }
 
     @Test
-    void usesUserSettings(){
+    void testGetSettingByClazz() {
+        Assertions.assertEquals(3, settingsManager.getSettingByClass(SpellingMistake.class, SettingsType.ALL).size());
+        Assertions.assertEquals(2, settingsManager.getSettingByClass(OrderRotation.class, SettingsType.ALL).size());
+        Assertions.assertEquals(2, settingsManager.getSettingByClass(StringSynonymGenerator.class, SettingsType.ALL)
+                .size());
+    }
+
+    @Test
+    void testLoadAllProperties() {
+        Set<SettingsOption> settingsOptionSet = settingsManager.getSettingsMap(SettingsType.ALL).keySet();
+        for (SettingsOption option
+                : Arrays.stream(SettingsOption.values())
+                .filter(settingsOption -> settingsOption != SettingsOption.DEFAULT).toList()) {
+            Assertions.assertTrue(settingsOptionSet.contains(option), "All does not contain:" + option);
+        }
+    }
+
+    @Test
+    void usesUserSettings() {
         settingsManager.parseUserSettingsInput(new SettingsForm(new HashSet<>(List.of(SettingsOption.KEYWORDSPELLING)),
                                                                 Collections.emptySet(),
                                                                 Collections.emptySet(),
@@ -76,46 +92,19 @@ class SettingsManagerTest {
                                                                 "")
         );
 
-        for (SettingsOption settingsOption :SettingsOption.values()){
+        for (SettingsOption settingsOption : SettingsOption.values()) {
             //catch default setted synonym manager
             if (settingsOption.equals(SettingsOption.KEYWORDSPELLING)
                     | settingsOption.equals(SettingsOption.DATESYNONYMS)
                     | settingsOption.equals(SettingsOption.TIMESYNONYMS)
                     | settingsOption.equals(SettingsOption.DATETIMESYNONYMS)
-            ){
-                Assertions.assertTrue(settingsManager.getSettingBySettingsOption(settingsOption), "Assertion failed for: " + settingsOption);
-            }else{
-                Assertions.assertFalse(settingsManager.getSettingBySettingsOption(settingsOption), "Assertion failed for: " + settingsOption);
-            }
-        }
-    }
-
-    @Test
-    void testGetSettingByClazz(){
-        Assertions.assertEquals(3, settingsManager.getSettingByClass(SpellingMistake.class, true).size());
-        Assertions.assertEquals(2, settingsManager.getSettingByClass(OrderRotation.class, true).size());
-        Assertions.assertEquals(2, settingsManager.getSettingByClass(StringSynonymGenerator.class, true).size());
-    }
-
-    @Test
-    void testGetSetting(){
-        for (SettingsOption settingsOption : SettingsOption.values()) {
-            if(SettingsOption.DEFAULT.equals(settingsOption)){
-                continue;
-            }
-            Assertions.assertTrue(settingsManager.getDefaultSettingsMap().containsKey(settingsOption), "Does not contain " + settingsOption);
-            if (settingsOption == SettingsOption.NOT_AS_EXCLAMATION_AND_WORD) {
-                Assertions.assertNull(settingsManager.getDefaultSettingsMap().get(settingsOption));
+            ) {
+                Assertions.assertTrue(settingsManager.getSettingBySettingsOption(settingsOption),
+                                      "Assertion failed for: " + settingsOption);
             } else {
-                Assertions.assertNotNull(settingsManager.getDefaultSettingsMap().get(settingsOption));
+                Assertions.assertFalse(settingsManager.getSettingBySettingsOption(settingsOption),
+                                       "Assertion failed for: " + settingsOption);
             }
         }
-    }
-
-    @AfterAll
-    static void tearDown() throws Exception {
-        Field field = UserSettings.class.getDeclaredField("instance");
-        field.setAccessible(true);
-        field.set(UserSettings.getInstance(), null);
     }
 }
