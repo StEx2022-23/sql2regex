@@ -14,7 +14,7 @@ public enum SettingsOption {
     TIMESYNONYMS,
     AGGREGATEFUNCTIONLANG,
     NOT_AS_EXCLAMATION_AND_WORD,
-    EXPRESSIONORDER,
+    GROUPBYELEMENTORDER,
     OTHERSYNONYMS,
     DEFAULT
     // when extending this class keep the naming of the enums and the xml tags the same

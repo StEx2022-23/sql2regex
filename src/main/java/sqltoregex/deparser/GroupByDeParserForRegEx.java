@@ -5,8 +5,7 @@ import net.sf.jsqlparser.statement.select.GroupByElement;
 import net.sf.jsqlparser.util.deparser.GroupByDeParser;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
-import sqltoregex.settings.regexgenerator.ExpressionRotation;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
+import sqltoregex.settings.regexgenerator.GroupByElementRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import java.util.List;
@@ -15,7 +14,7 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private RegExGenerator<String> keywordSpellingMistake;
-    private RegExGenerator<List<Expression>> expressionOrder;
+    private RegExGenerator<List<Expression>> groupByElementOrder;
     private final ExpressionVisitor expressionVisitor;
 
     public GroupByDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, StringBuilder buffer,

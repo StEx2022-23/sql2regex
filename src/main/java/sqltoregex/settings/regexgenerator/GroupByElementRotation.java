@@ -15,12 +15,12 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ExpressionRotation extends RegExGenerator<List<Expression>> {
+public class GroupByElementRotation implements RegExGenerator<List<Expression>> {
     private final Map<Integer, List<Expression>> groupByOrderOptionsMap = new HashMap<>();
     private final SettingsOption settingsOption;
     private Integer groupByOrderOptionsCounter = 0;
 
-    public ExpressionRotation(SettingsOption settingsOption) {
+    public GroupByElementRotation(SettingsOption settingsOption) {
         this.settingsOption = settingsOption;
     }
 
@@ -97,7 +97,7 @@ public class ExpressionRotation extends RegExGenerator<List<Expression>> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ExpressionRotation that = (ExpressionRotation) o;
+        GroupByElementRotation that = (GroupByElementRotation) o;
         return settingsOption == that.settingsOption;
     }
 

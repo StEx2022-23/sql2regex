@@ -22,10 +22,9 @@
             <settingstype>ALL</settingstype>
             <value>true</value>
         </columnnameorder>
-        <expressionorder>
-            <settingstype>ALL</settingstype>
+        <groupbyelementorder>
             <value>true</value>
-        </expressionorder>
+        </groupbyelementorder>
     </order>
     <synonyms>
         <datesynonyms>
