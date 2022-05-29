@@ -486,13 +486,13 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 visit(function.getParameters());
             }
             if (function.getOrderByElements() != null) {
-                buffer.append(REQUIRED_WHITE_SPACE).append("ORDER BY").append(REQUIRED_WHITE_SPACE);
+                buffer.append(REQUIRED_WHITE_SPACE).append("ORDER").append(REQUIRED_WHITE_SPACE).append("BY").append(REQUIRED_WHITE_SPACE);
                 boolean comma = false;
                 orderByDeParser.setExpressionVisitor(this);
                 orderByDeParser.setBuffer(buffer);
                 for (OrderByElement orderByElement : function.getOrderByElements()) {
                     if (comma) {
-                        buffer.append(",").append(OPTIONAL_WHITE_SPACE);
+                        buffer.append(OPTIONAL_WHITE_SPACE).append(",").append(OPTIONAL_WHITE_SPACE);
                     } else {
                         comma = true;
                     }
