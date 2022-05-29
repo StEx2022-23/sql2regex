@@ -49,7 +49,8 @@ class InsertDeParserForRegExTest extends UserSettingsPreparer{
         List<String> toCheckedInput = List.of(
                 "INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')",
                 "INSERT INTO table (col1, col2) VALUES ('11', '22'), ('1', '2')",
-                "INSERT INTO table (col2, col1) VALUE ('22', '11'), ('2', '1')"
+                "INSERT INTO table (col2, col1) VALUE ('22', '11'), ('2', '1')",
+                "INSERT INTO table (col2, col1) VALUES (22, 11), (2, 1)"
         );
         testUtils.validateListAgainstRegEx("INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')", toCheckedInput, true);
     }
@@ -68,6 +69,14 @@ class InsertDeParserForRegExTest extends UserSettingsPreparer{
         List<String> toCheckedInput = List.of(
                 "INSERT INTO table SET name = 'Kim', isBFF = true"
         );
-        testUtils.validateListAgainstRegEx("INSERT INTO table SET name = 'Kim', isBFF = true", toCheckedInput, false);
+        testUtils.validateListAgainstRegEx("INSERT INTO table SET name = 'Kim', isBFF = true", toCheckedInput, true);
+    }
+
+    @Test
+    void testReturning() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "INSERT INTO t1 VALUES (val1, val2) RETURNING id"
+        );
+        testUtils.validateListAgainstRegEx("INSERT INTO t1 VALUES (val1, val2) RETURNING id", toCheckedInput, true);
     }
 }
