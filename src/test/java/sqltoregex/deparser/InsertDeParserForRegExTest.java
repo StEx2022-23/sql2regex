@@ -45,15 +45,22 @@ class InsertDeParserForRegExTest extends UserSettingsPreparer{
         testUtils.validateListAgainstRegEx("INSERT INTO table (col1, col2) VALUES ('1', '2')", toCheckedInput, false);
     }
 
-//    @Test
-//    void twoValueList() throws JSQLParserException {
-//        List<String> toCheckedInput = List.of(
-//                "INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')",
-//                "INSERT INTO table (col1, col2) VALUES ('11', '22'), ('1', '2')",
-//                "INSERT INTO table (col2, col1) VALUES ('11', '22'), ('1', '2')",
-//                "INSERT INTO table (col2, col1) VALUES ('22', '11'), ('1', '2')", //this should not match
-//                "INSERT INTO table (col2, col1) VALUE ('22', '11'), ('1', '2')"
-//        );
-//        testUtils.validateListAgainstRegEx("INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')", toCheckedInput, true);
-//    }
+    @Test
+    void twoValueList() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')",
+                "INSERT INTO table (col1, col2) VALUES ('11', '22'), ('1', '2')",
+                "INSERT INTO table (col2, col1) VALUE ('22', '11'), ('2', '1')"
+        );
+        testUtils.validateListAgainstRegEx("INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')", toCheckedInput, true);
+    }
+
+    @Test
+    void twoValueListFailing() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "INSERT INTO table (col2, col1) VALUES ('11', '22'), ('1', '2')",
+                "INSERT INTO table (col2, col1) VALUES ('22', '11'), ('1', '2')"
+        );
+        testUtils.validateListAgainstRegEx("INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')", toCheckedInput, false);
+    }
 }
