@@ -86,7 +86,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 buffer.append(OPTIONAL_WHITE_SPACE);
                 while (extractedColumnsIterator.hasNext()) {
                     buffer.append(this.generateRegExForQuotationMarks());
-                    buffer.append(mappedColumnsAndRelatedValues.get(extractedColumnsIterator.next()).replaceAll(this.generateRegExForQuotationMarks(), ""));
+                    buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, mappedColumnsAndRelatedValues.get(extractedColumnsIterator.next())).replaceAll(this.generateRegExForQuotationMarks(), ""));
                     buffer.append(this.generateRegExForQuotationMarks());
                     if (extractedColumnsIterator.hasNext()) {
                         buffer.append(OPTIONAL_WHITE_SPACE);
@@ -126,7 +126,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                     Iterator<String> stringIterator = tempValuesRelatedToActualCol.iterator();
                     while (stringIterator.hasNext()){
                         temp.append(this.generateRegExForQuotationMarks());
-                        temp.append(stringIterator.next().split(",")[i + 1].replaceAll(this.generateRegExForQuotationMarks(), ""));
+                        temp.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, stringIterator.next().split(",")[i + 1]).replaceAll(this.generateRegExForQuotationMarks(), ""));
                         temp.append(this.generateRegExForQuotationMarks());
                         if(stringIterator.hasNext()) temp.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
                     }
