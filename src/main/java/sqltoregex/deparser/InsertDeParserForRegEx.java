@@ -100,17 +100,12 @@ public class InsertDeParserForRegEx extends InsertDeParser {
             buffer.append(")");
         } else if (insert.getColumns() != null && insert.getItemsList(ExpressionList.class).getExpressions().size() > 1) {
             Map<String, List<String>> mappedColumnsAndRelatedValues = new HashMap<>();
-            //col1 -> 1, 11   col2 -> 2, 22
             buffer.append("(?:");
             Iterator<String> columnsOrderOptionsIterator = Arrays.stream(this.generateListOfColumnsOrderOptionForMultipleValues(mappedColumnsAndRelatedValues, insert)).iterator();
-            //col1, col2  col2, col1
-
             while (columnsOrderOptionsIterator.hasNext()) {
                 Iterator<String> extractedColumnsIterator = Arrays.stream(this.generateColumnArray(columnsOrderOptionsIterator)).iterator();
-
                 List<String> tempValuesRelatedToActualCol = new ArrayList<>();
                 int valueDepth = 0;
-                // col2, 2, 22   col1, 1, 11
                 while(extractedColumnsIterator.hasNext()){
                     String tempCol = extractedColumnsIterator.next();
                     StringBuilder stringBuilder = new StringBuilder();
@@ -137,9 +132,6 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 }
 
                 buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrder, valueListInRightOrder));
-
-
-                //TODO: handle multiexpressionlist
                 buffer.append(columnsOrderOptionsIterator.hasNext() ? "|" : "");
             }
             buffer.append(")");
@@ -243,7 +235,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         subSelect.getSelectBody().accept(this.selectDeParserForRegEx);
     }
 
-    public String[] generateListOfColumnsOrderOptionForMultipleValues(Map<String, List<String>> mappedColumnsAndRelatedValues, Insert insert){
+    private String[] generateListOfColumnsOrderOptionForMultipleValues(Map<String, List<String>> mappedColumnsAndRelatedValues, Insert insert){
         for (int i = 0; i < insert.getColumns().size(); i++) {
             List<Expression> expression = insert.getItemsList(ExpressionList.class).getExpressions();
             List<String> valueList = new ArrayList<>();
@@ -255,24 +247,22 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                     valueList
             );
         }
-        List<String> mappedColumnsAndRelatedValuesKeySet = new ArrayList<>();
-        for (String string : mappedColumnsAndRelatedValues.keySet()) {
-            mappedColumnsAndRelatedValuesKeySet.add(string.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
-        }
-        String columnsRotated = RegExGenerator.useOrderRotation(this.tableNameOrder, mappedColumnsAndRelatedValuesKeySet);
-        columnsRotated = columnsRotated.replace(OPTIONAL_WHITE_SPACE, "").replace("(?:", "").replace(")", "");
-        return columnsRotated.split("\\|");
+        return this.generateColumnsRotatedArray(mappedColumnsAndRelatedValues.keySet());
     }
 
-    public String[] generateListOfColumnsOrderOption(Map<String, String> mappedColumnsAndRelatedValues, Insert insert){
+    private String[] generateListOfColumnsOrderOption(Map<String, String> mappedColumnsAndRelatedValues, Insert insert){
         for (int i = 0; i < insert.getColumns().size(); i++) {
             mappedColumnsAndRelatedValues.put(
                     insert.getColumns().get(i).toString(),
                     insert.getItemsList(ExpressionList.class).getExpressions().get(i).toString()
             );
         }
+        return this.generateColumnsRotatedArray(mappedColumnsAndRelatedValues.keySet());
+    }
+
+    private String[] generateColumnsRotatedArray(Set<String> keySet){
         List<String> mappedColumnsAndRelatedValuesKeySet = new ArrayList<>();
-        for (String string : mappedColumnsAndRelatedValues.keySet()) {
+        for (String string : keySet) {
             mappedColumnsAndRelatedValuesKeySet.add(string.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
         }
         String columnsRotated = RegExGenerator.useOrderRotation(this.tableNameOrder, mappedColumnsAndRelatedValuesKeySet);
@@ -280,7 +270,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         return columnsRotated.split("\\|");
     }
 
-    public String[] generateColumnArray(Iterator<String> columnsOrderOptionsIterator){
+    private String[] generateColumnArray(Iterator<String> columnsOrderOptionsIterator){
         String singleColumnOrderOption = columnsOrderOptionsIterator.next();
         buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
         buffer.append(singleColumnOrderOption.replace(",", OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE));
