@@ -217,13 +217,11 @@ public class InsertDeParserForRegEx extends InsertDeParser {
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "RETURNING"));
             buffer.append(REQUIRED_WHITE_SPACE);
-            for (Iterator<SelectItem> iter = insert.getReturningExpressionList().iterator(); iter
-                    .hasNext();) {
-                buffer.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, iter.next().toString()));
-                if (iter.hasNext()) {
-                    buffer.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
-                }
+            List<String> returningExpressionsAsStringList = new ArrayList<>();
+            for (SelectItem selectItem : insert.getReturningExpressionList()) {
+                returningExpressionsAsStringList.add(selectItem.toString());
             }
+            buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrder, returningExpressionsAsStringList));
         }
     }
 
