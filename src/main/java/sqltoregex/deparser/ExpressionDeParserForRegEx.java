@@ -451,8 +451,11 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                     + RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, tableName)
                     + "|"
                     + RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, this.getRelatedTableNameOrAlias(tableName)) + ")";
+            buffer.append(tableName).append('.');
         }
-        if(!tableName.isEmpty()) buffer.append(tableName).append('.');
+        if(table == null || table.getFullyQualifiedName().isEmpty()){
+            buffer.append(".*\\.?");
+        }
 
         buffer.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, tableColumn.getColumnName()));
         buffer.append(OPTIONAL_WHITE_SPACE);
