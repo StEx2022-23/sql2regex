@@ -102,14 +102,14 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
             if(tempColumn.contains(".")){
                 temp.append(this.handleTableNameAlias(fromItem, tempColumn));
             } else {
-                temp.append(RegExGenerator.useTableNameSpellingMistake(this.columnNameSpellingMistake, tempColumn));
+                temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, tempColumn));
             }
             temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
         } else{
             if(orderByElement.getExpression().toString().contains(".")){
                 temp.append(this.handleTableNameAlias(fromItem, orderByElement.getExpression().toString()));
             } else {
-                temp.append(RegExGenerator.useTableNameSpellingMistake(this.columnNameSpellingMistake, orderByElement.getExpression().toString()));
+                temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, orderByElement.getExpression().toString()));
             }
         }
         temp.append(this.handleAscDesc(orderByElement));
@@ -134,7 +134,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         temp.append("|");
         temp.append(fromItem.getAlias().toString().replace(" ", ""));
         temp.append(")?\\.?");
-        temp.append(RegExGenerator.useTableNameSpellingMistake(this.columnNameSpellingMistake, columnName));
+        temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, columnName));
         return temp.toString();
     }
 }

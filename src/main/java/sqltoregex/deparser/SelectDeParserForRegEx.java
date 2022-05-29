@@ -434,8 +434,8 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
             List<String> selectedTableNamesAsStrings = new ArrayList<>();
             for (Table table : plainSelect.getIntoTables()) {
-                String temp = RegExGenerator.useTableNameSpellingMistake(this.tableNameSpellingMistake, table.getFullyQualifiedName());
-                temp = temp + (table.getAlias() != null ? REQUIRED_WHITE_SPACE + RegExGenerator.useTableNameSpellingMistake(this.tableNameSpellingMistake, table.getAlias().toString()) + DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE : "");
+                String temp = RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, table.getFullyQualifiedName());
+                temp = temp + (table.getAlias() != null ? REQUIRED_WHITE_SPACE + RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, table.getAlias().toString()) + DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE : "");
                 selectedTableNamesAsStrings.add(temp);
             }
             buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrder, selectedTableNamesAsStrings));

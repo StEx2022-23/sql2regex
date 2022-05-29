@@ -20,11 +20,6 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
         else return str;
     }
 
-    public static String useTableNameSpellingMistake(SpellingMistake spellingMistake, String str) {
-        if (null != spellingMistake) return spellingMistake.generateRegExFor(str);
-        else return str;
-    }
-
     public static <T> String useStringSynonymGenerator(SynonymGenerator<?, T> synonymGenerator, T str) {
         if (null != synonymGenerator) return synonymGenerator.generateRegExFor(str);
         else return str.toString();
