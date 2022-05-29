@@ -49,16 +49,6 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 SpellingMistake.class).orElse(null);
     }
 
-    private String generateRegExForQuotationMarks(){
-        StringBuilder str = new StringBuilder();
-        str.append("[");
-        for(String quotationMark : this.quotationMarkList){
-            str.append(quotationMark);
-        }
-        str.append("]");
-        return str.toString();
-    }
-
     @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.ExcessiveMethodLength", "PMD.NPathComplexity"})
     public void deParse(Insert insert) {
@@ -77,7 +67,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         }
 
         buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake,"INTO")).append(REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake,insert.getTable().toString())).append(REQUIRED_WHITE_SPACE);
+        buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, insert.getTable().toString())).append(REQUIRED_WHITE_SPACE);
 
         if (insert.getColumns() != null && !(insert.getItemsList(ExpressionList.class).getExpressions().get(0) instanceof RowConstructor)) {
             Map<String, String> mappedColumnsAndRelatedValues = new HashMap<>();
@@ -89,7 +79,12 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 buffer.append(OPTIONAL_WHITE_SPACE);
                 while (extractedColumnsIterator.hasNext()) {
                     buffer.append(this.generateRegExForQuotationMarks());
-                    buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, mappedColumnsAndRelatedValues.get(extractedColumnsIterator.next())).replaceAll(this.generateRegExForQuotationMarks(), ""));
+                    buffer.append(
+                            RegExGenerator.useSpellingMistake(
+                                    this.tableNameSpellingMistake,
+                                    mappedColumnsAndRelatedValues.get(extractedColumnsIterator.next())
+                            ).replaceAll(this.generateRegExForQuotationMarks(), "")
+                    );
                     buffer.append(this.generateRegExForQuotationMarks());
                     if (extractedColumnsIterator.hasNext()) {
                         buffer.append(OPTIONAL_WHITE_SPACE);
@@ -129,7 +124,11 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                     Iterator<String> stringIterator = tempValuesRelatedToActualCol.iterator();
                     while (stringIterator.hasNext()){
                         temp.append(this.generateRegExForQuotationMarks());
-                        temp.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, stringIterator.next().split(",")[i + 1]).replaceAll(this.generateRegExForQuotationMarks(), ""));
+                        temp.append(
+                                RegExGenerator.useSpellingMistake(
+                                        this.tableNameSpellingMistake,
+                                        stringIterator.next().split(",")[i + 1]
+                                ).replaceAll(this.generateRegExForQuotationMarks(), ""));
                         temp.append(this.generateRegExForQuotationMarks());
                         if(stringIterator.hasNext()) temp.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
                     }
@@ -141,10 +140,12 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 buffer.append(columnsOrderOptionsIterator.hasNext() ? "|" : "");
             }
             buffer.append(")");
-        } else if (insert.getColumns() == null && (insert.getItemsList(MultiExpressionList.class) != null && insert.getItemsList(ExpressionList.class) != null)) {
+        } else if (insert.getColumns() == null && (insert.getItemsList(MultiExpressionList.class) != null
+                && insert.getItemsList(ExpressionList.class) != null)) {
             insert.getItemsList(MultiExpressionList.class).accept(this);
             insert.getItemsList(ExpressionList.class).accept(this);
-        } else if (insert.getColumns() != null && (insert.getItemsList(MultiExpressionList.class) == null && insert.getItemsList(ExpressionList.class) == null)){
+        } else if (insert.getColumns() != null && (insert.getItemsList(MultiExpressionList.class) == null
+                && insert.getItemsList(ExpressionList.class) == null)){
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
             List<String> columnsAsStringList = new ArrayList<>();
@@ -158,51 +159,69 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         if (insert.getSelect() != null) {
             buffer.append(OPTIONAL_WHITE_SPACE);
             if (insert.getSelect().getWithItemsList() != null) {
-                buffer.append("WITH ");
+                buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "WITH"));
+                buffer.append(REQUIRED_WHITE_SPACE);
                 for (WithItem with : insert.getSelect().getWithItemsList()) {
                     with.accept(this.selectDeParserForRegEx);
                 }
-                buffer.append(" ");
+                buffer.append(REQUIRED_WHITE_SPACE);
             }
         }
 
         if (insert.isUseSet()) {
-            buffer.append(" SET ");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "SET"));
+            buffer.append(REQUIRED_WHITE_SPACE);
+
             for (int i = 0; i < insert.getSetColumns().size(); i++) {
                 Column column = insert.getSetColumns().get(i);
                 column.accept(this.expressionDeParserForRegEx);
 
-                buffer.append(" = ");
+                buffer.append(OPTIONAL_WHITE_SPACE + "=" + OPTIONAL_WHITE_SPACE);
 
                 Expression expression = insert.getSetExpressionList().get(i);
                 expression.accept(this.expressionDeParserForRegEx);
                 if (i < insert.getSetColumns().size() - 1) {
-                    buffer.append(", ");
+                    buffer.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
                 }
             }
         }
 
         if (insert.isUseDuplicate()) {
-            buffer.append(" ON DUPLICATE KEY UPDATE ");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ON"));
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "DUPLICATE"));
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "KEY"));
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "UPDATE"));
+            buffer.append(REQUIRED_WHITE_SPACE);
+
             for (int i = 0; i < insert.getDuplicateUpdateColumns().size(); i++) {
                 Column column = insert.getDuplicateUpdateColumns().get(i);
-                buffer.append(column.getFullyQualifiedName()).append(" = ");
+                buffer.append(column.getFullyQualifiedName()).append(OPTIONAL_WHITE_SPACE + "=" + OPTIONAL_WHITE_SPACE);
 
                 Expression expression = insert.getDuplicateUpdateExpressionList().get(i);
                 expression.accept(this.expressionDeParserForRegEx);
                 if (i < insert.getDuplicateUpdateColumns().size() - 1) {
-                    buffer.append(", ");
+                    buffer.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
                 }
             }
         }
 
         if (insert.getReturningExpressionList() != null) {
-            buffer.append(" RETURNING ");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "RETURNING"));
+            buffer.append(REQUIRED_WHITE_SPACE);
             for (Iterator<SelectItem> iter = insert.getReturningExpressionList().iterator(); iter
                     .hasNext();) {
-                buffer.append(iter.next().toString());
+                buffer.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, iter.next().toString()));
                 if (iter.hasNext()) {
-                    buffer.append(", ");
+                    buffer.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
                 }
             }
         }
@@ -215,7 +234,11 @@ public class InsertDeParserForRegEx extends InsertDeParser {
 
     @Override
     public void visit(ExpressionList expressionList) {
-        buffer.append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake,"VALUE")).append("S?").append(REQUIRED_WHITE_SPACE);
+        buffer.append(REQUIRED_WHITE_SPACE).append(
+                RegExGenerator.useSpellingMistake(
+                        this.keywordSpellingMistake,
+                        "VALUE")
+        ).append("S?").append(REQUIRED_WHITE_SPACE);
         List<String> expressionListAsString = new ArrayList<>();
         prepareExpressionListForOrderRotation(expressionList, expressionListAsString);
         buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
@@ -225,12 +248,20 @@ public class InsertDeParserForRegEx extends InsertDeParser {
 
     @Override
     public void visit(MultiExpressionList multiExprList) {
-        buffer.append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake,"VALUE")).append("S?").append(REQUIRED_WHITE_SPACE);
+        buffer.append(REQUIRED_WHITE_SPACE).append(
+                RegExGenerator.useSpellingMistake(
+                        this.keywordSpellingMistake,
+                        "VALUE")
+        ).append("S?").append(REQUIRED_WHITE_SPACE);
         List<String> multiExpressionListAsString  = new ArrayList<>();
         for (ExpressionList expressionList : multiExprList.getExpressionLists()) {
             List<String> expressionListAsString = new ArrayList<>();
             prepareExpressionListForOrderRotation(expressionList, expressionListAsString);
-            String singleValueListLine = OPTIONAL_WHITE_SPACE + "\\(" + RegExGenerator.useOrderRotation(this.tableNameOrder,expressionListAsString) + "\\)" + OPTIONAL_WHITE_SPACE;
+            String singleValueListLine = OPTIONAL_WHITE_SPACE
+                    + "\\("
+                    + RegExGenerator.useOrderRotation(this.tableNameOrder,expressionListAsString)
+                    + "\\)"
+                    + OPTIONAL_WHITE_SPACE;
             multiExpressionListAsString.add(singleValueListLine.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
         }
         buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrder, multiExpressionListAsString));
@@ -312,5 +343,15 @@ public class InsertDeParserForRegEx extends InsertDeParser {
             }
             expressionListAsString.add(expressionFixed.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
         }
+    }
+
+    private String generateRegExForQuotationMarks(){
+        StringBuilder str = new StringBuilder();
+        str.append("[");
+        for(String quotationMark : this.quotationMarkList){
+            str.append(quotationMark);
+        }
+        str.append("]");
+        return str.toString();
     }
 }

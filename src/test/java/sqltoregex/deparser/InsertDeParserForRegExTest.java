@@ -62,4 +62,12 @@ class InsertDeParserForRegExTest extends UserSettingsPreparer{
         );
         testUtils.validateListAgainstRegEx("INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')", toCheckedInput, false);
     }
+
+    @Test
+    void insertWithSet() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "INSERT INTO table SET name = 'Kim', isBFF = true"
+        );
+        testUtils.validateListAgainstRegEx("INSERT INTO table SET name = 'Kim', isBFF = true", toCheckedInput, false);
+    }
 }
