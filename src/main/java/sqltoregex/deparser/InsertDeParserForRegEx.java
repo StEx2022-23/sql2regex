@@ -28,6 +28,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     SelectDeParserForRegEx selectDeParserForRegEx;
     private final SpellingMistake keywordSpellingMistake;
     private final SpellingMistake tableNameSpellingMistake;
+    private final SpellingMistake columnNameSpellingMistake;
     private final OrderRotation tableNameOrder;
 
     public InsertDeParserForRegEx(SettingsManager settingsManager) {
@@ -39,6 +40,8 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         this.expressionDeParserForRegEx = expressionDeParserForRegEx;
         this.selectDeParserForRegEx = selectDeParserForRegEx;
         this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING,
+                SpellingMistake.class).orElse(null);
+        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING,
                 SpellingMistake.class).orElse(null);
         this.tableNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMEORDER,
                 OrderRotation.class).orElse(null);
@@ -275,8 +278,14 @@ public class InsertDeParserForRegEx extends InsertDeParser {
 
     private String[] generateColumnArray(Iterator<String> columnsOrderOptionsIterator){
         String singleColumnOrderOption = columnsOrderOptionsIterator.next();
+
         buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
-        buffer.append(singleColumnOrderOption.replace(",", OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE));
+        String[] splittedSingleColumnOrderOption = singleColumnOrderOption.replace(" ", "").split(",");
+        Iterator<String> stringIterator = Arrays.stream(splittedSingleColumnOrderOption).iterator();
+        while(stringIterator.hasNext()){
+            buffer.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, stringIterator.next()));
+            if(stringIterator.hasNext()) buffer.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
+        }
         buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
         buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake,"VALUE")).append("S?").append(OPTIONAL_WHITE_SPACE);
         return singleColumnOrderOption.replace(" ", "").split(",");
@@ -294,11 +303,11 @@ public class InsertDeParserForRegEx extends InsertDeParser {
             }
             if(hasQuotationMarks){
                 expressionFixed = this.generateRegExForQuotationMarks()
-                        + RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, expressionFixed.replaceAll(this.generateRegExForQuotationMarks(), ""))
+                        + RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, expressionFixed.replaceAll(this.generateRegExForQuotationMarks(), ""))
                         + this.generateRegExForQuotationMarks();
             } else {
                 expressionFixed = this.generateRegExForQuotationMarks()
-                        + RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake,expressionFixed)
+                        + RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake,expressionFixed)
                         + this.generateRegExForQuotationMarks();
             }
             expressionListAsString.add(expressionFixed.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
