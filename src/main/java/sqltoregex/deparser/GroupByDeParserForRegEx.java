@@ -14,8 +14,8 @@ import java.util.List;
 public class GroupByDeParserForRegEx extends GroupByDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
-    private SpellingMistake keywordSpellingMistake;
-    private GroupByElementRotation groupByElementOrder;
+    private final SpellingMistake keywordSpellingMistake;
+    private final GroupByElementRotation groupByElementOrder;
     private final ExpressionDeParserForRegEx expressionDeParserForRegEx;
 
     public GroupByDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, StringBuilder buffer,
@@ -45,12 +45,16 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
         if (this.groupByElementOrder != null) {
             this.groupByElementOrder.setCapturingGroup(true);
         }
+
         buffer.append(RegExGenerator.useExpressionRotation(this.groupByElementOrder, this.expressionDeParserForRegEx,
                                                            expressions));
-
         if (groupBy.isUsingBrackets()) {
             buffer.append(OPTIONAL_WHITE_SPACE);
             buffer.append(")");
         }
+    }
+
+    public GroupByElementRotation getGroupByElementOrder(){
+        return this.groupByElementOrder;
     }
 }

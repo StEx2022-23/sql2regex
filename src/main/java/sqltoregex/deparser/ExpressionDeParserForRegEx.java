@@ -17,8 +17,10 @@ import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Missing overrides: AnalyticExpression
@@ -34,6 +36,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     private final DateAndTimeFormatSynonymGenerator timeStampSynonyms;
     private final DateAndTimeFormatSynonymGenerator timeSynonyms;
     private final OrderByDeParserForRegEx orderByDeParser;
+    Map<String, String> tableNamesWithAlias;
 
     public ExpressionDeParserForRegEx(SettingsManager settingsManager) {
         this(new SelectDeParserForRegEx(settingsManager), new StringBuilder(), settingsManager);
@@ -60,6 +63,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         this.timeStampSynonyms = settingsManager.getSettingBySettingsOption(SettingsOption.DATETIMESYNONYMS,
                                                                             DateAndTimeFormatSynonymGenerator.class)
                 .orElse(null);
+        this.tableNamesWithAlias = new HashMap<>();
     }
 
     @Override
@@ -437,18 +441,18 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         buffer.append(OPTIONAL_WHITE_SPACE);
         final Table table = tableColumn.getTable();
         String tableName = "";
-        if (table != null && table.getFullyQualifiedName() != null) {
+        if (table != null && !table.getFullyQualifiedName().isEmpty()) {
             tableName += table.getFullyQualifiedName();
             if (table.getAlias() != null) {
                 tableName += table.getAlias().toString();
             }
+            tableName =
+                    "(?:"
+                    + RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, tableName)
+                    + "|"
+                    + RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, this.getRelatedTableNameOrAlias(tableName)) + ")";
         }
-        if(!tableName.isEmpty()) {
-            String finalTableName = tableName;
-            settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
-                    SpellingMistake.class).ifPresent(spelling -> buffer.append(spelling.generateRegExFor(finalTableName)));
-            buffer.append('.');
-        }
+        if(!tableName.isEmpty()) buffer.append(tableName).append('.');
 
         buffer.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, tableColumn.getColumnName()));
         buffer.append(OPTIONAL_WHITE_SPACE);
@@ -1024,5 +1028,22 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             buffer.append(OLD_ORACLE_JOIN + OPTIONAL_WHITE_SPACE);
         }
         buffer.append(OPTIONAL_WHITE_SPACE);
+    }
+
+    public void appendTableNameAliasPair(String tableName){
+        this.tableNamesWithAlias.put(tableName.split(" ")[0], tableName.split(" ")[1]);
+        this.tableNamesWithAlias.put(tableName.split(" ")[1], tableName.split(" ")[0]);
+    }
+
+    public Map<String, String> getAliasMap() {
+        return this.tableNamesWithAlias;
+    }
+
+    public void setAliasMap(Map<String, String> aliasMap) {
+        this.tableNamesWithAlias = aliasMap;
+    }
+
+    public String getRelatedTableNameOrAlias(String input){
+        return this.tableNamesWithAlias.getOrDefault(input, input);
     }
 }

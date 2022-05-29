@@ -19,6 +19,7 @@ public class GroupByElementRotation extends RegExGenerator<List<Expression>> {
     private final Map<Integer, List<Expression>> groupByOrderOptionsMap = new HashMap<>();
     private final SettingsOption settingsOption;
     private Integer groupByOrderOptionsCounter = 0;
+    Map<String, String> tableNamesWithAlias;
 
     public GroupByElementRotation(SettingsOption settingsOption) {
         this.settingsOption = settingsOption;
@@ -55,29 +56,30 @@ public class GroupByElementRotation extends RegExGenerator<List<Expression>> {
 
     @Override
     public String generateRegExFor(List<Expression> input) {
-        try{
-            generateGroupByOrderOptionsRek(input.size(), input);
-            StringBuilder buffer = new StringBuilder();
-            ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(new SelectVisitorAdapter(), buffer, new SettingsManager());
-            buffer.append(isCapturingGroup ? "(?:" : "(");
-            for(Map.Entry<Integer, List<Expression>> entry : groupByOrderOptionsMap.entrySet()){
-                Iterator<Expression> expressionIterator = groupByOrderOptionsMap.get(entry.getKey()).iterator();
-                while(expressionIterator.hasNext()){
-                    expressionIterator.next().accept(expressionDeParserForRegEx);
-                    if(expressionIterator.hasNext()){
-                        buffer.append(",");
-                    }
-                }
-                buffer.append("|");
-            }
-            buffer.deleteCharAt(buffer.length()-1);
-            buffer.append(")");
-            return buffer.toString();
-        } catch (XPathExpressionException | ParserConfigurationException | IOException | SAXException | URISyntaxException e) {
+        generateGroupByOrderOptionsRek(input.size(), input);
+        StringBuilder buffer = new StringBuilder();
+        ExpressionDeParserForRegEx expressionDeParserForRegEx = null;
+        try {
+            expressionDeParserForRegEx = new ExpressionDeParserForRegEx(new SelectVisitorAdapter(), buffer, new SettingsManager());
+            expressionDeParserForRegEx.setAliasMap(this.tableNamesWithAlias);
+        } catch (ParserConfigurationException | IOException | SAXException | XPathExpressionException | URISyntaxException e) {
             Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
             logger.log(Level.INFO, "Generate RegEx for Expressionlist go wrong: {0}", e.toString());
         }
-        return null;
+        buffer.append(isCapturingGroup ? "(?:" : "(");
+        for(Map.Entry<Integer, List<Expression>> entry : groupByOrderOptionsMap.entrySet()){
+            Iterator<Expression> expressionIterator = groupByOrderOptionsMap.get(entry.getKey()).iterator();
+            while(expressionIterator.hasNext()){
+                expressionIterator.next().accept(expressionDeParserForRegEx);
+                if(expressionIterator.hasNext()){
+                    buffer.append(",");
+                }
+            }
+            buffer.append("|");
+        }
+        buffer.deleteCharAt(buffer.length()-1);
+        buffer.append(")");
+        return buffer.toString();
     }
 
     /**
@@ -92,6 +94,10 @@ public class GroupByElementRotation extends RegExGenerator<List<Expression>> {
     @Override
     public SettingsOption getSettingsOption() {
         return settingsOption;
+    }
+
+    public void setAliasMap(Map<String, String> getAliasMap) {
+        this.tableNamesWithAlias = getAliasMap;
     }
 
     @Override

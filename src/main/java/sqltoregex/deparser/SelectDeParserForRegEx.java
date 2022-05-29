@@ -484,7 +484,12 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         if (plainSelect.getGroupBy() != null) {
             buffer.append(REQUIRED_WHITE_SPACE);
-            new GroupByDeParserForRegEx(this.expressionDeParserForRegEx, buffer, settingsManager).deParse(plainSelect.getGroupBy());
+            GroupByDeParserForRegEx groupByDeParserForRegEx = new GroupByDeParserForRegEx(this.expressionDeParserForRegEx, buffer, settingsManager);
+            if(plainSelect.getFromItem() != null){
+                this.expressionDeParserForRegEx.appendTableNameAliasPair(plainSelect.getFromItem().toString());
+                groupByDeParserForRegEx.getGroupByElementOrder().setAliasMap(this.expressionDeParserForRegEx.getAliasMap());
+            }
+            groupByDeParserForRegEx.deParse(plainSelect.getGroupBy());
         }
 
         if (plainSelect.getHaving() != null) {

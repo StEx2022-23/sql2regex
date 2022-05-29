@@ -61,4 +61,12 @@ class GroupByDeParserForRegExTest extends UserSettingsPreparer{
         );
         testUtils.validateListAgainstRegEx("SELECT col1 FROM table1 t1 GROUP BY t1.col1, t1.col2", toCheckedInput, true);
     }
+
+    @Test
+    void testAliasSupport() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 FROM table1 t1 GROUP BY t1.col1, table1.col2"
+        );
+        testUtils.validateListAgainstRegEx("SELECT col1 FROM table1 t1 GROUP BY t1.col1, t1.col2", toCheckedInput, true);
+    }
 }
