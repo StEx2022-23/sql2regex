@@ -1,6 +1,7 @@
 package sqltoregex.deparser;
 
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.RowConstructor;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.NamedExpressionList;
@@ -75,7 +76,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake,"INTO")).append(REQUIRED_WHITE_SPACE);
         buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake,insert.getTable().toString())).append(REQUIRED_WHITE_SPACE);
 
-        if (insert.getColumns() != null && insert.getItemsList(ExpressionList.class).getExpressions().size() == 1) {
+        if (insert.getColumns() != null && !(insert.getItemsList(ExpressionList.class).getExpressions().get(0) instanceof RowConstructor)) {
             Map<String, String> mappedColumnsAndRelatedValues = new HashMap<>();
             buffer.append("(?:");
             Iterator<String> columnsOrderOptionsIterator = Arrays.stream(this.generateListOfColumnsOrderOption(mappedColumnsAndRelatedValues, insert)).iterator();
@@ -98,7 +99,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 buffer.append(columnsOrderOptionsIterator.hasNext() ? "|" : "");
             }
             buffer.append(")");
-        } else if (insert.getColumns() != null && insert.getItemsList(ExpressionList.class).getExpressions().size() > 1) {
+        } else if (insert.getColumns() != null && insert.getItemsList(ExpressionList.class).getExpressions().get(0) instanceof RowConstructor) {
             Map<String, List<String>> mappedColumnsAndRelatedValues = new HashMap<>();
             buffer.append("(?:");
             Iterator<String> columnsOrderOptionsIterator = Arrays.stream(this.generateListOfColumnsOrderOptionForMultipleValues(mappedColumnsAndRelatedValues, insert)).iterator();

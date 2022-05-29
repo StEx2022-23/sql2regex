@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 import sqltoregex.settings.SettingsManager;
-import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.SettingsType;
 
 import javax.xml.parsers.ParserConfigurationException;
