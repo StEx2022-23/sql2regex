@@ -125,7 +125,9 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                     temp.append("\\(").append(OPTIONAL_WHITE_SPACE);
                     Iterator<String> stringIterator = tempValuesRelatedToActualCol.iterator();
                     while (stringIterator.hasNext()){
-                        temp.append(stringIterator.next().split(",")[i + 1]);
+                        temp.append(this.generateRegExForQuotationMarks());
+                        temp.append(stringIterator.next().split(",")[i + 1].replaceAll(this.generateRegExForQuotationMarks(), ""));
+                        temp.append(this.generateRegExForQuotationMarks());
                         if(stringIterator.hasNext()) temp.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
                     }
                     temp.append(OPTIONAL_WHITE_SPACE).append("\\)");
