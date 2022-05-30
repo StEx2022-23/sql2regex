@@ -1,6 +1,7 @@
 package sqltoregex.deparser;
 
 import net.sf.jsqlparser.statement.Statements;
+import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import sqltoregex.settings.SettingsManager;
@@ -9,11 +10,12 @@ import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 public class StatementDeParserForRegEx extends StatementDeParser {
-    public static final String WITH = "WITH";
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
+    private final SettingsManager settingsManager;
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
     IRegExGenerator<String> keywordSpellingMistake;
+
 
     public StatementDeParserForRegEx(StringBuilder buffer, SettingsManager settingsManager) {
         this(new ExpressionDeParserForRegEx(settingsManager), buffer, settingsManager);
@@ -30,6 +32,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         super(expressionDeParser, selectDeParser, buffer);
         this.expressionDeParserForRegEx = expressionDeParser;
         this.selectDeParserForRegEx = selectDeParser;
+        this.settingsManager = settingsManager;
         this.setKeywordSpellingMistake(settingsManager);
     }
 
@@ -50,11 +53,21 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         this.expressionDeParserForRegEx.setBuffer(buffer);
         this.selectDeParserForRegEx.setExpressionVisitor(expressionDeParserForRegEx);
         if (select.getWithItemsList() != null && !select.getWithItemsList().isEmpty()) {
-            buffer.append(useKeywordSpellingMistake(WITH));
+            buffer.append(useKeywordSpellingMistake("WITH"));
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append(this.selectDeParserForRegEx.handleWithItemValueList(select));
         }
         select.getSelectBody().accept(selectDeParserForRegEx);
+    }
+
+    @Override
+    public void visit(Insert insert) {
+        this.selectDeParserForRegEx.setBuffer(buffer);
+        this.expressionDeParserForRegEx.setSelectVisitor(this.selectDeParserForRegEx);
+        this.expressionDeParserForRegEx.setBuffer(buffer);
+        this.selectDeParserForRegEx.setExpressionVisitor(this.expressionDeParserForRegEx);
+        InsertDeParserForRegEx insertDeParserForRegEx = new InsertDeParserForRegEx(this.expressionDeParserForRegEx, this.selectDeParserForRegEx, buffer, this.settingsManager);
+        insertDeParserForRegEx.deParse(insert);
     }
 
     @Override
