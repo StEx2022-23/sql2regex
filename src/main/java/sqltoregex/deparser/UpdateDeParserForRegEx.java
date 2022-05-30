@@ -28,6 +28,10 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         super.deParse(update);
     }
 
+    public ExpressionDeParserForRegEx getExpressionDeParserForRegEx() {
+        return this.expressionDeParserForRegEx;
+    }
+
     @Override
     public ExpressionVisitor getExpressionVisitor() {
         return super.getExpressionVisitor();
@@ -36,6 +40,10 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     @Override
     public void setExpressionVisitor(ExpressionVisitor visitor) {
         super.setExpressionVisitor(visitor);
+    }
+
+    public void setExpressionDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx) {
+        this.expressionDeParserForRegEx = expressionDeParserForRegEx;
     }
 
     @Override
