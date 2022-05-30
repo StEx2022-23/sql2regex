@@ -81,7 +81,7 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.jsqlparser</groupId>
+			<groupId>com.herokuapp.sql2regex</groupId>
 			<artifactId>jsqlparser</artifactId>
 			<version>4.5</version>
 		</dependency>
