@@ -39,38 +39,41 @@ public class StatementDeParserForRegEx extends StatementDeParser {
 
     @Override
     public void visit(Select select) {
-        this.selectDeParserForRegEx.setBuffer(buffer);
+        this.selectDeParserForRegEx.setBuffer(this.buffer);
         this.expressionDeParserForRegEx.setSelectVisitor(this.selectDeParserForRegEx);
-        this.expressionDeParserForRegEx.setBuffer(buffer);
+        this.expressionDeParserForRegEx.setBuffer(this.buffer);
         this.selectDeParserForRegEx.setExpressionVisitor(expressionDeParserForRegEx);
         if (select.getWithItemsList() != null && !select.getWithItemsList().isEmpty()) {
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "WITH"));
-            buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(this.selectDeParserForRegEx.handleWithItemValueList(select));
+            this.buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "WITH"));
+            this.buffer.append(REQUIRED_WHITE_SPACE);
+            this.buffer.append(this.selectDeParserForRegEx.handleWithItemValueList(select));
         }
         select.getSelectBody().accept(selectDeParserForRegEx);
     }
 
     @Override
     public void visit(Insert insert) {
-        this.selectDeParserForRegEx.setBuffer(buffer);
+        this.selectDeParserForRegEx.setBuffer(this.buffer);
         this.expressionDeParserForRegEx.setSelectVisitor(this.selectDeParserForRegEx);
-        this.expressionDeParserForRegEx.setBuffer(buffer);
+        this.expressionDeParserForRegEx.setBuffer(this.buffer);
         this.selectDeParserForRegEx.setExpressionVisitor(this.expressionDeParserForRegEx);
         InsertDeParserForRegEx insertDeParserForRegEx = new InsertDeParserForRegEx(
                 this.expressionDeParserForRegEx,
                 this.selectDeParserForRegEx,
-                buffer,
+                this.buffer,
                 this.settingsManager);
         insertDeParserForRegEx.deParse(insert);
     }
 
     @Override
     public void visit(Update update) {
-        this.selectDeParserForRegEx.setBuffer(buffer);
+        this.selectDeParserForRegEx.setBuffer(this.buffer);
         this.expressionDeParserForRegEx.setSelectVisitor(this.selectDeParserForRegEx);
-        this.expressionDeParserForRegEx.setBuffer(buffer);
-        UpdateDeParserForRegEx updateDeParser = new UpdateDeParserForRegEx(this.expressionDeParserForRegEx, buffer);
+        this.expressionDeParserForRegEx.setBuffer(this.buffer);
+        UpdateDeParserForRegEx updateDeParser = new UpdateDeParserForRegEx(
+                this.expressionDeParserForRegEx,
+                this.buffer,
+                this.settingsManager);
         this.selectDeParserForRegEx.setExpressionVisitor(this.expressionDeParserForRegEx);
         updateDeParser.deParse(update);
     }

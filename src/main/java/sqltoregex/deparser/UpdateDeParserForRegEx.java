@@ -4,14 +4,23 @@ import net.sf.jsqlparser.expression.ExpressionVisitor;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.util.deparser.UpdateDeParser;
+import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 public class UpdateDeParserForRegEx extends UpdateDeParser {
-    public UpdateDeParserForRegEx() {
-        super();
+    private final SpellingMistake keywordSpellingMistake;
+    ExpressionDeParserForRegEx expressionDeParserForRegEx;
+
+    public UpdateDeParserForRegEx(SettingsManager settingsManager, StringBuilder buffer) {
+        this(new ExpressionDeParserForRegEx(settingsManager), buffer, settingsManager);
     }
 
-    public UpdateDeParserForRegEx(ExpressionVisitor expressionVisitor, StringBuilder buffer) {
-        super(expressionVisitor, buffer);
+    public UpdateDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx, StringBuilder buffer, SettingsManager settingsManager) {
+        super(expressionDeParserForRegEx, buffer);
+        this.expressionDeParserForRegEx = expressionDeParserForRegEx;
+        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING,
+                SpellingMistake.class).orElse(null);
     }
 
     @Override
