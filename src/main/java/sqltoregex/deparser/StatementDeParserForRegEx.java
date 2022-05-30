@@ -3,6 +3,7 @@ package sqltoregex.deparser;
 import net.sf.jsqlparser.statement.Statements;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
@@ -68,6 +69,16 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         this.selectDeParserForRegEx.setExpressionVisitor(this.expressionDeParserForRegEx);
         InsertDeParserForRegEx insertDeParserForRegEx = new InsertDeParserForRegEx(this.expressionDeParserForRegEx, this.selectDeParserForRegEx, buffer, this.settingsManager);
         insertDeParserForRegEx.deParse(insert);
+    }
+
+    @Override
+    public void visit(Update update) {
+        this.selectDeParserForRegEx.setBuffer(buffer);
+        this.expressionDeParserForRegEx.setSelectVisitor(this.selectDeParserForRegEx);
+        this.expressionDeParserForRegEx.setBuffer(buffer);
+        UpdateDeParserForRegEx updateDeParser = new UpdateDeParserForRegEx(this.expressionDeParserForRegEx, buffer);
+        this.selectDeParserForRegEx.setExpressionVisitor(this.expressionDeParserForRegEx);
+        updateDeParser.deParse(update);
     }
 
     @Override
