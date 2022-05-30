@@ -1,5 +1,7 @@
 package sqltoregex.deparser;
 
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.SelectItem;
@@ -13,9 +15,11 @@ import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class UpdateDeParserForRegEx extends UpdateDeParser {
+    private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SpellingMistake keywordSpellingMistake;
@@ -68,42 +72,30 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
 
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "SET", true);
 
-        int j=0;
-        for (UpdateSet updateSet : update.getUpdateSets()) {
-            if (j > 0) {
-                buffer.append(", ");
+        List<String> insertedSet = new ArrayList<>();
+        for(UpdateSet updateSet : update.getUpdateSets()){
+            StringBuilder singleSet = new StringBuilder();
+            singleSet.append(OPTIONAL_WHITE_SPACE + "\\(?" + OPTIONAL_WHITE_SPACE);
+            Iterator<Column> columnIterator = updateSet.getColumns().iterator();
+            while(columnIterator.hasNext()){
+                singleSet.append(columnIterator.next().toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+                if(columnIterator.hasNext()) singleSet.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
             }
+            singleSet.append(OPTIONAL_WHITE_SPACE + "\\)?" + OPTIONAL_WHITE_SPACE);
 
-            if (updateSet.isUsingBracketsForColumns()) {
-                buffer.append("(");
-            }
-            for (int i = 0; i < updateSet.getColumns().size(); i++) {
-                if (i > 0) {
-                    buffer.append(", ");
-                }
-                updateSet.getColumns().get(i).accept(this.getExpressionDeParserForRegEx());
-            }
-            if (updateSet.isUsingBracketsForColumns()) {
-                buffer.append(")");
-            }
+            singleSet.append(OPTIONAL_WHITE_SPACE + "=" + OPTIONAL_WHITE_SPACE);
 
-            buffer.append(" = ");
+            singleSet.append(OPTIONAL_WHITE_SPACE + "\\(?" + OPTIONAL_WHITE_SPACE);
+            Iterator<Expression> expressionIterator = updateSet.getExpressions().iterator();
+            while(expressionIterator.hasNext()){
+                singleSet.append(expressionIterator.next().toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+                if(expressionIterator.hasNext()) singleSet.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
+            }
+            singleSet.append(OPTIONAL_WHITE_SPACE + "\\)?" + OPTIONAL_WHITE_SPACE);
 
-            if (updateSet.isUsingBracketsForValues()) {
-                buffer.append("(");
-            }
-            for (int i = 0; i < updateSet.getExpressions().size(); i++) {
-                if (i > 0) {
-                    buffer.append(", ");
-                }
-                updateSet.getExpressions().get(i).accept(this.getExpressionDeParserForRegEx());
-            }
-            if (updateSet.isUsingBracketsForValues()) {
-                buffer.append(")");
-            }
-
-            j++;
+            insertedSet.add(singleSet.toString());
         }
+        buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrderRotation, insertedSet));
 
         if (update.getOutputClause() != null) {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "OUTPUT", true);

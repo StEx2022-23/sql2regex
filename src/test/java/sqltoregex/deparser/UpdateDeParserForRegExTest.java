@@ -21,9 +21,11 @@ class UpdateDeParserForRegExTest extends UserSettingsPreparer{
     @Test
     void simpleUpdateStatement() throws JSQLParserException {
         List<String> toCheckedInput = List.of(
-                "UPDATE table1 SET col1 = 1 ORDER BY col1"
+                "UPDATE table1 SET col1 = 1, col1 = 11, col2 = 2, col2 = 22 ORDER BY col1",
+                "UPDATE table1 SET col1 = 11, col1 = 1, col2 = 2, col2 = 22 ORDER BY col1",
+                "UPDATE table1 SET col2 = 2, col2 = 22, col1 = 1, col1 = 11 ORDER BY col1"
         );
-        testUtils.validateListAgainstRegEx("UPDATE table1 SET col1 = 1 ORDER BY col1", toCheckedInput, true);
+        testUtils.validateListAgainstRegEx("UPDATE table1 SET col1 = 1, col1 = 11, col2 = 2, col2 = 22 ORDER BY col1", toCheckedInput, true);
     }
 
     @Test
