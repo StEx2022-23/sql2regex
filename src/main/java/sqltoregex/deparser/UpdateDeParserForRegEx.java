@@ -43,20 +43,17 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity", "PMD.ExcessiveMethodLength"})
     public void deParse(Update update) {
         if (update.getWithItemsList() != null && !update.getWithItemsList().isEmpty()) {
-            this.buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "WITH"));
-            this.buffer.append(REQUIRED_WHITE_SPACE);
+            this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "WITH", true);
             this.buffer.append(this.selectDeParserForRegEx.handleWithItemValueList(update));
         }
 
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "UPDATE"));
-        buffer.append(REQUIRED_WHITE_SPACE);
+        this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "UPDATE", true);
 
         if (update.getModifierPriority() != null) {
             buffer.append(update.getModifierPriority()).append(" ");
         }
         if (update.isModifierIgnore()) {
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "IGNORE"));
-            buffer.append(REQUIRED_WHITE_SPACE);
+            this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "IGNORE", true);
         }
         buffer.append(update.getTable());
         if (update.getStartJoins() != null) {
@@ -69,9 +66,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             }
         }
 
-        buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "SET"));
-        buffer.append(REQUIRED_WHITE_SPACE);
+        this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "SET", true);
 
         int j=0;
         for (UpdateSet updateSet : update.getUpdateSets()) {
@@ -111,9 +106,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         }
 
         if (update.getOutputClause() != null) {
-            buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "OUTPUT"));
-            buffer.append(REQUIRED_WHITE_SPACE);
+            this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "OUTPUT", true);
             List<String> outputClauses = new ArrayList<>();
             for(SelectItem selectItem : update.getOutputClause().getSelectItemList()){
                 outputClauses.add(selectItem.toString());
@@ -122,9 +115,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         }
 
         if (update.getFromItem() != null) {
-            buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FROM"));
-            buffer.append(REQUIRED_WHITE_SPACE);
+            this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "FROM", true);
             buffer.append(update.getFromItem());
             if (update.getJoins() != null) {
                 for (Join join : update.getJoins()) {
@@ -138,9 +129,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         }
 
         if (update.getWhere() != null) {
-            buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "WHERE"));
-            buffer.append(REQUIRED_WHITE_SPACE);
+            this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "WHERE", true);
             update.getWhere().accept(this.getExpressionDeParserForRegEx());
         }
         if (update.getOrderByElements() != null) {
@@ -151,10 +140,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         }
 
         if (update.getReturningExpressionList() != null) {
-            buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "RETURNING"));
-            buffer.append(REQUIRED_WHITE_SPACE);
-
+            this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "RETURNING", true);
             List<String> returningExpressionList = new ArrayList<>();
             for(SelectItem selectItem : update.getReturningExpressionList()){
                 returningExpressionList.add(selectItem.toString());
@@ -174,5 +160,11 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     @Override
     public void visit(OrderByElement orderBy) {
         throw new UnsupportedOperationException();
+    }
+
+    private void setKeywordSpellingMistakeWithRequiredWhitespaces(boolean whiteSpaceBefore, String keyword, boolean whiteSpaceAfter){
+        buffer.append(whiteSpaceBefore ? REQUIRED_WHITE_SPACE : "");
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, keyword));
+        buffer.append(whiteSpaceAfter ? REQUIRED_WHITE_SPACE : "");
     }
 }
