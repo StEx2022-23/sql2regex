@@ -31,6 +31,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SpellingMistake columnNameSpellingMistake;
+    private final SpellingMistake tableNameSpellingMistake;
     private final DateAndTimeFormatSynonymGenerator dateSynonyms;
     private final SettingsManager settingsManager;
     private final DateAndTimeFormatSynonymGenerator timeStampSynonyms;
@@ -54,6 +55,8 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         this.settingsManager = settingsManager;
         this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING,
                                                                                     SpellingMistake.class).orElse(null);
+        this.tableNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
+                SpellingMistake.class).orElse(null);
         this.dateSynonyms = settingsManager.getSettingBySettingsOption(SettingsOption.DATESYNONYMS,
                                                                        DateAndTimeFormatSynonymGenerator.class)
                 .orElse(null);
@@ -448,7 +451,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             }
             tableName =
                     "(?:"
-                    + RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, tableName)
+                    + RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, tableName)
                     + "|"
                     + RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, this.getRelatedTableNameOrAlias(tableName))
                     + "|.*)";

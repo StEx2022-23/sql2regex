@@ -4,10 +4,7 @@ import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import org.junit.jupiter.api.Assertions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
-import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsType;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,11 +15,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Component
 public class TestUtils extends UserSettingsPreparer{
     StatementDeParserForRegEx statementDeParserForRegEx;
 
-    @Autowired
     public TestUtils() throws XPathExpressionException, ParserConfigurationException, IOException, URISyntaxException, SAXException {
         super(SettingsType.ALL);
         StringBuilder buffer = new StringBuilder();
