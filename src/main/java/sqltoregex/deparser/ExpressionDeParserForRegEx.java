@@ -453,7 +453,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                     "(?:"
                     + RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, tableName)
                     + "|"
-                    + RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, this.getRelatedTableNameOrAlias(tableName))
+                    + RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, this.getRelatedTableNameOrAlias(tableName))
                     + "|.*)";
             buffer.append(tableName).append('.');
         }
