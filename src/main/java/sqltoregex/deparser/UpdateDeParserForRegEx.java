@@ -134,7 +134,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             new OrderByDeParserForRegEx(this.getExpressionDeParserForRegEx(), buffer, this.settingsManager).deParse(update.getOrderByElements(), update.getFromItem());
         }
         if (update.getLimit() != null) {
-            new LimitDeparser(buffer).deParse(update.getLimit());
+            new LimitDeParserForRegEx(buffer, this.settingsManager).deParse(update.getLimit());
         }
 
         if (update.getReturningExpressionList() != null) {
