@@ -19,6 +19,7 @@ import java.util.Iterator;
 public class UpdateDeParserForRegEx extends UpdateDeParser {
     private final SpellingMistake keywordSpellingMistake;
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
+    SettingsManager settingsManager;
 
     public UpdateDeParserForRegEx(SettingsManager settingsManager, StringBuilder buffer) {
         this(new ExpressionDeParserForRegEx(settingsManager), buffer, settingsManager);
@@ -26,6 +27,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
 
     public UpdateDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx, StringBuilder buffer, SettingsManager settingsManager) {
         super(expressionDeParserForRegEx, buffer);
+        this.settingsManager = settingsManager;
         this.expressionDeParserForRegEx = expressionDeParserForRegEx;
         this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING,
                 SpellingMistake.class).orElse(null);
@@ -123,7 +125,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             update.getWhere().accept(this.getExpressionDeParserForRegEx());
         }
         if (update.getOrderByElements() != null) {
-            new OrderByDeParser(this.getExpressionDeParserForRegEx(), buffer).deParse(update.getOrderByElements());
+            new OrderByDeParserForRegEx(this.getExpressionDeParserForRegEx(), buffer, this.settingsManager).deParse(update.getOrderByElements(), update.getFromItem());
         }
         if (update.getLimit() != null) {
             new LimitDeparser(buffer).deParse(update.getLimit());
@@ -155,6 +157,6 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
 
     @Override
     public void visit(OrderByElement orderBy) {
-        super.visit(orderBy);
+        throw new UnsupportedOperationException();
     }
 }
