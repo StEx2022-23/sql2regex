@@ -11,10 +11,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-public class UpdateDeParserForRegExTest extends UserSettingsPreparer{
+class UpdateDeParserForRegExTest extends UserSettingsPreparer{
     TestUtils testUtils = new TestUtils();
 
-    public UpdateDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
+    UpdateDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
         super(SettingsType.ALL);
     }
 
