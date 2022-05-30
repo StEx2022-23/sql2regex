@@ -14,7 +14,7 @@ import sqltoregex.settings.SettingsForm;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.SettingsType;
-import sqltoregex.settings.regexgenerator.ExpressionRotation;
+import sqltoregex.settings.regexgenerator.GroupByElementRotation;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
@@ -50,13 +50,13 @@ public class SqlToRegexController {
         model.addAttribute("spellings", this.getSpellings(SettingsType.ALL));
         model.addAttribute("orders", this.getOrders(SettingsType.ALL));
         model.addAttribute("dateFormats",
-                           getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class, SettingsOption.DATESYNONYMS,
-                                                SettingsType.ALL));
+                getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class, SettingsOption.DATESYNONYMS,
+                        SettingsType.ALL));
         model.addAttribute("timeFormats",
-                           getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class, SettingsOption.TIMESYNONYMS,
-                                                SettingsType.ALL));
+                getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class, SettingsOption.TIMESYNONYMS,
+                        SettingsType.ALL));
         model.addAttribute("dateTimeFormats", getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class,
-                                                                   SettingsOption.DATETIMESYNONYMS, SettingsType.ALL));
+                SettingsOption.DATETIMESYNONYMS, SettingsType.ALL));
         //special preprocessing to render comfortably on frontend
         Map<String, Set<String>> aggregateFunctionSynonymsMap = settingsManager.getSettingBySettingsOption(
                         SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class, SettingsType.ALL)
@@ -72,13 +72,13 @@ public class SqlToRegexController {
                 this.getSpellings(SettingsType.DEFAULT_SCHOOL),
                 this.getOrders(SettingsType.DEFAULT_SCHOOL),
                 getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class, SettingsOption.DATESYNONYMS,
-                                     SettingsType.DEFAULT_SCHOOL),
+                        SettingsType.DEFAULT_SCHOOL),
                 getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class, SettingsOption.TIMESYNONYMS,
-                                     SettingsType.DEFAULT_SCHOOL),
+                        SettingsType.DEFAULT_SCHOOL),
                 getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class, SettingsOption.DATETIMESYNONYMS,
-                                     SettingsType.DEFAULT_SCHOOL),
+                        SettingsType.DEFAULT_SCHOOL),
                 getSynonymGenerators(StringSynonymGenerator.class, SettingsOption.AGGREGATEFUNCTIONLANG,
-                                     SettingsType.DEFAULT_SCHOOL),
+                        SettingsType.DEFAULT_SCHOOL),
                 ""
         );
     }
@@ -95,15 +95,15 @@ public class SqlToRegexController {
         this.settingsManager.parseUserSettingsInput(settingsForm);
 
         model.addAttribute("settingsForm",
-                           new SettingsForm(
-                                   settingsForm.getSpellings(),
-                                   settingsForm.getOrders(),
-                                   settingsForm.getDateFormats(),
-                                   settingsForm.getTimeFormats(),
-                                   settingsForm.getDateTimeFormats(),
-                                   settingsForm.getAggregateFunctionLang(),
-                                   settingsForm.getSql()
-                           )
+                new SettingsForm(
+                        settingsForm.getSpellings(),
+                        settingsForm.getOrders(),
+                        settingsForm.getDateFormats(),
+                        settingsForm.getTimeFormats(),
+                        settingsForm.getDateTimeFormats(),
+                        settingsForm.getAggregateFunctionLang(),
+                        settingsForm.getSql()
+                )
         );
 
         model.addAttribute("regex", converterManagement.deparse(settingsForm.getSql()));
@@ -124,8 +124,8 @@ public class SqlToRegexController {
                 .ifPresent(tableNameOrder -> orders.add(tableNameOrder.getSettingsOption()));
         settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class, settingsType)
                 .ifPresent(columnNameOrder -> orders.add(columnNameOrder.getSettingsOption()));
-        settingsManager.getSettingBySettingsOption(SettingsOption.EXPRESSIONORDER, ExpressionRotation.class,
-                                                   settingsType)
+        settingsManager.getSettingBySettingsOption(SettingsOption.GROUPBYELEMENTORDER, GroupByElementRotation.class,
+                        settingsType)
                 .ifPresent(expressionOrder -> orders.add(expressionOrder.getSettingsOption()));
         return orders;
     }
@@ -135,10 +135,10 @@ public class SqlToRegexController {
         settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class, settingsType)
                 .ifPresent(keywordSpelling -> spellings.add(keywordSpelling.getSettingsOption()));
         settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class,
-                                                   settingsType)
+                        settingsType)
                 .ifPresent(columnNameSpelling -> spellings.add(columnNameSpelling.getSettingsOption()));
         settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING, SpellingMistake.class,
-                                                   settingsType)
+                        settingsType)
                 .ifPresent(tableNameSpelling -> spellings.add(tableNameSpelling.getSettingsOption()));
         return spellings;
     }
@@ -177,4 +177,3 @@ public class SqlToRegexController {
         return "visualization";
     }
 }
-

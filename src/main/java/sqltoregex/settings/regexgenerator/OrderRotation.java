@@ -46,12 +46,12 @@ public class OrderRotation extends RegExGenerator<List<String>> {
      */
     public String generateRegExFor(List<String> valueList) {
         Assert.notNull(valueList, "Value list must not be null!");
-        buffer.replace(0, buffer.length(), "");
-        buffer.append(isCapturingGroup ? '(' : "(?:");
+        buffer.replace(0, buffer.length(),"");
+        buffer.append(isCapturingGroup ? "(" : "(?:");
         Integer amountOfElements = valueList.size();
         orderRotationRek(amountOfElements, valueList);
         buffer.replace(buffer.length() - 1, buffer.length(), "");
-        buffer.append(')');
+        buffer.append(")");
         return buffer.toString();
     }
 

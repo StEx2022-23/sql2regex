@@ -36,8 +36,9 @@ public class SpellingMistake extends RegExGenerator<String> {
         }
         StringBuilder alternativeWritingStyles = new StringBuilder();
         alternativeWritingStyles.append(isCapturingGroup ? '(' : "(?:");
-        alternativeWritingStyles.append(str).append("|");
-        for (int i = 0; i < str.length(); i++) {
+        alternativeWritingStyles.append(str);
+        if(str.length() > 1) alternativeWritingStyles.append("|");
+        for(int i = 0; i<str.length(); i++){
             String first = str.substring(0, i);
             String second = str.substring(i + 1);
             String concat = first.concat(second);

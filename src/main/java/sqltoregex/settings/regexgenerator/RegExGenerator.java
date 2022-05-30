@@ -41,7 +41,7 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
         return String.join(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE, stringList);
     }
 
-    public static String useExpressionRotation(ExpressionRotation expressionRotation,
+    public static String useExpressionRotation(GroupByElementRotation expressionRotation,
                                                ExpressionDeParserForRegEx expressionDeParserForRegEx,
                                                List<Expression> expressionList) {
         if (null != expressionRotation) return expressionRotation.generateRegExFor(expressionList);
