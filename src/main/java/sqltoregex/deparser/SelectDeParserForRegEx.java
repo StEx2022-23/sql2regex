@@ -9,6 +9,7 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.*;
+import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.statement.values.ValuesStatement;
 import net.sf.jsqlparser.util.deparser.SelectDeParser;
 import net.sf.jsqlparser.util.deparser.ValuesStatementDeParser;
@@ -284,6 +285,11 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public String handleWithItemValueList(SubSelect select) {
         return RegExGenerator.useOrderRotation(this.tableNameOrder,
                                                helperFunctionForHandleWithItemValueList(select.getWithItemsList()));
+    }
+
+    public String handleWithItemValueList(Update update) {
+        return RegExGenerator.useOrderRotation(this.tableNameOrder,
+                helperFunctionForHandleWithItemValueList(update.getWithItemsList()));
     }
 
     private List<String> helperFunctionForHandleWithItemValueList(List<WithItem> listOfWithItems) {

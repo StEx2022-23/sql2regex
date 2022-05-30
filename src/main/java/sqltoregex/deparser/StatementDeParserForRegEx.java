@@ -72,6 +72,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         this.expressionDeParserForRegEx.setBuffer(this.buffer);
         UpdateDeParserForRegEx updateDeParser = new UpdateDeParserForRegEx(
                 this.expressionDeParserForRegEx,
+                this.selectDeParserForRegEx,
                 this.buffer,
                 this.settingsManager);
         this.selectDeParserForRegEx.setExpressionVisitor(this.expressionDeParserForRegEx);

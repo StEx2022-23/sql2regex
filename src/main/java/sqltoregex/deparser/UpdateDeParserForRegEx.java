@@ -1,33 +1,34 @@
 package sqltoregex.deparser;
 
-import net.sf.jsqlparser.expression.ExpressionVisitor;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.statement.update.UpdateSet;
 import net.sf.jsqlparser.util.deparser.LimitDeparser;
 import net.sf.jsqlparser.util.deparser.UpdateDeParser;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
-import java.util.Iterator;
-
 public class UpdateDeParserForRegEx extends UpdateDeParser {
+    private static final String REQUIRED_WHITE_SPACE = "\\s+";
+    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SpellingMistake keywordSpellingMistake;
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
+    SelectDeParserForRegEx selectDeParserForRegEx;
     SettingsManager settingsManager;
 
     public UpdateDeParserForRegEx(SettingsManager settingsManager, StringBuilder buffer) {
-        this(new ExpressionDeParserForRegEx(settingsManager), buffer, settingsManager);
+        this(new ExpressionDeParserForRegEx(settingsManager), new SelectDeParserForRegEx(settingsManager), buffer, settingsManager);
     }
 
-    public UpdateDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx, StringBuilder buffer, SettingsManager settingsManager) {
+    public UpdateDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx, SelectDeParserForRegEx selectDeParserForRegEx, StringBuilder buffer, SettingsManager settingsManager) {
         super(expressionDeParserForRegEx, buffer);
         this.settingsManager = settingsManager;
         this.expressionDeParserForRegEx = expressionDeParserForRegEx;
+        this.selectDeParserForRegEx = selectDeParserForRegEx;
         this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING,
                 SpellingMistake.class).orElse(null);
     }
@@ -36,22 +37,20 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity", "PMD.ExcessiveMethodLength"})
     public void deParse(Update update) {
         if (update.getWithItemsList() != null && !update.getWithItemsList().isEmpty()) {
-            buffer.append("WITH ");
-            for (Iterator<WithItem> iter = update.getWithItemsList().iterator(); iter.hasNext();) {
-                WithItem withItem = iter.next();
-                buffer.append(withItem);
-                if (iter.hasNext()) {
-                    buffer.append(",");
-                }
-                buffer.append(" ");
-            }
+            this.buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "WITH"));
+            this.buffer.append(REQUIRED_WHITE_SPACE);
+            this.buffer.append(this.selectDeParserForRegEx.handleWithItemValueList(update));
         }
-        buffer.append("UPDATE ");
+
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "UPDATE"));
+        buffer.append(REQUIRED_WHITE_SPACE);
+
         if (update.getModifierPriority() != null) {
             buffer.append(update.getModifierPriority()).append(" ");
         }
         if (update.isModifierIgnore()) {
-            buffer.append("IGNORE ");
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "IGNORE"));
+            buffer.append(REQUIRED_WHITE_SPACE);
         }
         buffer.append(update.getTable());
         if (update.getStartJoins() != null) {
@@ -63,7 +62,10 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
                 }
             }
         }
-        buffer.append(" SET ");
+
+        buffer.append(REQUIRED_WHITE_SPACE);
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "SET"));
+        buffer.append(REQUIRED_WHITE_SPACE);
 
         int j=0;
         for (UpdateSet updateSet : update.getUpdateSets()) {
@@ -107,7 +109,10 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         }
 
         if (update.getFromItem() != null) {
-            buffer.append(" FROM ").append(update.getFromItem());
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FROM"));
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(update.getFromItem());
             if (update.getJoins() != null) {
                 for (Join join : update.getJoins()) {
                     if (join.isSimple()) {
@@ -120,7 +125,9 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         }
 
         if (update.getWhere() != null) {
-            buffer.append(" WHERE ");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "WHERE"));
+            buffer.append(REQUIRED_WHITE_SPACE);
             update.getWhere().accept(this.getExpressionDeParserForRegEx());
         }
         if (update.getOrderByElements() != null) {
@@ -131,8 +138,10 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         }
 
         if (update.getReturningExpressionList() != null) {
-            buffer.append(" RETURNING ").append(PlainSelect.
-                    getStringList(update.getReturningExpressionList(), true, false));
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "RETURNING"));
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(PlainSelect.getStringList(update.getReturningExpressionList(), true, false));
         }
     }
 
