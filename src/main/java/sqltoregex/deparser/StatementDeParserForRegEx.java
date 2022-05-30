@@ -7,16 +7,15 @@ import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
-import sqltoregex.settings.regexgenerator.IRegExGenerator;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 public class StatementDeParserForRegEx extends StatementDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
-    private final SettingsManager settingsManager;
+    private final SpellingMistake keywordSpellingMistake;
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
-    IRegExGenerator<String> keywordSpellingMistake;
-
+    SettingsManager settingsManager;
 
     public StatementDeParserForRegEx(StringBuilder buffer, SettingsManager settingsManager) {
         this(new ExpressionDeParserForRegEx(settingsManager), buffer, settingsManager);
@@ -33,18 +32,9 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         super(expressionDeParser, selectDeParser, buffer);
         this.expressionDeParserForRegEx = expressionDeParser;
         this.selectDeParserForRegEx = selectDeParser;
-        this.settingsManager = settingsManager;
-        this.setKeywordSpellingMistake(settingsManager);
-    }
-
-    private void setKeywordSpellingMistake(SettingsManager settingsManager) {
         this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING,
-                                                                                 SpellingMistake.class).orElse(null);
-    }
-
-    private String useKeywordSpellingMistake(String str) {
-        if (null != this.keywordSpellingMistake) return this.keywordSpellingMistake.generateRegExFor(str);
-        else return str;
+                SpellingMistake.class).orElse(null);
+        this.settingsManager = settingsManager;
     }
 
     @Override
@@ -54,7 +44,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         this.expressionDeParserForRegEx.setBuffer(buffer);
         this.selectDeParserForRegEx.setExpressionVisitor(expressionDeParserForRegEx);
         if (select.getWithItemsList() != null && !select.getWithItemsList().isEmpty()) {
-            buffer.append(useKeywordSpellingMistake("WITH"));
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "WITH"));
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append(this.selectDeParserForRegEx.handleWithItemValueList(select));
         }
@@ -67,7 +57,11 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         this.expressionDeParserForRegEx.setSelectVisitor(this.selectDeParserForRegEx);
         this.expressionDeParserForRegEx.setBuffer(buffer);
         this.selectDeParserForRegEx.setExpressionVisitor(this.expressionDeParserForRegEx);
-        InsertDeParserForRegEx insertDeParserForRegEx = new InsertDeParserForRegEx(this.expressionDeParserForRegEx, this.selectDeParserForRegEx, buffer, this.settingsManager);
+        InsertDeParserForRegEx insertDeParserForRegEx = new InsertDeParserForRegEx(
+                this.expressionDeParserForRegEx,
+                this.selectDeParserForRegEx,
+                buffer,
+                this.settingsManager);
         insertDeParserForRegEx.deParse(insert);
     }
 
