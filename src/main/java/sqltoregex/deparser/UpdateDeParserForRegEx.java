@@ -8,7 +8,6 @@ import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.statement.update.UpdateSet;
 import net.sf.jsqlparser.util.deparser.LimitDeparser;
-import net.sf.jsqlparser.util.deparser.OrderByDeParser;
 import net.sf.jsqlparser.util.deparser.UpdateDeParser;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
@@ -139,16 +138,6 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
 
     public ExpressionDeParserForRegEx getExpressionDeParserForRegEx() {
         return this.expressionDeParserForRegEx;
-    }
-
-    @Override
-    public ExpressionVisitor getExpressionVisitor() {
-        return super.getExpressionVisitor();
-    }
-
-    @Override
-    public void setExpressionVisitor(ExpressionVisitor visitor) {
-        super.setExpressionVisitor(visitor);
     }
 
     public void setExpressionDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx) {
