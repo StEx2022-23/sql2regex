@@ -1,5 +1,6 @@
 package sqltoregex.settings;
 
+import org.springframework.web.context.annotation.RequestScope;
 import sqltoregex.settings.regexgenerator.IRegExGenerator;
 
 import java.util.Collections;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@RequestScope
 public class UserSettings {
     private static UserSettings instance;
     private final Map<SettingsOption, IRegExGenerator<?>> settingsMap;
@@ -23,6 +25,7 @@ public class UserSettings {
             if (!instance.getSettingsMap().equals(map)) {
                 Logger.getLogger(Logger.GLOBAL_LOGGER_NAME)
                         .log(Level.INFO, "Wanted to create another instance with other settings");
+                instance = new UserSettings(map);
             }
         }
         return instance;
