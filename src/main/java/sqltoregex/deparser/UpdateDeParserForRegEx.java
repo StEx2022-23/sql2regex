@@ -2,11 +2,9 @@ package sqltoregex.deparser;
 
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.OrderByElement;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.statement.update.UpdateSet;
-import net.sf.jsqlparser.util.deparser.LimitDeparser;
 import net.sf.jsqlparser.util.deparser.UpdateDeParser;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
@@ -112,8 +110,15 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             j++;
         }
 
-        if (update.getOutputClause()!=null) {
-            update.getOutputClause().appendTo(buffer);
+        if (update.getOutputClause() != null) {
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "OUTPUT"));
+            buffer.append(REQUIRED_WHITE_SPACE);
+            List<String> outputClauses = new ArrayList<>();
+            for(SelectItem selectItem : update.getOutputClause().getSelectItemList()){
+                outputClauses.add(selectItem.toString());
+            }
+            buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrderRotation, outputClauses));
         }
 
         if (update.getFromItem() != null) {
