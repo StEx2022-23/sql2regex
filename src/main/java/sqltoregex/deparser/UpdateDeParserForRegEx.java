@@ -3,19 +3,25 @@ package sqltoregex.deparser;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.statement.update.UpdateSet;
 import net.sf.jsqlparser.util.deparser.LimitDeparser;
 import net.sf.jsqlparser.util.deparser.UpdateDeParser;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UpdateDeParserForRegEx extends UpdateDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SpellingMistake keywordSpellingMistake;
+    private final OrderRotation columnNameOrderRotation;
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
     SettingsManager settingsManager;
@@ -31,6 +37,8 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         this.selectDeParserForRegEx = selectDeParserForRegEx;
         this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING,
                 SpellingMistake.class).orElse(null);
+        this.columnNameOrderRotation = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER,
+                OrderRotation.class).orElse(null);
     }
 
     @Override
@@ -141,7 +149,12 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             buffer.append(REQUIRED_WHITE_SPACE);
             buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "RETURNING"));
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(PlainSelect.getStringList(update.getReturningExpressionList(), true, false));
+
+            List<String> returningExpressionList = new ArrayList<>();
+            for(SelectItem selectItem : update.getReturningExpressionList()){
+                returningExpressionList.add(selectItem.toString());
+            }
+            buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrderRotation, returningExpressionList));
         }
     }
 
