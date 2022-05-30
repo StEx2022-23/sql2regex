@@ -33,7 +33,6 @@ public class TestUtils extends UserSettingsPreparer{
     private String getRegEx(String sampleSolution) throws JSQLParserException {
         Statement statement = CCJSqlParserUtil.parse(sampleSolution);
         statement.accept(this.statementDeParserForRegEx);
-        System.out.println(this.statementDeParserForRegEx.getBuffer().toString());
         return this.statementDeParserForRegEx.getBuffer().toString();
     }
 

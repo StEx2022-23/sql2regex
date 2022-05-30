@@ -134,7 +134,7 @@ public class SettingsManager {
                             .getElementsByTagName("settingstype")
                             .item(0)
                             .getTextContent()
-                            .split(",");
+                            .split(";");
                     for (String settingsTypeString : settingTypes) {
                         settingsMapBuilderMap.get(SettingsType.valueOf(settingsTypeString.toUpperCase()))
                                 .withNodeList(settingsElement.getElementsByTagName("value"), relatedOption);
