@@ -23,6 +23,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SpellingMistake keywordSpellingMistake;
+    private final SpellingMistake columnNameSpellingMistake;
     private final OrderRotation columnNameOrderRotation;
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
@@ -41,6 +42,8 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
                 SpellingMistake.class).orElse(null);
         this.columnNameOrderRotation = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER,
                 OrderRotation.class).orElse(null);
+        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING,
+                SpellingMistake.class).orElse(null);
     }
 
     @Override
@@ -54,7 +57,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "UPDATE", true);
 
         if (update.getModifierPriority() != null) {
-            buffer.append(update.getModifierPriority()).append(" ");
+            buffer.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, update.getModifierPriority().toString())).append(REQUIRED_WHITE_SPACE);
         }
         if (update.isModifierIgnore()) {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "IGNORE", true);
@@ -78,7 +81,10 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             singleSet.append(OPTIONAL_WHITE_SPACE + "\\(?" + OPTIONAL_WHITE_SPACE);
             Iterator<Column> columnIterator = updateSet.getColumns().iterator();
             while(columnIterator.hasNext()){
-                singleSet.append(columnIterator.next().toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+                singleSet.append(
+                        RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, columnIterator.next().toString())
+                                .concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE)
+                );
                 if(columnIterator.hasNext()) singleSet.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
             }
             singleSet.append(OPTIONAL_WHITE_SPACE + "\\)?" + OPTIONAL_WHITE_SPACE);
