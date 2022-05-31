@@ -17,7 +17,7 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
 import java.util.*;
 
 public class UpdateDeParserForRegEx extends UpdateDeParser {
-    private Map<String, String> tableNameAliasCombinations = new HashMap<>();
+    private final Map<String, String> tableNameAliasCombinations = new HashMap<>();
     private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
@@ -71,7 +71,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         List<String> tableList = new ArrayList<>();
         if(update.getTable().toString().contains(" ")){
             tableList.add(this.extractTableNameAlias(update.getTable().toString()).concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
-        } else tableList.add(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, update.getTable().toString()));
+        } else tableList.add(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, update.getTable().toString()).concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
 
         if (update.getStartJoins() != null) {
             for (Join join : update.getStartJoins()) {
@@ -83,15 +83,14 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
 
         buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrderRotation, tableList));
 
-//        if (update.getStartJoins() != null) {
-//            for (Join join : update.getStartJoins()) {
-//                if (join.isSimple()) {
-//                    tableList.add(join.toString());
-//                } else {
-//                    buffer.append(" ").append(join);
-//                }
-//            }
-//        }
+        if (update.getStartJoins() != null) {
+            for (Join join : update.getStartJoins()) {
+                if (!join.isSimple()) {
+                    buffer.append(REQUIRED_WHITE_SPACE);
+                    this.selectDeParserForRegEx.deparseJoin(join);
+                }
+            }
+        }
 
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "SET", true);
 
@@ -191,13 +190,25 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             this.tableNameAliasCombinations.put(fullName, alias);
             this.tableNameAliasCombinations.put(alias, fullName);
             temp.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, fullName));
-            temp.append("(" + REQUIRED_WHITE_SPACE + "(?:").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ALIAS")).append("|").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "AS")).append(")").append(")?").append(REQUIRED_WHITE_SPACE);
+            temp.append("(" + REQUIRED_WHITE_SPACE + "(?:")
+                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ALIAS"))
+                    .append("|")
+                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "AS"))
+                    .append(")")
+                    .append(")?")
+                    .append(REQUIRED_WHITE_SPACE);
             temp.append(alias);
             return temp.toString();
         } else {
             String fullName = columnName.split(" ")[0];
             temp.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, fullName));
-            temp.append("(" + REQUIRED_WHITE_SPACE + "(?:").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ALIAS")).append("|").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "AS")).append(")").append(".*").append(")?");
+            temp.append("(" + REQUIRED_WHITE_SPACE + "(?:")
+                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ALIAS"))
+                    .append("|")
+                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "AS"))
+                    .append(")?")
+                    .append(".*")
+                    .append(")?");
             return temp.toString();
         }
     }
@@ -207,7 +218,11 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         if(column.contains(".")){
             String tab = column.split("\\.")[0];
             String col = column.split("\\.")[1];
-            temp.append("(?:").append(tab).append("|").append(this.tableNameAliasCombinations.get(tab)).append(")\\.");
+            temp.append("(?:")
+                    .append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, tab))
+                    .append("|")
+                    .append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, this.tableNameAliasCombinations.getOrDefault(tab, tab)))
+                    .append(")\\.");
             temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, col));
         } else{
             temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, column));
