@@ -168,7 +168,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         expressionDeParserForRegEx = (ExpressionDeParserForRegEx) visitor;
     }
 
-    private String handleALiasAndAggregateFunction(Object o) {
+    private String handleAliasAndAggregateFunction(Object o) {
         StringBuilder temp = new StringBuilder();
         if (o.toString().contains("(") && o.toString().contains(")")) {
             temp.append(RegExGenerator.useStringSynonymGenerator(this.aggregateFunctionLang,
@@ -387,7 +387,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             plainSelect.getSelectItems().get(0).accept(this);
         } else {
             for (SelectItem selectItem : plainSelect.getSelectItems()) {
-                selectedColumnNamesAsStrings.add(this.handleALiasAndAggregateFunction(selectItem));
+                selectedColumnNamesAsStrings.add(this.handleAliasAndAggregateFunction(selectItem));
             }
             buffer.append(this.handleOrderRotationWithExplicitNoneSpellingMistake(selectedColumnNamesAsStrings));
         }
@@ -435,6 +435,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         if (plainSelect.getWhere() != null) {
             buffer.append(OPTIONAL_WHITE_SPACE);
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "WHERE", true);
+            this.expressionDeParserForRegEx.appendTableNameAliasPair(plainSelect.getFromItem().toString());
             plainSelect.getWhere().accept(this.getExpressionVisitor());
         }
 
@@ -599,7 +600,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         buffer.append("\\(");
         List<String> functionItemList = new LinkedList<>();
         for (FunctionItem functionItem : pivot.getFunctionItems()) {
-            functionItemList.add(this.handleALiasAndAggregateFunction(functionItem));
+            functionItemList.add(this.handleAliasAndAggregateFunction(functionItem));
         }
         buffer.append(this.handleOrderRotationWithExplicitNoneSpellingMistake(functionItemList));
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "FOR", true);
@@ -711,7 +712,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         List<String> functionItemList = new LinkedList<>();
         for (FunctionItem functionItem : pivot.getFunctionItems()) {
-            functionItemList.add(this.handleALiasAndAggregateFunction(functionItem));
+            functionItemList.add(this.handleAliasAndAggregateFunction(functionItem));
         }
         buffer.append(this.handleOrderRotationWithExplicitNoneSpellingMistake(functionItemList));
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "FOR", true);
@@ -747,7 +748,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         buffer.append("\\(");
         subjoin.getLeft().accept(this);
         for (Join join : subjoin.getJoinList()) {
-            deparseJoin(join);
+            this.deparseJoin(join);
         }
         buffer.append("\\)");
 
@@ -786,11 +787,11 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
 
         if (list.getOffset() != null) {
-            deparseOffset(list.getOffset());
+            this.deparseOffset(list.getOffset());
         }
 
         if (list.getFetch() != null) {
-            deparseFetch(list.getFetch());
+            this.deparseFetch(list.getFetch());
         }
 
         if (list.getWithIsolation() != null) {
