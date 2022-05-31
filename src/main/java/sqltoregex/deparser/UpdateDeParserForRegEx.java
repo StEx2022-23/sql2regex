@@ -130,13 +130,26 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
 
         if (update.getFromItem() != null) {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "FROM", true);
-            buffer.append(update.getFromItem());
+            List<String> tableListFromItem = new ArrayList<>();
+            if(update.getFromItem().toString().contains(" ")){
+                tableListFromItem.add(this.extractTableNameAlias(update.getFromItem().toString()).concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+            } else tableListFromItem.add(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, update.getFromItem().toString()).concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+
             if (update.getJoins() != null) {
                 for (Join join : update.getJoins()) {
                     if (join.isSimple()) {
-                        buffer.append(", ").append(join);
-                    } else {
-                        buffer.append(" ").append(join);
+                        tableListFromItem.add(extractTableNameAlias(join.toString()).concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+                    }
+                }
+            }
+
+            buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrderRotation, tableListFromItem));
+
+            if (update.getJoins() != null) {
+                for (Join join : update.getJoins()) {
+                    if (!join.isSimple()) {
+                        buffer.append(REQUIRED_WHITE_SPACE);
+                        this.selectDeParserForRegEx.deparseJoin(join);
                     }
                 }
             }
