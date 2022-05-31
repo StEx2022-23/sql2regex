@@ -41,9 +41,9 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         }
 
         for (ColumnDefinition definition : columnDefinitions) {
-            StringBuilder _buffer = new StringBuilder();
-            concatColumnDefinition(definition, _buffer);
-            stringList.add(_buffer.toString());
+            StringBuilder tmpBuffer = new StringBuilder();
+            concatColumnDefinition(definition, tmpBuffer);
+            stringList.add(tmpBuffer.toString());
         }
         return stringList;
     }
@@ -56,34 +56,31 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         }
 
         for (Index index : indexList){
-            StringBuilder _buffer = new StringBuilder();
-            if (index.getType() != null){
-                if (index.getType().equals("PRIMARY KEY") || index.getType().equals("FOREIGN KEY")){
-                    _buffer.append("(?:CONSTRAINT").append(REQUIRED_WHITE_SPACE);
-                    _buffer.append(index.getName()).append(REQUIRED_WHITE_SPACE);
-                    _buffer.append(index.getType()).append(OPTIONAL_WHITE_SPACE);
-                    _buffer.append(concatIndexColumns(index));
-                    _buffer.append("|");
-                }
+            StringBuilder tmpBuffer = new StringBuilder();
+            if (index.getType() != null && (index.getType().equals("PRIMARY KEY") || index.getType().equals("FOREIGN KEY"))){
+                tmpBuffer.append("(?:CONSTRAINT").append(REQUIRED_WHITE_SPACE);
+                tmpBuffer.append(index.getName()).append(REQUIRED_WHITE_SPACE);
+                tmpBuffer.append(index.getType()).append(OPTIONAL_WHITE_SPACE);
+                tmpBuffer.append(concatIndexColumns(index));
+                tmpBuffer.append("|");
             }
-            _buffer.append(index.getType());
-            _buffer.append(!index.getName().isEmpty() ? REQUIRED_WHITE_SPACE + index.getName() : "");
-            _buffer.append(REQUIRED_WHITE_SPACE);
-            _buffer.append(concatIndexColumns(index));
-            if (index.getType() != null){
-                if (index.getType().equals("PRIMARY KEY") || index.getType().equals("FOREIGN KEY")){
-                    _buffer.append(")");
-                }
+
+            tmpBuffer.append(index.getType());
+            tmpBuffer.append(!index.getName().isEmpty() ? REQUIRED_WHITE_SPACE + index.getName() : "");
+            tmpBuffer.append(REQUIRED_WHITE_SPACE);
+            tmpBuffer.append(concatIndexColumns(index));
+            if (index.getType() != null && (index.getType().equals("PRIMARY KEY") || index.getType().equals("FOREIGN KEY"))){
+                tmpBuffer.append(")");
             }
-            stringList.add(_buffer.toString());
+            stringList.add(tmpBuffer.toString());
         }
         return stringList;
     }
 
     private String getProcessedTableOptions(CreateTable createTable){
-        StringBuilder _buffer = new StringBuilder();
+        StringBuilder tmpBuffer = new StringBuilder();
         if (createTable.getTableOptionsStrings() == null){
-            return _buffer.toString();
+            return tmpBuffer.toString();
         }
 
         Iterator<String> iterator = createTable.getTableOptionsStrings().iterator();
@@ -91,32 +88,32 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         while (iterator.hasNext()){
             String tableOption = iterator.next();
             if (tableOption.contains("(")){
-                _buffer.append(tableOption, 0, tableOption.indexOf('('));
-                _buffer.append("\\(");
+                tmpBuffer.append(tableOption, 0, tableOption.indexOf('('));
+                tmpBuffer.append("\\(");
                 String columnsString = tableOption.substring(tableOption.indexOf('(') + 1, tableOption.lastIndexOf(')'));
                 List<String> columns = new LinkedList<>(List.of(columnsString.split(",")));
-                _buffer.append(settingsManager.getSettingBySettingsOption(SettingsOption.INDEXCOLUMNNAMEORDER, OrderRotation.class)
+                tmpBuffer.append(settingsManager.getSettingBySettingsOption(SettingsOption.INDEXCOLUMNNAMEORDER, OrderRotation.class)
                                        .map(orderRotation -> orderRotation.generateRegExFor(columns))
                                        .orElse(String.join(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE, columns)));
-                _buffer.append("\\)");
+                tmpBuffer.append("\\)");
             }else if (tableOption.equals("=")) {
-                _buffer.delete(_buffer.length() - REQUIRED_WHITE_SPACE.length(), _buffer.length());
-                _buffer.append("(?:")
+                tmpBuffer.delete(tmpBuffer.length() - REQUIRED_WHITE_SPACE.length(), tmpBuffer.length());
+                tmpBuffer.append("(?:")
                         .append(OPTIONAL_WHITE_SPACE).append("=").append(OPTIONAL_WHITE_SPACE)
                         .append("|")
                         .append(REQUIRED_WHITE_SPACE)
                         .append(")");
             } else {
-                _buffer.append(tableOption);
+                tmpBuffer.append(tableOption);
                 if (iterator.hasNext()) {
-                    _buffer.append(REQUIRED_WHITE_SPACE);
+                    tmpBuffer.append(REQUIRED_WHITE_SPACE);
                 } else {
-                    _buffer.append(OPTIONAL_WHITE_SPACE);
+                    tmpBuffer.append(OPTIONAL_WHITE_SPACE);
                 }
             }
 
         }
-        return _buffer.toString();
+        return tmpBuffer.toString();
     }
 
     private String concatIndexColumns(Index index){
@@ -196,7 +193,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
             buffer.append(REQUIRED_WHITE_SPACE).append(params);
         }
 
-        //ORACLE: ALTER TABLE hr.employees ENABLE ROW MOVEMENT;
+        //ORACLE: ALTER TABLE hr.employees ENABLE ROW MOVEMENT
         if (createTable.getRowMovement() != null) {
             buffer.append(REQUIRED_WHITE_SPACE).append(createTable.getRowMovement().getMode().toString()).append(REQUIRED_WHITE_SPACE).append("ROW").append("MOVEMENT");
         }
