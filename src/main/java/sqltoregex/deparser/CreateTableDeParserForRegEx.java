@@ -1,0 +1,234 @@
+package sqltoregex.deparser;
+
+import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
+import net.sf.jsqlparser.statement.create.table.CreateTable;
+import net.sf.jsqlparser.statement.create.table.Index;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.util.deparser.CreateTableDeParser;
+import net.sf.jsqlparser.util.deparser.StatementDeParser;
+import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.OrderRotation;
+
+import java.util.*;
+
+public class CreateTableDeParserForRegEx extends CreateTableDeParser {
+    private static final String REQUIRED_WHITE_SPACE = "\\s+";
+    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
+
+    private final SettingsManager settingsManager;
+    private StatementDeParser statementDeParser;
+
+    public CreateTableDeParserForRegEx(StringBuilder buffer, SettingsManager settingsManager) {
+        super(buffer);
+        this.settingsManager = settingsManager;
+    }
+
+    public CreateTableDeParserForRegEx(StatementDeParser statementDeParser,
+                                       StringBuilder buffer, SettingsManager settingsManager) {
+        super(statementDeParser, buffer);
+        this.statementDeParser = statementDeParser;
+        this.settingsManager = settingsManager;
+    }
+
+    private List<String> columnDefinitionsListToStringList(List<ColumnDefinition> columnDefinitions){
+        List<String> stringList = new LinkedList<>();
+
+        if (columnDefinitions == null){
+            return stringList;
+        }
+
+        for (ColumnDefinition definition : columnDefinitions) {
+            StringBuilder _buffer = new StringBuilder();
+            concatColumnDefinition(definition, _buffer);
+            stringList.add(_buffer.toString());
+        }
+        return stringList;
+    }
+
+    private List<String> indexListToStringList(List<Index> indexList){
+        List<String> stringList = new LinkedList<>();
+
+        if (indexList == null){
+            return stringList;
+        }
+
+        for (Index index : indexList){
+            StringBuilder _buffer = new StringBuilder();
+            if (index.getType() != null){
+                if (index.getType().equals("PRIMARY KEY") || index.getType().equals("FOREIGN KEY")){
+                    _buffer.append("(?:CONSTRAINT").append(REQUIRED_WHITE_SPACE);
+                    _buffer.append(index.getName()).append(REQUIRED_WHITE_SPACE);
+                    _buffer.append(index.getType()).append(OPTIONAL_WHITE_SPACE);
+                    _buffer.append(concatIndexColumns(index));
+                    _buffer.append("|");
+                }
+            }
+            _buffer.append(index.getType());
+            _buffer.append(!index.getName().isEmpty() ? REQUIRED_WHITE_SPACE + index.getName() : "");
+            _buffer.append(REQUIRED_WHITE_SPACE);
+            _buffer.append(concatIndexColumns(index));
+            if (index.getType() != null){
+                if (index.getType().equals("PRIMARY KEY") || index.getType().equals("FOREIGN KEY")){
+                    _buffer.append(")");
+                }
+            }
+            stringList.add(_buffer.toString());
+        }
+        return stringList;
+    }
+
+    private String getProcessedTableOptions(CreateTable createTable){
+        StringBuilder _buffer = new StringBuilder();
+        if (createTable.getTableOptionsStrings() == null){
+            return _buffer.toString();
+        }
+
+        Iterator<String> iterator = createTable.getTableOptionsStrings().iterator();
+
+        while (iterator.hasNext()){
+            String tableOption = iterator.next();
+            if (tableOption.contains("(")){
+                _buffer.append(tableOption, 0, tableOption.indexOf('('));
+                _buffer.append("\\(");
+                String columnsString = tableOption.substring(tableOption.indexOf('(') + 1, tableOption.lastIndexOf(')'));
+                List<String> columns = new LinkedList<>(List.of(columnsString.split(",")));
+                _buffer.append(settingsManager.getSettingBySettingsOption(SettingsOption.INDEXCOLUMNNAMEORDER, OrderRotation.class)
+                                       .map(orderRotation -> orderRotation.generateRegExFor(columns))
+                                       .orElse(String.join(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE, columns)));
+                _buffer.append("\\)");
+            }else if (tableOption.equals("=")) {
+                _buffer.delete(_buffer.length() - REQUIRED_WHITE_SPACE.length(), _buffer.length());
+                _buffer.append("(?:")
+                        .append(OPTIONAL_WHITE_SPACE).append("=").append(OPTIONAL_WHITE_SPACE)
+                        .append("|")
+                        .append(REQUIRED_WHITE_SPACE)
+                        .append(")");
+            } else {
+                _buffer.append(tableOption);
+                if (iterator.hasNext()) {
+                    _buffer.append(REQUIRED_WHITE_SPACE);
+                } else {
+                    _buffer.append(OPTIONAL_WHITE_SPACE);
+                }
+            }
+
+        }
+        return _buffer.toString();
+    }
+
+    private String concatIndexColumns(Index index){
+        List<String> indexStringList = getStringList(index.getColumns());
+        return "\\(" + settingsManager.getSettingBySettingsOption(SettingsOption.INDEXCOLUMNNAMEORDER, OrderRotation.class)
+                .map(order -> order.generateRegExFor(indexStringList))
+                .orElse(String.join("," + OPTIONAL_WHITE_SPACE, indexStringList))
+                + "\\)";
+    }
+
+    private List<String> getStringList(List<?> list){
+        List<String> stringList = new LinkedList<>();
+        list.forEach(el -> stringList.add(el.toString()));
+        return stringList;
+    }
+
+    @Override
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
+    public void deParse(CreateTable createTable) {
+        buffer.append("CREATE").append(REQUIRED_WHITE_SPACE);
+        if (createTable.isOrReplace()) {
+            buffer.append("OR").append(REQUIRED_WHITE_SPACE).append("REPLACE").append(REQUIRED_WHITE_SPACE);
+        }
+        if (createTable.isUnlogged()) {
+            buffer.append("UNLOGGED").append(REQUIRED_WHITE_SPACE);
+        }
+        String params = PlainSelect.getStringList(createTable.getCreateOptionsStrings(), false, false);
+        if (!"".equals(params)) {
+            buffer.append(params).append(REQUIRED_WHITE_SPACE);
+        }
+
+        buffer.append("TABLE").append(REQUIRED_WHITE_SPACE);
+        if (createTable.isIfNotExists()) {
+            buffer.append("IF").append(REQUIRED_WHITE_SPACE)
+                    .append("NOT").append(REQUIRED_WHITE_SPACE)
+                    .append("EXISTS").append(REQUIRED_WHITE_SPACE);
+        }
+        buffer.append(createTable.getTable().getFullyQualifiedName());
+
+        if (createTable.getColumns() != null && !createTable.getColumns().isEmpty()) {
+            buffer.append(OPTIONAL_WHITE_SPACE).append("\\(");
+
+            buffer.append(
+                    settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class)
+                            .map(order -> order.generateRegExFor(createTable.getColumns()))
+                            .orElse(String.join("," + OPTIONAL_WHITE_SPACE, createTable.getColumns()))
+            );
+            buffer.append("\\)");
+        }
+        if (createTable.getColumnDefinitions() != null) {
+            buffer.append(OPTIONAL_WHITE_SPACE).append("\\(");
+
+            List<String> colAndIndexList = new LinkedList<>();
+
+            colAndIndexList.addAll(columnDefinitionsListToStringList(createTable.getColumnDefinitions()));
+            colAndIndexList.addAll(indexListToStringList(createTable.getIndexes()));
+
+
+            buffer.append(settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class)
+                    .map(order -> order.generateRegExFor(colAndIndexList))
+                    .orElseGet(() -> {
+                        for (Iterator<String> iter = colAndIndexList.iterator(); iter.hasNext();) {
+                            buffer.append(iter.next());
+
+                            if (iter.hasNext()) {
+                                buffer.append(",").append(OPTIONAL_WHITE_SPACE);
+                            }
+                        }
+                        return "";
+                    }));
+
+            buffer.append("\\)");
+        }
+
+        params = getProcessedTableOptions(createTable);
+        if (!"".equals(params)) {
+            buffer.append(REQUIRED_WHITE_SPACE).append(params);
+        }
+
+        //ORACLE: ALTER TABLE hr.employees ENABLE ROW MOVEMENT;
+        if (createTable.getRowMovement() != null) {
+            buffer.append(REQUIRED_WHITE_SPACE).append(createTable.getRowMovement().getMode().toString()).append(REQUIRED_WHITE_SPACE).append("ROW").append("MOVEMENT");
+        }
+        if (createTable.getSelect() != null) {
+            buffer.append(REQUIRED_WHITE_SPACE).append("AS").append(REQUIRED_WHITE_SPACE);
+            if (createTable.isSelectParenthesis()) {
+                buffer.append("\\(");
+            }
+            Select sel = createTable.getSelect();
+            sel.accept(this.statementDeParser);
+            if (createTable.isSelectParenthesis()) {
+                buffer.append("\\)");
+            }
+        }
+        if (createTable.getLikeTable() != null) {
+            buffer.append("(?:\\(").append(OPTIONAL_WHITE_SPACE).append(")?");
+            buffer.append(REQUIRED_WHITE_SPACE).append("LIKE").append(REQUIRED_WHITE_SPACE);
+            Table table = createTable.getLikeTable();
+            buffer.append(table.getFullyQualifiedName());
+            buffer.append("(?:").append(OPTIONAL_WHITE_SPACE).append("\\))?");
+        }
+    }
+
+    private void concatColumnDefinition(ColumnDefinition columnDefinition, StringBuilder buffer) {
+        buffer.append(columnDefinition.getColumnName());
+        buffer.append(REQUIRED_WHITE_SPACE);
+        buffer.append(columnDefinition.getColDataType().toString());
+        if (columnDefinition.getColumnSpecs() != null) {
+            for (String s : columnDefinition.getColumnSpecs()) {
+                buffer.append(REQUIRED_WHITE_SPACE);
+                buffer.append(s);
+            }
+        }
+    }
+}
