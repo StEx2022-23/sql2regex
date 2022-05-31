@@ -44,7 +44,7 @@ class SettingsMapBuilder {
         }
 
         switch (settingsOption) {
-            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, NOT_AS_EXCLAMATION_AND_WORD, GROUPBYELEMENTORDER -> this.withSettingsOption(
+            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, NOT_AS_EXCLAMATION_AND_WORD, GROUPBYELEMENTORDER, INDEXCOLUMNNAMEORDER -> this.withSettingsOption(
                     settingsOption);
             case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
                 Set<String> valueList = new HashSet<>();
@@ -68,7 +68,7 @@ class SettingsMapBuilder {
                 this.withStringSet(pairOfSynonymList, settingsOption);
             }
             case DEFAULT -> {
-                //pass because nothing needs to be needed for default
+                //pass because nothing needs to be added for default
             }
             default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + settingsOption);
         }
@@ -77,12 +77,12 @@ class SettingsMapBuilder {
 
     public SettingsMapBuilder withSettingsOption(SettingsOption settingsOption) {
         switch (settingsOption) {
-            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING -> {
+            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING -> {
                 SpellingMistake spellingMistake = new SpellingMistake(settingsOption);
                 this.settingsMap.put(settingsOption, spellingMistake);
                 spellingMistakes.add(spellingMistake);
             }
-            case TABLENAMEORDER, COLUMNNAMEORDER -> {
+            case TABLENAMEORDER, COLUMNNAMEORDER, INDEXCOLUMNNAMEORDER -> {
                 OrderRotation orderRotation = new OrderRotation(settingsOption);
                 this.settingsMap.put(settingsOption, orderRotation);
                 orderRotations.add(orderRotation);
