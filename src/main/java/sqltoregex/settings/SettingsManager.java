@@ -8,6 +8,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import sqltoregex.settings.regexgenerator.IRegExGenerator;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -34,8 +35,8 @@ public class SettingsManager {
         this.parseSettings();
     }
 
-    public static <T, C extends IRegExGenerator<T>> Optional<C> castSetting(IRegExGenerator<?> rawSetting,
-                                                                            Class<C> clazz) {
+    public static <T extends IRegExGenerator<?>> Optional<T> castSetting(IRegExGenerator<?> rawSetting,
+                                                                            Class<T> clazz) {
         try {
             return Optional.of(clazz.cast(rawSetting));
         } catch (ClassCastException e) {
@@ -48,13 +49,13 @@ public class SettingsManager {
     /**
      * Method for getting all Settings of one class with are setted by the user.
      */
-    public <S> Set<IRegExGenerator<S>> getSettingByClass(Class<? extends IRegExGenerator<S>> clazz) {
+    public <T extends IRegExGenerator<?>> Set<T> getSettingByClass(Class<T> clazz) {
         return getSettingByClass(clazz, SettingsType.USER);
     }
 
-    public <S> Set<IRegExGenerator<S>> getSettingByClass(Class<? extends IRegExGenerator<S>> clazz,
+    public <T extends IRegExGenerator<?>> Set<T> getSettingByClass(Class<T> clazz,
                                                          SettingsType settingsType) {
-        Set<IRegExGenerator<S>> settingsSet = new LinkedHashSet<>();
+        Set<T> settingsSet = new LinkedHashSet<>();
         for (IRegExGenerator<?> setting : this.getSettingsMap(settingsType).values()) {
             if (setting != null && setting.getClass().equals(clazz)) {
                 castSetting(setting, clazz).ifPresent(settingsSet::add);
@@ -71,12 +72,7 @@ public class SettingsManager {
         return this.getSettingsMap(settingsType).containsKey(settingsOption);
     }
 
-    public <S, C extends IRegExGenerator<S>> Optional<C> getSettingBySettingsOption(SettingsOption settingsOption,
-                                                                                    Class<C> clazz) {
-        return this.getSettingBySettingsOption(settingsOption, clazz, SettingsType.USER);
-    }
-
-    public <S, C extends IRegExGenerator<S>> Optional<C> getSettingBySettingsOption(SettingsOption settingsOption,
+    public <C extends IRegExGenerator<?>> Optional<C> getSettingBySettingsOption(SettingsOption settingsOption,
                                                                                     Class<C> clazz,
                                                                                     SettingsType settingsType) {
         for (Map.Entry<SettingsOption, IRegExGenerator<?>> entry
