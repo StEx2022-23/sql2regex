@@ -14,17 +14,18 @@ import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class UpdateDeParserForRegEx extends UpdateDeParser {
+    private Map<String, String> tableNameAliasCombinations = new HashMap<>();
     private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SpellingMistake keywordSpellingMistake;
     private final SpellingMistake columnNameSpellingMistake;
+    private final SpellingMistake tableNameSpellingMistake;
     private final OrderRotation columnNameOrderRotation;
+    private final OrderRotation tableNameOrderRotation;
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
     SettingsManager settingsManager;
@@ -42,7 +43,11 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
                 SpellingMistake.class).orElse(null);
         this.columnNameOrderRotation = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER,
                 OrderRotation.class).orElse(null);
+        this.tableNameOrderRotation = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMEORDER,
+                OrderRotation.class).orElse(null);
         this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING,
+                SpellingMistake.class).orElse(null);
+        this.tableNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
                 SpellingMistake.class).orElse(null);
     }
 
@@ -62,16 +67,31 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         if (update.isModifierIgnore()) {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "IGNORE", true);
         }
-        buffer.append(update.getTable());
+
+        List<String> tableList = new ArrayList<>();
+        if(update.getTable().toString().contains(" ")){
+            tableList.add(this.extractTableNameAlias(update.getTable().toString()).concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+        } else tableList.add(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, update.getTable().toString()));
+
         if (update.getStartJoins() != null) {
             for (Join join : update.getStartJoins()) {
                 if (join.isSimple()) {
-                    buffer.append(", ").append(join);
-                } else {
-                    buffer.append(" ").append(join);
+                    tableList.add(extractTableNameAlias(join.toString()).concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
                 }
             }
         }
+
+        buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrderRotation, tableList));
+
+//        if (update.getStartJoins() != null) {
+//            for (Join join : update.getStartJoins()) {
+//                if (join.isSimple()) {
+//                    tableList.add(join.toString());
+//                } else {
+//                    buffer.append(" ").append(join);
+//                }
+//            }
+//        }
 
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "SET", true);
 
@@ -81,10 +101,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             singleSet.append(OPTIONAL_WHITE_SPACE + "\\(?" + OPTIONAL_WHITE_SPACE);
             Iterator<Column> columnIterator = updateSet.getColumns().iterator();
             while(columnIterator.hasNext()){
-                singleSet.append(
-                        RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, columnIterator.next().toString())
-                                .concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE)
-                );
+                singleSet.append(this.checkOfExistingTableNameAndAlias(columnIterator.next().toString()).concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
                 if(columnIterator.hasNext()) singleSet.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
             }
             singleSet.append(OPTIONAL_WHITE_SPACE + "\\)?" + OPTIONAL_WHITE_SPACE);
@@ -164,5 +181,37 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         buffer.append(whiteSpaceBefore ? REQUIRED_WHITE_SPACE : "");
         buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, keyword));
         buffer.append(whiteSpaceAfter ? REQUIRED_WHITE_SPACE : "");
+    }
+
+    private String extractTableNameAlias(String columnName){
+        StringBuilder temp = new StringBuilder();
+        if (columnName.contains(" ")){
+            String fullName = columnName.split(" ")[0];
+            String alias = columnName.split(" ")[1];
+            this.tableNameAliasCombinations.put(fullName, alias);
+            this.tableNameAliasCombinations.put(alias, fullName);
+            temp.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, fullName));
+            temp.append("(" + REQUIRED_WHITE_SPACE + "(?:").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ALIAS")).append("|").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "AS")).append(")").append(")?").append(REQUIRED_WHITE_SPACE);
+            temp.append(alias);
+            return temp.toString();
+        } else {
+            String fullName = columnName.split(" ")[0];
+            temp.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, fullName));
+            temp.append("(" + REQUIRED_WHITE_SPACE + "(?:").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ALIAS")).append("|").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "AS")).append(")").append(".*").append(")?");
+            return temp.toString();
+        }
+    }
+
+    private String checkOfExistingTableNameAndAlias(String column){
+        StringBuilder temp = new StringBuilder();
+        if(column.contains(".")){
+            String tab = column.split("\\.")[0];
+            String col = column.split("\\.")[1];
+            temp.append("(?:").append(tab).append("|").append(this.tableNameAliasCombinations.get(tab)).append(")\\.");
+            temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, col));
+        } else{
+            temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, column));
+        }
+        return temp.toString();
     }
 }

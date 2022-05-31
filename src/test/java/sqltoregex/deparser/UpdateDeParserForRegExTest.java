@@ -37,4 +37,21 @@ class UpdateDeParserForRegExTest extends UserSettingsPreparer{
         );
         testUtils.validateListAgainstRegEx("UPDATE table1 SET col1 = 1, col2 = 2 OUTPUT inserted.col1, inserted.col2", toCheckedInput, true);
     }
+
+    @Test
+    void simpleJoin() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "UPDATE table1, table2 SET table1.col1 = 1, table2.col1 = 1",
+                "UPDATE table2, table1 SET table1.col1 = 1, table2.col1 = 1"
+        );
+        testUtils.validateListAgainstRegEx("UPDATE table1, table2 SET table1.col1 = 1, table2.col1 = 1", toCheckedInput, true);
+    }
+
+    @Test
+    void stableNameAlias() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "UPDATE table1 t1, table2 t2 SET table1.col1 = 1, t2.col1 = 1"
+        );
+        testUtils.validateListAgainstRegEx("UPDATE table1 t1, table2 t2 SET table1.col1 = 1, t2.col1 = 1", toCheckedInput, true);
+    }
 }
