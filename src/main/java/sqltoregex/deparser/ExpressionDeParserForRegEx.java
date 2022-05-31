@@ -454,7 +454,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                     + RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, tableName)
                     + "|"
                     + RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, this.getRelatedTableNameOrAlias(tableName))
-                    + "|.*)";
+                    + ")";
             buffer.append(tableName).append('.');
         }
 
@@ -1035,8 +1035,13 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     }
 
     public void appendTableNameAliasPair(String tableName){
-        this.tableNamesWithAlias.put(tableName.split(" ")[0], tableName.split(" ")[1]);
-        this.tableNamesWithAlias.put(tableName.split(" ")[1], tableName.split(" ")[0]);
+        if(tableName.contains(" ")){
+            this.tableNamesWithAlias.put(tableName.split(" ")[0], tableName.split(" ")[1]);
+            this.tableNamesWithAlias.put(tableName.split(" ")[1], tableName.split(" ")[0]);
+        } else {
+            this.tableNamesWithAlias.put(tableName, tableName);
+        }
+
     }
 
     public Map<String, String> getAliasMap() {

@@ -205,4 +205,14 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
         );
         testUtils.validateListAgainstRegEx("SELECT * FROM table FETCH NEXT 1 ROWS ONLY", toCheckedInput, true);
     }
+
+    @Test
+    void testComplexTableNameAliasUse() throws JSQLParserException {
+        List<String> toCheckedInput = List.of(
+                "SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5",
+                "SELECT col1 AS c1 FROM tab1 t1 WHERE tab1.c1 = 5",
+                "SELECT col1 AS c1 FROM tab1 AS t1 WHERE tab1.c1 = 5"
+        );
+        testUtils.validateListAgainstRegEx("SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5", toCheckedInput, true);
+    }
 }

@@ -26,6 +26,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     private final SpellingMistake keywordSpellingMistake;
     private final SpellingMistake tableNameSpellingMistake;
     private final SpellingMistake columnNameSpellingMistake;
+    private final OrderRotation columnNameOrder;
     private final OrderRotation tableNameOrder;
     List<String> quotationMarkList = Arrays.asList("'", "`", "\"");
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
@@ -44,6 +45,8 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING,
                 SpellingMistake.class).orElse(null);
         this.tableNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMEORDER,
+                OrderRotation.class).orElse(null);
+        this.columnNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER,
                 OrderRotation.class).orElse(null);
         this.tableNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
                 SpellingMistake.class).orElse(null);
@@ -152,6 +155,17 @@ public class InsertDeParserForRegEx extends InsertDeParser {
             }
             buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrder, columnsAsStringList));
             buffer.append(OPTIONAL_WHITE_SPACE).append("\\)");
+        }
+
+        if (insert.getOutputClause() != null) {
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "OUTPUT"));
+            buffer.append(REQUIRED_WHITE_SPACE);
+            List<String> outputClauses = new ArrayList<>();
+            for(SelectItem selectItem : insert.getOutputClause().getSelectItemList()){
+                outputClauses.add(selectItem.toString());
+            }
+            buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, outputClauses));
         }
 
         if (insert.getSelect() != null) {
