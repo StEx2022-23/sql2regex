@@ -12,6 +12,10 @@
           <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
           <value>true</value>
       </columnnamespelling>
+      <indexcolumnnamespelling>
+          <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
+          <value>true</value>
+      </indexcolumnnamespelling>
   </spelling>
   <order>
       <tablenameorder>
@@ -26,6 +30,10 @@
           <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
           <value>true</value>
       </groupbyelementorder>
+      <indexcolumnnameorder>
+          <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
+          <value>true</value>
+      </indexcolumnnameorder>
   </order>
   <synonyms>
       <datesynonyms>

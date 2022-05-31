@@ -44,7 +44,7 @@ class SettingsMapBuilder {
         }
 
         switch (settingsOption) {
-            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, NOT_AS_EXCLAMATION_AND_WORD, EXPRESSIONORDER, INDEXCOLUMNNAMEORDER -> this.withSettingsOption(
+            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, NOT_AS_EXCLAMATION_AND_WORD, GROUPBYELEMENTORDER, INDEXCOLUMNNAMEORDER -> this.withSettingsOption(
                     settingsOption);
             case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
                 Set<String> valueList = new HashSet<>();
@@ -77,7 +77,7 @@ class SettingsMapBuilder {
 
     public SettingsMapBuilder withSettingsOption(SettingsOption settingsOption) {
         switch (settingsOption) {
-            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING -> {
+            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING -> {
                 SpellingMistake spellingMistake = new SpellingMistake(settingsOption);
                 this.settingsMap.put(settingsOption, spellingMistake);
                 spellingMistakes.add(spellingMistake);
