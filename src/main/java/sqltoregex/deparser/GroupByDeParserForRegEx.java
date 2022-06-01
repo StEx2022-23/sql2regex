@@ -2,6 +2,7 @@ package sqltoregex.deparser;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.GroupByElement;
+import net.sf.jsqlparser.statement.select.SelectVisitor;
 import net.sf.jsqlparser.util.deparser.GroupByDeParser;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
@@ -9,6 +10,7 @@ import sqltoregex.settings.regexgenerator.GroupByElementRotation;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GroupByDeParserForRegEx extends GroupByDeParser {
@@ -56,5 +58,19 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
 
     public GroupByElementRotation getGroupByElementOrder(){
         return this.groupByElementOrder;
+    }
+
+    public List<String> expressionListToStringList(List<Expression> expressionList){
+        List<String> deParsedExpressionsAsString = new ArrayList<>();
+        StringBuilder tempBuffer = new StringBuilder();
+        ExpressionDeParserForRegEx tempExpressionDeParserForRegEx = new ExpressionDeParserForRegEx(new SelectDeParserForRegEx(this.settings), tempBuffer, this.settings);
+
+        for(Expression expression : expressionList){
+            expression.accept(tempExpressionDeParserForRegEx);
+            deParsedExpressionsAsString.add(tempBuffer.toString());
+            tempBuffer.replace(0, tempBuffer.length(), "");
+        }
+
+        return deParsedExpressionsAsString;
     }
 }

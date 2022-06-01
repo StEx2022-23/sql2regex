@@ -1,6 +1,11 @@
 package sqltoregex.deparser;
 
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.select.GroupByElement;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 import sqltoregex.settings.SettingsContainer;
@@ -10,6 +15,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 class GroupByDeParserForRegExTest{
@@ -64,5 +70,20 @@ class GroupByDeParserForRegExTest{
                 "SELECT col1 FROM table1 t1 GROUP BY t1.col1, table1.col2"
         );
         TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 FROM table1 t1 GROUP BY t1.col1, t1.col2", toCheckedInput, true);
+    }
+
+    @Test
+    void testExpressionToStringListConvert(){
+        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        List<Expression> expressionList = new ArrayList<>();
+        expressionList.add(new Column("col1"));
+        expressionList.add(new Column("col2"));
+
+        GroupByDeParserForRegEx groupByDeParserForRegEx = new GroupByDeParserForRegEx(new ExpressionDeParserForRegEx(defaultSettingsContainer), new StringBuilder(), defaultSettingsContainer);
+        for(String str : groupByDeParserForRegEx.expressionListToStringList(expressionList)){
+            Assertions.assertTrue(str.equals("\\s*(col1|ol1|cl1|co1|col)\\s*") || str.equals("\\s*(col2|ol2|cl2|co2|col)\\s*"));
+        }
+
+
     }
 }
