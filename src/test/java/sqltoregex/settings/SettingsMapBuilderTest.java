@@ -16,14 +16,14 @@ class SettingsMapBuilderTest {
 
     SettingsMapBuilder builder;
 
-    @Test
-    void OrderAndSpellingWithSameProp() {
-        builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
-        builder.withSettingsOption(SettingsOption.COLUMNNAMESPELLING);
-        OrderRotation orderRotation = (OrderRotation) builder.build().get(SettingsOption.COLUMNNAMEORDER);
-        Assertions.assertEquals(new SpellingMistake(SettingsOption.COLUMNNAMESPELLING),
-                                orderRotation.getSpellingMistake());
-    }
+//    @Test
+//    void OrderAndSpellingWithSameProp() {
+//        builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
+//        builder.withSettingsOption(SettingsOption.COLUMNNAMESPELLING);
+//        OrderRotation orderRotation = (OrderRotation) builder.build().get(SettingsOption.COLUMNNAMEORDER);
+//        Assertions.assertEquals(new SpellingMistake(SettingsOption.COLUMNNAMESPELLING),
+//                                orderRotation.getSpellingMistake());
+//    }
 
     @BeforeEach
     void beforeEach() {

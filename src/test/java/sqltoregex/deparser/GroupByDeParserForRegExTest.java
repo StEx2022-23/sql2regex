@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
-import sqltoregex.settings.SettingsType;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -17,6 +16,7 @@ class GroupByDeParserForRegExTest{
 
     @Test
     void testGroupByTwoStatements() throws JSQLParserException {
+        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
         List<String> toCheckedInput = List.of(
                 "SELECT col1 GROUP BY col1, col2",
                 "SELECT col1 GROUP BY col2,col1",
@@ -25,7 +25,7 @@ class GroupByDeParserForRegExTest{
                 "SELECT col1 GROUP BY col1 , col2",
                 "SELECT col1 GROUP BY col2,col1"
         );
-        TestUtils.validateListAgainstRegEx(new SettingsContainer(), "SELECT col1 GROUP BY col1, col2", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(defaultSettingsContainer, "SELECT col1 GROUP BY col1, col2", toCheckedInput, true);
     }
 
     @Test

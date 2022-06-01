@@ -32,7 +32,7 @@ class SettingsMapBuilder {
             SpellingMistake spellingMistake = new SpellingMistake(SettingsOption.valueOf(
                     settingsOption.toString().substring(0, settingsOption.toString().length() - 5) + "SPELLING"));
             if (spellingMistakes.contains(spellingMistake)) {
-                orderRotation.setSpellingMistake(spellingMistake);
+//                orderRotation.setSpellingMistake(spellingMistake);
             }
         }
         return this.settingsMap;

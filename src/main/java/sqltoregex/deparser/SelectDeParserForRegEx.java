@@ -28,7 +28,6 @@ import java.util.List;
 public class SelectDeParserForRegEx extends SelectDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
-    private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
     private boolean flagForOrderRotationWithOutSpellingMistake = false;
     private final SpellingMistake keywordSpellingMistake;
     private final SpellingMistake columnNameSpellingMistake;
@@ -203,11 +202,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     private String handleOrderRotationWithExplicitNoneSpellingMistake(List<String> stringList) {
         StringBuilder temp = new StringBuilder();
         if (this.flagForOrderRotationWithOutSpellingMistake) {
-            List<String> selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake = new ArrayList<>();
-            for (String str : stringList) {
-                selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake.add(
-                        str.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
-            }
+            List<String> selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake = new ArrayList<>(stringList);
             temp.append(RegExGenerator.useOrderRotation(this.columnNameOrder,
                                                         selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake));
         } else {
@@ -227,8 +222,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         List<String> expressionListAsStrings = new LinkedList<>();
         while (expressionIterator.hasNext()) {
             Expression selectItem = expressionIterator.next();
-            expressionListAsStrings.add(
-                    selectItem.toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+            expressionListAsStrings.add(selectItem.toString());
         }
         temp.append(RegExGenerator.useOrderRotation(this.columnNameOrder, expressionListAsStrings));
         temp.append(OPTIONAL_WHITE_SPACE);
@@ -276,7 +270,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
                     temp.append("\\)");
                 }
             }
-            withItemStringList.add(temp.toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+            withItemStringList.add(temp.toString());
         }
         return withItemStringList;
     }
@@ -390,7 +384,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             List<String> selectedTableNamesAsStrings = new ArrayList<>();
             for (Table table : plainSelect.getIntoTables()) {
                 String temp = RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, table.getFullyQualifiedName());
-                temp = temp + (table.getAlias() != null ? REQUIRED_WHITE_SPACE + RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, table.getAlias().toString()) + DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE : "");
+                temp = temp + (table.getAlias() != null ? REQUIRED_WHITE_SPACE + RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, table.getAlias().toString()) : "");
                 selectedTableNamesAsStrings.add(temp);
             }
             buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrder, selectedTableNamesAsStrings));
@@ -407,12 +401,12 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "FROM", true);
 
             if (simpleJoinElements.size() == 1) {
-                buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrder, simpleJoinElements));
+                buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrder, simpleJoinElements.stream().map(join -> RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, join)).toList()));
                 for (Join join : plainSelect.getJoins()) {
                     deparseJoin(join);
                 }
             } else {
-                buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrder, simpleJoinElements));
+                buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrder, simpleJoinElements.stream().map(join -> RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, join)).toList()));
             }
         } else if (plainSelect.getFromItem() != null) {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "FROM", true);
@@ -604,7 +598,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
         buffer.append(
                 forColumnsList.size() > 1 ? OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE : OPTIONAL_WHITE_SPACE);
-        buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, forColumnsList));
+        buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, forColumnsList.stream().map(col -> RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, col)).toList()));
         buffer.append(
                 forColumnsList.size() > 1 ? OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE : OPTIONAL_WHITE_SPACE);
 
@@ -616,7 +610,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         for (Object o : pivot.getInItems()) {
             inItemList.add(o.toString());
         }
-        buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, inItemList));
+        buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, inItemList.stream().map(inItem -> RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, inItem)).toList()));
         buffer.append(
                 forColumnsList.size() > 1 ? OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE : OPTIONAL_WHITE_SPACE);
         buffer.append("\\)");
@@ -649,9 +643,9 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
 
         List<SelectExpressionItem> unpivotInClause = unpivot.getUnPivotInClause();
-        List<String> unpivotInClauseAsStringList = new LinkedList<>();
+        List<String> unPivotInClauseAsStringList = new LinkedList<>();
         for (SelectExpressionItem selectExpressionItem : unpivotInClause) {
-            unpivotInClauseAsStringList.add(selectExpressionItem.toString());
+            unPivotInClauseAsStringList.add(selectExpressionItem.toString());
         }
 
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "UNPIVOT", false);
@@ -664,21 +658,21 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
         buffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
         buffer.append(unPivotClause.size() > 1 ? "\\(" : "");
-        buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, unPivotClauseAsStringList));
+        buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, unPivotClauseAsStringList.stream().map(unPivot -> RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, unPivot)).toList()));
         buffer.append(unPivotClause.size() > 1 ? "\\)" : "");
 
         buffer.append(unPivotClause.size() > 1 ? OPTIONAL_WHITE_SPACE : REQUIRED_WHITE_SPACE);
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "FOR", true);
 
         buffer.append(unpivotForClause.size() > 1 ? "\\(" : "");
-        buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, unPivotForClauseAsStringList));
+        buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, unPivotForClauseAsStringList.stream().map(unPivotFor -> RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, unPivotFor)).toList()));
         buffer.append(unpivotForClause.size() > 1 ? "\\)" : "");
 
         buffer.append(unpivotForClause.size() > 1 ? OPTIONAL_WHITE_SPACE : REQUIRED_WHITE_SPACE);
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "IN", true);
 
         buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
-        buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, unpivotInClauseAsStringList));
+        buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, unPivotInClauseAsStringList.stream().map(unPivotIn -> RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, unPivotIn)).toList()));
         buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE).append("\\)");
 
         if (unpivot.getAlias() != null) {
@@ -711,7 +705,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "FOR", true);
 
         buffer.append(forColumns.size() > 1 ? "\\(" : "");
-        buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, forColumnsAsStringList));
+        buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, forColumnsAsStringList.stream().map(forColumn -> RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, forColumn)).toList()));
         buffer.append(forColumns.size() > 1 ? "\\)" : "");
 
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "IN", false);
@@ -730,7 +724,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
                 inItemsAsStringList.add(o.toString());
             }
             buffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
-            buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, inItemsAsStringList));
+            buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, inItemsAsStringList.stream().map(inItem -> RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, inItem)).toList()));
             buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
         }
         buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE).append("\\)");
@@ -853,7 +847,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         temp.append(REQUIRED_WHITE_SPACE);
         List<String> withItemStringListForSelectItem = new LinkedList<>();
         for(SelectItem selectItem : withItem.getWithItemList()){
-            withItemStringListForSelectItem.add(selectItem.toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+            withItemStringListForSelectItem.add(selectItem.toString());
         }
         temp.append(RegExGenerator.useOrderRotation(this.columnNameOrder, withItemStringListForSelectItem));
         return temp.toString();
