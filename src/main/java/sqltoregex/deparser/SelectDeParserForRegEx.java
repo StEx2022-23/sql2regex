@@ -13,7 +13,7 @@ import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.statement.values.ValuesStatement;
 import net.sf.jsqlparser.util.deparser.SelectDeParser;
 import net.sf.jsqlparser.util.deparser.ValuesStatementDeParser;
-import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
@@ -36,26 +36,19 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     private final OrderRotation columnNameOrder;
     private final OrderRotation tableNameOrder;
     private final StringSynonymGenerator aggregateFunctionLang;
-    SettingsManager settingsManager;
+    private final SettingsContainer settingsContainer;
     private ExpressionDeParserForRegEx expressionDeParserForRegEx;
 
-    public SelectDeParserForRegEx(SettingsManager settingsManager) {
+    public SelectDeParserForRegEx(SettingsContainer settingsContainer) {
         super();
-        this.settingsManager = settingsManager;
-        this.expressionDeParserForRegEx = new ExpressionDeParserForRegEx(this, buffer, settingsManager);
-        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING,
-                                                                                 SpellingMistake.class).orElse(null);
-        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING,
-                                                                                    SpellingMistake.class).orElse(null);
-        this.aggregateFunctionLang = settingsManager.getSettingBySettingsOption(SettingsOption.AGGREGATEFUNCTIONLANG,
-                                                                                StringSynonymGenerator.class)
-                .orElse(null);
-        this.columnNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER,
-                                                                          OrderRotation.class).orElse(null);
-        this.tableNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMEORDER,
-                                                                         OrderRotation.class).orElse(null);
-        this.tableNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
-                                                                                   SpellingMistake.class).orElse(null);
+        this.settingsContainer = settingsContainer;
+        this.expressionDeParserForRegEx = new ExpressionDeParserForRegEx(this, buffer, settingsContainer);
+        this.keywordSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
+        this.columnNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
+        this.aggregateFunctionLang = settingsContainer.get(StringSynonymGenerator.class).get(SettingsOption.AGGREGATEFUNCTIONLANG);
+        this.columnNameOrder = settingsContainer.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
+        this.tableNameOrder = settingsContainer.get(OrderRotation.class).get(SettingsOption.TABLENAMEORDER);
+        this.tableNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
     }
 
     public String addOptionalAliasKeywords(boolean isOptional) {
@@ -445,7 +438,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         if (plainSelect.getGroupBy() != null) {
             buffer.append(REQUIRED_WHITE_SPACE);
-            GroupByDeParserForRegEx groupByDeParserForRegEx = new GroupByDeParserForRegEx(this.expressionDeParserForRegEx, buffer, settingsManager);
+            GroupByDeParserForRegEx groupByDeParserForRegEx = new GroupByDeParserForRegEx(this.expressionDeParserForRegEx, buffer, settingsContainer);
             if(plainSelect.getFromItem() != null){
                 this.expressionDeParserForRegEx.appendTableNameAliasPair(plainSelect.getFromItem().toString());
                 groupByDeParserForRegEx.getGroupByElementOrder().setAliasMap(this.expressionDeParserForRegEx.getAliasMap());
@@ -462,7 +455,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             new OrderByDeParserForRegEx(
                     this.getExpressionVisitor(),
                     buffer,
-                    this.settingsManager).deParse(
+                    this.settingsContainer).deParse(
                         plainSelect.getOrderByElements(),
                         plainSelect.getFromItem()
                     );
@@ -473,7 +466,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "CHANGES", false);
         }
         if (plainSelect.getLimit() != null) {
-            new LimitDeParserForRegEx(buffer, settingsManager).deParse(plainSelect.getLimit());
+            new LimitDeParserForRegEx(buffer, settingsContainer).deParse(plainSelect.getLimit());
         }
         if (plainSelect.getOffset() != null) {
             deparseOffset(plainSelect.getOffset());
@@ -778,7 +771,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
 
         if (list.getOrderByElements() != null) {
-            new OrderByDeParserForRegEx(expressionDeParserForRegEx, buffer, this.settingsManager).deParse(
+            new OrderByDeParserForRegEx(expressionDeParserForRegEx, buffer, this.settingsContainer).deParse(
                     list.getOrderByElements());
         }
 

@@ -2,8 +2,10 @@ package sqltoregex.settings.regexgenerator;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
+import org.springframework.util.Assert;
 import org.xml.sax.SAXException;
 import sqltoregex.deparser.ExpressionDeParserForRegEx;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 
@@ -22,6 +24,7 @@ public class GroupByElementRotation extends RegExGenerator<List<Expression>> {
     Map<String, String> tableNamesWithAlias;
 
     public GroupByElementRotation(SettingsOption settingsOption) {
+        Assert.notNull(settingsOption, "SettingsOption must not be null");
         this.settingsOption = settingsOption;
     }
 
@@ -58,14 +61,10 @@ public class GroupByElementRotation extends RegExGenerator<List<Expression>> {
     public String generateRegExFor(List<Expression> input) {
         generateGroupByOrderOptionsRek(input.size(), input);
         StringBuilder buffer = new StringBuilder();
-        ExpressionDeParserForRegEx expressionDeParserForRegEx = null;
-        try {
-            expressionDeParserForRegEx = new ExpressionDeParserForRegEx(new SelectVisitorAdapter(), buffer, new SettingsManager());
-            expressionDeParserForRegEx.setAliasMap(this.tableNamesWithAlias);
-        } catch (ParserConfigurationException | IOException | SAXException | XPathExpressionException | URISyntaxException e) {
-            Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-            logger.log(Level.INFO, "Generate RegEx for Expressionlist go wrong: {0}", e.toString());
-        }
+        ExpressionDeParserForRegEx expressionDeParserForRegEx;
+        //TODO: SettingsContainer initalisierung eventuell auflösen, oder das ganze gleich rausnehmen indem, wie besprochen List<String> übergeben wird und außerhalb der OrderRotation geparsed wird (Wäre auch eher Konform mit SRP)
+        expressionDeParserForRegEx = new ExpressionDeParserForRegEx(new SelectVisitorAdapter(), buffer, new SettingsContainer());
+        expressionDeParserForRegEx.setAliasMap(this.tableNamesWithAlias);
         buffer.append(isCapturingGroup ? "(?:" : "(");
         for(Map.Entry<Integer, List<Expression>> entry : groupByOrderOptionsMap.entrySet()){
             Iterator<Expression> expressionIterator = groupByOrderOptionsMap.get(entry.getKey()).iterator();

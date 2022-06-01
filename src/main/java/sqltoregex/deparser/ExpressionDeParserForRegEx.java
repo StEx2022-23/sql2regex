@@ -11,7 +11,7 @@ import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
-import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
@@ -33,39 +33,31 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     private final SpellingMistake columnNameSpellingMistake;
     private final SpellingMistake tableNameSpellingMistake;
     private final DateAndTimeFormatSynonymGenerator dateSynonyms;
-    private final SettingsManager settingsManager;
     private final DateAndTimeFormatSynonymGenerator timeStampSynonyms;
     private final DateAndTimeFormatSynonymGenerator timeSynonyms;
     private final OrderByDeParserForRegEx orderByDeParser;
     Map<String, String> tableNamesWithAlias;
+    private final SettingsContainer settings;
 
-    public ExpressionDeParserForRegEx(SettingsManager settingsManager) {
-        this(new SelectDeParserForRegEx(settingsManager), new StringBuilder(), settingsManager);
+    public ExpressionDeParserForRegEx(SettingsContainer settingsContainer) {
+        this(new SelectDeParserForRegEx(settingsContainer), new StringBuilder(), settingsContainer);
     }
 
     public ExpressionDeParserForRegEx(SelectVisitor selectVisitor, StringBuilder buffer,
-                                      SettingsManager settingsManager) {
-        this(selectVisitor, buffer, new OrderByDeParserForRegEx(settingsManager), settingsManager);
+                                      SettingsContainer settingsContainer) {
+        this(selectVisitor, buffer, new OrderByDeParserForRegEx(settingsContainer), settingsContainer);
     }
 
     ExpressionDeParserForRegEx(SelectVisitor selectVisitor, StringBuilder buffer,
-                               OrderByDeParserForRegEx orderByDeParser, SettingsManager settingsManager) {
+                               OrderByDeParserForRegEx orderByDeParser, SettingsContainer settings) {
         super(selectVisitor, buffer);
         this.orderByDeParser = orderByDeParser;
-        this.settingsManager = settingsManager;
-        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING,
-                                                                                    SpellingMistake.class).orElse(null);
-        this.tableNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
-                SpellingMistake.class).orElse(null);
-        this.dateSynonyms = settingsManager.getSettingBySettingsOption(SettingsOption.DATESYNONYMS,
-                                                                       DateAndTimeFormatSynonymGenerator.class)
-                .orElse(null);
-        this.timeSynonyms = settingsManager.getSettingBySettingsOption(SettingsOption.TIMESYNONYMS,
-                                                                       DateAndTimeFormatSynonymGenerator.class)
-                .orElse(null);
-        this.timeStampSynonyms = settingsManager.getSettingBySettingsOption(SettingsOption.DATETIMESYNONYMS,
-                                                                            DateAndTimeFormatSynonymGenerator.class)
-                .orElse(null);
+        this.settings = settings;
+        this.columnNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
+        this.tableNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
+        this.dateSynonyms = settings.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.DATESYNONYMS);
+        this.timeSynonyms = settings.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.TIMESYNONYMS);
+        this.timeStampSynonyms = settings.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.DATETIMESYNONYMS);
         this.tableNamesWithAlias = new HashMap<>();
     }
 
@@ -140,19 +132,20 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     @Override
     public void visit(NotExpression notExpr) {
         buffer.append(OPTIONAL_WHITE_SPACE);
-        if (settingsManager.getSettingBySettingsOption(SettingsOption.NOT_AS_EXCLAMATION_AND_WORD)) {
-            buffer.append("(?:");
-            buffer.append("!" + OPTIONAL_WHITE_SPACE);
-            buffer.append("|");
-            buffer.append(OPTIONAL_WHITE_SPACE + NOT + OPTIONAL_WHITE_SPACE);
-            buffer.append(")");
-        } else {
-            if (notExpr.isExclamationMark()) {
-                buffer.append("!").append(OPTIONAL_WHITE_SPACE);
-            } else {
-                buffer.append(NOT).append(OPTIONAL_WHITE_SPACE);
-            }
-        }
+        //TODO: fix after refactor
+//        if (settingsContainer.getSettingBySettingsOption(SettingsOption.NOT_AS_EXCLAMATION_AND_WORD)) {
+//            buffer.append("(?:");
+//            buffer.append("!" + OPTIONAL_WHITE_SPACE);
+//            buffer.append("|");
+//            buffer.append(OPTIONAL_WHITE_SPACE + NOT + OPTIONAL_WHITE_SPACE);
+//            buffer.append(")");
+//        } else {
+//            if (notExpr.isExclamationMark()) {
+//                buffer.append("!").append(OPTIONAL_WHITE_SPACE);
+//            } else {
+//                buffer.append(NOT).append(OPTIONAL_WHITE_SPACE);
+//            }
+//        }
         notExpr.getExpression().accept(this);
         buffer.append(OPTIONAL_WHITE_SPACE);
     }

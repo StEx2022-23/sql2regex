@@ -3,7 +3,7 @@ package sqltoregex.deparser;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.GroupByElement;
 import net.sf.jsqlparser.util.deparser.GroupByDeParser;
-import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.GroupByElementRotation;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
@@ -17,15 +17,15 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
     private final SpellingMistake keywordSpellingMistake;
     private final GroupByElementRotation groupByElementOrder;
     private final ExpressionDeParserForRegEx expressionDeParserForRegEx;
+    private final SettingsContainer settings;
 
     public GroupByDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, StringBuilder buffer,
-                                   SettingsManager settingsManager) {
+                                   SettingsContainer settings) {
         super(expressionDeParser, buffer);
         this.expressionDeParserForRegEx = expressionDeParser;
-        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING,
-                                                                                 SpellingMistake.class).orElse(null);
-        this.groupByElementOrder = settingsManager.getSettingBySettingsOption(SettingsOption.GROUPBYELEMENTORDER,
-                                                                          GroupByElementRotation.class).orElse(null);
+        this.keywordSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
+        this.groupByElementOrder = settings.get(GroupByElementRotation.class).get(SettingsOption.GROUPBYELEMENTORDER);
+        this.settings = settings;
     }
 
     @Override

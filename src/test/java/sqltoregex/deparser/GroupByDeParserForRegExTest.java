@@ -3,6 +3,7 @@ package sqltoregex.deparser;
 import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsType;
 
@@ -12,12 +13,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-class GroupByDeParserForRegExTest extends UserSettingsPreparer{
-    TestUtils testUtils = new TestUtils();
-
-    GroupByDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, URISyntaxException, SAXException {
-        super(SettingsType.ALL);
-    }
+class GroupByDeParserForRegExTest{
 
     @Test
     void testGroupByTwoStatements() throws JSQLParserException {
@@ -29,7 +25,7 @@ class GroupByDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT col1 GROUP BY col1 , col2",
                 "SELECT col1 GROUP BY col2,col1"
         );
-        testUtils.validateListAgainstRegEx("SELECT col1 GROUP BY col1, col2", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(), "SELECT col1 GROUP BY col1, col2", toCheckedInput, true);
     }
 
     @Test
@@ -40,7 +36,7 @@ class GroupByDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT col1 GROUP BY col3, col1, col2",
                 "SELECT col1 GROUP BY col3, col2, col1"
         );
-        testUtils.validateListAgainstRegEx("SELECT col1 GROUP BY col1, col2, col3", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 GROUP BY col1, col2, col3", toCheckedInput, true);
     }
 
     @Test
@@ -51,7 +47,7 @@ class GroupByDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT col1 GROUP BYcol3, col1, col2",
                 "SELECT col1 GROUP BY col3col2col1"
         );
-        testUtils.validateListAgainstRegEx("SELECT col1 GROUP BY col1, col2, col3", toCheckedInput, false);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 GROUP BY col1, col2, col3", toCheckedInput, false);
     }
 
     @Test
@@ -59,7 +55,7 @@ class GroupByDeParserForRegExTest extends UserSettingsPreparer{
         List<String> toCheckedInput = List.of(
                 "SELECT col1 FROM table1 t1 GROUP BY t1.col1, t1.col2"
         );
-        testUtils.validateListAgainstRegEx("SELECT col1 FROM table1 t1 GROUP BY t1.col1, t1.col2", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 FROM table1 t1 GROUP BY t1.col1, t1.col2", toCheckedInput, true);
     }
 
     @Test
@@ -67,6 +63,6 @@ class GroupByDeParserForRegExTest extends UserSettingsPreparer{
         List<String> toCheckedInput = List.of(
                 "SELECT col1 FROM table1 t1 GROUP BY t1.col1, table1.col2"
         );
-        testUtils.validateListAgainstRegEx("SELECT col1 FROM table1 t1 GROUP BY t1.col1, t1.col2", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 FROM table1 t1 GROUP BY t1.col1, t1.col2", toCheckedInput, true);
     }
 }

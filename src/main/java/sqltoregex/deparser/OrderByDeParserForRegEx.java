@@ -5,7 +5,7 @@ import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.util.deparser.OrderByDeParser;
-import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
@@ -19,31 +19,26 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
-    private ExpressionVisitor regExExpressionVisitor;
-    private final SpellingMistake keywordSpellingMistake;
-    private final SpellingMistake columnNameSpellingMistake;
-    private final OrderRotation columnNameOrder;
-    private final StringSynonymGenerator specialSynonyms;
     private final StringSynonymGenerator aggregateFunctionLang;
+    private final OrderRotation columnNameOrder;
+    private final SpellingMistake columnNameSpellingMistake;
+    private final SpellingMistake keywordSpellingMistake;
+    private final StringSynonymGenerator specialSynonyms;
+    private ExpressionVisitor regExExpressionVisitor;
 
-    public OrderByDeParserForRegEx(SettingsManager settingsManager) {
-        this(new ExpressionVisitorAdapter(), new StringBuilder(), settingsManager);
+    public OrderByDeParserForRegEx(SettingsContainer settingsContainer) {
+        this(new ExpressionVisitorAdapter(), new StringBuilder(), settingsContainer);
     }
 
     public OrderByDeParserForRegEx(ExpressionVisitor expressionVisitor, StringBuilder buffer,
-                                   SettingsManager settingsManager) {
+                                   SettingsContainer settings) {
         super(expressionVisitor, buffer);
         this.regExExpressionVisitor = expressionVisitor;
-        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING,
-                                                                                    SpellingMistake.class).orElse(null);
-        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING,
-                                                                                 SpellingMistake.class).orElse(null);
-        this.columnNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER,
-                                                                          OrderRotation.class).orElse(null);
-        this.specialSynonyms = settingsManager.getSettingBySettingsOption(SettingsOption.OTHERSYNONYMS,
-                                                                          StringSynonymGenerator.class).orElse(null);
-        this.aggregateFunctionLang = settingsManager.getSettingBySettingsOption(SettingsOption.AGGREGATEFUNCTIONLANG,
-                StringSynonymGenerator.class).orElse(null);
+        this.columnNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
+        this.keywordSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
+        this.columnNameOrder = settings.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
+        this.specialSynonyms = settings.get(StringSynonymGenerator.class).get(SettingsOption.OTHERSYNONYMS);
+        this.aggregateFunctionLang = settings.get(StringSynonymGenerator.class).get(SettingsOption.AGGREGATEFUNCTIONLANG);
     }
 
     public void deParse(List<OrderByElement> orderByElementList, FromItem fromItem) {
@@ -63,53 +58,28 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, orderByElementsAsStrings));
     }
 
-    private String handleAscDesc(OrderByElement orderByElement){
+    public String deParseElementForOrderRotation(OrderByElement orderByElement, FromItem fromItem) {
         StringBuilder temp = new StringBuilder();
-
-        if (orderByElement.isAscDescPresent()) {
-            if (orderByElement.isAsc()) {
-                temp.append(REQUIRED_WHITE_SPACE);
-                temp.append("(?:").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ASC")).append("|").append(RegExGenerator.useStringSynonymGenerator(this.specialSynonyms, "ASC")).append(")");
-            } else {
-                temp.append(REQUIRED_WHITE_SPACE);
-                temp.append("(?:").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "DESC")).append("|").append(RegExGenerator.useStringSynonymGenerator(this.specialSynonyms, "DESC")).append(")");
-            }
-        }
-
-        return temp.toString();
-    }
-
-    private String handleNullFirstLast(OrderByElement orderByElement){
-        StringBuilder temp = new StringBuilder();
-        if (orderByElement.getNullOrdering() != null) {
-            temp.append(REQUIRED_WHITE_SPACE);
-            if(orderByElement.getNullOrdering() == OrderByElement.NullOrdering.NULLS_FIRST){
-                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "NULLS FIRST"));
-            } else {
-                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "NULLS LAST"));
-            }
-        }
-        return temp.toString();
-    }
-
-    public String deParseElementForOrderRotation(OrderByElement orderByElement, FromItem fromItem){
-        StringBuilder temp = new StringBuilder();
-        if(orderByElement.getExpression().toString().contains("(") && orderByElement.getExpression().toString().contains(")")){
-            temp.append(RegExGenerator.useStringSynonymGenerator(this.aggregateFunctionLang, orderByElement.getExpression().toString().replaceAll("\\(.*", "")));
+        if (orderByElement.getExpression().toString().contains("(") && orderByElement.getExpression().toString()
+                .contains(")")) {
+            temp.append(RegExGenerator.useStringSynonymGenerator(this.aggregateFunctionLang,
+                                                                 orderByElement.getExpression().toString()
+                                                                         .replaceAll("\\(.*", "")));
             temp.append(OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE);
 
             String tempColumn = orderByElement.getExpression().toString().split("\\(")[1].split("\\)")[0];
-            if(tempColumn.contains(".")){
+            if (tempColumn.contains(".")) {
                 temp.append(this.handleTableNameAlias(fromItem, tempColumn));
             } else {
                 temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, tempColumn));
             }
             temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
-        } else{
-            if(orderByElement.getExpression().toString().contains(".")){
+        } else {
+            if (orderByElement.getExpression().toString().contains(".")) {
                 temp.append(this.handleTableNameAlias(fromItem, orderByElement.getExpression().toString()));
             } else {
-                temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, orderByElement.getExpression().toString()));
+                temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake,
+                                                              orderByElement.getExpression().toString()));
             }
         }
         temp.append(this.handleAscDesc(orderByElement));
@@ -126,7 +96,40 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         this.regExExpressionVisitor = expressionVisitor;
     }
 
-    private String handleTableNameAlias(FromItem fromItem, String tempColumn){
+    private String handleAscDesc(OrderByElement orderByElement) {
+        StringBuilder temp = new StringBuilder();
+
+        if (orderByElement.isAscDescPresent()) {
+            if (orderByElement.isAsc()) {
+                temp.append(REQUIRED_WHITE_SPACE);
+                temp.append("(?:").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ASC"))
+                        .append("|").append(RegExGenerator.useStringSynonymGenerator(this.specialSynonyms, "ASC"))
+                        .append(")");
+            } else {
+                temp.append(REQUIRED_WHITE_SPACE);
+                temp.append("(?:").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "DESC"))
+                        .append("|").append(RegExGenerator.useStringSynonymGenerator(this.specialSynonyms, "DESC"))
+                        .append(")");
+            }
+        }
+
+        return temp.toString();
+    }
+
+    private String handleNullFirstLast(OrderByElement orderByElement) {
+        StringBuilder temp = new StringBuilder();
+        if (orderByElement.getNullOrdering() != null) {
+            temp.append(REQUIRED_WHITE_SPACE);
+            if (orderByElement.getNullOrdering() == OrderByElement.NullOrdering.NULLS_FIRST) {
+                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "NULLS FIRST"));
+            } else {
+                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "NULLS LAST"));
+            }
+        }
+        return temp.toString();
+    }
+
+    private String handleTableNameAlias(FromItem fromItem, String tempColumn) {
         StringBuilder temp = new StringBuilder();
         String columnName = tempColumn.split("\\.")[1];
         temp.append("(?:");

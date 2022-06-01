@@ -55,11 +55,7 @@ class SettingsManagerTest {
             }
             Assertions.assertTrue(settingsManager.getSettingsMap(SettingsType.ALL).containsKey(settingsOption),
                                   "Does not contain " + settingsOption);
-            if (settingsOption == SettingsOption.NOT_AS_EXCLAMATION_AND_WORD) {
-                Assertions.assertNull(settingsManager.getSettingsMap(SettingsType.ALL).get(settingsOption));
-            } else {
-                Assertions.assertNotNull(settingsManager.getSettingsMap(SettingsType.ALL).get(settingsOption));
-            }
+            Assertions.assertNotNull(settingsManager.getSettingsMap(SettingsType.ALL).get(settingsOption));
         }
     }
 

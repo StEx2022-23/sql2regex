@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 import sqltoregex.deparser.ExpressionDeParserForRegEx;
 import sqltoregex.deparser.UserSettingsPreparer;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.SettingsType;
@@ -90,13 +91,13 @@ class RegExGeneratorTest extends UserSettingsPreparer {
     }
 
     @Test
-    void useExpressionRotation() throws XPathExpressionException, ParserConfigurationException, IOException,
-            SAXException, URISyntaxException {
+    void useExpressionRotation() {
+        SettingsContainer settings = new SettingsContainer();
         GroupByElementRotation expressionRotation = new GroupByElementRotation(SettingsOption.DEFAULT);
 
         List<Expression> expressionList = new LinkedList<>(List.of(new Column("a"), new Column("b")));
         StringBuilder buffer = new StringBuilder();
-        ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(new SettingsManager());
+        ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settings);
         expressionDeParserForRegEx.setBuffer(buffer);
         String regex = RegExGenerator.useExpressionRotation(expressionRotation, expressionDeParserForRegEx,
                                                             expressionList);
@@ -106,13 +107,13 @@ class RegExGeneratorTest extends UserSettingsPreparer {
 
 
         ExpressionDeParserForRegEx expressionDeParserForRegExWithoutRotation = new ExpressionDeParserForRegEx(
-                new SettingsManager());
+                settings);
         String regexWithoutRotation = RegExGenerator.useExpressionRotation(
                 null,
                 expressionDeParserForRegExWithoutRotation,
                 expressionListWithOutRotation
         );
         Assertions.assertEquals("\\s*a\\s*,\\s*b\\s*",
-                                expressionDeParserForRegExWithoutRotation.getBuffer().toString());
+                                regexWithoutRotation);
     }
 }

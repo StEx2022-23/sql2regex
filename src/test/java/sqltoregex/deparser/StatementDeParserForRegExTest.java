@@ -4,6 +4,7 @@ import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsType;
 
@@ -13,44 +14,34 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-class StatementDeParserForRegExTest extends UserSettingsPreparer{
-    TestUtils testUtils = new TestUtils();
-
-    StatementDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException,
-            SAXException, URISyntaxException {
-        super(SettingsType.ALL);
-    }
+class StatementDeParserForRegExTest{
 
     @Test
-    void testConstructorOne() throws XPathExpressionException, ParserConfigurationException, IOException,
-            SAXException, URISyntaxException {
-        SettingsManager settingsManager = new SettingsManager();
+    void testConstructorOne() {
         StringBuilder buffer = new StringBuilder();
-        StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(buffer, settingsManager);
+        StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(buffer, new SettingsContainer());
         Assertions.assertNotNull(statementDeParserForRegEx);
     }
 
     @Test
-    void testConstructorThree() throws XPathExpressionException, ParserConfigurationException, IOException,
-            SAXException, URISyntaxException {
-        SettingsManager settingsManager = new SettingsManager();
-        ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settingsManager);
+    void testConstructorThree() {
+        SettingsContainer settings = new SettingsContainer();
+        ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settings);
         StringBuilder buffer = new StringBuilder();
         StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(expressionDeParserForRegEx,
-                                                                                            buffer, settingsManager);
+                                                                                            buffer, settings);
         Assertions.assertNotNull(statementDeParserForRegEx);
     }
 
     @Test
-    void testConstructorTwo() throws XPathExpressionException, ParserConfigurationException, IOException,
-            SAXException, URISyntaxException {
-        SettingsManager settingsManager = new SettingsManager();
-        ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settingsManager);
+    void testConstructorTwo() {
+        SettingsContainer settings = new SettingsContainer();
+        ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settings);
         StringBuilder buffer = new StringBuilder();
-        SelectDeParserForRegEx selectDeParserForRegEx = new SelectDeParserForRegEx(settingsManager);
+        SelectDeParserForRegEx selectDeParserForRegEx = new SelectDeParserForRegEx(settings);
         StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(expressionDeParserForRegEx,
                                                                                             selectDeParserForRegEx,
-                                                                                            buffer, settingsManager);
+                                                                                            buffer, settings);
         Assertions.assertNotNull(statementDeParserForRegEx);
     }
 
@@ -59,6 +50,6 @@ class StatementDeParserForRegExTest extends UserSettingsPreparer{
         List<String> toCheckedInput = List.of(
                 "WITH temporaryTable(averageValue) as (SELECT AVG(col2) from table2) SELECT col1 FROM table1"
         );
-        testUtils.validateListAgainstRegEx("WITH temporaryTable(averageValue) as (SELECT AVG(col2) from table2) SELECT col1 FROM table1", toCheckedInput, false);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(), "WITH temporaryTable(averageValue) as (SELECT AVG(col2) from table2) SELECT col1 FROM table1", toCheckedInput, false);
     }
 }
