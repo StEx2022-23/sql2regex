@@ -3,19 +3,11 @@ package sqltoregex.settings.regexgenerator;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.SelectVisitorAdapter;
 import org.springframework.util.Assert;
-import org.xml.sax.SAXException;
 import sqltoregex.deparser.ExpressionDeParserForRegEx;
 import sqltoregex.settings.SettingsContainer;
-import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class GroupByElementRotation extends RegExGenerator<List<Expression>> {
     private final Map<Integer, List<Expression>> groupByOrderOptionsMap = new HashMap<>();
