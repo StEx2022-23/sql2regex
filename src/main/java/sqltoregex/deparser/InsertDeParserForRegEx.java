@@ -11,7 +11,7 @@ import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.util.deparser.InsertDeParser;
-import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
@@ -32,24 +32,19 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
 
-    public InsertDeParserForRegEx(SettingsManager settingsManager) {
-        this(new ExpressionDeParserForRegEx(settingsManager), new SelectDeParserForRegEx(settingsManager), new StringBuilder(), settingsManager);
+    public InsertDeParserForRegEx(SettingsContainer settings) {
+        this(new ExpressionDeParserForRegEx(settings), new SelectDeParserForRegEx(settings), new StringBuilder(), settings);
     }
 
-    public InsertDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx, SelectDeParserForRegEx selectDeParserForRegEx, StringBuilder buffer, SettingsManager settingsManager) {
+    public InsertDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx, SelectDeParserForRegEx selectDeParserForRegEx, StringBuilder buffer, SettingsContainer settings) {
         super(expressionDeParserForRegEx, selectDeParserForRegEx, buffer);
         this.expressionDeParserForRegEx = expressionDeParserForRegEx;
         this.selectDeParserForRegEx = selectDeParserForRegEx;
-        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING,
-                SpellingMistake.class).orElse(null);
-        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING,
-                SpellingMistake.class).orElse(null);
-        this.tableNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMEORDER,
-                OrderRotation.class).orElse(null);
-        this.columnNameOrder = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER,
-                OrderRotation.class).orElse(null);
-        this.tableNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
-                SpellingMistake.class).orElse(null);
+        this.keywordSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
+        this.columnNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
+        this.tableNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
+        this.tableNameOrder = settings.get(OrderRotation.class).get(SettingsOption.TABLENAMEORDER);
+        this.columnNameOrder = settings.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
     }
 
     @Override

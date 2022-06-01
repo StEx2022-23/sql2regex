@@ -44,7 +44,8 @@ class SettingsMapBuilder {
         }
 
         switch (settingsOption) {
-            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, NOT_AS_EXCLAMATION_AND_WORD, GROUPBYELEMENTORDER, INDEXCOLUMNNAMEORDER -> this.withSettingsOption(
+            //TODO: add not as eclamation mark after refactoring
+            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, GROUPBYELEMENTORDER -> this.withSettingsOption(
                     settingsOption);
             case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
                 Set<String> valueList = new HashSet<>();
@@ -91,7 +92,6 @@ class SettingsMapBuilder {
                 GroupByElementRotation groupByElementRotation = new GroupByElementRotation(settingsOption);
                 this.settingsMap.put(settingsOption, groupByElementRotation);
             }
-            case NOT_AS_EXCLAMATION_AND_WORD -> this.settingsMap.put(settingsOption, null);
             default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + settingsOption);
         }
         return this;

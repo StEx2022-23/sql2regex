@@ -6,7 +6,7 @@ import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.util.deparser.StatementDeParser;
-import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
@@ -16,27 +16,25 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     private final SpellingMistake keywordSpellingMistake;
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
-    SettingsManager settingsManager;
+    SettingsContainer settings;
 
-
-    public StatementDeParserForRegEx(StringBuilder buffer, SettingsManager settingsManager) {
-        this(new ExpressionDeParserForRegEx(settingsManager), buffer, settingsManager);
+    public StatementDeParserForRegEx(StringBuilder buffer, SettingsContainer settings) {
+        this(new ExpressionDeParserForRegEx(settings), buffer, settings);
     }
 
     public StatementDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, StringBuilder buffer,
-                                     SettingsManager settingsManager) {
-        this(expressionDeParser, new SelectDeParserForRegEx(settingsManager), buffer, settingsManager);
+                                     SettingsContainer settings) {
+        this(expressionDeParser, new SelectDeParserForRegEx(settings), buffer, settings);
     }
 
     public StatementDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser,
                                      SelectDeParserForRegEx selectDeParser, StringBuilder buffer,
-                                     SettingsManager settingsManager) {
+                                     SettingsContainer settings) {
         super(expressionDeParser, selectDeParser, buffer);
         this.expressionDeParserForRegEx = expressionDeParser;
         this.selectDeParserForRegEx = selectDeParser;
-        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING,
-                SpellingMistake.class).orElse(null);
-        this.settingsManager = settingsManager;
+        this.keywordSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
+        this.settings = settings;
     }
 
     @Override
@@ -63,7 +61,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
                 this.expressionDeParserForRegEx,
                 this.selectDeParserForRegEx,
                 this.buffer,
-                this.settingsManager);
+                this.settings);
         insertDeParserForRegEx.deParse(insert);
     }
 
@@ -82,7 +80,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
                 this.expressionDeParserForRegEx,
                 this.selectDeParserForRegEx,
                 this.buffer,
-                this.settingsManager);
+                this.settings);
         this.selectDeParserForRegEx.setExpressionVisitor(this.expressionDeParserForRegEx);
         updateDeParser.deParse(update);
     }

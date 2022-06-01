@@ -4,6 +4,7 @@ import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsType;
 
@@ -13,14 +14,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-class LimitDeParserForRegExTest extends UserSettingsPreparer{
-    TestUtils testUtils = new TestUtils();
-
-    LimitDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException,
-            SAXException, URISyntaxException {
-        super(SettingsType.ALL);
-    }
-
+class LimitDeParserForRegExTest{
+    
     @Test
     void testLimitDeparser(){
         StringBuilder buffer = new StringBuilder();
@@ -35,7 +30,7 @@ class LimitDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT col1 LIMIT 3 OFFST 2",
                 "SELECT col1 LIMIT    3   OFFSET    2"
         );
-        testUtils.validateListAgainstRegEx("SELECT col1 LIMIT 2, 3", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(), "SELECT col1 LIMIT 2, 3", toCheckedInput, true);
     }
 
     @Test
@@ -43,7 +38,7 @@ class LimitDeParserForRegExTest extends UserSettingsPreparer{
         List<String> toCheckedInput = List.of(
                 "SELECT col1 LIMIT null"
         );
-        testUtils.validateListAgainstRegEx("SELECT col1 LIMIT null", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 LIMIT null", toCheckedInput, true);
     }
 
     @Test
@@ -51,7 +46,7 @@ class LimitDeParserForRegExTest extends UserSettingsPreparer{
         List<String> toCheckedInput = List.of(
                 "SELECT col1 LIMIT 3 OFFSET 2"
         );
-        testUtils.validateListAgainstRegEx("SELECT col1 LIMIT 3 OFFSET 2", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 LIMIT 3 OFFSET 2", toCheckedInput, true);
     }
 
     @Test
@@ -61,6 +56,6 @@ class LimitDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT col1 OFFSET  10  ROWS",
                 "SELECT col1 OFFST 10 RWS"
         );
-        testUtils.validateListAgainstRegEx("SELECT col1 OFFSET 10 ROWS", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 OFFSET 10 ROWS", toCheckedInput, true);
     }
 }

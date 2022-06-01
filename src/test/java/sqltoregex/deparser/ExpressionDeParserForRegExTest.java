@@ -6,6 +6,7 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsType;
 
@@ -18,12 +19,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class ExpressionDeParserForRegExTest extends UserSettingsPreparer {
-
-    public ExpressionDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException,
-            IOException, SAXException, URISyntaxException {
-        super(SettingsType.ALL);
-    }
+class ExpressionDeParserForRegExTest {
 
     private void assertIsNonCapturingGroup(String regEx) {
         Assertions.assertTrue(regEx.contains("(?:"));
@@ -232,10 +228,11 @@ class ExpressionDeParserForRegExTest extends UserSettingsPreparer {
     private String testDeParsedExpressionVsStringLists(String expressionString, List<String> matchingStrings,
                                                        List<String> notMatchingStrings) {
         StringBuilder b = new StringBuilder();
+        SettingsContainer settings = new SettingsContainer();
         try {
             Expression expression = CCJSqlParserUtil.parseExpression(
                     expressionString);
-            ExpressionDeParserForRegEx deParser = new ExpressionDeParserForRegEx(settingsManager);
+            ExpressionDeParserForRegEx deParser = new ExpressionDeParserForRegEx(settings);
             deParser.setBuffer(b);
             expression.accept(deParser);
             Pattern pattern = Pattern.compile(b.toString());
@@ -254,16 +251,15 @@ class ExpressionDeParserForRegExTest extends UserSettingsPreparer {
     }
 
     @Test
-    void testFullConstructor() throws XPathExpressionException, ParserConfigurationException, IOException,
-            SAXException, URISyntaxException {
+    void testFullConstructor() {
         StringBuilder buffer = new StringBuilder();
-        SettingsManager settingsManager = new SettingsManager();
-        SelectDeParserForRegEx selectDeParserForRegEx = new SelectDeParserForRegEx(settingsManager);
-        ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settingsManager);
+        SettingsContainer settings = new SettingsContainer();
+        SelectDeParserForRegEx selectDeParserForRegEx = new SelectDeParserForRegEx(settings);
+        ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settings);
         OrderByDeParserForRegEx orderByDeParserForRegEx = new OrderByDeParserForRegEx(expressionDeParserForRegEx,
-                                                                                      buffer, settingsManager);
+                                                                                      buffer, settings);
         ExpressionDeParserForRegEx expressionDeParserForRegExTwo = new ExpressionDeParserForRegEx(
-                selectDeParserForRegEx, buffer, orderByDeParserForRegEx, settingsManager);
+                selectDeParserForRegEx, buffer, orderByDeParserForRegEx, settings);
         Assertions.assertNotNull(expressionDeParserForRegExTwo);
     }
 }

@@ -5,6 +5,7 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import org.junit.jupiter.api.Assertions;
 import org.xml.sax.SAXException;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsType;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -15,32 +16,28 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TestUtils extends UserSettingsPreparer{
-    StatementDeParserForRegEx statementDeParserForRegEx;
+public class TestUtils{
 
-    public TestUtils() throws XPathExpressionException, ParserConfigurationException, IOException, URISyntaxException, SAXException {
-        super(SettingsType.ALL);
-        StringBuilder buffer = new StringBuilder();
-        this.statementDeParserForRegEx = new StatementDeParserForRegEx(buffer, this.settingsManager);
-    }
-
-    private boolean checkAgainstRegEx(String regex, String toBeChecked) {
+    private static boolean checkAgainstRegEx(String regex, String toBeChecked) {
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(toBeChecked);
         return matcher.matches();
     }
 
-    private String getRegEx(String sampleSolution) throws JSQLParserException {
+    private static String getRegEx(SettingsContainer settings, String sampleSolution) throws JSQLParserException {
+        StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(new StringBuilder(),
+                                                                                            settings);
+
         Statement statement = CCJSqlParserUtil.parse(sampleSolution);
-        statement.accept(this.statementDeParserForRegEx);
-        return this.statementDeParserForRegEx.getBuffer().toString();
+        statement.accept(statementDeParserForRegEx);
+        return statementDeParserForRegEx.getBuffer().toString();
     }
 
-    public void validateListAgainstRegEx(String sampleSolution, List<String> alternativeStatements, boolean isAssertTrue) throws JSQLParserException {
-        String regex = this.getRegEx(sampleSolution);
+    public static void validateListAgainstRegEx(SettingsContainer settings, String sampleSolution, List<String> alternativeStatements, boolean isAssertTrue) throws JSQLParserException {
+        String regex = getRegEx(settings, sampleSolution);
         for(String str : alternativeStatements){
-            if(isAssertTrue) Assertions.assertTrue(checkAgainstRegEx(regex, str), str + " " + regex);
-            else Assertions.assertFalse(checkAgainstRegEx(regex, str), str + " " + regex);
+            if(isAssertTrue) Assertions.assertTrue(checkAgainstRegEx(regex, str), str + " /// " + regex);
+            else Assertions.assertFalse(checkAgainstRegEx(regex, str), str + " /// " + regex);
         }
     }
 

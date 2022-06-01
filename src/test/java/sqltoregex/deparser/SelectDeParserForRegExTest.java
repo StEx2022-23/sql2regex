@@ -3,6 +3,7 @@ package sqltoregex.deparser;
 import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsType;
 
@@ -12,13 +13,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-class SelectDeParserForRegExTest extends UserSettingsPreparer{
-    TestUtils testUtils = new TestUtils();
-
-    SelectDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException,
-            SAXException, URISyntaxException {
-        super(SettingsType.ALL);
-    }
+class SelectDeParserForRegExTest{
 
     @Test
     void testSelectFromWithTwoColumns() throws JSQLParserException {
@@ -30,7 +25,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELCT col2,col1 FROM table1",
                 "SELECT col2, col1 FOM table1"
         );
-        testUtils.validateListAgainstRegEx("SELECT col1, col2 FROM table1", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1, col2 FROM table1", toCheckedInput, true);
     }
 
     @Test
@@ -43,7 +38,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELCTcol2,col1 FROM table1",
                 "SELECTcol2,col1FOMtable1"
         );
-        testUtils.validateListAgainstRegEx("SELECT col1, col2 FROM table1", toCheckedInput, false);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1, col2 FROM table1", toCheckedInput, false);
     }
 
     @Test
@@ -53,7 +48,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT col1 FROM table1 INNER  JOIN  table2  ON  col1 = col2",
                 "SELECT col1 FROM table1 INNER  JOIN  table2  ON  col2 = col1"
         );
-        testUtils.validateListAgainstRegEx("SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(), "SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2", toCheckedInput, true);
     }
 
     @Test
@@ -62,7 +57,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT col1 FROM table1, table2",
                 "SELECT col1 FROM table2, table1"
         );
-        testUtils.validateListAgainstRegEx("SELECT col1 FROM table1, table2", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 FROM table1, table2", toCheckedInput, true);
     }
 
     @Test
@@ -72,7 +67,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT AVG ( col1 ) ALIAS c1 FROM table1, table2",
                 "SELECT MITTELWERT(co1) AS c1 FROM table1, table2"
         );
-        testUtils.validateListAgainstRegEx("SELECT AVG(col1) AS c1 FROM table1, table2", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT AVG(col1) AS c1 FROM table1, table2", toCheckedInput, true);
     }
 
     @Test
@@ -82,7 +77,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT AVG ( col1 ) ALIAS c1, column2 FROM table1, table2",
                 "SELECT column2, MITTELWERT(co1) AS c1 FROM table2, table1"
         );
-        testUtils.validateListAgainstRegEx("SELECT AVG(col1) AS c1, column2 FROM table1, table2", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT AVG(col1) AS c1, column2 FROM table1, table2", toCheckedInput, true);
     }
 
     @Test
@@ -92,7 +87,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT col2, col1 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
                 "SELECT col2, col1 FROM table1 t1 INNER JOIN table2 t2 ON t2.key = t1.key"
         );
-        testUtils.validateListAgainstRegEx("SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key", toCheckedInput, true);
     }
 
     @Test
@@ -103,7 +98,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT col1 AS c1, col2, col3 AS c3",
                 "SELECT col1 AS c1, col2 AS c2, col3 AS c3"
         );
-        testUtils.validateListAgainstRegEx("SELECT col1, col2, col3 AS c3", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1, col2, col3 AS c3", toCheckedInput, true);
     }
 
     @Test
@@ -113,7 +108,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT DISTICT col1",
                 "SELECT  DISTINCT  col1"
         );
-        testUtils.validateListAgainstRegEx("SELECT DISTINCT col1", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT DISTINCT col1", toCheckedInput, true);
     }
 
     @Test
@@ -123,7 +118,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT UNIUE col1",
                 "SELECT  UNIQUE  col1"
         );
-        testUtils.validateListAgainstRegEx("SELECT UNIQUE col1", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT UNIQUE col1", toCheckedInput, true);
     }
 
     @Test
@@ -133,7 +128,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT  *  FROM table1",
                 "SELECT ALL FROM table1"
         );
-        testUtils.validateListAgainstRegEx("SELECT * FROM table1", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT * FROM table1", toCheckedInput, true);
     }
 
     @Test
@@ -142,7 +137,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT table1.* FROM table1",
                 "SELECT  table1.*  FROM table1"
         );
-        testUtils.validateListAgainstRegEx("SELECT table1.* FROM table1", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT table1.* FROM table1", toCheckedInput, true);
     }
 
     @Test
@@ -152,7 +147,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT * FROM table1  EMIT  CHANGES",
                 "SELECT * FROM table1 EMT CHANES"
         );
-        testUtils.validateListAgainstRegEx("SELECT * FROM table1 EMIT CHANGES", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT * FROM table1 EMIT CHANGES", toCheckedInput, true);
     }
 
     @Test
@@ -162,7 +157,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT * FROM table1 WHERE (SELECT AVG(col1) AS avgcol1 FROM table2) = col1",
                 "SELECT * FROM table1 WHERE (SELECT MITTELWERT(col1) AS avgcol1 FROM table2) = col1"
         );
-        testUtils.validateListAgainstRegEx("SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) AS avgcol1 FROM table2)", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) AS avgcol1 FROM table2)", toCheckedInput, true);
     }
 
     @Test
@@ -173,7 +168,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT * FROM table1 ALIAS t1",
                 "SELECT * FROM table1 AS t"
         );
-        testUtils.validateListAgainstRegEx("SELECT * FROM table1 t1", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT * FROM table1 t1", toCheckedInput, true);
     }
 
     @Test
@@ -184,7 +179,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT * FROM table1 ALIAS t1",
                 "SELECT * FROM table1 AS t"
         );
-        testUtils.validateListAgainstRegEx("SELECT * FROM table1", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT * FROM table1", toCheckedInput, true);
     }
 
     @Test
@@ -194,7 +189,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
         );
 
         String input = "SELECT * FROM (SELECT c1, p1) UNPIVOT (q FOR p1 IN ('a','b'))";
-        testUtils.validateListAgainstRegEx(input, toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),input, toCheckedInput, true);
     }
 
     @Test
@@ -203,7 +198,7 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT * FROM table FETCH NEXT 1 ROWS ONLY",
                 "SELECT * FROM table  FTCH  NEXT  1  ROWS  ONLY"
         );
-        testUtils.validateListAgainstRegEx("SELECT * FROM table FETCH NEXT 1 ROWS ONLY", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT * FROM table FETCH NEXT 1 ROWS ONLY", toCheckedInput, true);
     }
 
     @Test
@@ -213,6 +208,6 @@ class SelectDeParserForRegExTest extends UserSettingsPreparer{
                 "SELECT col1 AS c1 FROM tab1 t1 WHERE tab1.c1 = 5",
                 "SELECT col1 AS c1 FROM tab1 AS t1 WHERE tab1.c1 = 5"
         );
-        testUtils.validateListAgainstRegEx("SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5", toCheckedInput, true);
+        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5", toCheckedInput, true);
     }
 }
