@@ -22,7 +22,6 @@ import java.util.*;
 public class InsertDeParserForRegEx extends InsertDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
-    private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
     private final SpellingMistake keywordSpellingMistake;
     private final SpellingMistake tableNameSpellingMistake;
     private final SpellingMistake columnNameSpellingMistake;
@@ -31,13 +30,16 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     List<String> quotationMarkList = Arrays.asList("'", "`", "\"");
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
+    SettingsContainer settings;
 
     public InsertDeParserForRegEx(SettingsContainer settings) {
         this(new ExpressionDeParserForRegEx(settings), new SelectDeParserForRegEx(settings), new StringBuilder(), settings);
+        this.settings = settings;
     }
 
     public InsertDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx, SelectDeParserForRegEx selectDeParserForRegEx, StringBuilder buffer, SettingsContainer settings) {
         super(expressionDeParserForRegEx, selectDeParserForRegEx, buffer);
+        this.settings = settings;
         this.expressionDeParserForRegEx = expressionDeParserForRegEx;
         this.selectDeParserForRegEx = selectDeParserForRegEx;
         this.keywordSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
@@ -131,10 +133,10 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                         if (stringIterator.hasNext()) temp.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
                     }
                     temp.append(OPTIONAL_WHITE_SPACE).append("\\)");
-                    valueListInRightOrder.add(temp.toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+                    valueListInRightOrder.add(temp.toString());
                 }
 
-                buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrder, valueListInRightOrder));
+                buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, valueListInRightOrder));
                 buffer.append(columnsOrderOptionsIterator.hasNext() ? "|" : "");
             }
             buffer.append(")");
@@ -146,7 +148,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
             buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
             List<String> columnsAsStringList = new ArrayList<>();
             for (Column column : insert.getColumns()) {
-                columnsAsStringList.add(column.toString());
+                columnsAsStringList.add(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, column.toString()));
             }
             buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrder, columnsAsStringList));
             buffer.append(OPTIONAL_WHITE_SPACE).append("\\)");
@@ -158,7 +160,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
             buffer.append(REQUIRED_WHITE_SPACE);
             List<String> outputClauses = new ArrayList<>();
             for(SelectItem selectItem : insert.getOutputClause().getSelectItemList()){
-                outputClauses.add(selectItem.toString());
+                outputClauses.add(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, selectItem.toString()));
             }
             buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, outputClauses));
         }
@@ -225,7 +227,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
             buffer.append(REQUIRED_WHITE_SPACE);
             List<String> returningExpressionsAsStringList = new ArrayList<>();
             for (SelectItem selectItem : insert.getReturningExpressionList()) {
-                returningExpressionsAsStringList.add(selectItem.toString());
+                returningExpressionsAsStringList.add(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, selectItem.toString()));
             }
             buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrder, returningExpressionsAsStringList));
         }
@@ -266,7 +268,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                     + RegExGenerator.useOrderRotation(this.tableNameOrder, expressionListAsString)
                     + "\\)"
                     + OPTIONAL_WHITE_SPACE;
-            multiExpressionListAsString.add(singleValueListLine.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+            multiExpressionListAsString.add(singleValueListLine);
         }
         buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrder, multiExpressionListAsString));
     }
@@ -304,7 +306,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     private String[] generateColumnsRotatedArray(Set<String> keySet) {
         List<String> mappedColumnsAndRelatedValuesKeySet = new ArrayList<>();
         for (String string : keySet) {
-            mappedColumnsAndRelatedValuesKeySet.add(string.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+            mappedColumnsAndRelatedValuesKeySet.add(string);
         }
         String columnsRotated = RegExGenerator.useOrderRotation(this.tableNameOrder, mappedColumnsAndRelatedValuesKeySet);
         columnsRotated = columnsRotated.replace(OPTIONAL_WHITE_SPACE, "").replace("(?:", "").replace(")", "");
@@ -345,7 +347,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                         + RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, expressionFixed)
                         + this.generateRegExForQuotationMarks() + "?";
             }
-            expressionListAsString.add(expressionFixed.concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+            expressionListAsString.add(expressionFixed);
         }
     }
 

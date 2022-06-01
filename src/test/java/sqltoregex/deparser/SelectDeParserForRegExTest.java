@@ -1,234 +1,347 @@
 package sqltoregex.deparser;
 
-import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Test;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
+import java.util.EnumMap;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Map;
 
 class SelectDeParserForRegExTest{
     StringSynonymGenerator stringSynonymGenerator = new StringSynonymGenerator(SettingsOption.AGGREGATEFUNCTIONLANG);
     @Test
-    void testSelectFromWithTwoColumns() throws JSQLParserException {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
-        List<String> toCheckedInput = List.of(
+    void testSelectFromWithTwoColumns()  {
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1, col2 FROM table1",
                 "SELECT col2, col1 FROM table1",
                 "SELECT col2,col1 FROM table1",
                 "SELECT col2, col1 FROM table1",
                 "SELCT col2,col1 FROM table1",
                 "SELECT col2, col1 FOM table1"
+        ));;
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT col1, col2 FROM table1",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT col1, col2 FROM table1", toCheckedInput, true);
     }
 
     @Test
-    void testSelectFromWithTwoColumnsFailings() throws JSQLParserException {
+    void testSelectFromWithTwoColumnsFailings()  {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
-        List<String> toCheckedInput = List.of(
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECTcol1, col2 FROM table1",
                 "SELECT col2, col1FROM table1",
                 "SELECT col2,col1 FROMtable1",
                 "SELECT col2 col1 FROM table1",
                 "SELCTcol2,col1 FROM table1",
                 "SELECTcol2,col1FOMtable1"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT col1, col2 FROM table1",
+                matchingMap,
+                false
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT col1, col2 FROM table1", toCheckedInput, false);
     }
 
     @Test
-    void testSimpleInnerJoin() throws JSQLParserException {
+    void testSimpleInnerJoin()  {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
-        List<String> toCheckedInput = List.of(
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2",
                 "SELECT col1 FROM table1 INNER  JOIN  table2  ON  col1 = col2",
                 "SELECT col1 FROM table1 INNER  JOIN  table2  ON  col2 = col1"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer, "SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2", toCheckedInput, true);
     }
 
     @Test
-    void testFrom() throws JSQLParserException {
+    void testFrom()  {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
-        List<String> toCheckedInput = List.of(
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 FROM table1, table2",
                 "SELECT col1 FROM table2, table1"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT col1 FROM table1, table2",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT col1 FROM table1, table2", toCheckedInput, true);
     }
 
     @Test
-    void testAliasAndAggregateOne() throws JSQLParserException{
+    void testAliasAndAggregateOne() {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
         stringSynonymGenerator.addSynonymFor("AVG", "MITTELWERT");
-        defaultSettingsContainer.withStringSynonymGenerator(stringSynonymGenerator);
-        List<String> toCheckedInput = Stream.of(
+        defaultSettingsContainer.with(stringSynonymGenerator);
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT AVG(col1) AS c1 FROM table1, table2",
                 "SELECT AVG ( col1 ) ALIAS c1 FROM table1, table2",
                 "SELECT MITTELWERT(co1) AS c1 FROM table1, table2"
-        ).toList();
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT AVG(col1) AS c1 FROM table1, table2", toCheckedInput, true);
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT AVG(col1) AS c1 FROM table1, table2",
+                matchingMap,
+                true
+        );
     }
 
     @Test
-    void testAliasAndAggregateTwo() throws JSQLParserException{
+    void testAliasAndAggregateTwo() {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
         stringSynonymGenerator.addSynonymFor("AVG", "MITTELWERT");
-        defaultSettingsContainer.withStringSynonymGenerator(stringSynonymGenerator);
-        List<String> toCheckedInput = List.of(
-                "SELECT AVG(col1) AS c1, column2 FROM table1, table2",
+        defaultSettingsContainer.with(stringSynonymGenerator);
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT AVG(col1)); AS c1, column2 FROM table1, table2",
                 "SELECT AVG ( col1 ) ALIAS c1, column2 FROM table1, table2",
                 "SELECT column2, MITTELWERT(co1) AS c1 FROM table2, table1"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT AVG(col1) AS c1, column2 FROM table1, table2",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT AVG(col1) AS c1, column2 FROM table1, table2", toCheckedInput, true);
     }
 
     @Test
-    void testTableAlias() throws JSQLParserException{
+    void testTableAlias() {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
-        List<String> toCheckedInput = List.of(
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
                 "SELECT col2, col1 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
                 "SELECT col2, col1 FROM table1 t1 INNER JOIN table2 t2 ON t2.key = t1.key"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key", toCheckedInput, true);
     }
 
     @Test
-    void testOptionalAliasAddedByStudent() throws JSQLParserException{
+    void testOptionalAliasAddedByStudent() {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
-        List<String> toCheckedInput = List.of(
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1, col2, col3 AS c3",
                 "SELECT col1, col2 AS c2, col3 AS c3",
                 "SELECT col1 AS c1, col2, col3 AS c3",
                 "SELECT col1 AS c1, col2 AS c2, col3 AS c3"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT col1, col2, col3 AS c3",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT col1, col2, col3 AS c3", toCheckedInput, true);
     }
 
     @Test
-    void testDistinctKeyword() throws JSQLParserException{
+    void testDistinctKeyword() {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
-        List<String> toCheckedInput = List.of(
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT DISTINCT col1",
                 "SELECT DISTICT col1",
                 "SELECT  DISTINCT  col1"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT DISTINCT col1",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT DISTINCT col1", toCheckedInput, true);
     }
 
     @Test
-    void testUniqueKeyword() throws JSQLParserException{
+    void testUniqueKeyword() {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
-        List<String> toCheckedInput = List.of(
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT UNIQUE col1",
                 "SELECT UNIUE col1",
                 "SELECT  UNIQUE  col1"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT UNIQUE col1",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT UNIQUE col1", toCheckedInput, true);
     }
 
     @Test
-    void testSelectAll() throws JSQLParserException {
+    void testSelectAll()  {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
-        List<String> toCheckedInput = List.of(
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT * FROM table1",
                 "SELECT  *  FROM table1",
                 "SELECT ALL FROM table1"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT * FROM table1",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT * FROM table1", toCheckedInput, true);
     }
 
     @Test
-    void testSelectAllTableColumns() throws JSQLParserException {
+    void testSelectAllTableColumns()  {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
-        List<String> toCheckedInput = List.of(
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT table1.* FROM table1",
                 "SELECT  table1.*  FROM table1"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT table1.* FROM table1",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT table1.* FROM table1", toCheckedInput, true);
     }
 
     @Test
-    void testEmitChanges() throws JSQLParserException {
+    void testEmitChanges()  {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
-        List<String> toCheckedInput = List.of(
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT * FROM table1 EMIT CHANGES",
                 "SELECT * FROM table1  EMIT  CHANGES",
                 "SELECT * FROM table1 EMT CHANES"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT * FROM table1 EMIT CHANGES",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT * FROM table1 EMIT CHANGES", toCheckedInput, true);
     }
 
     @Test
-    void testSubSelect() throws JSQLParserException {
+    void testSubSelect()  {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
         stringSynonymGenerator.addSynonymFor("AVG", "MITTELWERT");
-        defaultSettingsContainer.withStringSynonymGenerator(stringSynonymGenerator);
-        List<String> toCheckedInput = List.of(
-                "SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) AS avgcol1 FROM table2)",
+        defaultSettingsContainer.with(stringSynonymGenerator);
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1)); AS avgcol1 FROM table2)",
                 "SELECT * FROM table1 WHERE (SELECT AVG(col1) AS avgcol1 FROM table2) = col1",
                 "SELECT * FROM table1 WHERE (SELECT MITTELWERT(col1) AS avgcol1 FROM table2) = col1"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) AS avgcol1 FROM table2)",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) AS avgcol1 FROM table2)", toCheckedInput, true);
     }
 
     @Test
-    void testTableNameAlias() throws JSQLParserException {
+    void testTableNameAlias()  {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
-        List<String> toCheckedInput = List.of(
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT * FROM table1 t1",
                 "SELECT * FROM table1 AS t1",
                 "SELECT * FROM table1 ALIAS t1",
                 "SELECT * FROM table1 AS t"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT * FROM table1 t1",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT * FROM table1 t1", toCheckedInput, true);
     }
 
     @Test
-    void testTableNameAliasOptionalAddedByStudent() throws JSQLParserException {
+    void testTableNameAliasOptionalAddedByStudent()  {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
-        List<String> toCheckedInput = List.of(
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT * FROM table1 t1",
                 "SELECT * FROM table1 AS t1",
                 "SELECT * FROM table1 ALIAS t1",
                 "SELECT * FROM table1 AS t"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT * FROM table1",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT * FROM table1", toCheckedInput, true);
     }
 
     @Test
-    void unPivotStatement() throws JSQLParserException {
+    void unPivotStatement()  {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
-        List<String> toCheckedInput = List.of(
-                "SELECT * FROM (SELECT c1, p1) UNPIVOT (q FOR p1 IN ('a','b'))"
-        );
-
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT * FROM (SELECT c1, p1)); UNPIVOT (q FOR p1 IN ('a','b'))"
+        ));
         String input = "SELECT * FROM (SELECT c1, p1) UNPIVOT (q FOR p1 IN ('a','b'))";
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,input, toCheckedInput, true);
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                input,
+                matchingMap,
+                true
+        );
     }
 
     @Test
-    void fetchStatement() throws JSQLParserException {
+    void fetchStatement()  {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
-        List<String> toCheckedInput = List.of(
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT * FROM table FETCH NEXT 1 ROWS ONLY",
                 "SELECT * FROM table  FTCH  NEXT  1  ROWS  ONLY"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT * FROM table FETCH NEXT 1 ROWS ONLY",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT * FROM table FETCH NEXT 1 ROWS ONLY", toCheckedInput, true);
     }
 
     @Test
-    void testComplexTableNameAliasUse() throws JSQLParserException {
+    void testComplexTableNameAliasUse()  {
         SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
-        List<String> toCheckedInput = List.of(
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5",
                 "SELECT col1 AS c1 FROM tab1 t1 WHERE tab1.c1 = 5",
                 "SELECT col1 AS c1 FROM tab1 AS t1 WHERE tab1.c1 = 5"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                defaultSettingsContainer,
+                "SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(defaultSettingsContainer,"SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5", toCheckedInput, true);
     }
 }

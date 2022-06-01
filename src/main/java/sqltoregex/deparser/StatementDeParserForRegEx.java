@@ -67,7 +67,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
 
     @Override
     public void visit(CreateTable createTable) {
-        CreateTableDeParserForRegEx createTableDeParserForRegEx = new CreateTableDeParserForRegEx(this, buffer, settingsManager);
+        CreateTableDeParserForRegEx createTableDeParserForRegEx = new CreateTableDeParserForRegEx(this, buffer, settings);
         createTableDeParserForRegEx.deParse(createTable);
     }
 

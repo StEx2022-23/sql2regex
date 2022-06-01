@@ -1,28 +1,18 @@
 package sqltoregex.deparser;
 
-import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 import sqltoregex.settings.SettingsContainer;
-import sqltoregex.settings.SettingsManager;
-import sqltoregex.settings.SettingsType;
+import sqltoregex.settings.SettingsOption;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.LinkedList;
+import java.util.EnumMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Map;
 
 class ExpressionDeParserForRegExTest {
 
     private void assertIsNonCapturingGroup(String regEx) {
-        Assertions.assertTrue(regEx.contains("(?:"));
+        Assertions.assertTrue(regEx.contains("(?:"), "Expected nonCapturing Group");
         Assertions.assertTrue(regEx.contains(")"));
     }
 
@@ -31,12 +21,15 @@ class ExpressionDeParserForRegExTest {
      */
     @Test
     void between() {
-        final List<String> matching = new LinkedList<>();
-        matching.add("a BETWEEN 1 AND 5");
-        matching.add(" a BETWEEN 1 AND 5 ");
-        matching.add("a    BETWEEN   1   AND    5");
-        final List<String> notMatching = new LinkedList<>();
-        testDeParsedExpressionVsStringLists("a BETWEEN 1 AND 5", matching, notMatching);
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "a BETWEEN 1 AND 5",
+                " a BETWEEN 1 AND 5 ",
+                "a    BETWEEN   1   AND    5"
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, "a BETWEEN 1 AND 5", matchingMap, true);
     }
 
     /**
@@ -44,18 +37,25 @@ class ExpressionDeParserForRegExTest {
      */
     @Test
     void binaryExpression() {
-        final List<String> matching = new LinkedList<>();
-        matching.add("3 / 2");
-        matching.add("3/2");
-        matching.add("3  /  2");
-        final List<String> notMatching = new LinkedList<>();
-        notMatching.add("3:2");
-        testDeParsedExpressionVsStringLists("3 / 2", matching, notMatching);
-        matching.clear();
-        notMatching.clear();
-        testDeParsedExpressionVsStringLists("4 DIV 2", matching, notMatching);
-        testDeParsedExpressionVsStringLists("4 >> 2", matching, notMatching);
-        testDeParsedExpressionVsStringLists("4 << 2", matching, notMatching);
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "3 / 2",
+                "3/2",
+                "3  /  2"
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, "3 / 2", matchingMap, true);
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "3:2"
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, "3 / 2", notMatchingMap, false);
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, "4 DIV 2", notMatchingMap, false);
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, "4 >> 2", notMatchingMap, false);
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, "4 << 2", notMatchingMap, false);
     }
 
     /**
@@ -63,191 +63,370 @@ class ExpressionDeParserForRegExTest {
      */
     @Test
     void commutativeBinaryExpression() {
-        final List<String> matching = new LinkedList<>();
-        matching.add("1 AND 2");
-        matching.add("1   AND   2");
-        matching.add("2 AND 1");
-        final List<String> notMatching = new LinkedList<>();
-        notMatching.add("1 UND 2");
-        notMatching.add("1   &&   2");
-        assertIsNonCapturingGroup(testDeParsedExpressionVsStringLists("1 AND 2", matching, notMatching));
+        final String sampleSolution = "1 AND 2";
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "1 AND 2",
+                "1   AND   2",
+                "2 AND 1"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true)
+        );
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "1 UND 2",
+                "1   &&   2"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false)
+        );
     }
 
     @Test
     void dateValue() {
-        final List<String> matching = new LinkedList<>();
-        matching.add("2022-05-17");
-        matching.add("2022-5-17");
-        final List<String> notMatching = new LinkedList<>();
-        notMatching.add("17.05.2022");
-        assertIsNonCapturingGroup(testDeParsedExpressionVsStringLists("{d'2022-05-17'}", matching, notMatching));
+        final String sampleSolution = "{d'2022-05-17'}";
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "2022-05-17",
+                "2022-5-17"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true)
+        );
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "17.05.2022"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false)
+        );
     }
 
     @Test
     void exists() {
-        final List<String> matching = new LinkedList<>();
-        final List<String> notMatching = new LinkedList<>();
-        matching.add("NOT EXISTS b");
-        matching.add("NOT  EXISTS  b");
-        testDeParsedExpressionVsStringLists("NOT EXISTS b", matching, notMatching);
+        final String sampleSolution = "NOT EXISTS b";
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "NOT EXISTS b",
+                "NOT  EXISTS  b"
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true);
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false);
     }
 
     @Test
     void fullTextSearch() {
-        final List<String> matching = new LinkedList<>();
-        matching.add("MATCH (col1,col2) AGAINST ('text' IN NATURAL LANGUAGE MODE)");
-        matching.add("MATCH  (col1 , col2)  AGAINST  ( 'text' IN NATURAL LANGUAGE MODE)");
-        matching.add("MATCH (col1,col2) AGAINST (\"text\" IN NATURAL LANGUAGE MODE)");
-        final List<String> notMatching = new LinkedList<>();
-        testDeParsedExpressionVsStringLists("MATCH (col1, col2) AGAINST ('text' IN NATURAL LANGUAGE MODE)", matching,
-                                            notMatching);
+        final String sampleSolution = "MATCH (col1, col2) AGAINST ('text' IN NATURAL LANGUAGE MODE)";
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "MATCH (col1,col2) AGAINST ('text' IN NATURAL LANGUAGE MODE)",
+                "MATCH  (col1 , col2)  AGAINST  ( 'text' IN NATURAL LANGUAGE MODE)",
+                "MATCH (col1,col2) AGAINST (\"text\" IN NATURAL LANGUAGE MODE)"
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true);
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false);
     }
 
     @Test
     void inExpression() {
-        final List<String> matching = new LinkedList<>();
-        matching.add("2(+) NOT IN 5");
-        matching.add("2(+)  NOT IN  5");
-        final List<String> notMatching = new LinkedList<>();
-        testDeParsedExpressionVsStringLists("2(+) NOT IN 5", matching, notMatching);
+        final String sampleSolution = "2(+) NOT IN 5";
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "2(+) NOT IN 5",
+                "2(+)  NOT IN  5"
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true);
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false);
     }
 
     @Test
-    void isBoolean() {
-        final List<String> matching = new LinkedList<>();
-        final List<String> notMatching = new LinkedList<>();
-        matching.add("2 IS NOT TRUE");
-        matching.add("2  IS  NOT  TRUE");
-        notMatching.add("2 ISNOT TRUE");
-        notMatching.add("2 IS NOTTRUE");
-        testDeParsedExpressionVsStringLists("2 IS NOT TRUE", matching, notMatching);
+    void isBooleanTrue() {
+        final String sampleSolution = "2 IS NOT TRUE";
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "2 IS NOT TRUE",
+                "2  IS  NOT  TRUE"
+        ));
 
-        matching.clear();
-        notMatching.clear();
-        matching.add("2 IS NOT FALSE");
-        matching.add("2  IS  NOT  FALSE");
-        notMatching.add("2 ISNOT FALSE");
-        notMatching.add("2 IS NOTFALSE");
-        testDeParsedExpressionVsStringLists("2 IS NOT FALSE", matching, notMatching);
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true);
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "2 ISNOT TRUE",
+                "2 IS NOTTRUE"
+        ));
+
+       TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false);
+    }
+
+    @Test
+    void isBooleanFalse() {
+        final String sampleSolution = "2 IS NOT FALSE";
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "2 IS NOT FALSE",
+                "2  IS  NOT  FALSE"
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true);
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "2 ISNOT FALSE",
+                "2 IS NOTFALSE"
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false);
     }
 
     @Test
     void isNullExpression() {
-        final List<String> matching = new LinkedList<>();
-        final List<String> notMatching = new LinkedList<>();
-        matching.add("2 ISNULL");
-        matching.add("2 IS NULL");
-        assertIsNonCapturingGroup(testDeParsedExpressionVsStringLists("2 ISNULL", matching, notMatching));
+        final String sampleSolution = "2 ISNULL";
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "2 ISNULL",
+                "2 IS NULL"
+        ));
 
-        matching.clear();
-        notMatching.clear();
-        matching.add("2 NOT ISNULL");
-        matching.add("2 NOT IS NULL");
-        matching.add("2 IS NOT NULL");
-        notMatching.add("2 IS NOTNULL");
-        assertIsNonCapturingGroup(testDeParsedExpressionVsStringLists("2 IS NOT NULL", matching, notMatching));
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true);
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false);
+    }
+
+    @Test
+    void isNotNullExpression() {
+        final String sampleSolution = "2 IS NOT NULL";
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "2 NOT ISNULL",
+                "2 NOT IS NULL",
+                "2 IS NOT NULL"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true)
+        );
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "2 IS NOTNULL"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false)
+        );
     }
 
     @Test
     void like() {
-        final List<String> matching = new LinkedList<>();
-        final List<String> notMatching = new LinkedList<>();
-        matching.add("a NOT LIKE b");
-        notMatching.add("a NOTLIKE b");
-        testDeParsedExpressionVsStringLists("a NOT LIKE b", matching, notMatching);
+        final String sampleSolution = "a NOT LIKE b";
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "a NOT LIKE b"
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true);
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "a NOTLIKE b"
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false);
     }
 
     @Test
     void minorThan() {
-        final List<String> matching = new LinkedList<>();
-        matching.add("5<8");
-        matching.add("5< 8");
-        matching.add("5< 8");
-        matching.add("5 < 8");
-        matching.add("8 > 5");
-        final List<String> notMatching = new LinkedList<>();
-        notMatching.add("5 > 8");
-        assertIsNonCapturingGroup(testDeParsedExpressionVsStringLists("5<8", matching, notMatching));
+        final String sampleSolution = "5<8";
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "5<8",
+                "5< 8",
+                "5< 8",
+                "5 < 8",
+                "8 > 5"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true)
+        );
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "5 > 8"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false)
+        );
     }
 
     @Test
     void minorThanEquals() {
-        final List<String> matching = new LinkedList<>();
-        matching.add("5<=8");
-        matching.add("5<= 8");
-        matching.add("5<= 8");
-        matching.add("5 <= 8");
-        matching.add("8 >= 5");
-        final List<String> notMatching = new LinkedList<>();
-        notMatching.add("5 >= 8");
-        assertIsNonCapturingGroup(testDeParsedExpressionVsStringLists("5<=8", matching, notMatching));
+        final String sampleSolution = "5<=8";
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "5<=8",
+                "5<= 8",
+                "5<= 8",
+                "5 <= 8",
+                "8 >= 5"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true)
+        );
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "5 >= 8"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false)
+        );
     }
 
     @Test
     void multiplication() {
-        final List<String> matching = new LinkedList<>();
-        matching.add("5* 8");
-        matching.add("5 *8");
-        matching.add("8*5");
-        final List<String> notMatching = new LinkedList<>();
-        assertIsNonCapturingGroup(testDeParsedExpressionVsStringLists("5*8", matching, notMatching));
+        final String sampleSolution = "5*8";
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "5* 8",
+                "5 *8",
+                "8*5"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true)
+        );
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false)
+        );
     }
 
     @Test
     void not() {
-        final List<String> matching = new LinkedList<>();
-        matching.add("NOT 5");
-        matching.add("NOT  5");
-        matching.add("!5");
-        matching.add("!  5");
-        final List<String> notMatching = new LinkedList<>();
-        notMatching.add("NICHT 5");
-        assertIsNonCapturingGroup(testDeParsedExpressionVsStringLists("NOT 5", matching, notMatching));
+        final String sampleSolution = "NOT 5";
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "NOT 5",
+                "NOT  5",
+                "!5",
+                "!  5"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true)
+        );
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "NICHT 5"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false)
+        );
     }
 
     @Test
     void notEqualsTo() {
-        final List<String> matching = new LinkedList<>();
-        matching.add("5!=NULL");
-        matching.add("NULL!=5");
-        final List<String> notMatching = new LinkedList<>();
-        assertIsNonCapturingGroup(testDeParsedExpressionVsStringLists("5!= NULL", matching, notMatching));
+        final String sampleSolution = "5!= NULL";
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "5!=NULL",
+                "NULL!=5"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true)
+        );
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false)
+        );
     }
 
     @Test
     void oldOracleJoinBinaryExpression() {
-        final List<String> matching = new LinkedList<>();
-        matching.add("2(+) = 5");
-        matching.add("2(+)=5");
-        matching.add("5 = 2(+)");
-        matching.add("5=2(+)");
-        final List<String> notMatching = new LinkedList<>();
-        assertIsNonCapturingGroup(testDeParsedExpressionVsStringLists("2(+) = 5", matching, notMatching));
-    }
+        final String sampleSolution = "2(+) = 5";
+        SettingsContainer settingsContainer = new SettingsContainer();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "2(+) = 5",
+                "2(+)=5",
+                "5 = 2(+)",
+                "5=2(+)"
+        ));
 
-    private String testDeParsedExpressionVsStringLists(String expressionString, List<String> matchingStrings,
-                                                       List<String> notMatchingStrings) {
-        StringBuilder b = new StringBuilder();
-        SettingsContainer settings = new SettingsContainer();
-        try {
-            Expression expression = CCJSqlParserUtil.parseExpression(
-                    expressionString);
-            ExpressionDeParserForRegEx deParser = new ExpressionDeParserForRegEx(settings);
-            deParser.setBuffer(b);
-            expression.accept(deParser);
-            Pattern pattern = Pattern.compile(b.toString());
-            for (String testString : matchingStrings) {
-                Matcher matcher = pattern.matcher(testString);
-                Assertions.assertTrue(matcher.matches(), "Pattern:" + b + " test String:" + testString);
-            }
-            for (String testString : notMatchingStrings) {
-                Matcher matcher = pattern.matcher(testString);
-                Assertions.assertFalse(matcher.matches(), "Pattern:" + b + " test String:" + testString);
-            }
-        } catch (JSQLParserException e) {
-            Assertions.fail("Expression couldn't get parsed");
-        }
-        return b.toString();
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true)
+        );
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false)
+        );
     }
 
     @Test
@@ -257,7 +436,7 @@ class ExpressionDeParserForRegExTest {
         SelectDeParserForRegEx selectDeParserForRegEx = new SelectDeParserForRegEx(settings);
         ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settings);
         OrderByDeParserForRegEx orderByDeParserForRegEx = new OrderByDeParserForRegEx(expressionDeParserForRegEx,
-                                                                                      buffer, settings);
+                buffer, settings);
         ExpressionDeParserForRegEx expressionDeParserForRegExTwo = new ExpressionDeParserForRegEx(
                 selectDeParserForRegEx, buffer, orderByDeParserForRegEx, settings);
         Assertions.assertNotNull(expressionDeParserForRegExTwo);

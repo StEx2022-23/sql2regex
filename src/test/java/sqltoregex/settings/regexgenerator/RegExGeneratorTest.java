@@ -1,15 +1,10 @@
 package sqltoregex.settings.regexgenerator;
 
 import net.sf.jsqlparser.expression.DateValue;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.schema.Column;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-import sqltoregex.deparser.ExpressionDeParserForRegEx;
 import sqltoregex.deparser.UserSettingsPreparer;
-import sqltoregex.settings.SettingsContainer;
-import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.SettingsType;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
@@ -50,7 +45,7 @@ class RegExGeneratorTest extends UserSettingsPreparer {
         List<String> stringList = new LinkedList<>();
         stringList.add("1");
         stringList.add("2");
-        String orderRotatedExpections = "(?:1\\s*,\\s*2|2\\s*,\\s*1)";
+        String orderRotatedExpections = "(1\\s*,\\s*2|2\\s*,\\s*1)";
         String orderRotatedList = RegExGenerator.useOrderRotation(new OrderRotation(SettingsOption.TABLENAMEORDER),
                                                                   stringList);
         Assertions.assertEquals(orderRotatedExpections, orderRotatedList);
@@ -88,32 +83,5 @@ class RegExGeneratorTest extends UserSettingsPreparer {
         Assertions.assertTrue(regex.contains("Coke"));
 
         Assertions.assertEquals("Cola", RegExGenerator.useStringSynonymGenerator(null, "Cola"));
-    }
-
-    @Test
-    void useExpressionRotation() {
-        SettingsContainer settings = new SettingsContainer();
-        GroupByElementRotation expressionRotation = new GroupByElementRotation(SettingsOption.DEFAULT);
-
-        List<Expression> expressionList = new LinkedList<>(List.of(new Column("a"), new Column("b")));
-        StringBuilder buffer = new StringBuilder();
-        ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settings);
-        expressionDeParserForRegEx.setBuffer(buffer);
-        String regex = RegExGenerator.useExpressionRotation(expressionRotation, expressionDeParserForRegEx,
-                                                            expressionList);
-        Assertions.assertNotEquals("a\\s*,\\s*b", regex);
-
-        List<Expression> expressionListWithOutRotation = new LinkedList<>(List.of(new Column("a"), new Column("b")));
-
-
-        ExpressionDeParserForRegEx expressionDeParserForRegExWithoutRotation = new ExpressionDeParserForRegEx(
-                settings);
-        String regexWithoutRotation = RegExGenerator.useExpressionRotation(
-                null,
-                expressionDeParserForRegExWithoutRotation,
-                expressionListWithOutRotation
-        );
-        Assertions.assertEquals("\\s*a\\s*,\\s*b\\s*",
-                                regexWithoutRotation);
     }
 }

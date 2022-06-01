@@ -1,6 +1,5 @@
 package sqltoregex.settings;
 
-import sqltoregex.settings.regexgenerator.GroupByElementRotation;
 import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
@@ -10,43 +9,16 @@ import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.Set;
 
 public class SettingsContainer {
-    SingleSettingsContainer<SpellingMistake> spellingMistakes = new SingleSettingsContainer<>();
-    SingleSettingsContainer<OrderRotation> orderRotations = new SingleSettingsContainer<>();
-    SingleSettingsContainer<StringSynonymGenerator> stringSynonymGenerators = new SingleSettingsContainer<>();
-    SingleSettingsContainer<DateAndTimeFormatSynonymGenerator> dateAndTimeFormatSynonymGenerators = new SingleSettingsContainer<>();
-    SingleSettingsContainer<GroupByElementRotation> groupByElementRotations = new SingleSettingsContainer<>();
+    SettingsMap<IRegExGenerator<?>> allSettings = new SettingsMap<>();
 
-    public class SingleSettingsContainer<V extends IRegExGenerator<?>> extends EnumMap<SettingsOption,V>{
-
-        SingleSettingsContainer(){
-            super(SettingsOption.class);
-        }
-
-        V get(SettingsOption settingsOption){
-            return getOrDefault(settingsOption, null);
-        }
+    public void putAll(SettingsContainer settingsContainer) {
+        allSettings.putAll(settingsContainer.allSettings);
     }
 
-    public SettingsContainer withOrderRotation(OrderRotation orderRotation){
-       orderRotations.put(orderRotation.getSettingsOption(), orderRotation);
-        return this;
-    }
-
-    public SettingsContainer withSpellingMistake(SpellingMistake spellingMistake){
-        this.spellingMistakes.put(spellingMistake.getSettingsOption(), spellingMistake);
-        return this;
-    }
-
-    public SettingsContainer withStringSynonymGenerator(StringSynonymGenerator synonymGenerator){
-        stringSynonymGenerators.put(synonymGenerator.getSettingsOption(), synonymGenerator);
-        return this;
-    }
-
-    public SettingsContainer withDateAndTimeSynonymGenerator(DateAndTimeFormatSynonymGenerator synonymGenerator){
-        dateAndTimeFormatSynonymGenerators.put(synonymGenerator.getSettingsOption(), synonymGenerator);
+    public SettingsContainer with(IRegExGenerator<?> regExGenerator){
+        this.allSettings.put(regExGenerator.getSettingsOption(), regExGenerator);
         return this;
     }
 
@@ -54,32 +26,10 @@ public class SettingsContainer {
         for(SettingsOption settingsOption : SettingsOption.values()){
             switch (settingsOption){
                 case COLUMNNAMEORDER, TABLENAMEORDER, GROUPBYELEMENTORDER -> {
-                    this.withOrderRotation(new OrderRotation(settingsOption));
+                    this.with(new OrderRotation(settingsOption));
                 }
                 case KEYWORDSPELLING, COLUMNNAMESPELLING, TABLENAMESPELLING -> {
-                    this.withSpellingMistake(new SpellingMistake(settingsOption));
-                }
-            }
-        }
-        return this;
-    }
-
-    public SettingsContainer withAllSpellingMistakes(){
-        for(SettingsOption settingsOption : SettingsOption.values()){
-            switch (settingsOption){
-                case COLUMNNAMEORDER, TABLENAMEORDER, GROUPBYELEMENTORDER -> {
-                    this.withOrderRotation(new OrderRotation(settingsOption));
-                }
-            }
-        }
-        return this;
-    }
-
-    public SettingsContainer withAllOrderRotations(){
-        for(SettingsOption settingsOption : SettingsOption.values()){
-            switch (settingsOption){
-                case KEYWORDSPELLING, COLUMNNAMESPELLING, TABLENAMESPELLING -> {
-                    this.withSpellingMistake(new SpellingMistake(settingsOption));
+                    this.with(new SpellingMistake(settingsOption));
                 }
             }
         }
@@ -88,38 +38,48 @@ public class SettingsContainer {
 
     public SettingsContainer withSettingsManager(SettingsManager settingsManager){
         for (OrderRotation orderRotation : settingsManager.getSettingByClass(OrderRotation.class)){
-            this.withOrderRotation(orderRotation);
+            this.with(orderRotation);
         }
         for (SpellingMistake spellingMistake : settingsManager.getSettingByClass(SpellingMistake.class)){
-            this.withSpellingMistake(spellingMistake);
+            this.with(spellingMistake);
         }
         for (StringSynonymGenerator synonymGenerator : settingsManager.getSettingByClass(StringSynonymGenerator.class)){
-            this.withStringSynonymGenerator(synonymGenerator);
+            this.with(synonymGenerator);
         }
         for (DateAndTimeFormatSynonymGenerator synonymGenerator : settingsManager.getSettingByClass(DateAndTimeFormatSynonymGenerator.class)){
-            this.withDateAndTimeSynonymGenerator(synonymGenerator);
+            this.with(synonymGenerator);
         }
         return this;
     }
 
-    public <C extends IRegExGenerator<?>> SingleSettingsContainer<C> get(Class<C> clazz){
+    public IRegExGenerator<?> get(SettingsOption settingsOption){
+        for (IRegExGenerator<?> generator : this.allSettings.values()){
+            if (generator.getSettingsOption() == settingsOption){
+                return generator;
+            }
+        }
+        return null;
+    }
+
+    public <C extends IRegExGenerator<?>> SettingsMap<C> get(Class<C> clazz){
         try {
             if (OrderRotation.class.isAssignableFrom(clazz)) {
-                return castSingleSettingsContainer (this.orderRotations, clazz);
-            }else if (GroupByElementRotation.class.isAssignableFrom(clazz)){
-                return castSingleSettingsContainer (this.groupByElementRotations, clazz);
+                return castSingleSettingsContainer (this.allSettings, clazz);
+            }else if (OrderRotation.class.isAssignableFrom(clazz)){
+                return castSingleSettingsContainer (this.allSettings, clazz);
             } else if (SpellingMistake.class.isAssignableFrom(clazz)) {
-                return castSingleSettingsContainer (this.spellingMistakes, clazz);
+                return castSingleSettingsContainer (this.allSettings, clazz);
             } else if (SynonymGenerator.class.isAssignableFrom(clazz) ) {
-                return castSingleSettingsContainer (this.stringSynonymGenerators, clazz);
+                return castSingleSettingsContainer (this.allSettings, clazz);
             }else{
                 return null;
             }
         } catch (ClassCastException e){ return null;}
     }
 
-    private <T extends IRegExGenerator<?>> SingleSettingsContainer<T> castSingleSettingsContainer(SingleSettingsContainer<?> singleSettingsContainer, Class<T> clazz){
-        SingleSettingsContainer<T> newContainer = new SingleSettingsContainer<>();
+
+    private <T extends IRegExGenerator<?>> SettingsMap<T> castSingleSettingsContainer(SettingsMap<?> singleSettingsContainer, Class<T> clazz){
+        SettingsMap<T> newContainer = new SettingsMap<>();
 
         for (Map.Entry<SettingsOption,?> entry : singleSettingsContainer.entrySet()){
             try{
@@ -131,19 +91,8 @@ public class SettingsContainer {
         return newContainer;
     }
 
-    public Map<SettingsOption, SpellingMistake> getSpellingMistakes(){
-        return this.spellingMistakes;
+    public Map<SettingsOption, IRegExGenerator<?>> getAllSettings(){
+        return this.allSettings;
     }
 
-    public Map<SettingsOption, OrderRotation> getOrderRotations(){
-        return this.orderRotations;
-    }
-
-    public SingleSettingsContainer<StringSynonymGenerator> getStringSynonymGenerators() {
-        return stringSynonymGenerators;
-    }
-
-    public SingleSettingsContainer<DateAndTimeFormatSynonymGenerator> getDateAndTimeFormatSynonymGenerators() {
-        return dateAndTimeFormatSynonymGenerators;
-    }
 }

@@ -5,18 +5,21 @@ import net.sf.jsqlparser.statement.select.GroupByElement;
 import net.sf.jsqlparser.util.deparser.GroupByDeParser;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
-import sqltoregex.settings.regexgenerator.GroupByElementRotation;
+import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GroupByDeParserForRegEx extends GroupByDeParser {
+    Map<String, String> tableNameAliasMap = new HashMap<>();
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SpellingMistake keywordSpellingMistake;
-    private final GroupByElementRotation groupByElementOrder;
+    private final OrderRotation groupByOrderRotation;
     private final ExpressionDeParserForRegEx expressionDeParserForRegEx;
     private final SettingsContainer settings;
 
@@ -25,7 +28,7 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
         super(expressionDeParser, buffer);
         this.expressionDeParserForRegEx = expressionDeParser;
         this.keywordSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
-        this.groupByElementOrder = settings.get(GroupByElementRotation.class).get(SettingsOption.GROUPBYELEMENTORDER);
+        this.groupByOrderRotation = settings.get(OrderRotation.class).get(SettingsOption.GROUPBYELEMENTORDER);
         this.settings = settings;
     }
 
@@ -43,27 +46,31 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
         }
 
         List<Expression> expressions = groupBy.getGroupByExpressionList().getExpressions();
-        if (this.groupByElementOrder != null) {
-            this.groupByElementOrder.setCapturingGroup(true);
-        }
 
-        buffer.append(RegExGenerator.useExpressionRotation(this.groupByElementOrder, this.expressionDeParserForRegEx,
-                                                           expressions));
+        buffer.append(RegExGenerator.useOrderRotation(this.groupByOrderRotation, this.expressionListToStringList(expressions)));
         if (groupBy.isUsingBrackets()) {
             buffer.append(OPTIONAL_WHITE_SPACE);
             buffer.append(")");
         }
     }
 
-    public GroupByElementRotation getGroupByElementOrder(){
-        return this.groupByElementOrder;
+    public ExpressionDeParserForRegEx expressionDeParserForRegEx(){
+        return this.expressionDeParserForRegEx;
+    }
+
+    public void setTableNameAliasMap(Map<String, String> tableNameAliasMap){
+        this.tableNameAliasMap = tableNameAliasMap;
+    }
+
+    public Map<String, String> getTableNameAliasMap(){
+        return this.tableNameAliasMap;
     }
 
     public List<String> expressionListToStringList(List<Expression> expressionList){
         List<String> deParsedExpressionsAsString = new ArrayList<>();
         StringBuilder tempBuffer = new StringBuilder();
         ExpressionDeParserForRegEx tempExpressionDeParserForRegEx = new ExpressionDeParserForRegEx(new SelectDeParserForRegEx(this.settings), tempBuffer, this.settings);
-
+        tempExpressionDeParserForRegEx.setTableNameAliasMap(this.getTableNameAliasMap());
         for(Expression expression : expressionList){
             expression.accept(tempExpressionDeParserForRegEx);
             deParsedExpressionsAsString.add(tempBuffer.toString());

@@ -17,7 +17,7 @@ public class SettingsContainerTest {
         OrderRotation orderRotation1 = new OrderRotation(SettingsOption.TABLENAMEORDER);
         SpellingMistake spellingMistake1 = new SpellingMistake(SettingsOption.TABLENAMESPELLING);
         StringSynonymGenerator stringSynonymGenerator1 = new StringSynonymGenerator(SettingsOption.AGGREGATEFUNCTIONLANG);
-        settingsContainer.withOrderRotation(orderRotation1).withSpellingMistake(spellingMistake1).withStringSynonymGenerator(stringSynonymGenerator1);
+        settingsContainer.with(orderRotation1).with(spellingMistake1).with(stringSynonymGenerator1);
 
         Assertions.assertEquals(settingsContainer.get(OrderRotation.class).get(SettingsOption.TABLENAMEORDER), orderRotation1);
         Assertions.assertEquals(settingsContainer.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING), spellingMistake1);

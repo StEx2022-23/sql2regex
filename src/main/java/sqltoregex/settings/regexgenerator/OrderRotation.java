@@ -17,6 +17,7 @@ import java.util.Objects;
 public class OrderRotation extends RegExGenerator<List<String>> {
     private final StringBuilder buffer = new StringBuilder();
     private final SettingsOption settingsOption;
+    boolean isCapturingGroup = false;
 
     public OrderRotation(SettingsOption settingsOption) {
         Assert.notNull(settingsOption, "SettingsOption must not be null");
@@ -76,6 +77,11 @@ public class OrderRotation extends RegExGenerator<List<String>> {
                 orderRotationRek(amount - 1, valueList);
             }
         }
+    }
+
+    @Override
+    public void setCapturingGroup(boolean capturingGroup) {
+        this.isCapturingGroup = capturingGroup;
     }
 
     @Override

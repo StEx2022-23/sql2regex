@@ -422,7 +422,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         if (plainSelect.getWhere() != null) {
             buffer.append(OPTIONAL_WHITE_SPACE);
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "WHERE", true);
-            this.expressionDeParserForRegEx.appendTableNameAliasPair(plainSelect.getFromItem().toString());
+            this.expressionDeParserForRegEx.addTableNameAlias(plainSelect.getFromItem().toString());
             plainSelect.getWhere().accept(this.getExpressionVisitor());
         }
 
@@ -434,8 +434,8 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             buffer.append(REQUIRED_WHITE_SPACE);
             GroupByDeParserForRegEx groupByDeParserForRegEx = new GroupByDeParserForRegEx(this.expressionDeParserForRegEx, buffer, settingsContainer);
             if(plainSelect.getFromItem() != null){
-                this.expressionDeParserForRegEx.appendTableNameAliasPair(plainSelect.getFromItem().toString());
-                groupByDeParserForRegEx.getGroupByElementOrder().setAliasMap(this.expressionDeParserForRegEx.getAliasMap());
+                this.expressionDeParserForRegEx.addTableNameAlias(plainSelect.getFromItem().toString());
+                groupByDeParserForRegEx.setTableNameAliasMap(this.expressionDeParserForRegEx.getTableNameAliasMap());
             }
             groupByDeParserForRegEx.deParse(plainSelect.getGroupBy());
         }

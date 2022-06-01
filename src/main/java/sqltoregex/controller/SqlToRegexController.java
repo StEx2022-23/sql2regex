@@ -14,7 +14,6 @@ import sqltoregex.settings.SettingsForm;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.SettingsType;
-import sqltoregex.settings.regexgenerator.GroupByElementRotation;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
@@ -127,7 +126,7 @@ public class SqlToRegexController {
                 .ifPresent(tableNameOrder -> orders.add(tableNameOrder.getSettingsOption()));
         settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class, settingsType)
                 .ifPresent(columnNameOrder -> orders.add(columnNameOrder.getSettingsOption()));
-        settingsManager.getSettingBySettingsOption(SettingsOption.GROUPBYELEMENTORDER, GroupByElementRotation.class,
+        settingsManager.getSettingBySettingsOption(SettingsOption.GROUPBYELEMENTORDER, OrderRotation.class,
                         settingsType)
                 .ifPresent(expressionOrder -> orders.add(expressionOrder.getSettingsOption()));
         return orders;

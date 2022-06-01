@@ -1,46 +1,65 @@
 package sqltoregex.deparser;
 
-import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sqltoregex.settings.SettingsContainer;
+import sqltoregex.settings.SettingsOption;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 class OrderByDeParserForRegExTest{
 
     @Test
-    void testComplexerOrderByWithIsSibling() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
+    void testComplexerOrderByWithIsSibling() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 FROM table1 ORDER SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
                 "SELECT col1 FROM table1 ORDER SIBLINGS  BY col2 ASC NULLS FIRST, col1 DESC NULLS LAST",
                 "SELECT col1 FROM table1 ORDER  SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
                 "SELECT col1 FROM table1 ORDER SIBLNGS BY col1 DESC NULS LAST, col2 AC NULS FIRST"
+                )
         );
-        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 FROM table1 ORDER SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
-                                 toCheckedInput, true);
+        TestUtils.validateStatementAgainstRegEx(
+                new SettingsContainer(),
+                "SELECT col1 FROM table1 ORDER SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
+                matchingMap,
+                true
+        );
     }
 
     @Test
-    void testComplexerOrderByWithNullFirstLast() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
+    void testComplexerOrderByWithNullFirstLast() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 FROM table1 ORDER BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
                 "SELECT col1 FROM table1 ORDER BY col2 ASC NULLS FIRST, col1 DESC NULLS LAST",
                 "SELECT col1 FROM table1 ORDER BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
                 "SELECT col1 FROM table1 ORDER BY col1 DESC NULS LAST, col2 AC NULS FIRST"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                new SettingsContainer(),
+                "SELECT col1 FROM table1 ORDER BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 FROM table1 ORDER BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
-                                 toCheckedInput, true);
     }
 
     @Test
-    void testComplexerOrderByWithSynonyms() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
+    void testComplexerOrderByWithSynonyms() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 FROM table1 ORDER BY col1 absteigend, col2 ASC",
                 "SELECT col1 FROM table1 ORDER BY col2 ASC, col1 absteigend",
                 "SELECT col1 FROM table1 ORDER BY col1  DESC , col2  aufsteigend"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                new SettingsContainer(),
+                "SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC", toCheckedInput, true);
     }
 
     @Test
@@ -56,67 +75,107 @@ class OrderByDeParserForRegExTest{
     }
 
     @Test
-    void testSimpleOrderByAsc() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
+    void testSimpleOrderByAsc() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1, col2 FROM table1 ORDER BY col1 ASC"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                new SettingsContainer(),
+                "SELECT col1, col2 FROM table1 ORDER BY col1 ASC",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1, col2 FROM table1 ORDER BY col1 ASC", toCheckedInput, true);
     }
 
     @Test
-    void testSimpleOrderByDesc() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
+    void testSimpleOrderByDesc() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1, col2 FROM table1 ORDER BY col1 DESC"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                new SettingsContainer(),
+                "SELECT col1, col2 FROM table1 ORDER BY col1 DESC",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1, col2 FROM table1 ORDER BY col1 DESC", toCheckedInput, true);
     }
 
     @Test
-    void testComplexerOrderBy() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
+    void testComplexerOrderBy() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC",
                 "SELECT col1 FROM table1 ORDER BY col2 ASC, col1 DESC",
                 "SELECT col1 FROM table1 ORDER BY col1  DESC , col2  ASC"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                new SettingsContainer(),
+                "SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC", toCheckedInput, true);
     }
 
     @Test
-    void testComplexerOrderByWithTableNameAlias() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
+    void testComplexerOrderByWithTableNameAlias() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 FROM table1 t1 ORDER BY t1.col1, t1.col2"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                new SettingsContainer(),
+                "SELECT col1 FROM table1 t1 ORDER BY t1.col1, t1.col2",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 FROM table1 t1 ORDER BY t1.col1, t1.col2", toCheckedInput, true);
     }
 
     @Test
-    void testComplexerOrderByWithAggregateFunction() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT col1 FROM table1 t1 ORDER BY SUM(col1)",
+    void testComplexerOrderByWithAggregateFunction() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT col1 FROM table1 t1 ORDER BY SUM(col1));",
                 "SELECT col1 FROM table1 t1 ORDER BY SUMME(col1)"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                new SettingsContainer(),
+                "SELECT col1 FROM table1 t1 ORDER BY SUM(col1)",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 FROM table1 t1 ORDER BY SUM(col1)", toCheckedInput, true);
     }
 
     @Test
-    void testComplexerOrderByWithAggregateFunctionAndTwoArguments() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT col1 FROM table1 t1 ORDER BY SUM(col1), col2",
+    void testComplexerOrderByWithAggregateFunctionAndTwoArguments() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT col1 FROM table1 t1 ORDER BY SUM(col1));, col2",
                 "SELECT col1 FROM table1 t1 ORDER BY col2, SUM(col1)",
                 "SELECT col1 FROM table1 t1 ORDER BY col2, SUMME(col1)"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                new SettingsContainer(),
+                "SELECT col1 FROM table1 t1 ORDER BY SUM(col1), col2",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 FROM table1 t1 ORDER BY SUM(col1), col2", toCheckedInput, true);
     }
 
     @Test
-    void testComplexerOrderByWithAggregateFunctionAndTwoArgumentsAndTableNameAlias() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "SELECT col1 FROM table1 t1 ORDER BY SUM(t1.col1), t1.col2",
+    void testComplexerOrderByWithAggregateFunctionAndTwoArgumentsAndTableNameAlias() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT col1 FROM table1 t1 ORDER BY SUM(t1.col1));, t1.col2",
                 "SELECT col1 FROM table1 t1 ORDER BY t1.col2, SUM(col1)",
                 "SELECT col1 FROM table1 t1 ORDER BY col2, SUMME(col1)"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                new SettingsContainer(),
+                "SELECT col1 FROM table1 t1 ORDER BY SUM(t1.col1), t1.col2",
+                matchingMap,
+                true
         );
-        TestUtils.validateListAgainstRegEx(new SettingsContainer(),"SELECT col1 FROM table1 t1 ORDER BY SUM(t1.col1), t1.col2", toCheckedInput, true);
     }
-
-
 }

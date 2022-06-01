@@ -62,7 +62,8 @@
           <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
           <value>ASC;aufsteigend</value>
           <value>DESC;absteigend</value>
-          <value>!;NOT</value>
+          <value>NOT;!</value>
+          <value>NOT;NICHT</value>
       </othersynonyms>
   </synonyms>
 </properties>

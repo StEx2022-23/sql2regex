@@ -3,7 +3,6 @@ package sqltoregex.settings;
 import org.springframework.util.Assert;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import sqltoregex.settings.regexgenerator.GroupByElementRotation;
 import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
@@ -16,25 +15,13 @@ import java.util.*;
 class SettingsMapBuilder {
     private static final String UNSUPPORTED_BUILD_WITH = "Unsupported build with:";
     private static final String STRING_SYNONYM_DELIMITER = ";";
-    private final Set<OrderRotation> orderRotations;
     private final Map<SettingsOption, IRegExGenerator<?>> settingsMap;
-    private final Set<SpellingMistake> spellingMistakes;
 
     public SettingsMapBuilder() {
         this.settingsMap = new EnumMap<>(SettingsOption.class);
-        this.orderRotations = new LinkedHashSet<>();
-        this.spellingMistakes = new LinkedHashSet<>();
     }
 
     public Map<SettingsOption, IRegExGenerator<?>> build() {
-        for (OrderRotation orderRotation : orderRotations) {
-            SettingsOption settingsOption = orderRotation.getSettingsOption();
-            SpellingMistake spellingMistake = new SpellingMistake(SettingsOption.valueOf(
-                    settingsOption.toString().substring(0, settingsOption.toString().length() - 5) + "SPELLING"));
-            if (spellingMistakes.contains(spellingMistake)) {
-//                orderRotation.setSpellingMistake(spellingMistake);
-            }
-        }
         return this.settingsMap;
     }
 
@@ -45,7 +32,7 @@ class SettingsMapBuilder {
 
         switch (settingsOption) {
             //TODO: add not as eclamation mark after refactoring
-            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, GROUPBYELEMENTORDER -> this.withSettingsOption(
+            case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, GROUPBYELEMENTORDER, INDEXCOLUMNNAMEORDER -> this.withSettingsOption(
                     settingsOption);
             case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
                 Set<String> valueList = new HashSet<>();
@@ -81,16 +68,10 @@ class SettingsMapBuilder {
             case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING -> {
                 SpellingMistake spellingMistake = new SpellingMistake(settingsOption);
                 this.settingsMap.put(settingsOption, spellingMistake);
-                spellingMistakes.add(spellingMistake);
             }
-            case TABLENAMEORDER, COLUMNNAMEORDER, INDEXCOLUMNNAMEORDER -> {
+            case TABLENAMEORDER, COLUMNNAMEORDER, INDEXCOLUMNNAMEORDER, GROUPBYELEMENTORDER -> {
                 OrderRotation orderRotation = new OrderRotation(settingsOption);
                 this.settingsMap.put(settingsOption, orderRotation);
-                orderRotations.add(orderRotation);
-            }
-            case GROUPBYELEMENTORDER -> {
-                GroupByElementRotation groupByElementRotation = new GroupByElementRotation(settingsOption);
-                this.settingsMap.put(settingsOption, groupByElementRotation);
             }
             default -> throw new IllegalArgumentException(UNSUPPORTED_BUILD_WITH + settingsOption);
         }
