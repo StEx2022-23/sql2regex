@@ -7,7 +7,6 @@ import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSyno
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
-import java.util.EnumMap;
 import java.util.Map;
 
 public class SettingsContainer {
