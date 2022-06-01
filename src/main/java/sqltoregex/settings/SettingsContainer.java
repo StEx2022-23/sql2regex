@@ -18,29 +18,9 @@ public class SettingsContainer {
         return this;
     }
 
-    public static class SettingsMap<V extends IRegExGenerator<?>> extends EnumMap<SettingsOption,V> {
-
-        SettingsMap(){
-            super(SettingsOption.class);
-        }
-
-        public V get(SettingsOption settingsOption){
-            return getOrDefault(settingsOption, null);
-        }
-
-        @Override
-        public V get(Object key) {
-            if(!(key instanceof SettingsOption)){
-                throw new UnsupportedOperationException("Not allowed for this implementation.");
-            }
-            return super.get(key);
-        }
-    }
-
     public void putAll(SettingsContainer settingsContainer) {
         allSettings.putAll(settingsContainer.allSettings);
     }
-
 
     public SettingsContainer withAllSpellingMistakesAndOrderRotations(){
         for(SettingsOption settingsOption : SettingsOption.values()){
@@ -83,8 +63,6 @@ public class SettingsContainer {
     public <C extends IRegExGenerator<?>> SettingsMap<C> get(Class<C> clazz){
         try {
             if (OrderRotation.class.isAssignableFrom(clazz)) {
-                return castSingleSettingsContainer (this.allSettings, clazz);
-            }else if (OrderRotation.class.isAssignableFrom(clazz)){
                 return castSingleSettingsContainer (this.allSettings, clazz);
             } else if (SpellingMistake.class.isAssignableFrom(clazz)) {
                 return castSingleSettingsContainer (this.allSettings, clazz);
