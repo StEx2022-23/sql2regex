@@ -31,7 +31,6 @@ class SettingsMapBuilder {
         }
 
         switch (settingsOption) {
-            //TODO: add not as eclamation mark after refactoring
             case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, GROUPBYELEMENTORDER, INDEXCOLUMNNAMEORDER -> this.withSettingsOption(
                     settingsOption);
             case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {

@@ -9,7 +9,7 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
-public class SettingsContainerTest {
+class SettingsContainerTest {
 
     @Test
     void testCast(){

@@ -12,7 +12,6 @@ import java.util.Objects;
  */
 public class SpellingMistake extends RegExGenerator<String> {
     private final SettingsOption settingsOption;
-    boolean isCapturingGroup = false;
 
     public SpellingMistake(SettingsOption settingsOption) {
         this.settingsOption = settingsOption;
@@ -42,11 +41,6 @@ public class SpellingMistake extends RegExGenerator<String> {
         alternativeWritingStyles.replace(alternativeWritingStyles.length() - 1, alternativeWritingStyles.length(), "");
         alternativeWritingStyles.append(')');
         return alternativeWritingStyles.toString();
-    }
-
-    @Override
-    public void setCapturingGroup(boolean capturingGroup) {
-        this.isCapturingGroup = capturingGroup;
     }
 
     @Override
