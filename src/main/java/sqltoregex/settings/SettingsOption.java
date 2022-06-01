@@ -9,6 +9,8 @@ public enum SettingsOption {
     TABLENAMESPELLING,
     COLUMNNAMEORDER,
     TABLENAMEORDER,
+    INDEXCOLUMNNAMEORDER,
+    INDEXCOLUMNNAMESPELLING,
     DATESYNONYMS,
     DATETIMESYNONYMS,
     TIMESYNONYMS,
@@ -18,4 +20,5 @@ public enum SettingsOption {
     DEFAULT
     // when extending this class keep the naming of the enums and the xml tags the same
     // that they can easily be transformed in each other
+    // Spellings and orders need to be added in pairs
 }

@@ -25,6 +25,13 @@ class SettingsMapBuilderTest {
 //                                orderRotation.getSpellingMistake());
 //    }
 
+    @Test
+    void orderRotationHasNoSpellingByDefault(){
+        builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
+        OrderRotation orderRotation = (OrderRotation) builder.build().get(SettingsOption.COLUMNNAMEORDER);
+        Assertions.assertNull(orderRotation.getSpellingMistake());
+    }
+
     @BeforeEach
     void beforeEach() {
         builder = new SettingsMapBuilder();

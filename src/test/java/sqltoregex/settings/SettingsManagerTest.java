@@ -61,8 +61,8 @@ class SettingsManagerTest {
 
     @Test
     void testGetSettingByClazz() {
-        Assertions.assertEquals(3, settingsManager.getSettingByClass(SpellingMistake.class, SettingsType.ALL).size());
-        Assertions.assertEquals(2, settingsManager.getSettingByClass(OrderRotation.class, SettingsType.ALL).size());
+        Assertions.assertEquals(4, settingsManager.getSettingByClass(SpellingMistake.class, SettingsType.ALL).size());
+        Assertions.assertEquals(3, settingsManager.getSettingByClass(OrderRotation.class, SettingsType.ALL).size());
         Assertions.assertEquals(2, settingsManager.getSettingByClass(StringSynonymGenerator.class, SettingsType.ALL)
                 .size());
     }
