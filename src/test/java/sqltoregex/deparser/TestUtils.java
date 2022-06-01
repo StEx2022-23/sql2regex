@@ -4,14 +4,8 @@ import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import org.junit.jupiter.api.Assertions;
-import org.xml.sax.SAXException;
 import sqltoregex.settings.SettingsContainer;
-import sqltoregex.settings.SettingsType;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

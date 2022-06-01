@@ -50,6 +50,42 @@ public class SettingsContainer {
         return this;
     }
 
+    public SettingsContainer withAllSpellingMistakesAndOrderRotations(){
+        for(SettingsOption settingsOption : SettingsOption.values()){
+            switch (settingsOption){
+                case COLUMNNAMEORDER, TABLENAMEORDER, GROUPBYELEMENTORDER -> {
+                    this.withOrderRotation(new OrderRotation(settingsOption));
+                }
+                case KEYWORDSPELLING, COLUMNNAMESPELLING, TABLENAMESPELLING -> {
+                    this.withSpellingMistake(new SpellingMistake(settingsOption));
+                }
+            }
+        }
+        return this;
+    }
+
+    public SettingsContainer withAllSpellingMistakes(){
+        for(SettingsOption settingsOption : SettingsOption.values()){
+            switch (settingsOption){
+                case COLUMNNAMEORDER, TABLENAMEORDER, GROUPBYELEMENTORDER -> {
+                    this.withOrderRotation(new OrderRotation(settingsOption));
+                }
+            }
+        }
+        return this;
+    }
+
+    public SettingsContainer withAllOrderRotations(){
+        for(SettingsOption settingsOption : SettingsOption.values()){
+            switch (settingsOption){
+                case KEYWORDSPELLING, COLUMNNAMESPELLING, TABLENAMESPELLING -> {
+                    this.withSpellingMistake(new SpellingMistake(settingsOption));
+                }
+            }
+        }
+        return this;
+    }
+
     public SettingsContainer withSettingsManager(SettingsManager settingsManager){
         for (OrderRotation orderRotation : settingsManager.getSettingByClass(OrderRotation.class)){
             this.withOrderRotation(orderRotation);
