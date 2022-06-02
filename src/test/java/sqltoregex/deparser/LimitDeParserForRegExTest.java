@@ -27,7 +27,7 @@ class LimitDeParserForRegExTest{
                 "SELECT col1 LIMIT    3   OFFSET    2"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1 LIMIT 2, 3",
                 matchingMap,
                 true
@@ -41,7 +41,7 @@ class LimitDeParserForRegExTest{
                 "SELECT col1 LIMIT null"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1 LIMIT null",
                 matchingMap,
                 true
@@ -55,7 +55,7 @@ class LimitDeParserForRegExTest{
                 "SELECT col1 LIMIT 3 OFFSET 2"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1 LIMIT 3 OFFSET 2",
                 matchingMap,
                 true
@@ -71,7 +71,7 @@ class LimitDeParserForRegExTest{
                 "SELECT col1 OFFST 10 RWS"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1 OFFSET 10 ROWS",
                 matchingMap,
                 true

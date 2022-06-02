@@ -23,7 +23,7 @@ public class UserSettingsPreparer {
         if (settingsType == SettingsType.USER) {
             this.settingsManager.parseUserSettingsInput(SettingsForm.EMPTY_FORM);
         } else {
-            UserSettings.getInstance(settingsManager.getSettingsMap(settingsType));
+            UserSettings.getInstance(settingsManager.getSettingsContainer(settingsType));
         }
     }
 

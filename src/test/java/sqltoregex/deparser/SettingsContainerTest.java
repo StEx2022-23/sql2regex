@@ -7,17 +7,18 @@ import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
-import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
 class SettingsContainerTest {
 
     @Test
     void testCast(){
-        SettingsContainer settingsContainer = new SettingsContainer();
         OrderRotation orderRotation1 = new OrderRotation(SettingsOption.TABLENAMEORDER);
         SpellingMistake spellingMistake1 = new SpellingMistake(SettingsOption.TABLENAMESPELLING);
         StringSynonymGenerator stringSynonymGenerator1 = new StringSynonymGenerator(SettingsOption.AGGREGATEFUNCTIONLANG);
-        settingsContainer.with(orderRotation1).with(spellingMistake1).with(stringSynonymGenerator1);
+        SettingsContainer settingsContainer = SettingsContainer.builder()
+                .with(orderRotation1)
+                .with(spellingMistake1)
+                .with(stringSynonymGenerator1).build();
 
         Assertions.assertEquals(settingsContainer.get(OrderRotation.class).get(SettingsOption.TABLENAMEORDER), orderRotation1);
         Assertions.assertEquals(settingsContainer.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING), spellingMistake1);

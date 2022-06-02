@@ -22,7 +22,7 @@ class OrderByDeParserForRegExTest{
                 )
         );
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1 FROM table1 ORDER SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
                 matchingMap,
                 true
@@ -39,7 +39,7 @@ class OrderByDeParserForRegExTest{
                 "SELECT col1 FROM table1 ORDER BY col1 DESC NULS LAST, col2 AC NULS FIRST"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1 FROM table1 ORDER BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
                 matchingMap,
                 true
@@ -55,7 +55,7 @@ class OrderByDeParserForRegExTest{
                 "SELECT col1 FROM table1 ORDER BY col1  DESC , col2  aufsteigend"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC",
                 matchingMap,
                 true
@@ -64,7 +64,7 @@ class OrderByDeParserForRegExTest{
 
     @Test
     void testSetGetExpressionVisitor() {
-        SettingsContainer settings = new SettingsContainer();
+        SettingsContainer settings = SettingsContainer.builder().build();
         StringBuilder buffer = new StringBuilder();
         ExpressionDeParserForRegEx expressionDeParserForRegExOne = new ExpressionDeParserForRegEx(settings);
         ExpressionDeParserForRegEx expressionDeParserForRegExTwo = new ExpressionDeParserForRegEx(settings);
@@ -81,7 +81,7 @@ class OrderByDeParserForRegExTest{
                 "SELECT col1, col2 FROM table1 ORDER BY col1 ASC"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1, col2 FROM table1 ORDER BY col1 ASC",
                 matchingMap,
                 true
@@ -95,7 +95,7 @@ class OrderByDeParserForRegExTest{
                 "SELECT col1, col2 FROM table1 ORDER BY col1 DESC"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1, col2 FROM table1 ORDER BY col1 DESC",
                 matchingMap,
                 true
@@ -111,7 +111,7 @@ class OrderByDeParserForRegExTest{
                 "SELECT col1 FROM table1 ORDER BY col1  DESC , col2  ASC"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC",
                 matchingMap,
                 true
@@ -125,7 +125,7 @@ class OrderByDeParserForRegExTest{
                 "SELECT col1 FROM table1 t1 ORDER BY t1.col1, t1.col2"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1 FROM table1 t1 ORDER BY t1.col1, t1.col2",
                 matchingMap,
                 true
@@ -140,7 +140,7 @@ class OrderByDeParserForRegExTest{
                 "SELECT col1 FROM table1 t1 ORDER BY SUMME(col1)"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1 FROM table1 t1 ORDER BY SUM(col1)",
                 matchingMap,
                 true
@@ -156,7 +156,7 @@ class OrderByDeParserForRegExTest{
                 "SELECT col1 FROM table1 t1 ORDER BY col2, SUMME(col1)"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1 FROM table1 t1 ORDER BY SUM(col1), col2",
                 matchingMap,
                 true
@@ -172,7 +172,7 @@ class OrderByDeParserForRegExTest{
                 "SELECT col1 FROM table1 t1 ORDER BY col2, SUMME(col1)"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1 FROM table1 t1 ORDER BY SUM(t1.col1), t1.col2",
                 matchingMap,
                 true

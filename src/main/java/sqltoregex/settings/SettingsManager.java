@@ -20,47 +20,19 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Service
 public class SettingsManager {
-    //refactor to a HashList of a new class "SettingsContainer" which holds Maps?
-    private final Map<SettingsType, Map<SettingsOption, IRegExGenerator<?>>> settingsMap = new EnumMap<SettingsType,
-            Map<SettingsOption, IRegExGenerator<?>>>(SettingsType.class);
+    private final Map<SettingsType, SettingsContainer> settingsMap = new EnumMap<>(SettingsType.class);
 
     public SettingsManager() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException
             , URISyntaxException {
         this.parseSettings();
     }
 
-    public static <T extends IRegExGenerator<?>> Optional<T> castSetting(IRegExGenerator<?> rawSetting,
-                                                                            Class<T> clazz) {
-        try {
-            return Optional.of(clazz.cast(rawSetting));
-        } catch (ClassCastException e) {
-            Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-            logger.log(Level.INFO, "Something went wrong by casting setting: {0}", e.toString());
-        }
-        return Optional.empty();
-    }
-
-    /**
-     * Method for getting all Settings of one class with are setted by the user.
-     */
-    public <T extends IRegExGenerator<?>> Set<T> getSettingByClass(Class<T> clazz) {
-        return getSettingByClass(clazz, SettingsType.USER);
-    }
-
     public <T extends IRegExGenerator<?>> Set<T> getSettingByClass(Class<T> clazz,
                                                          SettingsType settingsType) {
-        Set<T> settingsSet = new LinkedHashSet<>();
-        for (IRegExGenerator<?> setting : this.getSettingsMap(settingsType).values()) {
-            if (setting != null && setting.getClass().equals(clazz)) {
-                castSetting(setting, clazz).ifPresent(settingsSet::add);
-            }
-        }
-        return settingsSet;
+        return new LinkedHashSet<>(this.getSettingsContainer(settingsType).get(clazz).values());
     }
 
     public boolean getSettingBySettingsOption(SettingsOption settingsOption) {
@@ -68,30 +40,28 @@ public class SettingsManager {
     }
 
     public boolean getSettingBySettingsOption(SettingsOption settingsOption, SettingsType settingsType) {
-        return this.getSettingsMap(settingsType).containsKey(settingsOption);
+        return this.getSettingsContainer(settingsType).get(settingsOption) != null;
     }
 
-    public <C extends IRegExGenerator<?>> Optional<C> getSettingBySettingsOption(SettingsOption settingsOption,
-                                                                                    Class<C> clazz,
+    public <T extends IRegExGenerator<?>> Optional<T> getSettingBySettingsOption(SettingsOption settingsOption,
+                                                                                    Class<T> clazz,
                                                                                     SettingsType settingsType) {
-        for (Map.Entry<SettingsOption, IRegExGenerator<?>> entry
-                : this.getSettingsMap(settingsType).entrySet()
-        ) {
-            if (entry.getKey().equals(settingsOption)) {
-                return castSetting(entry.getValue(), clazz);
+        for (T generator : this.getSettingsContainer(settingsType).get(clazz).values()){
+            if (generator.getSettingsOption().equals(settingsOption)) {
+                return Optional.of(generator);
             }
         }
         return Optional.empty();
     }
 
-    public Map<SettingsOption, IRegExGenerator<?>> getSettingsMap() {
-        return this.getSettingsMap(SettingsType.USER);
+    public SettingsContainer getSettingsContainer() {
+        return this.getSettingsContainer(SettingsType.USER);
     }
 
-    public Map<SettingsOption, IRegExGenerator<?>> getSettingsMap(SettingsType settingsType) {
+    public SettingsContainer getSettingsContainer(SettingsType settingsType) {
         Assert.notNull(settingsType, "settingsType must not be null");
         if (settingsType == SettingsType.USER) {
-            return UserSettings.getInstance().getSettingsMap();
+            return UserSettings.getInstance().getSettingsContainer();
         }
         return this.settingsMap.get(settingsType);
     }
@@ -110,11 +80,11 @@ public class SettingsManager {
 
         stripWhitespaces(document);
 
-        Map<SettingsType, SettingsMapBuilder> settingsMapBuilderMap = new EnumMap<SettingsType, SettingsMapBuilder>(
+        Map<SettingsType, SettingsContainer.Builder> settingsContainerBuilderMap = new EnumMap<>(
                 SettingsType.class);
         for (SettingsType settingsType : Arrays.stream(SettingsType.values())
                 .filter(settingsType -> settingsType != SettingsType.USER).toList()) {
-            settingsMapBuilderMap.put(settingsType, new SettingsMapBuilder());
+            settingsContainerBuilderMap.put(settingsType, SettingsContainer.builder());
         }
 
         Node root = document.getElementsByTagName("properties").item(0);
@@ -131,7 +101,7 @@ public class SettingsManager {
                             .getTextContent()
                             .split(";");
                     for (String settingsTypeString : settingTypes) {
-                        settingsMapBuilderMap.get(SettingsType.valueOf(settingsTypeString.toUpperCase()))
+                        settingsContainerBuilderMap.get(SettingsType.valueOf(settingsTypeString.toUpperCase()))
                                 .withNodeList(settingsElement.getElementsByTagName("value"), relatedOption);
                     }
                 }
@@ -139,15 +109,15 @@ public class SettingsManager {
         }
         for (SettingsType settingsType : Arrays.stream(SettingsType.values())
                 .filter(settingsType -> settingsType != SettingsType.USER).toList()) {
-            this.settingsMap.put(settingsType, settingsMapBuilderMap.get(settingsType).build());
+            this.settingsMap.put(settingsType, settingsContainerBuilderMap.get(settingsType).build());
         }
     }
 
 
-    public Map<SettingsOption, IRegExGenerator<?>> parseUserSettingsInput(SettingsForm form) {
-        SettingsMapBuilder settingsMapBuilder = new SettingsMapBuilder();
+    public SettingsContainer parseUserSettingsInput(SettingsForm form) {
+        SettingsContainer.Builder settingsContainerBuilder = SettingsContainer.builder();
 
-        Map<SettingsOption, IRegExGenerator<?>> map = settingsMapBuilder
+        SettingsContainer settingsContainer = settingsContainerBuilder
                 .withSettingsOptionSet(form.getSpellings())
                 .withSettingsOptionSet(form.getOrders())
                 .withSimpleDateFormatSet(form.getDateFormats(), SettingsOption.DATESYNONYMS)
@@ -156,9 +126,9 @@ public class SettingsManager {
                 .withStringSet(form.getAggregateFunctionLang(), SettingsOption.AGGREGATEFUNCTIONLANG)
                 .build();
 
-        UserSettings.getInstance(map);
+        UserSettings.getInstance(settingsContainer);
 
-        return map;
+        return settingsContainer;
     }
 
     /**

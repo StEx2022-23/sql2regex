@@ -62,6 +62,11 @@ public class SqlToRegexController {
                 .map(synonymGenerator -> GraphPreProcessor.getSynonymMap(synonymGenerator.getGraph()))
                 .orElse(new HashMap<>());
         model.addAttribute("aggregateFunctionLang", aggregateFunctionSynonymsMap);
+        Map<String, Set<String>> otherSynonymsMap = settingsManager.getSettingBySettingsOption(
+                        SettingsOption.OTHERSYNONYMS, StringSynonymGenerator.class, SettingsType.ALL)
+                .map(synonymGenerator -> GraphPreProcessor.getSynonymMap(synonymGenerator.getGraph()))
+                .orElse(new HashMap<>());
+        model.addAttribute("otherSynonyms", otherSynonymsMap);
 
 
         model.addAttribute("activeConverter", true);
@@ -79,6 +84,10 @@ public class SqlToRegexController {
                 //special preprocessing to render comfortably on frontend
                 settingsManager.getSettingBySettingsOption(
                                 SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class, SettingsType.ALL)
+                        .map(synonymGenerator -> GraphPreProcessor.getSynonymSetWithDelimiter(synonymGenerator.getGraph(), ";"))
+                        .orElse(new HashSet<>()),
+                settingsManager.getSettingBySettingsOption(
+                                SettingsOption.OTHERSYNONYMS, StringSynonymGenerator.class, SettingsType.ALL)
                         .map(synonymGenerator -> GraphPreProcessor.getSynonymSetWithDelimiter(synonymGenerator.getGraph(), ";"))
                         .orElse(new HashSet<>()),
                 ""
@@ -104,6 +113,7 @@ public class SqlToRegexController {
                         settingsForm.getTimeFormats(),
                         settingsForm.getDateTimeFormats(),
                         settingsForm.getAggregateFunctionLang(),
+                        settingsForm.getOtherSynonyms(),
                         settingsForm.getSql()
                 )
         );

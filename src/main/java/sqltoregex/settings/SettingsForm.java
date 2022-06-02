@@ -13,6 +13,7 @@ public class SettingsForm {
                                                                    Collections.emptySet(),
                                                                    Collections.emptySet(),
                                                                    Collections.emptySet(),
+                                                                   Collections.emptySet(),
                                                                    "EMPTY");
     Set<SettingsOption> spellings;
     Set<SettingsOption> orders;
@@ -20,6 +21,7 @@ public class SettingsForm {
     Set<SimpleDateFormat> timeFormats;
     Set<SimpleDateFormat> dateTimeFormats;
     Set<String> aggregateFunctionLang;
+    Set<String> otherSynonyms;
     @NotEmpty(message = "{settingsForm.sql.NotEmpty}") String sql;
 
     public SettingsForm(Set<SettingsOption> spellings,
@@ -28,6 +30,7 @@ public class SettingsForm {
                         Set<SimpleDateFormat> timeFormats,
                         Set<SimpleDateFormat> dateTimeFormats,
                         Set<String> aggregateFunctionLang,
+                        Set<String> otherSynonyms,
                         String sql) {
         this.spellings = spellings == null ? Collections.emptySet() : spellings;
         this.orders = orders == null ? Collections.emptySet() : orders;
@@ -35,11 +38,16 @@ public class SettingsForm {
         this.timeFormats = timeFormats == null ? Collections.emptySet() : timeFormats;
         this.dateTimeFormats = dateTimeFormats == null ? Collections.emptySet() : dateTimeFormats;
         this.aggregateFunctionLang = aggregateFunctionLang == null ? Collections.emptySet() : aggregateFunctionLang;
+        this.otherSynonyms = otherSynonyms == null ? Collections.emptySet() : otherSynonyms;
         this.sql = sql;
     }
 
     public Set<String> getAggregateFunctionLang() {
         return aggregateFunctionLang;
+    }
+
+    public Set<String> getOtherSynonyms() {
+        return otherSynonyms;
     }
 
     public Set<SimpleDateFormat> getDateFormats() {

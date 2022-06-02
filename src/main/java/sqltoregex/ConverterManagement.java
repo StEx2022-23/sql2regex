@@ -87,12 +87,12 @@ public class ConverterManagement {
     private String deParseStatement(String sqlStatement, StringBuilder buffer) throws JSQLParserException {
         Statement statement;
         statement = this.parseStatement(sqlStatement);
-        StatementDeParserForRegEx defaultStatementDeParser = new StatementDeParserForRegEx(buffer, new SettingsContainer().with(settingsManager, SettingsType.USER));
+        StatementDeParserForRegEx defaultStatementDeParser = new StatementDeParserForRegEx(buffer, SettingsContainer.builder().with(settingsManager, SettingsType.USER));
         statement.accept(defaultStatementDeParser);
         String regExOne = defaultStatementDeParser.getBuffer().toString();
-        ExpressionDeParserForRegEx expressionDeParser = new ExpressionDeParserForRegEx(new SettingsContainer().with(settingsManager, SettingsType.USER));
+        ExpressionDeParserForRegEx expressionDeParser = new ExpressionDeParserForRegEx(SettingsContainer.builder().with(settingsManager, SettingsType.USER));
         StatementDeParser joinWhereStatementDeParser = new StatementDeParserForRegEx(expressionDeParser, buffer,
-                                                                                     new SettingsContainer().with(settingsManager, SettingsType.USER));
+                                                                                     SettingsContainer.builder().with(settingsManager, SettingsType.USER));
         String regExTwo = joinWhereStatementDeParser.getBuffer().toString();
         return this.buildOutputRegex(Arrays.asList(regExOne, regExTwo));
     }

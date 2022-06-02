@@ -21,11 +21,11 @@ class UserSettingsTest {
 
     @Test
     void MapNotMutable() {
-        Map<SettingsOption, IRegExGenerator<?>> map = new HashMap<>();
-        map.put(SettingsOption.DEFAULT, null);
-        UserSettings userSettings1 = UserSettings.getInstance(map);
-        Map<SettingsOption, IRegExGenerator<?>> settingsMap = userSettings1.getSettingsMap();
-        Assertions.assertThrows(UnsupportedOperationException.class, () -> settingsMap.putAll(map));
+        SettingsContainer.Builder builder = SettingsContainer.builder();
+        builder.with(SettingsContainer.builder().build());
+        UserSettings userSettings1 = UserSettings.getInstance();
+        Map<SettingsOption, IRegExGenerator<?>> settingsMap = userSettings1.getSettingsContainer().getAllSettings();
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> settingsMap.putAll(new HashMap<>()));
         OrderRotation orderRotation = new OrderRotation(SettingsOption.DEFAULT);
         Assertions.assertThrows(UnsupportedOperationException.class,
                                 () -> settingsMap.put(SettingsOption.COLUMNNAMEORDER, orderRotation));
@@ -33,10 +33,11 @@ class UserSettingsTest {
 
     @Test
     void onlyOneInstance() {
-        Map<SettingsOption, IRegExGenerator<?>> map = new HashMap<>();
-        map.put(SettingsOption.DEFAULT, null);
-        UserSettings userSettings1 = UserSettings.getInstance(map);
-        UserSettings userSettings2 = UserSettings.getInstance(map);
+        SettingsContainer.Builder settingsContainerBuilder = SettingsContainer.builder();
+        SettingsContainer settingsContainer = settingsContainerBuilder.build();
+
+        UserSettings userSettings1 = UserSettings.getInstance(settingsContainer);
+        UserSettings userSettings2 = UserSettings.getInstance(settingsContainer);
         Assertions.assertEquals(userSettings1, userSettings2);
     }
 }

@@ -53,9 +53,9 @@ class SettingsManagerTest {
             if (SettingsOption.DEFAULT.equals(settingsOption)) {
                 continue;
             }
-            Assertions.assertTrue(settingsManager.getSettingsMap(SettingsType.ALL).containsKey(settingsOption),
+            Assertions.assertTrue(settingsManager.getSettingsContainer(SettingsType.ALL).getAllSettings().containsKey(settingsOption),
                                   "Does not contain " + settingsOption);
-            Assertions.assertNotNull(settingsManager.getSettingsMap(SettingsType.ALL).get(settingsOption));
+            Assertions.assertNotNull(settingsManager.getSettingsContainer(SettingsType.ALL).get(settingsOption));
         }
     }
 
@@ -69,7 +69,7 @@ class SettingsManagerTest {
 
     @Test
     void testLoadAllProperties() {
-        Set<SettingsOption> settingsOptionSet = settingsManager.getSettingsMap(SettingsType.ALL).keySet();
+        Set<SettingsOption> settingsOptionSet = settingsManager.getSettingsContainer(SettingsType.ALL).getAllSettings().keySet();
         for (SettingsOption option
                 : Arrays.stream(SettingsOption.values())
                 .filter(settingsOption -> settingsOption != SettingsOption.DEFAULT).toList()) {
@@ -80,6 +80,7 @@ class SettingsManagerTest {
     @Test
     void usesUserSettings() {
         settingsManager.parseUserSettingsInput(new SettingsForm(new HashSet<>(List.of(SettingsOption.KEYWORDSPELLING)),
+                                                                Collections.emptySet(),
                                                                 Collections.emptySet(),
                                                                 Collections.emptySet(),
                                                                 Collections.emptySet(),

@@ -13,7 +13,7 @@ class InsertDeParserForRegExTest{
 
     @Test
     void testInsertDeParserForRegExConstructor() {
-        SettingsContainer settings = new SettingsContainer();
+        SettingsContainer settings = SettingsContainer.builder().build();
         InsertDeParserForRegEx insertDeParserForRegEx = new InsertDeParserForRegEx(settings);
         Assertions.assertNotNull(insertDeParserForRegEx);
     }
@@ -27,7 +27,7 @@ class InsertDeParserForRegExTest{
                 "INSERT INTO table (col2, col1) VALUE ('2', '1')"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "INSERT INTO table (col1, col2) VALUES ('1', '2')",
                 matchingMap,
                 true
@@ -41,7 +41,7 @@ class InsertDeParserForRegExTest{
                 "INSERT INTO table (col1, col2)); VALUES ('2', '1')"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "INSERT INTO table (col1, col2) VALUES ('1', '2')",
                 matchingMap,
                 false
@@ -58,7 +58,7 @@ class InsertDeParserForRegExTest{
                 "INSERT INTO table (col2, col1) VALUES (22, 11), (2, 1)"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')",
                 matchingMap,
                 true
@@ -73,7 +73,7 @@ class InsertDeParserForRegExTest{
                 "INSERT INTO table (col2, col1) VALUES ('22', '11'), ('1', '2')"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')",
                 matchingMap,
                 false
@@ -87,7 +87,7 @@ class InsertDeParserForRegExTest{
                 "INSERT INTO table SET name = 'Kim', isBFF = true"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "INSERT INTO table SET name = 'Kim', isBFF = true",
                 matchingMap,
                 true
@@ -101,7 +101,7 @@ class InsertDeParserForRegExTest{
                 "INSERT INTO t1 VALUES (val1, val2)); RETURNING id"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "INSERT INTO t1 VALUES (val1, val2) RETURNING id",
                 matchingMap,
                 true

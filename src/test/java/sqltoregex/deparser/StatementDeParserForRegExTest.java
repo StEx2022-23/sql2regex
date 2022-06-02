@@ -14,13 +14,13 @@ class StatementDeParserForRegExTest{
     @Test
     void testConstructorOne() {
         StringBuilder buffer = new StringBuilder();
-        StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(buffer, new SettingsContainer());
+        StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(buffer, SettingsContainer.builder().build());
         Assertions.assertNotNull(statementDeParserForRegEx);
     }
 
     @Test
     void testConstructorThree() {
-        SettingsContainer settings = new SettingsContainer();
+        SettingsContainer settings = SettingsContainer.builder().build();
         ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settings);
         StringBuilder buffer = new StringBuilder();
         StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(expressionDeParserForRegEx,
@@ -30,7 +30,7 @@ class StatementDeParserForRegExTest{
 
     @Test
     void testConstructorTwo() {
-        SettingsContainer settings = new SettingsContainer();
+        SettingsContainer settings = SettingsContainer.builder().build();
         ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settings);
         StringBuilder buffer = new StringBuilder();
         SelectDeParserForRegEx selectDeParserForRegEx = new SelectDeParserForRegEx(settings);
@@ -47,7 +47,7 @@ class StatementDeParserForRegExTest{
                 "WITH temporaryTable(averageValue)); as (SELECT AVG(col2) from table2) SELECT col1 FROM table1"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(), 
+                SettingsContainer.builder().build(), 
                 "WITH temporaryTable(averageValue) as (SELECT AVG(col2) from table2) SELECT col1 FROM table1",
                 matchingMap,
                 false

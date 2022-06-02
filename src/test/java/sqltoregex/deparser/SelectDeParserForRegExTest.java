@@ -22,7 +22,7 @@ class SelectDeParserForRegExTest{
                 "SELECT col2, col1 FROM table1",
                 "SELCT col2,col1 FROM table1",
                 "SELECT col2, col1 FOM table1"
-        ));;
+        ));
         TestUtils.validateStatementAgainstRegEx(
                 defaultSettingsContainer,
                 "SELECT col1, col2 FROM table1",
@@ -88,7 +88,10 @@ class SelectDeParserForRegExTest{
     void testAliasAndAggregateOne() {
         SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         stringSynonymGenerator.addSynonymFor("AVG", "MITTELWERT");
-        defaultSettingsContainer.with(stringSynonymGenerator);
+        defaultSettingsContainer = SettingsContainer.builder()
+                .with(defaultSettingsContainer)
+                .with(stringSynonymGenerator)
+                .build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT AVG(col1) AS c1 FROM table1, table2",
@@ -107,7 +110,10 @@ class SelectDeParserForRegExTest{
     void testAliasAndAggregateTwo() {
         SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         stringSynonymGenerator.addSynonymFor("AVG", "MITTELWERT");
-        defaultSettingsContainer.with(stringSynonymGenerator);
+        defaultSettingsContainer = SettingsContainer.builder()
+                .with(defaultSettingsContainer)
+                .with(stringSynonymGenerator)
+                .build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT AVG(col1)); AS c1, column2 FROM table1, table2",
@@ -245,7 +251,10 @@ class SelectDeParserForRegExTest{
     void testSubSelect()  {
         SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         stringSynonymGenerator.addSynonymFor("AVG", "MITTELWERT");
-        defaultSettingsContainer.with(stringSynonymGenerator);
+        defaultSettingsContainer = SettingsContainer.builder()
+                .with(defaultSettingsContainer)
+                .with(stringSynonymGenerator)
+                .build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1)); AS avgcol1 FROM table2)",

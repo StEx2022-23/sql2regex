@@ -21,7 +21,7 @@ class ExpressionDeParserForRegExTest {
      */
     @Test
     void between() {
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "a BETWEEN 1 AND 5",
@@ -37,7 +37,7 @@ class ExpressionDeParserForRegExTest {
      */
     @Test
     void binaryExpression() {
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "3 / 2",
@@ -64,7 +64,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void commutativeBinaryExpression() {
         final String sampleSolution = "1 AND 2";
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "1 AND 2",
@@ -90,7 +90,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void dateValue() {
         final String sampleSolution = "{d'2022-05-17'}";
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "2022-05-17",
@@ -114,7 +114,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void exists() {
         final String sampleSolution = "NOT EXISTS b";
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "NOT EXISTS b",
@@ -133,7 +133,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void fullTextSearch() {
         final String sampleSolution = "MATCH (col1, col2) AGAINST ('text' IN NATURAL LANGUAGE MODE)";
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "MATCH (col1,col2) AGAINST ('text' IN NATURAL LANGUAGE MODE)",
@@ -153,7 +153,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void inExpression() {
         final String sampleSolution = "2(+) NOT IN 5";
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "2(+) NOT IN 5",
@@ -172,7 +172,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void isBooleanTrue() {
         final String sampleSolution = "2 IS NOT TRUE";
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "2 IS NOT TRUE",
@@ -193,7 +193,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void isBooleanFalse() {
         final String sampleSolution = "2 IS NOT FALSE";
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "2 IS NOT FALSE",
@@ -214,7 +214,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void isNullExpression() {
         final String sampleSolution = "2 ISNULL";
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "2 ISNULL",
@@ -233,7 +233,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void isNotNullExpression() {
         final String sampleSolution = "2 IS NOT NULL";
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "2 NOT ISNULL",
@@ -258,7 +258,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void like() {
         final String sampleSolution = "a NOT LIKE b";
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "a NOT LIKE b"
@@ -277,7 +277,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void minorThan() {
         final String sampleSolution = "5<8";
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "5<8",
@@ -304,7 +304,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void minorThanEquals() {
         final String sampleSolution = "5<=8";
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "5<=8",
@@ -331,7 +331,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void multiplication() {
         final String sampleSolution = "5*8";
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "5* 8",
@@ -356,7 +356,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void not() {
         final String sampleSolution = "NOT 5";
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "NOT 5",
@@ -382,7 +382,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void notEqualsTo() {
         final String sampleSolution = "5!= NULL";
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "5!=NULL",
@@ -406,7 +406,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void oldOracleJoinBinaryExpression() {
         final String sampleSolution = "2(+) = 5";
-        SettingsContainer settingsContainer = new SettingsContainer();
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "2(+) = 5",
@@ -432,7 +432,7 @@ class ExpressionDeParserForRegExTest {
     @Test
     void testFullConstructor() {
         StringBuilder buffer = new StringBuilder();
-        SettingsContainer settings = new SettingsContainer();
+        SettingsContainer settings = SettingsContainer.builder().build();
         SelectDeParserForRegEx selectDeParserForRegEx = new SelectDeParserForRegEx(settings);
         ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settings);
         OrderByDeParserForRegEx orderByDeParserForRegEx = new OrderByDeParserForRegEx(expressionDeParserForRegEx,

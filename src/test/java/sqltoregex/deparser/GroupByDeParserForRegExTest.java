@@ -44,7 +44,7 @@ class GroupByDeParserForRegExTest{
                 "SELECT col1 GROUP BY col3, col2, col1"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1 GROUP BY col1, col2, col3",
                 matchingMap,
                 true
@@ -61,7 +61,7 @@ class GroupByDeParserForRegExTest{
                 "SELECT col1 GROUP BY col3col2col1"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1 GROUP BY col1, col2, col3",
                 matchingMap,
                 false
@@ -75,7 +75,7 @@ class GroupByDeParserForRegExTest{
                 "SELECT col1 FROM table1 t1 GROUP BY t1.col1, t1.col2"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1 FROM table1 t1 GROUP BY t1.col1, t1.col2",
                 matchingMap,
                 true
@@ -89,7 +89,7 @@ class GroupByDeParserForRegExTest{
                 "SELECT col1 FROM table1 t1 GROUP BY t1.col1, table1.col2"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                new SettingsContainer(),
+                SettingsContainer.builder().build(),
                 "SELECT col1 FROM table1 t1 GROUP BY t1.col1, t1.col2",
                 matchingMap,
                 true

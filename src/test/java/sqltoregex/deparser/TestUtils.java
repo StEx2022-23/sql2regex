@@ -81,29 +81,35 @@ public class TestUtils{
     }
 
     public static SettingsContainer getSettingsContainerWithAllSpellingMistakesAndOrderRotations(){
-        SettingsContainer settingsContainer = new SettingsContainer();
-        settingsContainer.putAll(getSettingsContainerWithAllSpellingMistakes());
-        settingsContainer.putAll(getSettingsContainerWithAllOrderRotations());
-        return settingsContainer;
+        return SettingsContainer
+                .builder()
+                .with(getSettingsContainerWithAllSpellingMistakes())
+                .with(getSettingsContainerWithAllOrderRotations())
+                .build();
     }
 
     public static SettingsContainer getSettingsContainerWithAllSpellingMistakes(){
-        SettingsContainer settingsContainer = new SettingsContainer();
         SpellingMistake tableNameSpelling = new SpellingMistake(SettingsOption.TABLENAMESPELLING);
         SpellingMistake columnNameSpelling = new SpellingMistake(SettingsOption.COLUMNNAMESPELLING);
         SpellingMistake keywordSpelling = new SpellingMistake(SettingsOption.KEYWORDSPELLING);
         SpellingMistake indexColumnNameSpelling = new SpellingMistake(SettingsOption.INDEXCOLUMNNAMESPELLING);
-        settingsContainer.with(tableNameSpelling).with(columnNameSpelling).with(keywordSpelling).with(indexColumnNameSpelling);
-        return settingsContainer;
+        return SettingsContainer.builder()
+                .with(tableNameSpelling)
+                .with(columnNameSpelling)
+                .with(keywordSpelling)
+                .with(indexColumnNameSpelling)
+                .build();
     }
 
     public static SettingsContainer getSettingsContainerWithAllOrderRotations(){
-        SettingsContainer settingsContainer = new SettingsContainer();
         SpellingMistake tableOrder = new SpellingMistake(SettingsOption.TABLENAMEORDER);
         SpellingMistake columnOrder = new SpellingMistake(SettingsOption.COLUMNNAMEORDER);
         SpellingMistake groupByOrder = new SpellingMistake(SettingsOption.GROUPBYELEMENTORDER);
-        settingsContainer.with(tableOrder).with(columnOrder).with(groupByOrder);
-        return settingsContainer;
+        return SettingsContainer.builder()
+                .with(tableOrder)
+                .with(columnOrder)
+                .with(groupByOrder)
+                .build();
     }
 
 }
