@@ -63,21 +63,17 @@ public class GraphPreProcessor {
     static <T> Map<T, Set<T>> getSynonymMap(Graph<T, DefaultWeightedEdge> graph) {
         try {
             Map<T, Set<T>> map = new HashMap<>();
-            Set<T> vertexSet = new HashSet<>(graph.vertexSet());
-            Set<T> walkedVertices = new HashSet<>();
-            for (T startVertex : vertexSet) {
-                if (walkedVertices.contains(startVertex)) {
-                    continue;
+            Set<DefaultWeightedEdge> edgeSet = new HashSet<>(graph.edgeSet());
+            for (DefaultWeightedEdge edge : edgeSet) {
+                T source = graph.getEdgeSource(edge);
+                T target = graph.getEdgeTarget(edge);
+
+                Set<T> synonyms = map.get(source);
+                if (synonyms == null){
+                    map.put(source, new LinkedHashSet<>(List.of(target)));
+                }else{
+                    synonyms.add(target);
                 }
-                Set<DefaultWeightedEdge> outgoingEdges = graph.outgoingEdgesOf(startVertex);
-                Set<T> endVertexSet = new LinkedHashSet<>();
-                for (DefaultWeightedEdge edge : outgoingEdges) {
-                    T target = graph.getEdgeTarget(edge) == startVertex ? graph.getEdgeSource(
-                            edge) : graph.getEdgeTarget(edge);
-                    endVertexSet.add(target);
-                    walkedVertices.add(target);
-                }
-                map.put(startVertex, endVertexSet);
             }
             return map;
         } catch (ClassCastException e) {
