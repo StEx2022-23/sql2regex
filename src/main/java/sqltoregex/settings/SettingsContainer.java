@@ -16,18 +16,9 @@ public class SettingsContainer {
         allSettings.putAll(settingsContainer.allSettings);
     }
 
-    public SettingsContainer withSettingsManager(SettingsManager settingsManager){
-        for (OrderRotation orderRotation : settingsManager.getSettingByClass(OrderRotation.class)){
-            this.with(orderRotation);
-        }
-        for (SpellingMistake spellingMistake : settingsManager.getSettingByClass(SpellingMistake.class)){
-            this.with(spellingMistake);
-        }
-        for (StringSynonymGenerator synonymGenerator : settingsManager.getSettingByClass(StringSynonymGenerator.class)){
-            this.with(synonymGenerator);
-        }
-        for (DateAndTimeFormatSynonymGenerator synonymGenerator : settingsManager.getSettingByClass(DateAndTimeFormatSynonymGenerator.class)){
-            this.with(synonymGenerator);
+    public SettingsContainer with(SettingsManager settingsManager, SettingsType settingsType){
+        for (IRegExGenerator<?> generator : settingsManager.getSettingsMap(settingsType).values()){
+            this.with(generator);
         }
         return this;
     }

@@ -18,6 +18,7 @@ import sqltoregex.deparser.ExpressionDeParserForRegEx;
 import sqltoregex.deparser.StatementDeParserForRegEx;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsType;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -86,12 +87,12 @@ public class ConverterManagement {
     private String deParseStatement(String sqlStatement, StringBuilder buffer) throws JSQLParserException {
         Statement statement;
         statement = this.parseStatement(sqlStatement);
-        StatementDeParserForRegEx defaultStatementDeParser = new StatementDeParserForRegEx(buffer, new SettingsContainer().withSettingsManager(settingsManager));
+        StatementDeParserForRegEx defaultStatementDeParser = new StatementDeParserForRegEx(buffer, new SettingsContainer().with(settingsManager, SettingsType.USER));
         statement.accept(defaultStatementDeParser);
         String regExOne = defaultStatementDeParser.getBuffer().toString();
-        ExpressionDeParserForRegEx expressionDeParser = new ExpressionDeParserForRegEx(new SettingsContainer().withSettingsManager(settingsManager));
+        ExpressionDeParserForRegEx expressionDeParser = new ExpressionDeParserForRegEx(new SettingsContainer().with(settingsManager, SettingsType.USER));
         StatementDeParser joinWhereStatementDeParser = new StatementDeParserForRegEx(expressionDeParser, buffer,
-                                                                                     new SettingsContainer().withSettingsManager(settingsManager));
+                                                                                     new SettingsContainer().with(settingsManager, SettingsType.USER));
         String regExTwo = joinWhereStatementDeParser.getBuffer().toString();
         return this.buildOutputRegex(Arrays.asList(regExOne, regExTwo));
     }
