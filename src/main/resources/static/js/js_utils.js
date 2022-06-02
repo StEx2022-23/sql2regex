@@ -291,14 +291,14 @@ function languageChange(){
     let langOption = window.location.href.split("?")[1];
     if(langOption.length !== 0){
         if(langOption === "lang=de"){
-            localStorage.setItem("defaultLanguage", "eng");
-            window.location.replace(window.location.href.split("?")[0] + '?lang=eng');
+            localStorage.setItem("defaultLanguage", "en_us");
+            window.location.replace(window.location.href.split("?")[0] + '?lang=en_us');
         } else {
             localStorage.setItem("defaultLanguage", "de");
             window.location.replace(window.location.href.split("?")[0] + '?lang=de');
         }
     } else {
-        window.location.replace(window.location.href.split("?")[0] + '?lang=eng');
+        window.location.replace(window.location.href.split("?")[0] + '?lang=en_us');
     }
 }
 
@@ -308,7 +308,7 @@ function loadDefaultLanguageSettings(){
     if(defaultSettings !== null){
         window.location.replace(window.location.href.split("?")[0] + '?lang=' + defaultSettings);
     } else {
-        window.location.replace(window.location.href.split("?")[0] + '?lang=eng');
+        window.location.replace(window.location.href.split("?")[0] + '?lang=en_us');
     }
 }
 
