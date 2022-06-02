@@ -33,7 +33,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testSelectFromWithTwoColumnsFailings()  {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECTcol1, col2 FROM table1",
@@ -53,7 +53,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testSimpleInnerJoin()  {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2",
@@ -70,7 +70,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testFrom()  {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 FROM table1, table2",
@@ -86,7 +86,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testAliasAndAggregateOne() {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         stringSynonymGenerator.addSynonymFor("AVG", "MITTELWERT");
         defaultSettingsContainer.with(stringSynonymGenerator);
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
@@ -105,7 +105,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testAliasAndAggregateTwo() {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         stringSynonymGenerator.addSynonymFor("AVG", "MITTELWERT");
         defaultSettingsContainer.with(stringSynonymGenerator);
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
@@ -124,7 +124,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testTableAlias() {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
@@ -141,7 +141,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testOptionalAliasAddedByStudent() {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1, col2, col3 AS c3",
@@ -159,7 +159,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testDistinctKeyword() {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT DISTINCT col1",
@@ -176,7 +176,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testUniqueKeyword() {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT UNIQUE col1",
@@ -193,7 +193,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testSelectAll()  {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT * FROM table1",
@@ -210,7 +210,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testSelectAllTableColumns()  {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT table1.* FROM table1",
@@ -226,7 +226,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testEmitChanges()  {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT * FROM table1 EMIT CHANGES",
@@ -243,7 +243,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testSubSelect()  {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         stringSynonymGenerator.addSynonymFor("AVG", "MITTELWERT");
         defaultSettingsContainer.with(stringSynonymGenerator);
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
@@ -262,7 +262,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testTableNameAlias()  {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT * FROM table1 t1",
@@ -280,7 +280,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testTableNameAliasOptionalAddedByStudent()  {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT * FROM table1 t1",
@@ -298,7 +298,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void unPivotStatement()  {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT * FROM (SELECT c1, p1)); UNPIVOT (q FOR p1 IN ('a','b'))"
@@ -314,7 +314,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void fetchStatement()  {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT * FROM table FETCH NEXT 1 ROWS ONLY",
@@ -330,7 +330,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testComplexTableNameAliasUse()  {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5",

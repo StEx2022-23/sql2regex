@@ -16,7 +16,7 @@ class GroupByDeParserForRegExTest{
 
     @Test
     void testGroupByTwoStatements() {
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 GROUP BY col1, col2",
@@ -98,7 +98,7 @@ class GroupByDeParserForRegExTest{
 
     @Test
     void testExpressionToStringListConvert(){
-        SettingsContainer defaultSettingsContainer = new SettingsContainer().withAllSpellingMistakesAndOrderRotations();
+        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         List<Expression> expressionList = new ArrayList<>();
         expressionList.add(new Column("col1"));
         expressionList.add(new Column("col2"));

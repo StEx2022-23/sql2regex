@@ -1,11 +1,6 @@
 package sqltoregex.settings;
 
 import sqltoregex.settings.regexgenerator.IRegExGenerator;
-import sqltoregex.settings.regexgenerator.OrderRotation;
-import sqltoregex.settings.regexgenerator.SpellingMistake;
-import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
-import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
-import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
 import java.util.Map;
 
@@ -19,19 +14,6 @@ public class SettingsContainer {
 
     public void putAll(SettingsContainer settingsContainer) {
         allSettings.putAll(settingsContainer.allSettings);
-    }
-
-    public SettingsContainer withAllSpellingMistakesAndOrderRotations(){
-        for(SettingsOption settingsOption : SettingsOption.values()){
-            switch (settingsOption){
-                case COLUMNNAMEORDER, TABLENAMEORDER, GROUPBYELEMENTORDER -> this.with(new OrderRotation(settingsOption));
-                case KEYWORDSPELLING, COLUMNNAMESPELLING, TABLENAMESPELLING -> this.with(new SpellingMistake(settingsOption));
-                case DEFAULT -> {
-                    // pass because nothing needs to be added for default
-                }
-            }
-        }
-        return this;
     }
 
     public SettingsContainer withSettingsManager(SettingsManager settingsManager){
@@ -59,25 +41,10 @@ public class SettingsContainer {
         return null;
     }
 
-    public <C extends IRegExGenerator<?>> SettingsMap<C> get(Class<C> clazz){
-        try {
-            if (OrderRotation.class.isAssignableFrom(clazz)) {
-                return castSingleSettingsContainer (this.allSettings, clazz);
-            } else if (SpellingMistake.class.isAssignableFrom(clazz)) {
-                return castSingleSettingsContainer (this.allSettings, clazz);
-            } else if (SynonymGenerator.class.isAssignableFrom(clazz) ) {
-                return castSingleSettingsContainer (this.allSettings, clazz);
-            }else{
-                return new SettingsMap<>();
-            }
-        } catch (ClassCastException e){ return new SettingsMap<>();}
-    }
-
-
-    private <T extends IRegExGenerator<?>> SettingsMap<T> castSingleSettingsContainer(SettingsMap<?> singleSettingsContainer, Class<T> clazz){
+    public <T extends IRegExGenerator<?>> SettingsMap<T> get(Class<T> clazz){
         SettingsMap<T> newContainer = new SettingsMap<>();
 
-        for (Map.Entry<SettingsOption,?> entry : singleSettingsContainer.entrySet()){
+        for (Map.Entry<SettingsOption,?> entry : this.allSettings.entrySet()){
             try{
                 newContainer.put(entry.getKey(), clazz.cast(entry.getValue()));
             }catch (ClassCastException e){
