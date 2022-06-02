@@ -30,9 +30,6 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
 
     public static String useOrderRotation(OrderRotation orderRotation, List<String> stringList) {
         if (null != orderRotation) return orderRotation.generateRegExFor(stringList);
-        for (int i = 0; i < stringList.size(); i++) {
-            stringList.set(i, stringList.get(i));
-        }
         return String.join(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE, stringList);
     }
 
