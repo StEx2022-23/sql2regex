@@ -5,7 +5,7 @@
   "main": "home.html",
   "license": "MIT",
   "scripts": {
-    "scss": "node-sass src/main/resources/static/styles -o src/main/resources/static/styles",
+    "scss": "node-sass --output-style compressed src/main/resources/static/styles -o src/main/resources/static/styles",
     "watch": "node-sass --watch src/main/resources/static/styles -o src/main/resources/static/styles"
   },
   "author": "",
