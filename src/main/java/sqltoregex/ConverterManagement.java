@@ -16,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import sqltoregex.deparser.ExpressionDeParserForRegEx;
 import sqltoregex.deparser.StatementDeParserForRegEx;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsType;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -85,12 +87,12 @@ public class ConverterManagement {
     private String deParseStatement(String sqlStatement, StringBuilder buffer) throws JSQLParserException {
         Statement statement;
         statement = this.parseStatement(sqlStatement);
-        StatementDeParserForRegEx defaultStatementDeparser = new StatementDeParserForRegEx(buffer, settingsManager);
-        statement.accept(defaultStatementDeparser);
-        String regExOne = defaultStatementDeparser.getBuffer().toString();
-        ExpressionDeParserForRegEx expressionDeParser = new ExpressionDeParserForRegEx(settingsManager);
+        StatementDeParserForRegEx defaultStatementDeParser = new StatementDeParserForRegEx(buffer, SettingsContainer.builder().with(settingsManager, SettingsType.USER));
+        statement.accept(defaultStatementDeParser);
+        String regExOne = defaultStatementDeParser.getBuffer().toString();
+        ExpressionDeParserForRegEx expressionDeParser = new ExpressionDeParserForRegEx(SettingsContainer.builder().with(settingsManager, SettingsType.USER));
         StatementDeParser joinWhereStatementDeParser = new StatementDeParserForRegEx(expressionDeParser, buffer,
-                                                                                     settingsManager);
+                                                                                     SettingsContainer.builder().with(settingsManager, SettingsType.USER));
         String regExTwo = joinWhereStatementDeParser.getBuffer().toString();
         return this.buildOutputRegex(Arrays.asList(regExOne, regExTwo));
     }

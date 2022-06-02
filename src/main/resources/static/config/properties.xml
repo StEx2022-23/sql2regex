@@ -62,14 +62,10 @@
           <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
           <value>ASC;aufsteigend</value>
           <value>DESC;absteigend</value>
+          <value>NOT;!</value>
+          <value>NOT;NICHT</value>
       </othersynonyms>
   </synonyms>
-  <specificsettings>
-      <NOT_AS_EXCLAMATION_AND_WORD>
-          <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
-          <value>true</value>
-      </NOT_AS_EXCLAMATION_AND_WORD>
-  </specificsettings>
 </properties>
 
 <!-- check the enum class after changing -->

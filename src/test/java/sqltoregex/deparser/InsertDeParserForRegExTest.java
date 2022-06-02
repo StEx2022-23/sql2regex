@@ -1,82 +1,110 @@
 package sqltoregex.deparser;
 
-import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
-import sqltoregex.settings.SettingsManager;
-import sqltoregex.settings.SettingsType;
+import sqltoregex.settings.SettingsContainer;
+import sqltoregex.settings.SettingsOption;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
-class InsertDeParserForRegExTest extends UserSettingsPreparer{
-    TestUtils testUtils = new TestUtils();
-
-    InsertDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
-        super(SettingsType.ALL);
-    }
+class InsertDeParserForRegExTest{
 
     @Test
-    void testInsertDeParserForRegExConstructor() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
-        InsertDeParserForRegEx insertDeParserForRegEx = new InsertDeParserForRegEx(new SettingsManager());
+    void testInsertDeParserForRegExConstructor() {
+        SettingsContainer settings = SettingsContainer.builder().build();
+        InsertDeParserForRegEx insertDeParserForRegEx = new InsertDeParserForRegEx(settings);
         Assertions.assertNotNull(insertDeParserForRegEx);
     }
 
     @Test
-    void oneValueList() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "INSERT INTO table (col1, col2) VALUES ('1', '2')",
+    void oneValueList() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "INSERT INTO table (col1, col2)); VALUES ('1', '2')",
                 "INSERT INTO table (col2, col1) VALUES ('2', '1')",
                 "INSERT INTO table (col2, col1) VALUE ('2', '1')"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "INSERT INTO table (col1, col2) VALUES ('1', '2')",
+                matchingMap,
+                true
         );
-        testUtils.validateListAgainstRegEx("INSERT INTO table (col1, col2) VALUES ('1', '2')", toCheckedInput, true);
     }
 
     @Test
-    void oneValueListFailing() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "INSERT INTO table (col1, col2) VALUES ('2', '1')"
+    void oneValueListFailing() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "INSERT INTO table (col1, col2)); VALUES ('2', '1')"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "INSERT INTO table (col1, col2) VALUES ('1', '2')",
+                matchingMap,
+                false
         );
-        testUtils.validateListAgainstRegEx("INSERT INTO table (col1, col2) VALUES ('1', '2')", toCheckedInput, false);
     }
 
     @Test
-    void twoValueList() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')",
+    void twoValueList() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "INSERT INTO table (col1, col2)); VALUES ('1', '2'), ('11', '22')",
                 "INSERT INTO table (col1, col2) VALUES ('11', '22'), ('1', '2')",
                 "INSERT INTO table (col2, col1) VALUE ('22', '11'), ('2', '1')",
                 "INSERT INTO table (col2, col1) VALUES (22, 11), (2, 1)"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')",
+                matchingMap,
+                true
         );
-        testUtils.validateListAgainstRegEx("INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')", toCheckedInput, true);
     }
 
     @Test
-    void twoValueListFailing() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "INSERT INTO table (col2, col1) VALUES ('11', '22'), ('1', '2')",
+    void twoValueListFailing() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "INSERT INTO table (col2, col1)); VALUES ('11', '22'), ('1', '2')",
                 "INSERT INTO table (col2, col1) VALUES ('22', '11'), ('1', '2')"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')",
+                matchingMap,
+                false
         );
-        testUtils.validateListAgainstRegEx("INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')", toCheckedInput, false);
     }
 
     @Test
-    void insertWithSet() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
+    void insertWithSet() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "INSERT INTO table SET name = 'Kim', isBFF = true"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "INSERT INTO table SET name = 'Kim', isBFF = true",
+                matchingMap,
+                true
         );
-        testUtils.validateListAgainstRegEx("INSERT INTO table SET name = 'Kim', isBFF = true", toCheckedInput, true);
     }
 
     @Test
-    void testReturning() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "INSERT INTO t1 VALUES (val1, val2) RETURNING id"
+    void testReturning() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "INSERT INTO t1 VALUES (val1, val2)); RETURNING id"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "INSERT INTO t1 VALUES (val1, val2) RETURNING id",
+                matchingMap,
+                true
         );
-        testUtils.validateListAgainstRegEx("INSERT INTO t1 VALUES (val1, val2) RETURNING id", toCheckedInput, true);
     }
 }

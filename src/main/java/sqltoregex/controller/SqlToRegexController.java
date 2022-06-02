@@ -14,7 +14,6 @@ import sqltoregex.settings.SettingsForm;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.SettingsType;
-import sqltoregex.settings.regexgenerator.GroupByElementRotation;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
@@ -63,6 +62,11 @@ public class SqlToRegexController {
                 .map(synonymGenerator -> GraphPreProcessor.getSynonymMap(synonymGenerator.getGraph()))
                 .orElse(new HashMap<>());
         model.addAttribute("aggregateFunctionLang", aggregateFunctionSynonymsMap);
+        Map<String, Set<String>> otherSynonymsMap = settingsManager.getSettingBySettingsOption(
+                        SettingsOption.OTHERSYNONYMS, StringSynonymGenerator.class, SettingsType.ALL)
+                .map(synonymGenerator -> GraphPreProcessor.getSynonymMap(synonymGenerator.getGraph()))
+                .orElse(new HashMap<>());
+        model.addAttribute("otherSynonyms", otherSynonymsMap);
 
 
         model.addAttribute("activeConverter", true);
@@ -80,6 +84,10 @@ public class SqlToRegexController {
                 //special preprocessing to render comfortably on frontend
                 settingsManager.getSettingBySettingsOption(
                                 SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class, SettingsType.ALL)
+                        .map(synonymGenerator -> GraphPreProcessor.getSynonymSetWithDelimiter(synonymGenerator.getGraph(), ";"))
+                        .orElse(new HashSet<>()),
+                settingsManager.getSettingBySettingsOption(
+                                SettingsOption.OTHERSYNONYMS, StringSynonymGenerator.class, SettingsType.ALL)
                         .map(synonymGenerator -> GraphPreProcessor.getSynonymSetWithDelimiter(synonymGenerator.getGraph(), ";"))
                         .orElse(new HashSet<>()),
                 ""
@@ -105,6 +113,7 @@ public class SqlToRegexController {
                         settingsForm.getTimeFormats(),
                         settingsForm.getDateTimeFormats(),
                         settingsForm.getAggregateFunctionLang(),
+                        settingsForm.getOtherSynonyms(),
                         settingsForm.getSql()
                 )
         );
@@ -127,7 +136,7 @@ public class SqlToRegexController {
                 .ifPresent(tableNameOrder -> orders.add(tableNameOrder.getSettingsOption()));
         settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class, settingsType)
                 .ifPresent(columnNameOrder -> orders.add(columnNameOrder.getSettingsOption()));
-        settingsManager.getSettingBySettingsOption(SettingsOption.GROUPBYELEMENTORDER, GroupByElementRotation.class,
+        settingsManager.getSettingBySettingsOption(SettingsOption.GROUPBYELEMENTORDER, OrderRotation.class,
                         settingsType)
                 .ifPresent(expressionOrder -> orders.add(expressionOrder.getSettingsOption()));
         return orders;

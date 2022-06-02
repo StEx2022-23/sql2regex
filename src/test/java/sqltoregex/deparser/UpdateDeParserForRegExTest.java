@@ -1,78 +1,106 @@
 package sqltoregex.deparser;
 
-import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
-import sqltoregex.settings.SettingsType;
+import sqltoregex.settings.SettingsContainer;
+import sqltoregex.settings.SettingsOption;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
-class UpdateDeParserForRegExTest extends UserSettingsPreparer{
-    TestUtils testUtils = new TestUtils();
-
-    UpdateDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException, SAXException, URISyntaxException {
-        super(SettingsType.ALL);
-    }
+class UpdateDeParserForRegExTest{
 
     @Test
-    void simpleUpdateStatement() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
+    void simpleUpdateStatement() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "UPDATE table1 SET col1 = 1, col1 = 11, col2 = 2, col2 = 22 ORDER BY col1",
                 "UPDATE table1 SET col1 = 11, col1 = 1, col2 = 2, col2 = 22 ORDER BY col1",
                 "UPDATE table1 SET col2 = 2, col2 = 22, col1 = 1, col1 = 11 ORDER BY col1"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(), 
+                "UPDATE table1 SET col1 = 1, col1 = 11, col2 = 2, col2 = 22 ORDER BY col1",
+                matchingMap,
+                true
         );
-        testUtils.validateListAgainstRegEx("UPDATE table1 SET col1 = 1, col1 = 11, col2 = 2, col2 = 22 ORDER BY col1", toCheckedInput, true);
     }
 
     @Test
-    void complexUpdateWithAlias() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
+    void complexUpdateWithAlias() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "UPDATE table1 t1, table t2 SET t1.col1 = 1, t2.col1 = 11, t1.col2 = 2, t2.col2 = 22 ORDER BY col1",
                 "UPDATE table1 t1, table t2 SET table1.col1 = 1, t2.col1 = 11, t1.col2 = 2, table2.col2 = 22 ORDER BY col1",
                 "UPDATE table1 t1, table t2 SET table1.col1 = 1, t1.col2 = 2, t2.col1 = 11, table2.col2 = 22 ORDER BY col1",
                 "UPDATE table1 t1, table t2 SET tabe1.col1 = 1, 1.col2 = 2, t2.ol1 = 11, tabe2.col2 = 22 ORDER BY col1"
 
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "UPDATE table1 t1, table2 t2 SET t1.col1 = 1, t2.col1 = 11, t1.col2 = 2, t2.col2 = 22 ORDER BY col1",
+                matchingMap,
+                true
         );
-        testUtils.validateListAgainstRegEx("UPDATE table1 t1, table2 t2 SET t1.col1 = 1, t2.col1 = 11, t1.col2 = 2, t2.col2 = 22 ORDER BY col1", toCheckedInput, true);
     }
 
     @Test
-    void outputCLause() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
+    void outputCLause() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "UPDATE table1 SET col1 = 1, col2 = 2 OUTPUT inserted.col1, inserted.col2",
                 "UPDATE table1 SET col1 = 1, col2 = 2 OUTPUT inserted.col2, inserted.col1",
                 "UPDATE table1 SET col1 = 1, col2 = 2  OUTUT  inserted.col2 , inserted.col1"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "UPDATE table1 SET col1 = 1, col2 = 2 OUTPUT inserted.col1, inserted.col2",
+                matchingMap,
+                true
         );
-        testUtils.validateListAgainstRegEx("UPDATE table1 SET col1 = 1, col2 = 2 OUTPUT inserted.col1, inserted.col2", toCheckedInput, true);
     }
 
     @Test
-    void simpleJoin() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
+    void simpleJoin() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "UPDATE table1, table2 SET table1.col1 = 1, table2.col1 = 1",
                 "UPDATE table2, table1 SET table1.col1 = 1, table2.col1 = 1"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "UPDATE table1, table2 SET table1.col1 = 1, table2.col1 = 1",
+                matchingMap,
+                true
         );
-        testUtils.validateListAgainstRegEx("UPDATE table1, table2 SET table1.col1 = 1, table2.col1 = 1", toCheckedInput, true);
     }
 
     @Test
-    void tableNameAlias() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
+    void tableNameAlias() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "UPDATE table1 t1, table2 t2 SET table1.col1 = 1, t2.col1 = 1"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "UPDATE table1 t1, table2 t2 SET table1.col1 = 1, t2.col1 = 1",
+                matchingMap,
+                true
         );
-        testUtils.validateListAgainstRegEx("UPDATE table1 t1, table2 t2 SET table1.col1 = 1, t2.col1 = 1", toCheckedInput, true);
     }
 
     @Test
-    void tableNameAliasVariations() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
+    void tableNameAliasVariations() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "UPDATE table1 t1, table2 SET table1.col1 = 1, t2.col1 = 1",
                 "UPDATE table1 t1, table2 t2 SET table1.col1 = 1, t2.col1 = 1"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "UPDATE table1 t1, table2 SET table1.col1 = 1, t2.col1 = 1",
+                matchingMap,
+                true
         );
-        testUtils.validateListAgainstRegEx("UPDATE table1 t1, table2 SET table1.col1 = 1, t2.col1 = 1", toCheckedInput, true);
     }
 }

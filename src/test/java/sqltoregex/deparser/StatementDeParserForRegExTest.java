@@ -1,64 +1,56 @@
 package sqltoregex.deparser;
 
-import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
-import sqltoregex.settings.SettingsManager;
-import sqltoregex.settings.SettingsType;
+import sqltoregex.settings.SettingsContainer;
+import sqltoregex.settings.SettingsOption;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
-class StatementDeParserForRegExTest extends UserSettingsPreparer{
-    TestUtils testUtils = new TestUtils();
-
-    StatementDeParserForRegExTest() throws XPathExpressionException, ParserConfigurationException, IOException,
-            SAXException, URISyntaxException {
-        super(SettingsType.ALL);
-    }
+class StatementDeParserForRegExTest{
 
     @Test
-    void testConstructorOne() throws XPathExpressionException, ParserConfigurationException, IOException,
-            SAXException, URISyntaxException {
-        SettingsManager settingsManager = new SettingsManager();
+    void testConstructorOne() {
         StringBuilder buffer = new StringBuilder();
-        StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(buffer, settingsManager);
+        StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(buffer, SettingsContainer.builder().build());
         Assertions.assertNotNull(statementDeParserForRegEx);
     }
 
     @Test
-    void testConstructorThree() throws XPathExpressionException, ParserConfigurationException, IOException,
-            SAXException, URISyntaxException {
-        SettingsManager settingsManager = new SettingsManager();
-        ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settingsManager);
+    void testConstructorThree() {
+        SettingsContainer settings = SettingsContainer.builder().build();
+        ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settings);
         StringBuilder buffer = new StringBuilder();
         StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(expressionDeParserForRegEx,
-                                                                                            buffer, settingsManager);
+                                                                                            buffer, settings);
         Assertions.assertNotNull(statementDeParserForRegEx);
     }
 
     @Test
-    void testConstructorTwo() throws XPathExpressionException, ParserConfigurationException, IOException,
-            SAXException, URISyntaxException {
-        SettingsManager settingsManager = new SettingsManager();
-        ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settingsManager);
+    void testConstructorTwo() {
+        SettingsContainer settings = SettingsContainer.builder().build();
+        ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(settings);
         StringBuilder buffer = new StringBuilder();
-        SelectDeParserForRegEx selectDeParserForRegEx = new SelectDeParserForRegEx(settingsManager);
+        SelectDeParserForRegEx selectDeParserForRegEx = new SelectDeParserForRegEx(settings);
         StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(expressionDeParserForRegEx,
                                                                                             selectDeParserForRegEx,
-                                                                                            buffer, settingsManager);
+                                                                                            buffer, settings);
         Assertions.assertNotNull(statementDeParserForRegEx);
     }
 
     @Test
-    void withClause() throws JSQLParserException {
-        List<String> toCheckedInput = List.of(
-                "WITH temporaryTable(averageValue) as (SELECT AVG(col2) from table2) SELECT col1 FROM table1"
+    void withClause() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "WITH temporaryTable(averageValue)); as (SELECT AVG(col2) from table2) SELECT col1 FROM table1"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(), 
+                "WITH temporaryTable(averageValue) as (SELECT AVG(col2) from table2) SELECT col1 FROM table1",
+                matchingMap,
+                false
         );
-        testUtils.validateListAgainstRegEx("WITH temporaryTable(averageValue) as (SELECT AVG(col2) from table2) SELECT col1 FROM table1", toCheckedInput, false);
     }
 }

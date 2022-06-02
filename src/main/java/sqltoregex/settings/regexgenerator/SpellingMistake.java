@@ -17,13 +17,6 @@ public class SpellingMistake extends RegExGenerator<String> {
         this.settingsOption = settingsOption;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SpellingMistake that)) return false;
-        return settingsOption == that.settingsOption;
-    }
-
     /**
      * Iterates through each letter of the word, storing all spelling variations assuming a letter is forgotten
      *
@@ -35,7 +28,7 @@ public class SpellingMistake extends RegExGenerator<String> {
             throw new IllegalArgumentException("String str should not be empty!");
         }
         StringBuilder alternativeWritingStyles = new StringBuilder();
-        alternativeWritingStyles.append(isCapturingGroup ? '(' : "(?:");
+        alternativeWritingStyles.append(isCapturingGroup ? "(?:" : "(");
         alternativeWritingStyles.append(str);
         if(str.length() > 1) alternativeWritingStyles.append("|");
         for(int i = 0; i<str.length(); i++){
@@ -60,4 +53,10 @@ public class SpellingMistake extends RegExGenerator<String> {
         return Objects.hash(settingsOption);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SpellingMistake that)) return false;
+        return settingsOption == that.settingsOption;
+    }
 }

@@ -16,9 +16,7 @@ class SpellingMistakeTest {
     @Test
     void testSpellingMistakeOutputEmptyTableName() {
         String input = "";
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            String alternativeStyles = spellingMistake.generateRegExFor(input);
-        });
+        Assertions.assertThrows(IllegalArgumentException.class, () -> spellingMistake.generateRegExFor(input));
     }
 
     @Test
@@ -26,13 +24,14 @@ class SpellingMistakeTest {
         String input = "test";
         spellingMistake.setCapturingGroup(true);
         String alternativeStyles = spellingMistake.generateRegExFor(input);
-        Assertions.assertEquals("(test|est|tst|tet|tes)", alternativeStyles);
+        Assertions.assertEquals("(?:test|est|tst|tet|tes)", alternativeStyles);
     }
 
     @Test
     void testSpellingMistakeOutputWithNonCapturingGroup() {
         String input = "test";
+        spellingMistake.setCapturingGroup(false);
         String alternativeStyles = spellingMistake.generateRegExFor(input);
-        Assertions.assertEquals("(?:test|est|tst|tet|tes)", alternativeStyles);
+        Assertions.assertEquals("(test|est|tst|tet|tes)", alternativeStyles);
     }
 }

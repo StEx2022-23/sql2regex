@@ -8,9 +8,10 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.util.deparser.CreateTableDeParser;
 import net.sf.jsqlparser.util.deparser.StatementDeParser;
-import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 
 import java.util.*;
 
@@ -18,19 +19,22 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
 
-    private final SettingsManager settingsManager;
+    private final SettingsContainer settings;
     private StatementDeParser statementDeParser;
+    private final OrderRotation indexColumnNameOrder;
+    private final OrderRotation columnNameOrder;
 
-    public CreateTableDeParserForRegEx(StringBuilder buffer, SettingsManager settingsManager) {
-        super(buffer);
-        this.settingsManager = settingsManager;
+    public CreateTableDeParserForRegEx(StringBuilder buffer, SettingsContainer settingsContainer) {
+        this(new StatementDeParserForRegEx(buffer, settingsContainer), buffer, settingsContainer);
     }
 
     public CreateTableDeParserForRegEx(StatementDeParser statementDeParser,
-                                       StringBuilder buffer, SettingsManager settingsManager) {
+                                       StringBuilder buffer, SettingsContainer settingsContainer) {
         super(statementDeParser, buffer);
         this.statementDeParser = statementDeParser;
-        this.settingsManager = settingsManager;
+        this.settings = settingsContainer;
+        this.indexColumnNameOrder = settings.get(OrderRotation.class).get(SettingsOption.INDEXCOLUMNNAMEORDER);
+        this.columnNameOrder = settings.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
     }
 
     private List<String> columnDefinitionsListToStringList(List<ColumnDefinition> columnDefinitions){
@@ -92,9 +96,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
                 tmpBuffer.append("\\(");
                 String columnsString = tableOption.substring(tableOption.indexOf('(') + 1, tableOption.lastIndexOf(')'));
                 List<String> columns = new LinkedList<>(List.of(columnsString.split(",")));
-                tmpBuffer.append(settingsManager.getSettingBySettingsOption(SettingsOption.INDEXCOLUMNNAMEORDER, OrderRotation.class)
-                                       .map(orderRotation -> orderRotation.generateRegExFor(columns))
-                                       .orElse(String.join(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE, columns)));
+                tmpBuffer.append(RegExGenerator.useOrderRotation(this.indexColumnNameOrder, columns));
                 tmpBuffer.append("\\)");
             }else if (tableOption.equals("=")) {
                 tmpBuffer.delete(tmpBuffer.length() - REQUIRED_WHITE_SPACE.length(), tmpBuffer.length());
@@ -118,9 +120,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
 
     private String concatIndexColumns(Index index){
         List<String> indexStringList = getStringList(index.getColumns());
-        return "\\(" + settingsManager.getSettingBySettingsOption(SettingsOption.INDEXCOLUMNNAMEORDER, OrderRotation.class)
-                .map(order -> order.generateRegExFor(indexStringList))
-                .orElse(String.join("," + OPTIONAL_WHITE_SPACE, indexStringList))
+        return "\\(" + RegExGenerator.useOrderRotation(this.indexColumnNameOrder, indexStringList)
                 + "\\)";
     }
 
@@ -156,11 +156,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         if (createTable.getColumns() != null && !createTable.getColumns().isEmpty()) {
             buffer.append(OPTIONAL_WHITE_SPACE).append("\\(");
 
-            buffer.append(
-                    settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class)
-                            .map(order -> order.generateRegExFor(createTable.getColumns()))
-                            .orElse(String.join("," + OPTIONAL_WHITE_SPACE, createTable.getColumns()))
-            );
+            buffer.append(settings.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER).generateRegExFor(createTable.getColumns()));
             buffer.append("\\)");
         }
         if (createTable.getColumnDefinitions() != null) {
@@ -172,18 +168,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
             colAndIndexList.addAll(indexListToStringList(createTable.getIndexes()));
 
 
-            buffer.append(settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class)
-                    .map(order -> order.generateRegExFor(colAndIndexList))
-                    .orElseGet(() -> {
-                        for (Iterator<String> iter = colAndIndexList.iterator(); iter.hasNext();) {
-                            buffer.append(iter.next());
-
-                            if (iter.hasNext()) {
-                                buffer.append(",").append(OPTIONAL_WHITE_SPACE);
-                            }
-                        }
-                        return "";
-                    }));
+            buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder , colAndIndexList));
 
             buffer.append("\\)");
         }

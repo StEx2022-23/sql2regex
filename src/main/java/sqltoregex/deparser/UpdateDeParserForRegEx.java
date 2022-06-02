@@ -8,7 +8,7 @@ import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.statement.update.UpdateSet;
 import net.sf.jsqlparser.util.deparser.UpdateDeParser;
-import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
@@ -28,27 +28,22 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     private final OrderRotation tableNameOrderRotation;
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
-    SettingsManager settingsManager;
+    private final SettingsContainer settingsContainer;
 
-    public UpdateDeParserForRegEx(SettingsManager settingsManager, StringBuilder buffer) {
-        this(new ExpressionDeParserForRegEx(settingsManager), new SelectDeParserForRegEx(settingsManager), buffer, settingsManager);
+    public UpdateDeParserForRegEx(SettingsContainer settingsContainer, StringBuilder buffer) {
+        this(new ExpressionDeParserForRegEx(settingsContainer), new SelectDeParserForRegEx(settingsContainer), buffer, settingsContainer);
     }
 
-    public UpdateDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx, SelectDeParserForRegEx selectDeParserForRegEx, StringBuilder buffer, SettingsManager settingsManager) {
+    public UpdateDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx, SelectDeParserForRegEx selectDeParserForRegEx, StringBuilder buffer, SettingsContainer settingsManager) {
         super(expressionDeParserForRegEx, buffer);
-        this.settingsManager = settingsManager;
+        this.settingsContainer = settingsManager;
         this.expressionDeParserForRegEx = expressionDeParserForRegEx;
         this.selectDeParserForRegEx = selectDeParserForRegEx;
-        this.keywordSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING,
-                SpellingMistake.class).orElse(null);
-        this.columnNameOrderRotation = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER,
-                OrderRotation.class).orElse(null);
-        this.tableNameOrderRotation = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMEORDER,
-                OrderRotation.class).orElse(null);
-        this.columnNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING,
-                SpellingMistake.class).orElse(null);
-        this.tableNameSpellingMistake = settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING,
-                SpellingMistake.class).orElse(null);
+        this.keywordSpellingMistake = settingsManager.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
+        this.columnNameSpellingMistake = settingsManager.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
+        this.tableNameSpellingMistake = settingsManager.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
+        this.columnNameOrderRotation = settingsManager.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
+        this.tableNameOrderRotation = settingsManager.get(OrderRotation.class).get(SettingsOption.TABLENAMEORDER);
     }
 
     @Override
@@ -160,10 +155,10 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             update.getWhere().accept(this.getExpressionDeParserForRegEx());
         }
         if (update.getOrderByElements() != null) {
-            new OrderByDeParserForRegEx(this.getExpressionDeParserForRegEx(), buffer, this.settingsManager).deParse(update.getOrderByElements(), update.getFromItem());
+            new OrderByDeParserForRegEx(this.getExpressionDeParserForRegEx(), buffer, this.settingsContainer).deParse(update.getOrderByElements(), update.getFromItem());
         }
         if (update.getLimit() != null) {
-            new LimitDeParserForRegEx(buffer, this.settingsManager).deParse(update.getLimit());
+            new LimitDeParserForRegEx(buffer, this.settingsContainer).deParse(update.getLimit());
         }
 
         if (update.getReturningExpressionList() != null) {

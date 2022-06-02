@@ -53,27 +53,23 @@ class SettingsManagerTest {
             if (SettingsOption.DEFAULT.equals(settingsOption)) {
                 continue;
             }
-            Assertions.assertTrue(settingsManager.getSettingsMap(SettingsType.ALL).containsKey(settingsOption),
+            Assertions.assertTrue(settingsManager.getSettingsContainer(SettingsType.ALL).getAllSettings().containsKey(settingsOption),
                                   "Does not contain " + settingsOption);
-            if (settingsOption == SettingsOption.NOT_AS_EXCLAMATION_AND_WORD) {
-                Assertions.assertNull(settingsManager.getSettingsMap(SettingsType.ALL).get(settingsOption));
-            } else {
-                Assertions.assertNotNull(settingsManager.getSettingsMap(SettingsType.ALL).get(settingsOption));
-            }
+            Assertions.assertNotNull(settingsManager.getSettingsContainer(SettingsType.ALL).get(settingsOption));
         }
     }
 
     @Test
     void testGetSettingByClazz() {
         Assertions.assertEquals(4, settingsManager.getSettingByClass(SpellingMistake.class, SettingsType.ALL).size());
-        Assertions.assertEquals(3, settingsManager.getSettingByClass(OrderRotation.class, SettingsType.ALL).size());
+        Assertions.assertEquals(4, settingsManager.getSettingByClass(OrderRotation.class, SettingsType.ALL).size());
         Assertions.assertEquals(2, settingsManager.getSettingByClass(StringSynonymGenerator.class, SettingsType.ALL)
                 .size());
     }
 
     @Test
     void testLoadAllProperties() {
-        Set<SettingsOption> settingsOptionSet = settingsManager.getSettingsMap(SettingsType.ALL).keySet();
+        Set<SettingsOption> settingsOptionSet = settingsManager.getSettingsContainer(SettingsType.ALL).getAllSettings().keySet();
         for (SettingsOption option
                 : Arrays.stream(SettingsOption.values())
                 .filter(settingsOption -> settingsOption != SettingsOption.DEFAULT).toList()) {
@@ -84,6 +80,7 @@ class SettingsManagerTest {
     @Test
     void usesUserSettings() {
         settingsManager.parseUserSettingsInput(new SettingsForm(new HashSet<>(List.of(SettingsOption.KEYWORDSPELLING)),
+                                                                Collections.emptySet(),
                                                                 Collections.emptySet(),
                                                                 Collections.emptySet(),
                                                                 Collections.emptySet(),
