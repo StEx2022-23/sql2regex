@@ -7,7 +7,7 @@ import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 class UserSettingsTest {
@@ -25,7 +25,8 @@ class UserSettingsTest {
         builder.with(SettingsContainer.builder().build());
         UserSettings userSettings1 = UserSettings.getInstance();
         Map<SettingsOption, IRegExGenerator<?>> settingsMap = userSettings1.getSettingsContainer().getAllSettings();
-        Assertions.assertThrows(UnsupportedOperationException.class, () -> settingsMap.putAll(new HashMap<>()));
+        Map<SettingsOption, IRegExGenerator<?>> map = Collections.emptyMap();
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> settingsMap.putAll(map));
         OrderRotation orderRotation = new OrderRotation(SettingsOption.DEFAULT);
         Assertions.assertThrows(UnsupportedOperationException.class,
                                 () -> settingsMap.put(SettingsOption.COLUMNNAMEORDER, orderRotation));
