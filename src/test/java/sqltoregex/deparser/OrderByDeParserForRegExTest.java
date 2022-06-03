@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -13,17 +14,34 @@ class OrderByDeParserForRegExTest{
 
     @Test
     void testComplexerOrderByWithIsSibling() {
+        final String sampleSolution = "SELECT col1 FROM table1 ORDER SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 FROM table1 ORDER SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
-                "SELECT col1 FROM table1 ORDER SIBLINGS  BY col2 ASC NULLS FIRST, col1 DESC NULLS LAST",
-                "SELECT col1 FROM table1 ORDER  SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
-                "SELECT col1 FROM table1 ORDER SIBLNGS BY col1 DESC NULS LAST, col2 AC NULS FIRST"
-                )
+                "SELECT col1 FROM table1  ORDER  SIBLINGS    BY col1 DESC NULLS LAST,col2 ASC   NULLS FIRST"
+        ));
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
+                 "SELECT col1 FROM table1 ORDER SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
+                 "SELECT col1 FROM table1 ORDER SIBLINGS BY col2 ASC NULLS FIRST, col1 DESC NULLS LAST"
+        ));
+        matchingMap.put(SettingsOption.KEYWORDSPELLING, List.of(
+                 "SELCT col1 FOM table1 ODER SIBINGS BY col1 DSC NULS LAT, col2 AC NULS FRST"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.KEYWORDSPELLING).build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(),
+                sampleSolution,
+                matchingMap,
+                true
         );
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
-                "SELECT col1 FROM table1 ORDER SIBLINGS BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -31,32 +49,66 @@ class OrderByDeParserForRegExTest{
 
     @Test
     void testComplexerOrderByWithNullFirstLast() {
+        final String sampleSolution = "SELECT col1 FROM table1 ORDER BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT   col1   FROM table1   ORDER BY   col1 DESC   NULLS LAST  , col2 ASC NULLS FIRST"
+        ));
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
                 "SELECT col1 FROM table1 ORDER BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
-                "SELECT col1 FROM table1 ORDER BY col2 ASC NULLS FIRST, col1 DESC NULLS LAST",
-                "SELECT col1 FROM table1 ORDER BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
-                "SELECT col1 FROM table1 ORDER BY col1 DESC NULS LAST, col2 AC NULS FIRST"
+                "SELECT col1 FROM table1 ORDER BY col2 ASC NULLS FIRST, col1 DESC NULLS LAST"
         ));
         TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
-                "SELECT col1 FROM table1 ORDER BY col1 DESC NULLS LAST, col2 ASC NULLS FIRST",
+                sampleSolution,
                 matchingMap,
                 true
         );
     }
 
     @Test
-    void testComplexerOrderByWithSynonyms() {
+    void testAscDescSynonyms() {
+        final String sampleSolution = "SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC";
+        StringSynonymGenerator stringSynonymGenerator = new StringSynonymGenerator(SettingsOption.OTHERSYNONYMS);
+        stringSynonymGenerator.addSynonymFor("ASC", "aufsteigend");
+        stringSynonymGenerator.addSynonymFor("DESC", "absteigend");
+
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC",
+                "SELECT col1 FROM    table1   ORDER BY    col1   DESC,   col2 ASC"
+        ));
+        matchingMap.put(SettingsOption.OTHERSYNONYMS, List.of(
+                "SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC",
                 "SELECT col1 FROM table1 ORDER BY col1 absteigend, col2 ASC",
-                "SELECT col1 FROM table1 ORDER BY col2 ASC, col1 absteigend",
-                "SELECT col1 FROM table1 ORDER BY col1  DESC , col2  aufsteigend"
+                "SELECT col1 FROM table1 ORDER BY col1 absteigend, col2 aufsteigend",
+                "SELECT col1 FROM table1 ORDER BY col1 DESC, col2 aufsteigend"
+        ));
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
+                "SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC",
+                "SELECT col1 FROM table1 ORDER BY col2 ASC, col1 DESC"
         ));
         TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(stringSynonymGenerator).build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
-                "SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC",
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -76,13 +128,24 @@ class OrderByDeParserForRegExTest{
 
     @Test
     void testSimpleOrderByAsc() {
+        final String sampleSolution = "SELECT col1, col2 FROM table1 ORDER BY col1 ASC";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1, col2 FROM table1 ORDER BY col1 ASC"
         ));
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
+                "SELECT col1, col2 FROM table1 ORDER BY col1 ASC",
+                "SELECT  col2, col1 FROM table1 ORDER BY col1 ASC"
+        ));
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
-                "SELECT col1, col2 FROM table1 ORDER BY col1 ASC",
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -90,13 +153,24 @@ class OrderByDeParserForRegExTest{
 
     @Test
     void testSimpleOrderByDesc() {
+        final String sampleSolution = "SELECT col1, col2 FROM table1 ORDER BY col1 DESC";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1, col2 FROM table1 ORDER BY col1 DESC"
         ));
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
+                "SELECT col1, col2 FROM table1 ORDER BY col1 DESC",
+                "SELECT  col2, col1 FROM table1 ORDER BY col1 DESC"
+        ));
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
-                "SELECT col1, col2 FROM table1 ORDER BY col1 DESC",
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -104,15 +178,24 @@ class OrderByDeParserForRegExTest{
 
     @Test
     void testComplexerOrderBy() {
+        final String sampleSolution = "SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC",
-                "SELECT col1 FROM table1 ORDER BY col2 ASC, col1 DESC",
                 "SELECT col1 FROM table1 ORDER BY col1  DESC , col2  ASC"
+        ));
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
+                "SELECT col1 FROM table1 ORDER BY col2 ASC, col1 DESC"
         ));
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
-                "SELECT col1 FROM table1 ORDER BY col1 DESC, col2 ASC",
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -134,14 +217,25 @@ class OrderByDeParserForRegExTest{
 
     @Test
     void testComplexerOrderByWithAggregateFunction() {
+        final String sampleSolution = "SELECT col1 FROM table1 t1 ORDER BY SUM(col1)";
+        StringSynonymGenerator stringSynonymGenerator = new StringSynonymGenerator(SettingsOption.AGGREGATEFUNCTIONLANG);
+        stringSynonymGenerator.addSynonymFor("SUM", "Summe");
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "SELECT col1 FROM table1 t1 ORDER BY SUM(col1));",
+                "SELECT col1 FROM table1 t1 ORDER BY SUM(col1)"
+        ));
+        matchingMap.put(SettingsOption.AGGREGATEFUNCTIONLANG, List.of(
                 "SELECT col1 FROM table1 t1 ORDER BY SUMME(col1)"
         ));
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
-                "SELECT col1 FROM table1 t1 ORDER BY SUM(col1)",
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(stringSynonymGenerator).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -149,15 +243,26 @@ class OrderByDeParserForRegExTest{
 
     @Test
     void testComplexerOrderByWithAggregateFunctionAndTwoArguments() {
+        final String sampleSolution = "SELECT col1 FROM table1 t1 ORDER BY SUM(col1), col2";
+        StringSynonymGenerator stringSynonymGenerator = new StringSynonymGenerator(SettingsOption.AGGREGATEFUNCTIONLANG);
+        stringSynonymGenerator.addSynonymFor("SUM", "Summe");
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "SELECT col1 FROM table1 t1 ORDER BY SUM(col1));, col2",
+                "SELECT col1 FROM table1 t1 ORDER BY SUM(col1), col2"
+        ));
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
                 "SELECT col1 FROM table1 t1 ORDER BY col2, SUM(col1)",
-                "SELECT col1 FROM table1 t1 ORDER BY col2, SUMME(col1)"
+                "SELECT col1 FROM table1 t1 ORDER BY col2, SUM(col1)"
         ));
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
-                "SELECT col1 FROM table1 t1 ORDER BY SUM(col1), col2",
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -165,15 +270,35 @@ class OrderByDeParserForRegExTest{
 
     @Test
     void testComplexerOrderByWithAggregateFunctionAndTwoArgumentsAndTableNameAlias() {
+        final String sampleSolution = "SELECT col1 FROM table1 t1 ORDER BY SUM(t1.col1), t1.col2";
+        StringSynonymGenerator stringSynonymGenerator = new StringSynonymGenerator(SettingsOption.AGGREGATEFUNCTIONLANG);
+        stringSynonymGenerator.addSynonymFor("SUM", "Summe");
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "SELECT col1 FROM table1 t1 ORDER BY SUM(t1.col1));, t1.col2",
+                "SELECT col1 FROM table1 t1 ORDER BY SUM(t1.col1), t1.col2"
+        ));
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
                 "SELECT col1 FROM table1 t1 ORDER BY t1.col2, SUM(col1)",
-                "SELECT col1 FROM table1 t1 ORDER BY col2, SUMME(col1)"
+                "SELECT col1 FROM table1 t1 ORDER BY col2, SUM(col1)"
+        ));
+        matchingMap.put(SettingsOption.AGGREGATEFUNCTIONLANG, List.of(
+                "SELECT col1 FROM table1 t1 ORDER BY SUMME(t1.col1), t1.col2"
         ));
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
-                "SELECT col1 FROM table1 t1 ORDER BY SUM(t1.col1), t1.col2",
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(stringSynonymGenerator).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );

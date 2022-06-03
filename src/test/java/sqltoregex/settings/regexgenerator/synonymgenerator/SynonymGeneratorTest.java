@@ -143,18 +143,19 @@ class SynonymGeneratorTest {
     @Test
     void regExCreationCapturing() {
         stringSynonymGenerator.addSynonym("A");
-        stringSynonymGenerator.setCapturingGroup(true);
-        Assertions.assertEquals("(A)", stringSynonymGenerator.generateRegExFor("A"));
+        Assertions.assertEquals("(?:A)", stringSynonymGenerator.generateRegExFor("A"));
     }
 
     @Test
     void regExCreationNonCapturing() {
         stringSynonymGenerator.addSynonym("A");
-        Assertions.assertEquals("(?:A)", stringSynonymGenerator.generateRegExFor("A"));
+        stringSynonymGenerator.setNonCapturingGroup(false);
+        Assertions.assertEquals("(A)", stringSynonymGenerator.generateRegExFor("A"));
     }
 
     @Test
     void regExCreationWithPreSuffix() {
+        stringSynonymGenerator.setNonCapturingGroup(true);
         stringSynonymGenerator.addSynonym("Mittelwert");
         stringSynonymGenerator.addSynonym("AVG");
         stringSynonymGenerator.addSynonym("Average");

@@ -15,7 +15,7 @@ class StringSynonymGeneratorTest {
         defaultSynonymManager.addSynonym("witzig");
         defaultSynonymManager.addSynonym("komisch");
         defaultSynonymManager.addSynonym("ulkig");
-        defaultSynonymManager.setCapturingGroup(true);
+        defaultSynonymManager.setNonCapturingGroup(false);
     }
 
     @Test

@@ -12,5 +12,5 @@ public interface IRegExGenerator<T> {
      *
      * @param capturingGroup true for capturing group false for non-capturing group
      */
-    void setCapturingGroup(boolean capturingGroup);
+    void setNonCapturingGroup(boolean capturingGroup);
 }

@@ -7,8 +7,6 @@ import net.sf.jsqlparser.statement.Statement;
 import org.junit.jupiter.api.Assertions;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
-import sqltoregex.settings.regexgenerator.OrderRotation;
-import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import java.util.LinkedList;
 import java.util.List;

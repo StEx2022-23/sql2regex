@@ -10,7 +10,7 @@ import java.util.List;
 
 public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
     protected static final String OPTIONAL_WHITE_SPACE = "\\s*";
-    protected boolean isCapturingGroup = false;
+    protected boolean isNonCapturingGroup = true;
 
     public static String useSpellingMistake(SpellingMistake spellingMistake, String str) {
         if (null != spellingMistake) return spellingMistake.generateRegExFor(str);
@@ -34,7 +34,7 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
     }
 
     @Override
-    public void setCapturingGroup(boolean capturingGroup) {
-        this.isCapturingGroup = capturingGroup;
+    public void setNonCapturingGroup(boolean capturingGroup) {
+        this.isNonCapturingGroup = capturingGroup;
     }
 }

@@ -70,7 +70,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, insert.getTable().toString())).append(REQUIRED_WHITE_SPACE);
 
         if (insert.getColumns() != null && !(insert.getItemsList(ExpressionList.class).getExpressions().get(0) instanceof RowConstructor)) {
-            Map<String, String> mappedColumnsAndRelatedValues = new HashMap<>();
+            Map<String, String> mappedColumnsAndRelatedValues = new LinkedHashMap<>();
             buffer.append("(?:");
             Iterator<String> columnsOrderOptionsIterator = Arrays.stream(this.generateListOfColumnsOrderOption(mappedColumnsAndRelatedValues, insert)).iterator();
             while (columnsOrderOptionsIterator.hasNext()) {
@@ -98,7 +98,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
             }
             buffer.append(")");
         } else if (insert.getColumns() != null && insert.getItemsList(ExpressionList.class).getExpressions().get(0) instanceof RowConstructor) {
-            Map<String, List<String>> mappedColumnsAndRelatedValues = new HashMap<>();
+            Map<String, List<String>> mappedColumnsAndRelatedValues = new LinkedHashMap<>();
             buffer.append("(?:");
             Iterator<String> columnsOrderOptionsIterator = Arrays.stream(this.generateListOfColumnsOrderOptionForMultipleValues(mappedColumnsAndRelatedValues, insert)).iterator();
             while (columnsOrderOptionsIterator.hasNext()) {
@@ -180,19 +180,19 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         if (insert.isUseSet()) {
             buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "SET"));
             buffer.append(REQUIRED_WHITE_SPACE);
-
+            List<String> useSets = new LinkedList<>();
+            StringBuilder tempUseSet = new StringBuilder();
+            ExpressionDeParserForRegEx tmpExpressionDeParserForRegEx = new ExpressionDeParserForRegEx(this.selectDeParserForRegEx, tempUseSet, this.settings);
             for (int i = 0; i < insert.getSetColumns().size(); i++) {
                 Column column = insert.getSetColumns().get(i);
-                column.accept(this.expressionDeParserForRegEx);
-
-                buffer.append(OPTIONAL_WHITE_SPACE + "=" + OPTIONAL_WHITE_SPACE);
-
+                column.accept(tmpExpressionDeParserForRegEx);
+                tempUseSet.append(OPTIONAL_WHITE_SPACE + "=" + OPTIONAL_WHITE_SPACE);
                 Expression expression = insert.getSetExpressionList().get(i);
-                expression.accept(this.expressionDeParserForRegEx);
-                if (i < insert.getSetColumns().size() - 1) {
-                    buffer.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
-                }
+                expression.accept(tmpExpressionDeParserForRegEx);
+                useSets.add(tempUseSet.toString());
+                tempUseSet.replace(0, tempUseSet.length(),"");
             }
+            buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, useSets));
         }
 
         if (insert.isUseDuplicate()) {
@@ -308,7 +308,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         for (String string : keySet) {
             mappedColumnsAndRelatedValuesKeySet.add(string);
         }
-        String columnsRotated = RegExGenerator.useOrderRotation(this.tableNameOrder, mappedColumnsAndRelatedValuesKeySet);
+        String columnsRotated = RegExGenerator.useOrderRotation(this.columnNameOrder, mappedColumnsAndRelatedValuesKeySet);
         columnsRotated = columnsRotated.replace(OPTIONAL_WHITE_SPACE, "").replace("(?:", "").replace(")", "");
         return columnsRotated.split("\\|");
     }

@@ -18,7 +18,6 @@ import java.util.List;
 public class OrderByDeParserForRegEx extends OrderByDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
-    private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
     private final StringSynonymGenerator aggregateFunctionLang;
     private final OrderRotation columnNameOrder;
     private final SpellingMistake columnNameSpellingMistake;
@@ -84,7 +83,6 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         }
         temp.append(this.handleAscDesc(orderByElement));
         temp.append(this.handleNullFirstLast(orderByElement));
-        temp.append(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE);
         return temp.toString();
     }
 
@@ -121,9 +119,13 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         if (orderByElement.getNullOrdering() != null) {
             temp.append(REQUIRED_WHITE_SPACE);
             if (orderByElement.getNullOrdering() == OrderByElement.NullOrdering.NULLS_FIRST) {
-                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "NULLS FIRST"));
+                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "NULLS"));
+                temp.append(REQUIRED_WHITE_SPACE);
+                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FIRST"));
             } else {
-                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "NULLS LAST"));
+                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "NULLS"));
+                temp.append(REQUIRED_WHITE_SPACE);
+                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "LAST"));
             }
         }
         return temp.toString();
