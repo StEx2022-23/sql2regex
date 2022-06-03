@@ -32,6 +32,10 @@ function copy2clipbord(id, idFeedback) {
     });
 }
 
+function copyHistoryEntry(id) {
+    navigator.clipboard.writeText(document.getElementById(id).innerHTML).then(r => console.log("Successfully copied! :-)"));
+}
+
 function formattedCurrentTimestamp() {
     let currentdate = new Date();
     return ((currentdate.getDate().toString().length === 1) ? "0".concat(currentdate.getDate()) : (currentdate.getDate())) + "/" + (((currentdate.getMonth() + 1).toString().length === 1) ? "0".concat(currentdate.getMonth() + 1) : (currentdate.getMonth() + 1)) + "/" + ((currentdate.getFullYear().toString().length === 1) ? "0".concat(currentdate.getFullYear()) : (currentdate.getFullYear())) + " @ " + ((currentdate.getHours().toString().length === 1) ? "0".concat(currentdate.getHours()) : (currentdate.getHours())) + ":" + ((currentdate.getMinutes().toString().length === 1) ? "0".concat(currentdate.getMinutes()) : (currentdate.getMinutes())) + ":" + ((currentdate.getSeconds().toString().length === 1) ? "0".concat(currentdate.getSeconds()) : (currentdate.getSeconds()));
@@ -198,7 +202,8 @@ class SqlRegExHistory {
 
                 let copyDiv = document.createElement("div");
                 copyDiv.setAttribute("id","copyHistory");
-                copyDiv.setAttribute("onclick", "copyHistoryEntry("+String(i)+")");
+                let copyEntryId = "copyHistoryCodeId-".concat(String(i));
+                copyDiv.setAttribute("onclick", "copyHistoryEntry('"+copyEntryId+"')");
                 innerInnerDiv.append(copyDiv);
                 let copyIcon = document.createElementNS('http://www.w3.org/2000/svg', "svg");
                 copyIcon.setAttribute("width", "30");
