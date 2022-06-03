@@ -12,6 +12,7 @@ import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
+import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import java.util.*;
 
@@ -23,6 +24,8 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
     private StatementDeParser statementDeParser;
     private final OrderRotation indexColumnNameOrder;
     private final OrderRotation columnNameOrder;
+    private final SpellingMistake keywordSpellingMistake;
+    private final SpellingMistake indexColumnNameSpelling;
 
     public CreateTableDeParserForRegEx(StringBuilder buffer, SettingsContainer settingsContainer) {
         this(new StatementDeParserForRegEx(buffer, settingsContainer), buffer, settingsContainer);
@@ -33,6 +36,8 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         super(statementDeParser, buffer);
         this.statementDeParser = statementDeParser;
         this.settings = settingsContainer;
+        this.keywordSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
+        this.indexColumnNameSpelling = settingsContainer.get(SpellingMistake.class).get(SettingsOption.INDEXCOLUMNNAMESPELLING);
         this.indexColumnNameOrder = settings.get(OrderRotation.class).get(SettingsOption.INDEXCOLUMNNAMEORDER);
         this.columnNameOrder = settings.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
     }
@@ -62,15 +67,15 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         for (Index index : indexList){
             StringBuilder tmpBuffer = new StringBuilder();
             if (index.getType() != null && (index.getType().equals("PRIMARY KEY") || index.getType().equals("FOREIGN KEY"))){
-                tmpBuffer.append("(?:CONSTRAINT").append(REQUIRED_WHITE_SPACE);
-                tmpBuffer.append(index.getName()).append(REQUIRED_WHITE_SPACE);
-                tmpBuffer.append(index.getType()).append(OPTIONAL_WHITE_SPACE);
+                tmpBuffer.append("(?:").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "CONSTRAINT")).append(REQUIRED_WHITE_SPACE);
+                tmpBuffer.append(RegExGenerator.useSpellingMistake(this.indexColumnNameSpelling, index.getName())).append(REQUIRED_WHITE_SPACE);
+                tmpBuffer.append(RegExGenerator.useSpellingMistake(this.indexColumnNameSpelling, index.getType())).append(OPTIONAL_WHITE_SPACE);
                 tmpBuffer.append(concatIndexColumns(index));
                 tmpBuffer.append("|");
             }
 
             tmpBuffer.append(index.getType());
-            tmpBuffer.append(!index.getName().isEmpty() ? REQUIRED_WHITE_SPACE + index.getName() : "");
+            tmpBuffer.append(!index.getName().isEmpty() ? REQUIRED_WHITE_SPACE + RegExGenerator.useSpellingMistake(this.indexColumnNameSpelling, index.getName()) : "");
             tmpBuffer.append(REQUIRED_WHITE_SPACE);
             tmpBuffer.append(concatIndexColumns(index));
             if (index.getType() != null && (index.getType().equals("PRIMARY KEY") || index.getType().equals("FOREIGN KEY"))){
@@ -133,29 +138,32 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
     @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     public void deParse(CreateTable createTable) {
-        buffer.append("CREATE").append(REQUIRED_WHITE_SPACE);
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "CREATE")).append(REQUIRED_WHITE_SPACE);
         if (createTable.isOrReplace()) {
-            buffer.append("OR").append(REQUIRED_WHITE_SPACE).append("REPLACE").append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "OR"))
+                    .append(REQUIRED_WHITE_SPACE)
+                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "REPLACE"))
+                    .append(REQUIRED_WHITE_SPACE);
         }
         if (createTable.isUnlogged()) {
-            buffer.append("UNLOGGED").append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "UNLOGGED")).append(REQUIRED_WHITE_SPACE);
         }
         String params = PlainSelect.getStringList(createTable.getCreateOptionsStrings(), false, false);
         if (!"".equals(params)) {
             buffer.append(params).append(REQUIRED_WHITE_SPACE);
         }
 
-        buffer.append("TABLE").append(REQUIRED_WHITE_SPACE);
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "TABLE")).append(REQUIRED_WHITE_SPACE);
         if (createTable.isIfNotExists()) {
-            buffer.append("IF").append(REQUIRED_WHITE_SPACE)
-                    .append("NOT").append(REQUIRED_WHITE_SPACE)
-                    .append("EXISTS").append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "IF")).append(REQUIRED_WHITE_SPACE)
+                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "NOT")).append(REQUIRED_WHITE_SPACE)
+                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "EXISTS")).append(REQUIRED_WHITE_SPACE);
         }
         buffer.append(createTable.getTable().getFullyQualifiedName());
 
         if (createTable.getColumns() != null && !createTable.getColumns().isEmpty()) {
             buffer.append(OPTIONAL_WHITE_SPACE).append("\\(");
-
+            //TODO: ColumnNameSpelling
             buffer.append(settings.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER).generateRegExFor(createTable.getColumns()));
             buffer.append("\\)");
         }
@@ -180,10 +188,13 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
 
         //ORACLE: ALTER TABLE hr.employees ENABLE ROW MOVEMENT
         if (createTable.getRowMovement() != null) {
-            buffer.append(REQUIRED_WHITE_SPACE).append(createTable.getRowMovement().getMode().toString()).append(REQUIRED_WHITE_SPACE).append("ROW").append("MOVEMENT");
+            buffer.append(REQUIRED_WHITE_SPACE)
+                    .append(createTable.getRowMovement().getMode().toString())
+                    .append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ROW"))
+                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "MOVEMENT"));
         }
         if (createTable.getSelect() != null) {
-            buffer.append(REQUIRED_WHITE_SPACE).append("AS").append(REQUIRED_WHITE_SPACE);
+            buffer.append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "AS")).append(REQUIRED_WHITE_SPACE);
             if (createTable.isSelectParenthesis()) {
                 buffer.append("\\(");
             }
@@ -195,14 +206,16 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         }
         if (createTable.getLikeTable() != null) {
             buffer.append("(?:\\(").append(OPTIONAL_WHITE_SPACE).append(")?");
-            buffer.append(REQUIRED_WHITE_SPACE).append("LIKE").append(REQUIRED_WHITE_SPACE);
+            buffer.append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "LIKE")).append(REQUIRED_WHITE_SPACE);
             Table table = createTable.getLikeTable();
+            //TODO: tablenamespelling
             buffer.append(table.getFullyQualifiedName());
             buffer.append("(?:").append(OPTIONAL_WHITE_SPACE).append("\\))?");
         }
     }
 
     private void concatColumnDefinition(ColumnDefinition columnDefinition, StringBuilder buffer) {
+        //TODO: columnNameSpelling
         buffer.append(columnDefinition.getColumnName());
         buffer.append(REQUIRED_WHITE_SPACE);
         buffer.append(columnDefinition.getColDataType().toString());
