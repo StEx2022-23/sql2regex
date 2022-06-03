@@ -26,6 +26,8 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
     private final OrderRotation columnNameOrder;
     private final SpellingMistake keywordSpellingMistake;
     private final SpellingMistake indexColumnNameSpelling;
+    private final SpellingMistake tableNameSpellingMistake;
+    private final SpellingMistake columnNameSpellingMistake;
 
     public CreateTableDeParserForRegEx(StringBuilder buffer, SettingsContainer settingsContainer) {
         this(new StatementDeParserForRegEx(buffer, settingsContainer), buffer, settingsContainer);
@@ -38,6 +40,8 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         this.settings = settingsContainer;
         this.keywordSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
         this.indexColumnNameSpelling = settingsContainer.get(SpellingMistake.class).get(SettingsOption.INDEXCOLUMNNAMESPELLING);
+        this.tableNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
+        this.columnNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
         this.indexColumnNameOrder = settings.get(OrderRotation.class).get(SettingsOption.INDEXCOLUMNNAMEORDER);
         this.columnNameOrder = settings.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
     }
@@ -159,12 +163,13 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
                     .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "NOT")).append(REQUIRED_WHITE_SPACE)
                     .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "EXISTS")).append(REQUIRED_WHITE_SPACE);
         }
-        buffer.append(createTable.getTable().getFullyQualifiedName());
+
+        buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, createTable.getTable().getFullyQualifiedName()));
 
         if (createTable.getColumns() != null && !createTable.getColumns().isEmpty()) {
             buffer.append(OPTIONAL_WHITE_SPACE).append("\\(");
-            //TODO: ColumnNameSpelling
-            buffer.append(settings.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER).generateRegExFor(createTable.getColumns()));
+            buffer.append(settings.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER)
+                    .generateRegExFor(createTable.getColumns().stream().map(col -> RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, col)).toList()));
             buffer.append("\\)");
         }
         if (createTable.getColumnDefinitions() != null) {
@@ -174,7 +179,6 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
 
             colAndIndexList.addAll(columnDefinitionsListToStringList(createTable.getColumnDefinitions()));
             colAndIndexList.addAll(indexListToStringList(createTable.getIndexes()));
-
 
             buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder , colAndIndexList));
 
@@ -208,15 +212,13 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
             buffer.append("(?:\\(").append(OPTIONAL_WHITE_SPACE).append(")?");
             buffer.append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "LIKE")).append(REQUIRED_WHITE_SPACE);
             Table table = createTable.getLikeTable();
-            //TODO: tablenamespelling
-            buffer.append(table.getFullyQualifiedName());
+            buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, table.getFullyQualifiedName()));
             buffer.append("(?:").append(OPTIONAL_WHITE_SPACE).append("\\))?");
         }
     }
 
     private void concatColumnDefinition(ColumnDefinition columnDefinition, StringBuilder buffer) {
-        //TODO: columnNameSpelling
-        buffer.append(columnDefinition.getColumnName());
+        buffer.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, columnDefinition.getColumnName()));
         buffer.append(REQUIRED_WHITE_SPACE);
         buffer.append(columnDefinition.getColDataType().toString());
         if (columnDefinition.getColumnSpecs() != null) {
