@@ -67,7 +67,7 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
             return this.getSettingsOption() == that.getSettingsOption();
         } catch (ClassCastException e){
             Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-            logger.log(Level.WARNING, "Error while casting RegExGenerator<T>: {0}", e);
+            logger.log(Level.WARNING, "Error while casting RegExGenerator: {0}", e);
         }
         return false;
     }
