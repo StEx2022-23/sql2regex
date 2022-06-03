@@ -6,7 +6,6 @@ import sqltoregex.settings.SettingsOption;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * The OrderRotation class allows creating a RegEx expression that takes into all possible order possibilities.
@@ -16,11 +15,9 @@ import java.util.Objects;
  */
 public class OrderRotation extends RegExGenerator<List<String>> {
     private final StringBuilder buffer = new StringBuilder();
-    private final SettingsOption settingsOption;
 
     public OrderRotation(SettingsOption settingsOption) {
-        Assert.notNull(settingsOption, "SettingsOption must not be null");
-        this.settingsOption = settingsOption;
+        super(settingsOption);
     }
 
     /**
@@ -76,23 +73,5 @@ public class OrderRotation extends RegExGenerator<List<String>> {
                 orderRotationRek(amount - 1, valueList);
             }
         }
-    }
-
-    @Override
-    public SettingsOption getSettingsOption() {
-        return settingsOption;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(settingsOption);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        OrderRotation that = (OrderRotation) o;
-        return settingsOption == that.settingsOption;
     }
 }

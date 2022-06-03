@@ -2,8 +2,6 @@ package sqltoregex.settings.regexgenerator;
 
 import sqltoregex.settings.SettingsOption;
 
-import java.util.Objects;
-
 /**
  * The OrderRotation class allows creating a RegEx expression that takes into account different spelling variants
  * of a word. It is assumed that omitting a character is "okay".
@@ -11,10 +9,8 @@ import java.util.Objects;
  * test ↔ (?:test|est|tst|tet|tes) or (test|est|tst|tet|tes)
  */
 public class SpellingMistake extends RegExGenerator<String> {
-    private final SettingsOption settingsOption;
-
     public SpellingMistake(SettingsOption settingsOption) {
-        this.settingsOption = settingsOption;
+        super(settingsOption);
     }
 
     /**
@@ -41,22 +37,5 @@ public class SpellingMistake extends RegExGenerator<String> {
         alternativeWritingStyles.replace(alternativeWritingStyles.length() - 1, alternativeWritingStyles.length(), "");
         alternativeWritingStyles.append(')');
         return alternativeWritingStyles.toString();
-    }
-
-    @Override
-    public SettingsOption getSettingsOption() {
-        return settingsOption;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(settingsOption);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SpellingMistake that)) return false;
-        return settingsOption == that.settingsOption;
     }
 }
