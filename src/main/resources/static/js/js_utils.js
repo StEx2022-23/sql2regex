@@ -33,7 +33,7 @@ function copy2clipbord(id, idFeedback) {
 }
 
 function copyHistoryEntry(id) {
-    navigator.clipboard.writeText(document.getElementById(id).innerHTML).then(r => console.log("Successfully copied! :-)"));
+    navigator.clipboard.writeText(document.getElementById(id).innerHTML).then(_r => console.log("Successfully copied! :-)"));
 }
 
 function insertVisualizationPage() {
@@ -341,9 +341,15 @@ function loadDefaultLanguageSettings(){
 
 document.onreadystatechange = function () {
     if (document.readyState === "interactive") {
-        loadDefaultLanguageSettings();
-        let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
-        SqlRegExHis.checkUpdatedConverting();
-        insertVisualizationPage()
+        try{
+            loadDefaultLanguageSettings();
+        } catch{}
+        try{
+            let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
+            SqlRegExHis.checkUpdatedConverting();
+        } catch{}
+        try{
+            insertVisualizationPage()
+        } catch{}
     }
 }
