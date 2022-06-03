@@ -803,7 +803,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     @Override
     public void visit(AllColumns allColumns) {
-        buffer.append("(?:ALL|\\*)");
+        buffer.append("(?:").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ALL")).append("|\\*)");
     }
 
     @Override

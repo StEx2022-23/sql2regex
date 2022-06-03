@@ -82,7 +82,7 @@ public class SettingsContainer {
             }
 
             switch (settingsOption) {
-                case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, GROUPBYELEMENTORDER, INDEXCOLUMNNAMEORDER -> this.withSettingsOption(
+                case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, GROUPBYELEMENTORDER, INDEXCOLUMNNAMEORDER -> this.with(
                         settingsOption);
                 case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
                     Set<String> valueList = new HashSet<>();
@@ -113,7 +113,7 @@ public class SettingsContainer {
             return this;
         }
 
-        public Builder withSettingsOption(SettingsOption settingsOption) {
+        public Builder with(SettingsOption settingsOption) {
             switch (settingsOption) {
                 case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING -> {
                     SpellingMistake spellingMistake = new SpellingMistake(settingsOption);
@@ -131,7 +131,7 @@ public class SettingsContainer {
         public Builder withSettingsOptionSet(Set<SettingsOption> settingsOptions) {
             Assert.notNull(settingsOptions, "Set of settings options must not be null");
             for (SettingsOption settingsOption : settingsOptions) {
-                withSettingsOption(settingsOption);
+                with(settingsOption);
             }
             return this;
         }
@@ -152,6 +152,15 @@ public class SettingsContainer {
             return this;
         }
 
+        /**
+         * Creates a {@link IRegExGenerator} depending on the provided settingsOption and synonym Set.
+         * If the synonymSet consists of delimited Strings they can splitted
+         * and added with {@link sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator#addSynonymFor(Object, Object)}
+         *
+         * @param synonyms
+         * @param settingsOption
+         * @return
+         */
         public Builder withStringSet(Set<String> synonyms, SettingsOption settingsOption) {
             switch (settingsOption) {
                 case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
@@ -167,9 +176,13 @@ public class SettingsContainer {
                         StringSynonymGenerator aggregateFunctionSynonymGenerator = new StringSynonymGenerator(
                                 settingsOption);
                         for (String singleSynonym : synonyms) {
-                            aggregateFunctionSynonymGenerator.addSynonymFor(
-                                    singleSynonym.split(STRING_SYNONYM_DELIMITER)[0].strip(),
-                                    singleSynonym.split(STRING_SYNONYM_DELIMITER)[1].strip());
+                            if (singleSynonym.split(STRING_SYNONYM_DELIMITER).length == 1){
+                                aggregateFunctionSynonymGenerator.addSynonym(singleSynonym);
+                            }else {
+                                aggregateFunctionSynonymGenerator.addSynonymFor(
+                                        singleSynonym.split(STRING_SYNONYM_DELIMITER)[0].strip(),
+                                        singleSynonym.split(STRING_SYNONYM_DELIMITER)[1].strip());
+                            }
                         }
                         this.modifiableMap.put(settingsOption, aggregateFunctionSynonymGenerator);
                     }

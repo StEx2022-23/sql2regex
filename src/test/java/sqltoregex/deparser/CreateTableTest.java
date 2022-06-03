@@ -29,6 +29,16 @@ matchingMap.put(SettingsOption.DEFAULT, List.of(
     }
 
     @Test
+    void createAs(){
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "CREATE TEMPORARY TABLE table1 (column1 datatype1) AS SELECT col2 FROM table2"
+        ));
+
+        System.out.println(TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), "CREATE TEMPORARY TABLE table1 (column1 datatype1) AS SELECT col2 FROM table2", matchingMap, true));
+    }
+
+    @Test
     void createLIKE(){
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
 matchingMap.put(SettingsOption.DEFAULT, List.of(
@@ -51,12 +61,15 @@ matchingMap.put(SettingsOption.DEFAULT, List.of(
     @Test
     void withMultipleSimpleColumns() {
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "CREATE TABLE table1 (column1 datatype1, column2 datatype2, column3 datatype3)",
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "CREATE TABLE table1 (column1 datatype1, column2 datatype2, column3 datatype3)"
+        ));
+matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
                 "CREATE TABLE table1 (column2 datatype2, column1 datatype1, column3 datatype3)"
         ));
 
         TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), "CREATE TABLE table1 (column1 datatype1, column2 datatype2, column3 datatype3)", matchingMap, true);
+        TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(), "CREATE TABLE table1 (column1 datatype1, column2 datatype2, column3 datatype3)", matchingMap, true);
     }
 
     @Test
@@ -71,23 +84,30 @@ matchingMap.put(SettingsOption.DEFAULT, List.of(
 
     @Test
     void with2TableConstraint() {
+        final String sampleSolution = "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col1, col2))";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col1, col2))",
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col1, col2))"
+        ));
+        matchingMap.put(SettingsOption.INDEXCOLUMNNAMEORDER, List.of(
                 "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col2, col1))"
         ));
 
-        TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col1, col2))", matchingMap, true);
+        TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), sampleSolution , matchingMap, true);
+        TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().with(SettingsOption.INDEXCOLUMNNAMEORDER) .build(), sampleSolution , matchingMap, true);
     }
 
     @Test
     void withConstraintBetween2Columns() {
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-matchingMap.put(SettingsOption.DEFAULT, List.of(
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "CREATE TABLE table1 (col1 type1, col2 type2, CONSTRAINT my_constraint PRIMARY KEY (col1))"
+        ));
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
                 "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col1), col2 type2)"
         ));
 
-        TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col1), col2 type2)", matchingMap, true);
+        TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(), "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col1), col2 type2)", matchingMap, true);
     }
 
     /**

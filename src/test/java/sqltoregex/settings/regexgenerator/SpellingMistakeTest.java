@@ -22,7 +22,7 @@ class SpellingMistakeTest {
     @Test
     void testSpellingMistakeOutputWithCapturingGroup() {
         String input = "test";
-        spellingMistake.setCapturingGroup(true);
+        spellingMistake.setNonCapturingGroup(true);
         String alternativeStyles = spellingMistake.generateRegExFor(input);
         Assertions.assertEquals("(?:test|est|tst|tet|tes)", alternativeStyles);
     }
@@ -30,7 +30,7 @@ class SpellingMistakeTest {
     @Test
     void testSpellingMistakeOutputWithNonCapturingGroup() {
         String input = "test";
-        spellingMistake.setCapturingGroup(false);
+        spellingMistake.setNonCapturingGroup(false);
         String alternativeStyles = spellingMistake.generateRegExFor(input);
         Assertions.assertEquals("(test|est|tst|tet|tes)", alternativeStyles);
     }

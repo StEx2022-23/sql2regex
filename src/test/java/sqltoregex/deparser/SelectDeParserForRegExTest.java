@@ -13,47 +13,92 @@ class SelectDeParserForRegExTest{
     StringSynonymGenerator stringSynonymGenerator = new StringSynonymGenerator(SettingsOption.AGGREGATEFUNCTIONLANG);
     @Test
     void testSelectFromWithTwoColumns()  {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
+        final String sampleSolution = "SELECT col1, col2 FROM table1";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        Map<SettingsOption, List<String>> nonMatchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1, col2 FROM table1",
-                "SELECT col2, col1 FROM table1",
-                "SELECT col2,col1 FROM table1",
-                "SELECT col2, col1 FROM table1",
-                "SELCT col2,col1 FROM table1",
-                "SELECT col2, col1 FOM table1"
+                "SELECT   col1  , col2  FROM  table1"
+        ));
+        nonMatchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECTcol1, col2 FROM table1",
+                "SELECT   col1  , col2  FROMtable1"
+        ));
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
+                "SELECT col1, col2 FROM table1",
+                "SELECT col2, col1 FROM table1"
+        ));
+        matchingMap.put(SettingsOption.KEYWORDSPELLING, List.of(
+                "SELCT col1, col2 FRM table1"
+        ));
+        nonMatchingMap.put(SettingsOption.KEYWORDSPELLING, List.of(
+                "SECT col1, col2 FM table1"
+        ));
+        matchingMap.put(SettingsOption.COLUMNNAMESPELLING, List.of(
+                "SELECT cl1, cl2 FROM table1"
+        ));
+        nonMatchingMap.put(SettingsOption.COLUMNNAMESPELLING, List.of(
+                "SELECT c1, c2 FROM table1"
+        ));
+        matchingMap.put(SettingsOption.TABLENAMESPELLING, List.of(
+                "SELECT col1, col2 FROM tabe1"
+        ));
+        nonMatchingMap.put(SettingsOption.TABLENAMESPELLING, List.of(
+                "SELECT cl1, cl2 FROM tab1"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
-                "SELECT col1, col2 FROM table1",
+                SettingsContainer.builder().build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
-    }
-
-    @Test
-    void testSelectFromWithTwoColumnsFailings()  {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
-        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-        matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "SELECTcol1, col2 FROM table1",
-                "SELECT col2, col1FROM table1",
-                "SELECT col2,col1 FROMtable1",
-                "SELECT col2 col1 FROM table1",
-                "SELCTcol2,col1 FROM table1",
-                "SELECTcol2,col1FOMtable1"
-        ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
-                "SELECT col1, col2 FROM table1",
+                SettingsContainer.builder().with(SettingsOption.KEYWORDSPELLING).build(),
+                sampleSolution,
                 matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.KEYWORDSPELLING).build(),
+                sampleSolution,
+                nonMatchingMap,
+                false
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.COLUMNNAMESPELLING).build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.COLUMNNAMESPELLING).build(),
+                sampleSolution,
+                nonMatchingMap,
+                false
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.TABLENAMESPELLING).build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.TABLENAMESPELLING).build(),
+                sampleSolution,
+                nonMatchingMap,
                 false
         );
     }
 
     @Test
     void testSimpleInnerJoin()  {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
+        final String sampleSolution = "SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2",
@@ -61,8 +106,8 @@ class SelectDeParserForRegExTest{
                 "SELECT col1 FROM table1 INNER  JOIN  table2  ON  col2 = col1"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
-                "SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2",
+                SettingsContainer.builder().build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -70,59 +115,82 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testFrom()  {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
+        final String sampleSolution = "SELECT col1 FROM table1, table2";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        Map<SettingsOption, List<String>> nonMatchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT col1 FROM table1, table2",
+                "SELECT col1 FROM  table1   ,  table2",
+                "SELECT col1 FROM  table1,table2"
+        ));
+        matchingMap.put(SettingsOption.TABLENAMEORDER, List.of(
                 "SELECT col1 FROM table1, table2",
                 "SELECT col1 FROM table2, table1"
         ));
+        nonMatchingMap.put(SettingsOption.TABLENAMEORDER, List.of(
+                "SELECT col1 FROM table1, table1",
+                "SELECT col1 FROM table2, table2"
+        ));
+        matchingMap.put(SettingsOption.TABLENAMESPELLING, List.of(
+                "SELECT col1 FROM tabl1, tabe2"
+        ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
-                "SELECT col1 FROM table1, table2",
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.TABLENAMEORDER).build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.TABLENAMEORDER).build(),
+                sampleSolution,
+                nonMatchingMap,
+                false
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.TABLENAMESPELLING).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
     }
 
+    /**
+     * Test for rotating aggregate function isn't needed, cause its handled as a normal column
+     */
     @Test
-    void testAliasAndAggregateOne() {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
+    void testAliasAndAggregateFunction() {
+        final String sampleSolution = "SELECT AVG(col1) AS c1 FROM table1";
         stringSynonymGenerator.addSynonymFor("AVG", "MITTELWERT");
-        defaultSettingsContainer = SettingsContainer.builder()
-                .with(defaultSettingsContainer)
-                .with(stringSynonymGenerator)
-                .build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "SELECT AVG(col1) AS c1 FROM table1, table2",
-                "SELECT AVG ( col1 ) ALIAS c1 FROM table1, table2",
-                "SELECT MITTELWERT(co1) AS c1 FROM table1, table2"
+                "SELECT AVG(col1) AS c1 FROM table1",
+                "SELECT AVG ( col1 ) ALIAS c1 FROM table1",
+                "SELECT AVG(col1) AS c1 FROM table1"
+        ));
+        matchingMap.put(SettingsOption.AGGREGATEFUNCTIONLANG, List.of(
+                "SELECT MITTELWERT(col1) AS c1 FROM table1"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
-                "SELECT AVG(col1) AS c1 FROM table1, table2",
+                SettingsContainer.builder().build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
-    }
-
-    @Test
-    void testAliasAndAggregateTwo() {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
-        stringSynonymGenerator.addSynonymFor("AVG", "MITTELWERT");
-        defaultSettingsContainer = SettingsContainer.builder()
-                .with(defaultSettingsContainer)
-                .with(stringSynonymGenerator)
-                .build();
-        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-        matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "SELECT AVG(col1)); AS c1, column2 FROM table1, table2",
-                "SELECT AVG ( col1 ) ALIAS c1, column2 FROM table1, table2",
-                "SELECT column2, MITTELWERT(co1) AS c1 FROM table2, table1"
-        ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
-                "SELECT AVG(col1) AS c1, column2 FROM table1, table2",
+                SettingsContainer.builder().with(stringSynonymGenerator).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -130,16 +198,24 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testTableAlias() {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
+        final String sampleSolution = "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
-                "SELECT col2, col1 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
-                "SELECT col2, col1 FROM table1 t1 INNER JOIN table2 t2 ON t2.key = t1.key"
+                "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t2.key = t1.key"
+        ));
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
+                "SELECT col2, col1 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
-                "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -147,7 +223,6 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testOptionalAliasAddedByStudent() {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1, col2, col3 AS c3",
@@ -156,7 +231,7 @@ class SelectDeParserForRegExTest{
                 "SELECT col1 AS c1, col2 AS c2, col3 AS c3"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
+                SettingsContainer.builder().build(),
                 "SELECT col1, col2, col3 AS c3",
                 matchingMap,
                 true
@@ -165,16 +240,24 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testDistinctKeyword() {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
+        final String sampleSolution = "SELECT DISTINCT col1";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT DISTINCT col1",
-                "SELECT DISTICT col1",
                 "SELECT  DISTINCT  col1"
         ));
+        matchingMap.put(SettingsOption.KEYWORDSPELLING, List.of(
+                "SELECT DISTICT col1"
+        ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
-                "SELECT DISTINCT col1",
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.KEYWORDSPELLING).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -182,16 +265,25 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testUniqueKeyword() {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
+        final String sampleSolution = "SELECT UNIQUE col1";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT UNIQUE col1",
-                "SELECT UNIUE col1",
                 "SELECT  UNIQUE  col1"
         ));
+        matchingMap.put(SettingsOption.KEYWORDSPELLING, List.of(
+                "SELECT UNIUE col1"
+
+        ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
-                "SELECT UNIQUE col1",
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.KEYWORDSPELLING).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -199,16 +291,25 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testSelectAll()  {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
+        final String sampleSolution = "SELECT * FROM table1";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT * FROM table1",
                 "SELECT  *  FROM table1",
                 "SELECT ALL FROM table1"
         ));
+        matchingMap.put(SettingsOption.KEYWORDSPELLING, List.of(
+                "SELECT AL FROM table1"
+        ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
-                "SELECT * FROM table1",
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.KEYWORDSPELLING).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -216,14 +317,13 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testSelectAllTableColumns()  {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT table1.* FROM table1",
                 "SELECT  table1.*  FROM table1"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
+                SettingsContainer.builder().build(),
                 "SELECT table1.* FROM table1",
                 matchingMap,
                 true
@@ -232,16 +332,24 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testEmitChanges()  {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
+        final String sampleSolution = "SELECT * FROM table1 EMIT CHANGES";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT * FROM table1 EMIT CHANGES",
-                "SELECT * FROM table1  EMIT  CHANGES",
+                "SELECT * FROM table1  EMIT  CHANGES"
+        ));
+        matchingMap.put(SettingsOption.KEYWORDSPELLING, List.of(
                 "SELECT * FROM table1 EMT CHANES"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
-                "SELECT * FROM table1 EMIT CHANGES",
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.KEYWORDSPELLING).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -249,21 +357,28 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testSubSelect()  {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
+        final String sampleSolution = "SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) AS avgcol1 FROM table2)";
         stringSynonymGenerator.addSynonymFor("AVG", "MITTELWERT");
-        defaultSettingsContainer = SettingsContainer.builder()
-                .with(defaultSettingsContainer)
-                .with(stringSynonymGenerator)
-                .build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1)); AS avgcol1 FROM table2)",
+                "SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) AS avgcol1 FROM table2)"
+        ));
+        matchingMap.put(SettingsOption.AGGREGATEFUNCTIONLANG, List.of(
                 "SELECT * FROM table1 WHERE (SELECT AVG(col1) AS avgcol1 FROM table2) = col1",
                 "SELECT * FROM table1 WHERE (SELECT MITTELWERT(col1) AS avgcol1 FROM table2) = col1"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
-                "SELECT * FROM table1 WHERE col1 = (SELECT AVG(col1) AS avgcol1 FROM table2)",
+                SettingsContainer.builder()
+                        .build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder()
+                        .with(stringSynonymGenerator)
+                        .build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -271,7 +386,7 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testTableNameAlias()  {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
+        final String sampleSolution = "SELECT * FROM table1";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT * FROM table1 t1",
@@ -279,9 +394,19 @@ class SelectDeParserForRegExTest{
                 "SELECT * FROM table1 ALIAS t1",
                 "SELECT * FROM table1 AS t"
         ));
+        matchingMap.put(SettingsOption.TABLENAMESPELLING, List.of(
+                "SELECT * FROM table1 AS t",
+                "SELECT * FROM table AS t1"
+        ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
-                "SELECT * FROM table1 t1",
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.TABLENAMESPELLING).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -289,17 +414,25 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testTableNameAliasOptionalAddedByStudent()  {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
+        final String sampleSolution = "SELECT * FROM table1";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT * FROM table1 t1",
                 "SELECT * FROM table1 AS t1",
-                "SELECT * FROM table1 ALIAS t1",
+                "SELECT * FROM table1 ALIAS t1"
+        ));
+        matchingMap.put(SettingsOption.TABLENAMESPELLING, List.of(
                 "SELECT * FROM table1 AS t"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
-                "SELECT * FROM table1",
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.TABLENAMESPELLING).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -307,14 +440,13 @@ class SelectDeParserForRegExTest{
 
     @Test
     void unPivotStatement()  {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "SELECT * FROM (SELECT c1, p1)); UNPIVOT (q FOR p1 IN ('a','b'))"
+                "SELECT * FROM (SELECT c1, p1) UNPIVOT (q FOR p1 IN ('a','b'))"
         ));
         String input = "SELECT * FROM (SELECT c1, p1) UNPIVOT (q FOR p1 IN ('a','b'))";
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
+                SettingsContainer.builder().build(),
                 input,
                 matchingMap,
                 true
@@ -323,15 +455,23 @@ class SelectDeParserForRegExTest{
 
     @Test
     void fetchStatement()  {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
+        final String sampleSolution = "SELECT * FROM table FETCH NEXT 1 ROWS ONLY";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "SELECT * FROM table FETCH NEXT 1 ROWS ONLY",
+                "SELECT * FROM table FETCH NEXT 1 ROWS ONLY"
+        ));
+        matchingMap.put(SettingsOption.KEYWORDSPELLING, List.of(
                 "SELECT * FROM table  FTCH  NEXT  1  ROWS  ONLY"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
-                "SELECT * FROM table FETCH NEXT 1 ROWS ONLY",
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.KEYWORDSPELLING).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -339,7 +479,6 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testComplexTableNameAliasUse()  {
-        SettingsContainer defaultSettingsContainer = TestUtils.getSettingsContainerWithAllSpellingMistakesAndOrderRotations();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5",
@@ -347,7 +486,7 @@ class SelectDeParserForRegExTest{
                 "SELECT col1 AS c1 FROM tab1 AS t1 WHERE tab1.c1 = 5"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                defaultSettingsContainer,
+                SettingsContainer.builder().build(),
                 "SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5",
                 matchingMap,
                 true

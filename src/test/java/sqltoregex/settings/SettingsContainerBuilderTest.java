@@ -23,15 +23,15 @@ class SettingsContainerBuilderTest {
 
     @Test
     void buildWith2EqualObjects() {
-        builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
-        builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
+        builder.with(SettingsOption.COLUMNNAMEORDER);
+        builder.with(SettingsOption.COLUMNNAMEORDER);
         Map<SettingsOption, IRegExGenerator<?>> map = builder.build().getAllSettings();
         Assertions.assertEquals(1, map.size());
     }
 
     @Test
     void buildWithColumnNameOrder() {
-        builder.withSettingsOption(SettingsOption.COLUMNNAMEORDER);
+        builder.with(SettingsOption.COLUMNNAMEORDER);
         Map<SettingsOption, IRegExGenerator<?>> map = builder.build().getAllSettings();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(SettingsOption.COLUMNNAMEORDER));
@@ -110,7 +110,7 @@ class SettingsContainerBuilderTest {
 
     @Test
     void buildWithKeyWordSpelling() {
-        builder.withSettingsOption(SettingsOption.KEYWORDSPELLING);
+        builder.with(SettingsOption.KEYWORDSPELLING);
         Map<SettingsOption, IRegExGenerator<?>> map = builder.build().getAllSettings();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(SettingsOption.KEYWORDSPELLING));
@@ -119,7 +119,7 @@ class SettingsContainerBuilderTest {
 
     @Test
     void buildWithTableNameOrder() {
-        builder.withSettingsOption(SettingsOption.TABLENAMEORDER);
+        builder.with(SettingsOption.TABLENAMEORDER);
         Map<SettingsOption, IRegExGenerator<?>> map = builder.build().getAllSettings();
         Assertions.assertEquals(1, map.size());
         Assertions.assertTrue(map.containsKey(SettingsOption.TABLENAMEORDER));

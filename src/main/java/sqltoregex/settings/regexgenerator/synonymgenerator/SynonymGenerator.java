@@ -137,7 +137,7 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
 
             Iterator<A> iterator = new DepthFirstIterator<>(synonymsGraph, start);
             StringBuilder strRegEx = new StringBuilder();
-            strRegEx.append(isCapturingGroup ? '(' : "(?:");
+            strRegEx.append(isNonCapturingGroup ? "(?:" : '(');
             while (iterator.hasNext()) {
                 strRegEx.append(prefix);
                 strRegEx.append(prepareVertexForRegEx(iterator.next(), wordToFindSynonyms));
@@ -149,7 +149,7 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
             strRegEx.append(')');
             return strRegEx.toString();
         } catch (NoSuchElementException e) {
-            return (isCapturingGroup ? '(' : "(?:") + searchSynonymToString(wordToFindSynonyms) + ')';
+            return (isNonCapturingGroup ? "(?:" : "(") + searchSynonymToString(wordToFindSynonyms) + ')';
         }
     }
 

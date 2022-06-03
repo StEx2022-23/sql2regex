@@ -45,7 +45,7 @@ class RegExGeneratorTest extends UserSettingsPreparer {
         List<String> stringList = new LinkedList<>();
         stringList.add("1");
         stringList.add("2");
-        String orderRotatedExpections = "(1\\s*,\\s*2|2\\s*,\\s*1)";
+        String orderRotatedExpections = "(?:1\\s*,\\s*2|2\\s*,\\s*1)";
         String orderRotatedList = RegExGenerator.useOrderRotation(new OrderRotation(SettingsOption.TABLENAMEORDER),
                                                                   stringList);
         Assertions.assertEquals(orderRotatedExpections, orderRotatedList);

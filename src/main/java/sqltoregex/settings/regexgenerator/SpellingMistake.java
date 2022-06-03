@@ -28,7 +28,7 @@ public class SpellingMistake extends RegExGenerator<String> {
             throw new IllegalArgumentException("String str should not be empty!");
         }
         StringBuilder alternativeWritingStyles = new StringBuilder();
-        alternativeWritingStyles.append(isCapturingGroup ? "(?:" : "(");
+        alternativeWritingStyles.append(isNonCapturingGroup ? "(?:" : "(");
         alternativeWritingStyles.append(str);
         if(str.length() > 1) alternativeWritingStyles.append("|");
         for(int i = 0; i<str.length(); i++){

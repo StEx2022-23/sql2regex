@@ -18,7 +18,6 @@ import java.util.*;
 
 public class UpdateDeParserForRegEx extends UpdateDeParser {
     private final Map<String, String> tableNameAliasCombinations = new HashMap<>();
-    private static final String DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE = "##########";
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SpellingMistake keywordSpellingMistake;
@@ -65,13 +64,13 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
 
         List<String> tableList = new ArrayList<>();
         if(update.getTable().toString().contains(" ")){
-            tableList.add(this.extractTableNameAlias(update.getTable().toString()).concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
-        } else tableList.add(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, update.getTable().toString()).concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+            tableList.add(this.extractTableNameAlias(update.getTable().toString()));
+        } else tableList.add(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, update.getTable().toString()));
 
         if (update.getStartJoins() != null) {
             for (Join join : update.getStartJoins()) {
                 if (join.isSimple()) {
-                    tableList.add(extractTableNameAlias(join.toString()).concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+                    tableList.add(extractTableNameAlias(join.toString()));
                 }
             }
         }
@@ -95,7 +94,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             singleSet.append(OPTIONAL_WHITE_SPACE + "\\(?" + OPTIONAL_WHITE_SPACE);
             Iterator<Column> columnIterator = updateSet.getColumns().iterator();
             while(columnIterator.hasNext()){
-                singleSet.append(this.checkOfExistingTableNameAndAlias(columnIterator.next().toString()).concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+                singleSet.append(this.checkOfExistingTableNameAndAlias(columnIterator.next().toString()));
                 if(columnIterator.hasNext()) singleSet.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
             }
             singleSet.append(OPTIONAL_WHITE_SPACE + "\\)?" + OPTIONAL_WHITE_SPACE);
@@ -105,7 +104,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             singleSet.append(OPTIONAL_WHITE_SPACE + "\\(?" + OPTIONAL_WHITE_SPACE);
             Iterator<Expression> expressionIterator = updateSet.getExpressions().iterator();
             while(expressionIterator.hasNext()){
-                singleSet.append(expressionIterator.next().toString().concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+                singleSet.append(expressionIterator.next().toString());
                 if(expressionIterator.hasNext()) singleSet.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
             }
             singleSet.append(OPTIONAL_WHITE_SPACE + "\\)?" + OPTIONAL_WHITE_SPACE);
@@ -127,13 +126,13 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "FROM", true);
             List<String> tableListFromItem = new ArrayList<>();
             if(update.getFromItem().toString().contains(" ")){
-                tableListFromItem.add(this.extractTableNameAlias(update.getFromItem().toString()).concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
-            } else tableListFromItem.add(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, update.getFromItem().toString()).concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+                tableListFromItem.add(this.extractTableNameAlias(update.getFromItem().toString()));
+            } else tableListFromItem.add(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, update.getFromItem().toString()));
 
             if (update.getJoins() != null) {
                 for (Join join : update.getJoins()) {
                     if (join.isSimple()) {
-                        tableListFromItem.add(extractTableNameAlias(join.toString()).concat(DELIMITER_FOR_ORDERROTATION_WITHOUT_SPELLINGMISTAKE));
+                        tableListFromItem.add(extractTableNameAlias(join.toString()));
                     }
                 }
             }

@@ -22,7 +22,7 @@ class OrderRotationTest {
 
     @Test
     void testOrderRotationWithCapturingGroup() {
-        orderRotation.setCapturingGroup(true);
+        orderRotation.setNonCapturingGroup(true);
         Assertions.assertEquals(
                 "(?:table1\\s*,\\s*table2|table2\\s*,\\s*table1)",
                 orderRotation.generateRegExFor(testListOne)
@@ -31,7 +31,7 @@ class OrderRotationTest {
 
     @Test
     void testOrderRotationWithoutCapturingGroup() {
-        orderRotation.setCapturingGroup(false);
+        orderRotation.setNonCapturingGroup(false);
         Assertions.assertEquals(
                 "(table1\\s*,\\s*table2|table2\\s*,\\s*table1)",
                 orderRotation.generateRegExFor(testListOne)
@@ -40,7 +40,7 @@ class OrderRotationTest {
 
     @Test
     void testOrderRotationWithOneElement() {
-        orderRotation.setCapturingGroup(false);
+        orderRotation.setNonCapturingGroup(false);
         Assertions.assertEquals(
                 "(table1)",
                 orderRotation.generateRegExFor(testListTwo)
@@ -49,7 +49,7 @@ class OrderRotationTest {
 
     @Test
     void testOrderRotationWithOneElementWithCapturingGroup() {
-        orderRotation.setCapturingGroup(true);
+        orderRotation.setNonCapturingGroup(true);
         Assertions.assertEquals(
                 "(?:table1)",
                 orderRotation.generateRegExFor(testListTwo)

@@ -33,7 +33,7 @@ public class OrderRotation extends RegExGenerator<List<String>> {
         List<String> rekList = new ArrayList<>(valueList);
         Assert.notNull(valueList, "Value list must not be null!");
         buffer.replace(0, buffer.length(),"");
-        buffer.append(isCapturingGroup ? "(?:" : "(");
+        buffer.append(isNonCapturingGroup ? "(?:" : "(");
         Integer amountOfElements = valueList.size();
         orderRotationRek(amountOfElements, rekList);
         buffer.replace(buffer.length() - 1, buffer.length(), "");

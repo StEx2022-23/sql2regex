@@ -20,15 +20,24 @@ class InsertDeParserForRegExTest{
 
     @Test
     void oneValueList() {
+        final String sampleSolution = "INSERT INTO table (col1, col2) VALUES ('1', '2')";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "INSERT INTO table (col1, col2)); VALUES ('1', '2')",
+                "INSERT INTO table (col1, col2) VALUES ('1', '2')"
+        ));
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
                 "INSERT INTO table (col2, col1) VALUES ('2', '1')",
                 "INSERT INTO table (col2, col1) VALUE ('2', '1')"
         ));
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
-                "INSERT INTO table (col1, col2) VALUES ('1', '2')",
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -38,7 +47,7 @@ class InsertDeParserForRegExTest{
     void oneValueListFailing() {
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "INSERT INTO table (col1, col2)); VALUES ('2', '1')"
+                "INSERT INTO table (col1, col2) VALUES ('2', '1')"
         ));
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
@@ -50,16 +59,26 @@ class InsertDeParserForRegExTest{
 
     @Test
     void twoValueList() {
+        final String sampleSolution = "INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "INSERT INTO table (col1, col2)); VALUES ('1', '2'), ('11', '22')",
+                "INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')"
+        ));
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
                 "INSERT INTO table (col1, col2) VALUES ('11', '22'), ('1', '2')",
                 "INSERT INTO table (col2, col1) VALUE ('22', '11'), ('2', '1')",
                 "INSERT INTO table (col2, col1) VALUES (22, 11), (2, 1)"
         ));
+
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
-                "INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')",
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -67,14 +86,16 @@ class InsertDeParserForRegExTest{
 
     @Test
     void twoValueListFailing() {
+        final String sampleSolution = "INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "INSERT INTO table (col2, col1)); VALUES ('11', '22'), ('1', '2')",
-                "INSERT INTO table (col2, col1) VALUES ('22', '11'), ('1', '2')"
+                "INSERT INTO table (col2, col1) VALUES ('11', '22'), ('1', '2')",
+                "INSERT INTO table (col2, col1) VALUES ('22', '11'), ('1', '2')",
+                "INSERT INTO table (col2, col1) VALUES ('11', '22'), ('2', '1')"
         ));
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
-                "INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')",
+                sampleSolution,
                 matchingMap,
                 false
         );
@@ -82,13 +103,23 @@ class InsertDeParserForRegExTest{
 
     @Test
     void insertWithSet() {
+        final String sampleSolution = "INSERT INTO table SET name = 'Kim', isBFF = true";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "INSERT INTO table SET name = 'Kim', isBFF = true"
         ));
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
+                "INSERT INTO table SET isBFF = true, name = 'Kim'"
+        ));
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
-                "INSERT INTO table SET name = 'Kim', isBFF = true",
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );
@@ -98,7 +129,7 @@ class InsertDeParserForRegExTest{
     void testReturning() {
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "INSERT INTO t1 VALUES (val1, val2)); RETURNING id"
+                "INSERT INTO t1 VALUES (val1, val2) RETURNING id"
         ));
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
