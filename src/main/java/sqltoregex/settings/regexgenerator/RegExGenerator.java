@@ -9,6 +9,8 @@ import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
     protected static final String OPTIONAL_WHITE_SPACE = "\\s*";
@@ -64,7 +66,8 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
             RegExGenerator<T> that = (RegExGenerator<T>) o;
             return this.getSettingsOption() == that.getSettingsOption();
         } catch (ClassCastException e){
-            e.printStackTrace();
+            Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+            logger.log(Level.WARNING, "Error while casting RegExGenerator<T>: {0}", e);
         }
         return false;
     }
