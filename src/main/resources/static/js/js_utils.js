@@ -36,6 +36,26 @@ function copyHistoryEntry(id) {
     navigator.clipboard.writeText(document.getElementById(id).innerHTML).then(r => console.log("Successfully copied! :-)"));
 }
 
+function insertVisualizationPage() {
+    let src = "https://jex.im/regulex/#!flags=i";
+    let params = new URLSearchParams(document.location.search);
+    if(null !== params.get("regex") && params.get("regex").length !== 0){
+        src = src + "&re=" + params.get("regex");
+    } else {
+        src = src + "&re=" + encodeURIComponent("SELECT \\* FROM table");
+    }
+
+    let iframe = document.createElement('iframe');
+    iframe.setAttribute("width", "100%");
+    iframe.setAttribute("height", "800");
+    iframe.setAttribute("scrollbar", "scrollbar");
+    iframe.setAttribute("id", "visualizationOption1");
+    iframe.setAttribute("src", src);
+
+    let container = document.getElementById("visualizationOption1Heading");
+    container.appendChild(iframe);
+}
+
 function formattedCurrentTimestamp() {
     let currentdate = new Date();
     return ((currentdate.getDate().toString().length === 1) ? "0".concat(currentdate.getDate()) : (currentdate.getDate())) + "/" + (((currentdate.getMonth() + 1).toString().length === 1) ? "0".concat(currentdate.getMonth() + 1) : (currentdate.getMonth() + 1)) + "/" + ((currentdate.getFullYear().toString().length === 1) ? "0".concat(currentdate.getFullYear()) : (currentdate.getFullYear())) + " @ " + ((currentdate.getHours().toString().length === 1) ? "0".concat(currentdate.getHours()) : (currentdate.getHours())) + ":" + ((currentdate.getMinutes().toString().length === 1) ? "0".concat(currentdate.getMinutes()) : (currentdate.getMinutes())) + ":" + ((currentdate.getSeconds().toString().length === 1) ? "0".concat(currentdate.getSeconds()) : (currentdate.getSeconds()));
@@ -140,11 +160,13 @@ class SqlRegExHistory {
     }
 
     checkUpdatedConverting() {
-        document.getElementById("convertbodycontainer").style.display = "none";
-        let sqlinput = document.getElementById("sqlinput").value;
-        let regexinput = document.getElementById("regexoutput").value;
-        if (!this.sql.includes(sqlinput) && sqlinput.length !== 0) this.addToLocalStorage(sqlinput, regexinput);
-        if (this.sql.length !== 0) this.showConvertingHistory();
+        if(null !== document.getElementById("convertbodycontainer")) {
+            document.getElementById("convertbodycontainer").style.display = "none";
+            let sqlinput = document.getElementById("sqlinput").value;
+            let regexinput = document.getElementById("regexoutput").value;
+            if (!this.sql.includes(sqlinput) && sqlinput.length !== 0) this.addToLocalStorage(sqlinput, regexinput);
+            if (this.sql.length !== 0) this.showConvertingHistory();
+        }
     }
 
     showConvertingHistory() {
@@ -165,7 +187,7 @@ class SqlRegExHistory {
         outerDiv.setAttribute("id","historyAccordion")
 
         if (arrayOfSqlAndArrayOfRegex[0] !== -1) {
-            for (var i = 0; i < this.sql.length; i++) {
+            for (let i = 0; i < this.sql.length; i++) {
                 let tempAccordionDiv = document.createElement('div');
                 tempAccordionDiv.classList.add("accordion-item");
                 tempAccordionDiv.setAttribute("id", "#"+String(i));
@@ -245,8 +267,7 @@ class SqlRegExHistory {
         try{
             let converts = {}
             let ConvertingHistory = {}
-
-            for (var i = 0; i < this.readSqlRegExFromLocalStorage()[0].length; i++) {
+            for (let i = 0; i < this.readSqlRegExFromLocalStorage()[0].length; i++) {
                 let SingleConvert = {};
                 SingleConvert["sql"] = this.readSqlRegExFromLocalStorage()[0][i];
                 SingleConvert["regex"] = this.readSqlRegExFromLocalStorage()[1][i];
@@ -317,7 +338,11 @@ function loadDefaultLanguageSettings(){
     }
 }
 
-loadDefaultLanguageSettings();
-
-let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
-SqlRegExHis.checkUpdatedConverting();
+document.onreadystatechange = function () {
+    if (document.readyState === "interactive") {
+        loadDefaultLanguageSettings();
+        let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
+        SqlRegExHis.checkUpdatedConverting();
+        insertVisualizationPage()
+    }
+}

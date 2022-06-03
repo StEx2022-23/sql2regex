@@ -7,10 +7,16 @@
         <button lang="en" th:replace="assets/scrolltotop :: scrolltotop"></button>
         <nav lang="en" th:replace="assets/navbar :: navbar"></nav>
         <div lang="en" th:replace="assets/userwarning :: userwarning"></div>
-
         <div class="container mt-3">
             <div class="card">
                 <div class="card-body">
+                    <div id="visualizationOption1Heading">
+                        <h1 class="fw-bolder border-bottom mb-3 mt-3" id="visualizationOption1">Visualization</h1>
+                    </div>
+                    <hr>
+                    <div id="visualizationOption2Heading">
+                        <h1 class="fw-bolder border-bottom mb-3 mt-3" id="visualizationOption2">Advanced Visualization</h1>
+                    </div>
                     <iframe src="https://www.debuggex.com/" width="100%" height="800" scrollbar="scrollbar" title="W3Schools Free Online Web Tutorials">
                     </iframe>
                 </div>
@@ -18,5 +24,5 @@
         </div>
     </body>
     <footer lang="en" th:replace="assets/footer :: footer"></footer>
-    <div lang="en" th:replace="assets/jsscripts :: jsscripts"></div>
+    <div lang="en" th:replace="assets/jsscripts :: jsscripts"> </div>
 </html>
