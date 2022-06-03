@@ -7,6 +7,7 @@ import net.sf.jsqlparser.statement.Statement;
 import org.junit.jupiter.api.Assertions;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import java.util.LinkedList;
@@ -52,7 +53,7 @@ public class TestUtils{
         String regex = getRegEx(settings, sampleSolution, false);
         List<String> alternativeStatements = new LinkedList<>();
         for (Map.Entry<SettingsOption, List<String>> entry : matchingMap.entrySet()){
-            if (settings.get(entry.getKey()) != null){
+            if (entry.getKey() == SettingsOption.DEFAULT || settings.get(entry.getKey()) != null){
                 alternativeStatements.addAll(entry.getValue());
             }
         }
@@ -68,7 +69,7 @@ public class TestUtils{
         String regex = getRegEx(settings, sampleSolution, true);
         List<String> alternativeStatements = new LinkedList<>();
         for (Map.Entry<SettingsOption, List<String>> entry : matchingMap.entrySet()){
-            if (settings.get(entry.getKey()) != null){
+            if (entry.getKey() == SettingsOption.DEFAULT || settings.get(entry.getKey()) != null){
                 alternativeStatements.addAll(entry.getValue());
             }
         }
@@ -79,37 +80,4 @@ public class TestUtils{
         }
         return regex;
     }
-
-    public static SettingsContainer getSettingsContainerWithAllSpellingMistakesAndOrderRotations(){
-        return SettingsContainer
-                .builder()
-                .with(getSettingsContainerWithAllSpellingMistakes())
-                .with(getSettingsContainerWithAllOrderRotations())
-                .build();
-    }
-
-    public static SettingsContainer getSettingsContainerWithAllSpellingMistakes(){
-        SpellingMistake tableNameSpelling = new SpellingMistake(SettingsOption.TABLENAMESPELLING);
-        SpellingMistake columnNameSpelling = new SpellingMistake(SettingsOption.COLUMNNAMESPELLING);
-        SpellingMistake keywordSpelling = new SpellingMistake(SettingsOption.KEYWORDSPELLING);
-        SpellingMistake indexColumnNameSpelling = new SpellingMistake(SettingsOption.INDEXCOLUMNNAMESPELLING);
-        return SettingsContainer.builder()
-                .with(tableNameSpelling)
-                .with(columnNameSpelling)
-                .with(keywordSpelling)
-                .with(indexColumnNameSpelling)
-                .build();
-    }
-
-    public static SettingsContainer getSettingsContainerWithAllOrderRotations(){
-        SpellingMistake tableOrder = new SpellingMistake(SettingsOption.TABLENAMEORDER);
-        SpellingMistake columnOrder = new SpellingMistake(SettingsOption.COLUMNNAMEORDER);
-        SpellingMistake groupByOrder = new SpellingMistake(SettingsOption.GROUPBYELEMENTORDER);
-        return SettingsContainer.builder()
-                .with(tableOrder)
-                .with(columnOrder)
-                .with(groupByOrder)
-                .build();
-    }
-
 }
