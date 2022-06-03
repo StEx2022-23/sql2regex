@@ -26,6 +26,7 @@
 }
 
 #copyHistory{
+    background-color: transparent;
     position: absolute;
     top: 5px;
     right: 5px;
@@ -43,6 +44,16 @@
 
 .nondecoration{
     text-decoration:none;
+}
+
+.icon{}
+
+.icon:hover {
+    transform: scale(1.1, 1.1);
+}
+
+.icon:active {
+    transform: scale(0.9, 0.9);
 }
 
 $white: #fff;

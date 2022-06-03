@@ -230,8 +230,9 @@ class SqlRegExHistory {
                 let copyIcon = document.createElementNS('http://www.w3.org/2000/svg', "svg");
                 copyIcon.setAttribute("width", "30");
                 copyIcon.setAttribute("height", "30");
-                copyIcon.setAttribute("fill", "currentColor");
+                copyIcon.setAttribute("fill", "black");
                 copyIcon.setAttribute("viewBox", "0 0 16 16");
+                copyIcon.setAttribute("class", "icon");
                 let copyIconPathEins = document.createElementNS('http://www.w3.org/2000/svg', "path");
                 copyIconPathEins.setAttribute("d", "M9.5 0a.5.5 0 0 1 .5.5.5.5 0 0 0 .5.5.5.5 0 0 1 .5.5V2a.5.5 0 0 1-.5.5h-5A.5.5 0 0 1 5 2v-.5a.5.5 0 0 1 .5-.5.5.5 0 0 0 .5-.5.5.5 0 0 1 .5-.5h3Z");
                 copyIcon.append(copyIconPathEins);
