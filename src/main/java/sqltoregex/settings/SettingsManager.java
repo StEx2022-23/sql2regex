@@ -124,6 +124,7 @@ public class SettingsManager {
                 .withSimpleDateFormatSet(form.getTimeFormats(), SettingsOption.TIMESYNONYMS)
                 .withSimpleDateFormatSet(form.getDateTimeFormats(), SettingsOption.DATETIMESYNONYMS)
                 .withStringSet(form.getAggregateFunctionLang(), SettingsOption.AGGREGATEFUNCTIONLANG)
+                .withStringSet(form.getDatatypeSynonyms(), SettingsOption.DATATYPESYNONYMS)
                 .withStringSet(form.getOtherSynonyms(), SettingsOption.OTHERSYNONYMS)
                 .build();
 

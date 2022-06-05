@@ -92,7 +92,7 @@ public class SettingsContainer {
                     }
                     this.withStringSet(valueList, settingsOption);
                 }
-                case AGGREGATEFUNCTIONLANG, OTHERSYNONYMS -> {
+                case AGGREGATEFUNCTIONLANG, DATATYPESYNONYMS, OTHERSYNONYMS -> {
                     List<Node> valuePairsForSynonyms = new LinkedList<>();
                     SettingsNodeListIterator valueTagIterator = new SettingsNodeListIterator(nodeList);
                     for (Node node : valueTagIterator) {
@@ -171,7 +171,7 @@ public class SettingsContainer {
                     }
                     this.modifiableMap.put(settingsOption, synonymGenerator);
                 }
-                case AGGREGATEFUNCTIONLANG, OTHERSYNONYMS -> {
+                case AGGREGATEFUNCTIONLANG, DATATYPESYNONYMS, OTHERSYNONYMS -> {
                     if (synonyms != null && !synonyms.isEmpty()) {
                         StringSynonymGenerator aggregateFunctionSynonymGenerator = new StringSynonymGenerator(
                                 settingsOption);
