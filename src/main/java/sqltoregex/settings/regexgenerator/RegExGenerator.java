@@ -55,7 +55,7 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.getSettingsOption());
+        return Objects.hash(this.isNonCapturingGroup, this.getSettingsOption());
     }
 
     @Override
@@ -64,7 +64,7 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
         if (o == null || getClass() != o.getClass()) return false;
         try{
             RegExGenerator<T> that = (RegExGenerator<T>) o;
-            return this.getSettingsOption() == that.getSettingsOption();
+            return this.isNonCapturingGroup == that.isNonCapturingGroup && this.getSettingsOption() == that.getSettingsOption();
         } catch (ClassCastException e){
             Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
             logger.log(Level.WARNING, "Error while casting RegExGenerator: {0}", e);

@@ -115,11 +115,12 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SynonymGenerator<?, ?> that)) return false;
-        return synonymsGraph.vertexSet().equals(that.synonymsGraph.vertexSet())
-                && synonymsGraph.edgeSet().size() == that.synonymsGraph.edgeSet().size()
-                && prefix.equals(that.prefix)
-                && suffix.equals(that.suffix)
-                && this.getSettingsOption() == that.getSettingsOption();
+        return this.synonymsGraph.vertexSet().equals(that.synonymsGraph.vertexSet())
+                && this.synonymsGraph.edgeSet().size() == that.synonymsGraph.edgeSet().size()
+                && this.prefix.equals(that.prefix)
+                && this.suffix.equals(that.suffix)
+                && this.getSettingsOption() == that.getSettingsOption()
+                && this.isNonCapturingGroup == that.isNonCapturingGroup;
     }
 
     /**
@@ -163,11 +164,12 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     @Override
     public int hashCode() {
         return Objects.hash(
-                synonymsGraph.vertexSet(),
-                synonymsGraph.edgeSet().size(),
-                prefix,
-                suffix,
-                getSettingsOption()
+                this.synonymsGraph.vertexSet(),
+                this.synonymsGraph.edgeSet().size(),
+                this.prefix,
+                this.suffix,
+                this.getSettingsOption(),
+                this.isNonCapturingGroup
         );
     }
 
