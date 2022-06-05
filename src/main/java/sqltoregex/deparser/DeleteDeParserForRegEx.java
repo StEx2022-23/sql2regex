@@ -1,5 +1,6 @@
 package sqltoregex.deparser;
 
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.select.Join;
@@ -24,13 +25,13 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     Map<String, String> tableNameAliasMap = new HashMap<>();
     private ExpressionDeParserForRegEx expressionDeParserForRegEx;
-    private SelectDeParserForRegEx selectDeParserForRegEx;
+    private final SelectDeParserForRegEx selectDeParserForRegEx;
     private final SettingsContainer settingsContainer;
-    private SpellingMistake keywordSpellingMistake;
-    private SpellingMistake tableNameSpellingMistake;
-    private SpellingMistake columnNameSpellingMistake;
-    private OrderRotation columnNameOrderRotation;
-    private OrderRotation tableNameOrderRotation;
+    private final SpellingMistake keywordSpellingMistake;
+    private final SpellingMistake tableNameSpellingMistake;
+    private final SpellingMistake columnNameSpellingMistake;
+    private final OrderRotation columnNameOrderRotation;
+    private final OrderRotation tableNameOrderRotation;
 
     /**
      * default constructor
@@ -138,23 +139,39 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
             buffer.append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FROM"));
         }
 
+        List<Object> allTablesWithJoin = new LinkedList<>();
+        allTablesWithJoin.add(delete.getTable());
+        if (delete.getJoins() != null) {
+            for (Join join : delete.getJoins()) {
+                if (join.isSimple()) {
+                    allTablesWithJoin.add(join);
+                }
+            }
+        }
         //handle table alias
         buffer.append(REQUIRED_WHITE_SPACE);
-        if (delete.getTable().toString().contains(" ")){
-            this.tableNameAliasMap.put(delete.getTable().toString().split(" ")[0], delete.getTable().toString().split(" ")[1]);
-            this.tableNameAliasMap.put(delete.getTable().toString().split(" ")[1], delete.getTable().toString().split(" ")[0]);
-            buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, delete.getTable().toString().split(" ")[0]));
-            buffer.append("(");
-            buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append("(?:ALIAS|AS)").append(")?");
-            buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, delete.getTable().toString().split(" ")[1]));
-        } else {
-            buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, delete.getTable().toString()));
-            buffer.append("(");
-            buffer.append(REQUIRED_WHITE_SPACE).append("(?:ALIAS|AS)").append(".*");
-            buffer.append(")?");
+        List<String> toRotateTables = new LinkedList<>();
+        for(Object o : allTablesWithJoin){
+            StringBuilder tmpbuffer = new StringBuilder();
+            if (o.toString().contains(" ")){
+                this.tableNameAliasMap.put(o.toString().split(" ")[0], o.toString().split(" ")[1]);
+                this.tableNameAliasMap.put(o.toString().split(" ")[1], o.toString().split(" ")[0]);
+                tmpbuffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, o.toString().split(" ")[0]));
+                tmpbuffer.append("(");
+                tmpbuffer.append(REQUIRED_WHITE_SPACE);
+                tmpbuffer.append("(?:ALIAS|AS)").append(")?");
+                tmpbuffer.append(REQUIRED_WHITE_SPACE);
+                tmpbuffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, o.toString().split(" ")[1]));
+            } else {
+                tmpbuffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, o.toString()));
+                tmpbuffer.append("(");
+                tmpbuffer.append(REQUIRED_WHITE_SPACE).append("(?:ALIAS|AS)").append(".*");
+                tmpbuffer.append(")?");
+            }
+            toRotateTables.add(tmpbuffer.toString());
         }
+        buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrderRotation, toRotateTables));
+
 
         if (delete.getUsingList() != null && !delete.getUsingList().isEmpty()) {
             buffer.append(REQUIRED_WHITE_SPACE);
@@ -167,18 +184,20 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
             buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrderRotation, tableNameListAsStrings));
         }
 
+
         if (delete.getJoins() != null) {
             for (Join join : delete.getJoins()) {
-                if (join.isSimple()) {
-                    buffer.append(", ").append(join);
-                } else {
-                    buffer.append(" ").append(join);
+                if (!join.isSimple()) {
+                    SelectDeParserForRegEx joinSelectDeParserForRegEx = new SelectDeParserForRegEx(settingsContainer);
+                    joinSelectDeParserForRegEx.setBuffer(buffer);
+                    joinSelectDeParserForRegEx.setExpressionVisitor(this.expressionDeParserForRegEx);
+                    joinSelectDeParserForRegEx.deparseJoin(join);
                 }
             }
         }
 
         if (delete.getWhere() != null) {
-            buffer.append(" WHERE ");
+            buffer.append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "WHERE")).append(REQUIRED_WHITE_SPACE);
             delete.getWhere().accept(this.getExpressionDeParserForRegEx());
         }
 
@@ -194,8 +213,12 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
         }
 
         if (delete.getReturningExpressionList() != null) {
-            buffer.append(" RETURNING ").append(PlainSelect.
-                    getStringList(delete.getReturningExpressionList(), true, false));
+            buffer.append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "RETURNING")).append(REQUIRED_WHITE_SPACE);
+            List<String> returningExpressions = new LinkedList<>();
+            for(SelectItem selectItem : delete.getReturningExpressionList()){
+                returningExpressions.add(selectItem.toString());
+            }
+            buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrderRotation, returningExpressions));
         }
     }
 
@@ -221,5 +244,13 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
      */
     private SettingsContainer getSettingsContainer(){
         return this.settingsContainer;
+    }
+
+    /**
+     * actual sample of collected tablenames and alias names
+     * @return Map with tablename ↔ alias & alias ↔ tablename
+     */
+    private Map<String, String> getTableNameAliasMap() {
+        return this.tableNameAliasMap;
     }
 }
