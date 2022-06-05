@@ -1,10 +1,8 @@
 package sqltoregex.deparser;
 
-import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.select.Join;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.util.deparser.DeleteDeParser;
 import sqltoregex.settings.SettingsContainer;
@@ -15,14 +13,11 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import java.util.*;
 
-import static java.util.stream.Collectors.joining;
-
 /**
  * implements own delete statement deparser for regular expressions
  */
 public class DeleteDeParserForRegEx extends DeleteDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
-    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     Map<String, String> tableNameAliasMap = new HashMap<>();
     private ExpressionDeParserForRegEx expressionDeParserForRegEx;
     private final SelectDeParserForRegEx selectDeParserForRegEx;
@@ -125,9 +120,7 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
         }
 
         if (delete.getOutputClause()!=null) {
-            buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "OUTPUT"));
-            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "OUTPUT")).append(REQUIRED_WHITE_SPACE);
             List<String> outputClauses = new ArrayList<>();
             for(SelectItem selectItem : delete.getOutputClause().getSelectItemList()){
                 outputClauses.add(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, selectItem.toString()));
@@ -157,16 +150,11 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
                 this.tableNameAliasMap.put(o.toString().split(" ")[0], o.toString().split(" ")[1]);
                 this.tableNameAliasMap.put(o.toString().split(" ")[1], o.toString().split(" ")[0]);
                 tmpbuffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, o.toString().split(" ")[0]));
-                tmpbuffer.append("(");
-                tmpbuffer.append(REQUIRED_WHITE_SPACE);
-                tmpbuffer.append("(?:ALIAS|AS)").append(")?");
-                tmpbuffer.append(REQUIRED_WHITE_SPACE);
+                tmpbuffer.append("(").append(REQUIRED_WHITE_SPACE).append("(?:ALIAS|AS)").append(")?").append(REQUIRED_WHITE_SPACE);
                 tmpbuffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, o.toString().split(" ")[1]));
             } else {
                 tmpbuffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, o.toString()));
-                tmpbuffer.append("(");
-                tmpbuffer.append(REQUIRED_WHITE_SPACE).append("(?:ALIAS|AS)").append(".*");
-                tmpbuffer.append(")?");
+                tmpbuffer.append("(").append(REQUIRED_WHITE_SPACE).append("(?:ALIAS|AS)").append(".*").append(")?");
             }
             toRotateTables.add(tmpbuffer.toString());
         }
@@ -174,9 +162,7 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
 
 
         if (delete.getUsingList() != null && !delete.getUsingList().isEmpty()) {
-            buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "USING"));
-            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "USING")).append(REQUIRED_WHITE_SPACE);
             List<String> tableNameListAsStrings = new LinkedList<>();
             for(Table table : delete.getUsingList()){
                 tableNameListAsStrings.add(table.toString());
