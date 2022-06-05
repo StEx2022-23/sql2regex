@@ -1,6 +1,7 @@
 package sqltoregex.deparser;
 
 import net.sf.jsqlparser.statement.Statements;
+import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.select.Select;
@@ -11,6 +12,9 @@ import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
+/**
+ * implements own statement deparser for regular expressions
+ */
 public class StatementDeParserForRegEx extends StatementDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private final SpellingMistake keywordSpellingMistake;
@@ -37,6 +41,10 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         this.settings = settings;
     }
 
+    /**
+     * override visit method for select statements
+     * @param select select statement
+     */
     @Override
     public void visit(Select select) {
         this.selectDeParserForRegEx.setBuffer(this.buffer);
@@ -51,6 +59,10 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         select.getSelectBody().accept(selectDeParserForRegEx);
     }
 
+    /**
+     * override visit method for insert statements
+     * @param insert insert statement
+     */
     @Override
     public void visit(Insert insert) {
         this.selectDeParserForRegEx.setBuffer(this.buffer);
@@ -65,12 +77,20 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         insertDeParserForRegEx.deParse(insert);
     }
 
+    /**
+     * override visit method for createTable statements
+     * @param createTable createTable statement
+     */
     @Override
     public void visit(CreateTable createTable) {
         CreateTableDeParserForRegEx createTableDeParserForRegEx = new CreateTableDeParserForRegEx(this, buffer, settings);
         createTableDeParserForRegEx.deParse(createTable);
     }
 
+    /**
+     * override visit method for update statements
+     * @param update update statement
+     */
     @Override
     public void visit(Update update) {
         this.selectDeParserForRegEx.setBuffer(this.buffer);
@@ -85,6 +105,24 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         updateDeParser.deParse(update);
     }
 
+    /**
+     * override visit method for delete statements
+     * @param delete delete statement
+     */
+    @Override
+    public void visit(Delete delete) {
+        this.selectDeParserForRegEx.setBuffer(buffer);
+        this.expressionDeParserForRegEx.setSelectVisitor(this.selectDeParserForRegEx);
+        this.expressionDeParserForRegEx.setBuffer(buffer);
+        this.selectDeParserForRegEx.setExpressionVisitor(this.expressionDeParserForRegEx);
+        DeleteDeParserForRegEx deleteDeParserForRegEx = new DeleteDeParserForRegEx(this.settings, this.expressionDeParserForRegEx, buffer);
+        deleteDeParserForRegEx.deParse(delete);
+    }
+
+    /**
+     * override visit method for statements
+     * @param stmts statement
+     */
     @Override
     public void visit(Statements stmts) {
         stmts.accept(this);
