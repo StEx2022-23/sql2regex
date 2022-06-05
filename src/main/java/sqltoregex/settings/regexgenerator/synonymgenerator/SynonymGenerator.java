@@ -4,7 +4,6 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
-import org.springframework.util.Assert;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 
@@ -31,7 +30,6 @@ import java.util.Objects;
 
 public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     public static final long DEFAULT_WEIGHT = 1L;
-    private final SettingsOption settingsOption;
     //due to: Edges undirected (synonyms apply in both directions); Self-loops: no; Multiple edges: no; weighted: yes
     protected SimpleWeightedGraph<A, DefaultWeightedEdge> synonymsGraph;
     protected boolean graphForSynonymsOfTwoWords = false;
@@ -39,9 +37,8 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     private String suffix = "";
 
     protected SynonymGenerator(SettingsOption settingsOption) {
-        Assert.notNull(settingsOption, "SettingsOption must not be null");
+        super(settingsOption);
         this.synonymsGraph = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
-        this.settingsOption = settingsOption;
     }
 
     /**
@@ -118,9 +115,12 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SynonymGenerator<?, ?> that)) return false;
-        return synonymsGraph.vertexSet().equals(that.synonymsGraph.vertexSet()) && synonymsGraph.edgeSet()
-                .size() == that.synonymsGraph.edgeSet().size() && prefix.equals(that.prefix) && suffix.equals(
-                that.suffix) && settingsOption == that.settingsOption;
+        return this.synonymsGraph.vertexSet().equals(that.synonymsGraph.vertexSet())
+                && this.synonymsGraph.edgeSet().size() == that.synonymsGraph.edgeSet().size()
+                && this.prefix.equals(that.prefix)
+                && this.suffix.equals(that.suffix)
+                && this.getSettingsOption() == that.getSettingsOption()
+                && this.isNonCapturingGroup == that.isNonCapturingGroup;
     }
 
     /**
@@ -162,13 +162,15 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     }
 
     @Override
-    public SettingsOption getSettingsOption() {
-        return this.settingsOption;
-    }
-
-    @Override
     public int hashCode() {
-        return Objects.hash(synonymsGraph.vertexSet(), synonymsGraph.edgeSet().size(), prefix, suffix, settingsOption);
+        return Objects.hash(
+                this.synonymsGraph.vertexSet(),
+                this.synonymsGraph.edgeSet().size(),
+                this.prefix,
+                this.suffix,
+                this.getSettingsOption(),
+                this.isNonCapturingGroup
+        );
     }
 
     /**
