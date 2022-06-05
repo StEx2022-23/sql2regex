@@ -1,14 +1,14 @@
 {
-  "name": "sasscompileinspring",
-  "version": "1.0.0",
-  "description": "compile scss to css",
+  "name": "sasscompiler",
+  "version": "1.0.1",
+  "description": "compile scss to as minimized css",
   "main": "home.html",
   "license": "MIT",
   "scripts": {
     "scss": "node-sass --output-style compressed src/main/resources/static/styles -o src/main/resources/static/styles",
     "watch": "node-sass --watch src/main/resources/static/styles -o src/main/resources/static/styles"
   },
-  "author": "",
+  "author": "Patrick Binkert",
   "repository": {
     "private": true
   },
