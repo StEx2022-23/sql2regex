@@ -23,6 +23,7 @@ class SettingsFormTest {
                 Collections.emptySet(),
                 Collections.emptySet(),
                 Collections.emptySet(),
+                Collections.emptySet(),
                 ""
         ));
         Assertions.assertEquals(1, constraintViolations.size(),
@@ -42,6 +43,7 @@ class SettingsFormTest {
                 Collections.emptySet(),
                 Collections.emptySet(),
                 Collections.emptySet(),
+                Collections.emptySet(),
                 "SQL STRING"
         ));
 
@@ -51,6 +53,7 @@ class SettingsFormTest {
     @Test
     void validFormCreationAllBoxesUnchecked() {
         Set<ConstraintViolation<SettingsForm>> constraintViolations = validator.validate(new SettingsForm(
+                null,
                 null,
                 null,
                 null,

@@ -58,6 +58,15 @@
           <value>AVG;MITTELWERT</value>
           <value>AVG;Average</value>
       </aggregatefunctionlang>
+      <datatypesynonyms>
+          <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
+          <value>INTEGER;INT</value>
+          <value>DECIMAL;DEC</value>
+          <value>DECIMAL;FIXED</value>
+          <value>REAL;DOUBLE</value>
+          <value>REAL;DOUBLE PRECISION</value>
+          <value>BOOLEAN;BOOL</value>
+      </datatypesynonyms>
       <othersynonyms>
           <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
           <value>ASC;aufsteigend</value>

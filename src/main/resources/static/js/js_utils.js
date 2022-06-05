@@ -295,6 +295,17 @@ class SqlRegExHistory {
     }
 }
 
+function toggleSlaveCheckboxes(master, slaveName){
+    const slaveArray = document.getElementsByName(slaveName);
+
+    console.log(slaveArray);
+
+    slaveArray.forEach((el) => {
+        console.log(el);
+        document.getElementById(el.id).checked = master.checked
+    })
+}
+
 document.addEventListener('submit',  (e) => {
     const form = e.target;
     fetch(form.action, {

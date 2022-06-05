@@ -13,6 +13,8 @@ import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
+import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
+import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
 import java.util.*;
 
@@ -28,6 +30,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
     private final SpellingMistake indexColumnNameSpelling;
     private final SpellingMistake tableNameSpellingMistake;
     private final SpellingMistake columnNameSpellingMistake;
+    private final SynonymGenerator<?, String> datatypeSynonymGenerator;
 
     public CreateTableDeParserForRegEx(StringBuilder buffer, SettingsContainer settingsContainer) {
         this(new StatementDeParserForRegEx(buffer, settingsContainer), buffer, settingsContainer);
@@ -44,6 +47,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         this.columnNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
         this.indexColumnNameOrder = settings.get(OrderRotation.class).get(SettingsOption.INDEXCOLUMNNAMEORDER);
         this.columnNameOrder = settings.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
+        this.datatypeSynonymGenerator = settings.get(StringSynonymGenerator.class).get(SettingsOption.DATATYPESYNONYMS);
     }
 
     private List<String> columnDefinitionsListToStringList(List<ColumnDefinition> columnDefinitions){
@@ -224,7 +228,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         if (columnDefinition.getColumnSpecs() != null) {
             for (String s : columnDefinition.getColumnSpecs()) {
                 buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(s);
+                buffer.append(RegExGenerator.useStringSynonymGenerator(this.datatypeSynonymGenerator, s));
             }
         }
     }
