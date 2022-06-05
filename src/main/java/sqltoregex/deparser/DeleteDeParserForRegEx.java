@@ -30,6 +30,7 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
     private SpellingMistake tableNameSpellingMistake;
     private SpellingMistake columnNameSpellingMistake;
     private OrderRotation columnNameOrderRotation;
+    private OrderRotation tableNameOrderRotation;
 
     /**
      * default constructor
@@ -53,6 +54,7 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
         this.tableNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
         this.columnNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
         this.columnNameOrderRotation = settingsContainer.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
+        this.tableNameOrderRotation = settingsContainer.get(OrderRotation.class).get(SettingsOption.TABLENAMEORDER);
         this.selectDeParserForRegEx = new SelectDeParserForRegEx(settingsContainer);
     }
 
@@ -155,9 +157,16 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
         }
 
         if (delete.getUsingList() != null && !delete.getUsingList().isEmpty()) {
-            buffer.append(" USING").append(
-                    delete.getUsingList().stream().map(Table::toString).collect(joining(", ", " ", "")));
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "USING"));
+            buffer.append(REQUIRED_WHITE_SPACE);
+            List<String> tableNameListAsStrings = new LinkedList<>();
+            for(Table table : delete.getUsingList()){
+                tableNameListAsStrings.add(table.toString());
+            }
+            buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrderRotation, tableNameListAsStrings));
         }
+
         if (delete.getJoins() != null) {
             for (Join join : delete.getJoins()) {
                 if (join.isSimple()) {
