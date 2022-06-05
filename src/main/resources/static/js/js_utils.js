@@ -350,6 +350,51 @@ function loadDefaultLanguageSettings(){
     }
 }
 
+function loadUserFormSettings(formElement){
+    let allCheckboxes = formElement.querySelectorAll('input[type="checkbox"]');
+    if(localStorage.getItem("userSettingSavings") === null){
+        let settingsDict = {}
+        allCheckboxes.forEach(checkbox => {
+            settingsDict[checkbox.id] = checkbox.checked;
+            document.getElementById(checkbox.id).checked = true;
+        })
+        localStorage.setItem("userSettingSavings", JSON.stringify(settingsDict));
+    } else if(localStorage.getItem("userSettingSavings") === JSON.stringify("userSettingsReset")){
+        let settingsDict = {}
+        allCheckboxes.forEach(checkbox => {
+            settingsDict[checkbox.id] = true;
+            document.getElementById(checkbox.id).checked = true;
+        })
+        localStorage.setItem("userSettingSavings", JSON.stringify(settingsDict));
+    } else {
+        let savings = JSON.parse(localStorage.getItem("userSettingSavings"));
+        allCheckboxes.forEach(checkbox => {
+            checkbox.checked = savings[checkbox.id];
+        })
+    }
+}
+
+function updateSingleUserSetting(inputElement){
+    let settingsDict = {}
+    if(localStorage.getItem("userSettingSavings") !== null){
+        settingsDict = JSON.parse(localStorage.getItem("userSettingSavings"));
+    }
+
+    if(settingsDict[inputElement.id] !== undefined){
+        if(settingsDict[inputElement.id] !== inputElement.checked){
+            settingsDict[inputElement.id] = inputElement.checked;
+        }
+    } else {
+        settingsDict[inputElement.id] = inputElement.checked;
+    }
+    localStorage.setItem("userSettingSavings", JSON.stringify(settingsDict));
+}
+
+function resetUserSettings(formElement){
+    localStorage.setItem("userSettingSavings", JSON.stringify("userSettingsReset"));
+    loadUserFormSettings(formElement);
+}
+
 document.onreadystatechange = function () {
     if (document.readyState === "interactive") {
         loadDefaultLanguageSettings();
@@ -357,6 +402,7 @@ document.onreadystatechange = function () {
         let actualPath = currentDomain[currentDomain.length - 1].split("?")[0];
 
         if(actualPath === ""){
+            loadUserFormSettings(document.getElementById("converterForm"));
             let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
             SqlRegExHis.checkUpdatedConverting();
         } else if(actualPath === "visualization"){
