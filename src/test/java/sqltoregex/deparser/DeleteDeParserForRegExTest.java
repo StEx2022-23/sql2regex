@@ -47,14 +47,41 @@ class DeleteDeParserForRegExTest {
     }
 
     @Test
-    void testForImplementing(){
-        final String sampleSolution = "DELETE tab as t1, tab FROM tab.col1 WHERE col2 > 1000.00";
+    void testDeleteTableOrder(){
+        final String sampleSolution = "DELETE tab1, tab2 FROM tab3";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "DELETE tab.col1, tab.col2 FROM tab.col1 WHERE col2 > 1000.00"
+                "DELETE tab1, tab2 FROM tab3"
+        ));
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
+                "DELETE tab1, tab2 FROM tab3",
+                "DELETE tab2, tab1 FROM tab3"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).with(SettingsOption.COLUMNNAMESPELLING).with(SettingsOption.TABLENAMESPELLING).build(),
+                SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+    }
+
+    @Test
+    void testAliasHandling(){
+        final String sampleSolution = "DELETE tab1 t1, tab2 FROM tab3 t3";
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "DELETE tab1 t1, tab2 FROM tab3 t3",
+                "DELETE   tab1 t1  ,   tab2   FROM   tab3   t3",
+                "DELETE tab1 AS t1, tab2 AS t2 FROM tab3 ALIAS t3"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
                 sampleSolution,
                 matchingMap,
                 true

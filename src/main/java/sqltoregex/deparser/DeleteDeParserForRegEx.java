@@ -4,6 +4,7 @@ import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.select.Join;
 import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sf.jsqlparser.util.deparser.DeleteDeParser;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
@@ -11,8 +12,7 @@ import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static java.util.stream.Collectors.joining;
 
@@ -22,6 +22,7 @@ import static java.util.stream.Collectors.joining;
 public class DeleteDeParserForRegEx extends DeleteDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
+    Map<String, String> tableNameAliasMap = new HashMap<>();
     private ExpressionDeParserForRegEx expressionDeParserForRegEx;
     private SelectDeParserForRegEx selectDeParserForRegEx;
     private final SettingsContainer settingsContainer;
@@ -110,9 +111,9 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
 
                 //handle alias
                 if(null != table.getAlias()){
-
+                    temp.append(REQUIRED_WHITE_SPACE).append("(").append("(?:ALIAS|AS)").append(REQUIRED_WHITE_SPACE).append(")?").append(table.getAlias().toString().replace("AS", "").replace(" ", ""));
                 } else {
-                    temp.append("(").append("(?:ALIAS|AS)").append(".*").append(")?");
+                    temp.append("(").append(REQUIRED_WHITE_SPACE).append("(?:ALIAS|AS)").append(".*").append(")?");
                 }
                 tableList.add(temp.toString());
             }
@@ -121,13 +122,37 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
         }
 
         if (delete.getOutputClause()!=null) {
-            delete.getOutputClause().appendTo(buffer);
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "OUTPUT"));
+            buffer.append(REQUIRED_WHITE_SPACE);
+            List<String> outputClauses = new ArrayList<>();
+            for(SelectItem selectItem : delete.getOutputClause().getSelectItemList()){
+                outputClauses.add(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, selectItem.toString()));
+            }
+            buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrderRotation, outputClauses));
         }
 
         if (delete.isHasFrom()) {
-            buffer.append(" FROM");
+            buffer.append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FROM"));
         }
-        buffer.append(" ").append(delete.getTable().toString());
+
+        //handle table alias
+        buffer.append(REQUIRED_WHITE_SPACE);
+        if (delete.getTable().toString().contains(" ")){
+            this.tableNameAliasMap.put(delete.getTable().toString().split(" ")[0], delete.getTable().toString().split(" ")[1]);
+            this.tableNameAliasMap.put(delete.getTable().toString().split(" ")[1], delete.getTable().toString().split(" ")[0]);
+            buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, delete.getTable().toString().split(" ")[0]));
+            buffer.append("(");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append("(?:ALIAS|AS)").append(")?");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, delete.getTable().toString().split(" ")[1]));
+        } else {
+            buffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, delete.getTable().toString()));
+            buffer.append("(");
+            buffer.append(REQUIRED_WHITE_SPACE).append("(?:ALIAS|AS)").append(".*");
+            buffer.append(")?");
+        }
 
         if (delete.getUsingList() != null && !delete.getUsingList().isEmpty()) {
             buffer.append(" USING").append(
