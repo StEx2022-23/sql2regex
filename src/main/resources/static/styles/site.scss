@@ -13,6 +13,10 @@
     background-color: #f8dec2 !important;
 }
 
+.btn-quart{
+    background-color: #FFC1C1 !important;
+}
+
 .inputHeight{
     height: 200px;
 }
@@ -26,8 +30,9 @@
 }
 
 #copyHistory{
+    background-color: transparent;
     position: absolute;
-    top: 5px;
+    top: 8px;
     right: 5px;
     cursor: pointer;
     z-index: 99;
@@ -43,6 +48,14 @@
 
 .nondecoration{
     text-decoration:none;
+}
+
+.icon:hover {
+    transform: scale(1.1, 1.1);
+}
+
+.icon:active {
+    transform: scale(0.9, 0.9);
 }
 
 $white: #fff;
