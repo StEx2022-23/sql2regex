@@ -18,7 +18,6 @@ import java.util.*;
  */
 public class DeleteDeParserForRegEx extends DeleteDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
-    Map<String, String> tableNameAliasMap = new HashMap<>();
     private ExpressionDeParserForRegEx expressionDeParserForRegEx;
     private final SelectDeParserForRegEx selectDeParserForRegEx;
     private final SettingsContainer settingsContainer;
@@ -83,21 +82,17 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
             buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "IGNORE"));
         }
 
-        //DELETE FROM == DELETE * FROM
         if (null == delete.getTables()) {
             buffer.append(REQUIRED_WHITE_SPACE).append("\\*").append(REQUIRED_WHITE_SPACE);
         }
 
         List<String> tableList = new LinkedList<>();
-        //DELETE tab == DELETE tab.*, DELETE tab.col, DELETE tab||tab.col (AS|ALIAS) xyz
         if (delete.getTables() != null && !delete.getTables().isEmpty()) {
             buffer.append(REQUIRED_WHITE_SPACE);
             List<Table> unEditedTableList = delete.getTables();
 
             for(Table table : unEditedTableList){
                 StringBuilder temp = new StringBuilder();
-
-                //handle optional star-operator and table/column-name spelling
                 if(table.getFullyQualifiedName().contains(".")){
                     temp.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, table.getFullyQualifiedName().split("\\.")[0]));
                     temp.append("\\.");
@@ -107,7 +102,6 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
                     temp.append("(\\.\\*)?");
                 }
 
-                //handle alias
                 if(null != table.getAlias()){
                     temp.append(REQUIRED_WHITE_SPACE).append("(").append("(?:ALIAS|AS)").append(REQUIRED_WHITE_SPACE).append(")?").append(table.getAlias().toString().replace("AS", "").replace(" ", ""));
                 } else {
@@ -147,8 +141,7 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
         for(Object o : allTablesWithJoin){
             StringBuilder tmpbuffer = new StringBuilder();
             if (o.toString().contains(" ")){
-                this.tableNameAliasMap.put(o.toString().split(" ")[0], o.toString().split(" ")[1]);
-                this.tableNameAliasMap.put(o.toString().split(" ")[1], o.toString().split(" ")[0]);
+                this.expressionDeParserForRegEx.addTableNameAlias(o.toString());
                 tmpbuffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, o.toString().split(" ")[0]));
                 tmpbuffer.append("(").append(REQUIRED_WHITE_SPACE).append("(?:ALIAS|AS)").append(")?").append(REQUIRED_WHITE_SPACE);
                 tmpbuffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, o.toString().split(" ")[1]));
@@ -169,7 +162,6 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
             }
             buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrderRotation, tableNameListAsStrings));
         }
-
 
         if (delete.getJoins() != null) {
             for (Join join : delete.getJoins()) {
@@ -230,13 +222,5 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
      */
     private SettingsContainer getSettingsContainer(){
         return this.settingsContainer;
-    }
-
-    /**
-     * actual sample of collected tablenames and alias names
-     * @return Map with tablename ↔ alias & alias ↔ tablename
-     */
-    private Map<String, String> getTableNameAliasMap() {
-        return this.tableNameAliasMap;
     }
 }
