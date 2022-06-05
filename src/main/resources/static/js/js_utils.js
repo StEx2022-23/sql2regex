@@ -341,15 +341,15 @@ function loadDefaultLanguageSettings(){
 
 document.onreadystatechange = function () {
     if (document.readyState === "interactive") {
-        try{
-            loadDefaultLanguageSettings();
-        } catch{}
-        try{
+        loadDefaultLanguageSettings();
+        let currentDomain = window.location.href.split("/");
+        let actualPath = currentDomain[currentDomain.length - 1].split("?")[0];
+
+        if(actualPath === ""){
             let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
             SqlRegExHis.checkUpdatedConverting();
-        } catch{}
-        try{
+        } else if(actualPath === "visualization"){
             insertVisualizationPage()
-        } catch{}
+        }
     }
 }
