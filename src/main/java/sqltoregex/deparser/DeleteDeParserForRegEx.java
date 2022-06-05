@@ -7,8 +7,14 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.util.deparser.DeleteDeParser;
 import sqltoregex.settings.SettingsContainer;
+import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.regexgenerator.OrderRotation;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
+import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import static java.util.stream.Collectors.joining;
 
@@ -16,8 +22,15 @@ import static java.util.stream.Collectors.joining;
  * implements own delete statement deparser for regular expressions
  */
 public class DeleteDeParserForRegEx extends DeleteDeParser {
+    private static final String REQUIRED_WHITE_SPACE = "\\s+";
+    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private ExpressionDeParserForRegEx expressionDeParserForRegEx;
+    private SelectDeParserForRegEx selectDeParserForRegEx;
     private final SettingsContainer settingsContainer;
+    private SpellingMistake keywordSpellingMistake;
+    private SpellingMistake tableNameSpellingMistake;
+    private SpellingMistake columnNameSpellingMistake;
+    private OrderRotation columnNameOrderRotation;
 
     /**
      * default constructor
@@ -37,6 +50,11 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
         super(expressionDeParserForRegEx, buffer);
         this.expressionDeParserForRegEx = expressionDeParserForRegEx;
         this.settingsContainer = settingsContainer;
+        this.keywordSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
+        this.tableNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
+        this.columnNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
+        this.columnNameOrderRotation = settingsContainer.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
+        this.selectDeParserForRegEx = new SelectDeParserForRegEx(settingsContainer);
     }
 
     /**
@@ -44,32 +62,64 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
      * @param delete Delete
      */
     @Override
-    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.CognitiveComplexity", "PMD.NPathComplexity"})
     public void deParse(Delete delete) {
         if (delete.getWithItemsList() != null && !delete.getWithItemsList().isEmpty()) {
-            buffer.append("WITH ");
-            for (Iterator<WithItem> iter = delete.getWithItemsList().iterator(); iter.hasNext(); ) {
-                WithItem withItem = iter.next();
-                buffer.append(withItem);
-                if (iter.hasNext()) {
-                    buffer.append(",");
-                }
-                buffer.append(" ");
-            }
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "WITH"));
+            buffer.append(REQUIRED_WHITE_SPACE);
+            this.buffer.append(this.selectDeParserForRegEx.handleWithItemValueList(delete));
         }
-        buffer.append("DELETE");
+        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "DELETE"));
+
         if (delete.getModifierPriority() != null) {
-            buffer.append(" ").append(delete.getModifierPriority());
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, String.valueOf(delete.getModifierPriority())));
         }
+
         if (delete.isModifierQuick()) {
-            buffer.append(" QUICK");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "QUICK"));
         }
+
         if (delete.isModifierIgnore()) {
-            buffer.append(" IGNORE");
+            buffer.append(REQUIRED_WHITE_SPACE);
+            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "IGNORE"));
         }
+
+        //DELETE FROM == DELETE * FROM
+        if (null == delete.getTables()) {
+            buffer.append(REQUIRED_WHITE_SPACE).append("\\*").append(REQUIRED_WHITE_SPACE);
+        }
+
+        List<String> tableList = new LinkedList<>();
+        //DELETE tab == DELETE tab.*, DELETE tab.col, DELETE tab||tab.col (AS|ALIAS) xyz
         if (delete.getTables() != null && !delete.getTables().isEmpty()) {
-            buffer.append(
-                    delete.getTables().stream().map(Table::getFullyQualifiedName).collect(joining(", ", " ", "")));
+            buffer.append(REQUIRED_WHITE_SPACE);
+            List<Table> unEditedTableList = delete.getTables();
+
+            for(Table table : unEditedTableList){
+                StringBuilder temp = new StringBuilder();
+
+                //handle optional star-operator and table/column-name spelling
+                if(table.getFullyQualifiedName().contains(".")){
+                    temp.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, table.getFullyQualifiedName().split("\\.")[0]));
+                    temp.append("\\.");
+                    temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, table.getFullyQualifiedName().split("\\.")[1]));
+                } else {
+                    temp.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, table.getFullyQualifiedName()));
+                    temp.append("(\\.\\*)?");
+                }
+
+                //handle alias
+                if(null != table.getAlias()){
+
+                } else {
+                    temp.append("(").append("(?:ALIAS|AS)").append(".*").append(")?");
+                }
+                tableList.add(temp.toString());
+            }
+
+            buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrderRotation, tableList));
         }
 
         if (delete.getOutputClause()!=null) {
@@ -140,5 +190,4 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
     private SettingsContainer getSettingsContainer(){
         return this.settingsContainer;
     }
-
 }
