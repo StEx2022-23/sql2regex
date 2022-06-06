@@ -122,7 +122,7 @@ public class SqlToRegexController {
                         settingsForm.getTimeFormats(),
                         settingsForm.getDateTimeFormats(),
                         settingsForm.getAggregateFunctionLang(),
-                        settingsForm.getOtherSynonyms(),
+                        settingsForm.getDatatypeSynonyms(),
                         settingsForm.getOtherSynonyms(),
                         settingsForm.getSql()
                 )
