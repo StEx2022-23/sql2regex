@@ -298,11 +298,9 @@ class SqlRegExHistory {
 function toggleSlaveCheckboxes(master, slaveName){
     const slaveArray = document.getElementsByName(slaveName);
 
-    console.log(slaveArray);
-
     slaveArray.forEach((el) => {
-        console.log(el);
-        document.getElementById(el.id).checked = master.checked
+        document.getElementById(el.id).checked = master.checked;
+        updateSingleUserSetting(el);
     })
 }
 
