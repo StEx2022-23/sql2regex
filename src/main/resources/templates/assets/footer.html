@@ -21,10 +21,10 @@
         </a>
       </div>
       <div class="col-md-4 text-center m-auto">
-        <a href="impressum" class="link-light fw-bolder text-decoration-none">impressum</a> <br>
-        <a href="privacy" class="link-light fw-bolder text-decoration-none">privacy policy</a>
+        <a href="impressum" class="link-light fw-bolder text-decoration-none" th:text="#{footer.impressum}">impressum</a> <br>
+        <a href="privacy" class="link-light fw-bolder text-decoration-none" th:text="#{footer.privacyPolicy}">privacy policy</a>
         <br><br>
-        <p class="link-light text-decoration-none">licensed under <a href="https://github.com/binkertpat/sql2regex/blob/main/LICENSE" class="link-light fw-bolder text-decoration-none">MIT License</a></p>
+        <p class="link-light text-decoration-none"><span th:text="#{footer.licensedUnder}"></span> <a href="https://github.com/binkertpat/sql2regex/blob/main/LICENSE" class="link-light fw-bolder text-decoration-none">MIT License</a></p>
       </div>
     </div>
   </div>
