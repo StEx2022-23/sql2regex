@@ -6,6 +6,15 @@
             title error
         </div>
     </div>
+    <div class="text-end">
+        <button type="button" onclick="resetUserSettings(document.getElementById('converterForm'))" id="reset_user_settings" class="btn btn-m btn-success copy-button mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-filetype-json" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+            </svg>
+            <span th:text="#{conv.reset}"></span>
+        </button>
+    </div>
     <div class="accordion" id="accordion">
         <div class="accordion-item">
             <div class="accordion-header" id="headingSpelling">
@@ -59,7 +68,7 @@
                         <div class="col-sm"
                              th:each="setting : ${dateFormats}">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" th:id="'dateFormats_' + ${setting.toPattern()}" th:value="${setting.toPattern()}" th:name="dateFormats" th:checked="${settingsForm.getDateFormats().contains(setting)}">
+                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'dateFormats_' + ${setting.toPattern()}" th:value="${setting.toPattern()}" th:name="dateFormats" th:checked="${settingsForm.getDateFormats().contains(setting)}">
                                 <label class="form-check-label" th:for="'dateFormats_' + ${setting.toPattern()}" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
                             </div>
                         </div>
@@ -68,7 +77,7 @@
                         <div class="col-sm"
                              th:each="setting : ${timeFormats}">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" th:id="'timeFormats_' + ${setting.toPattern()}" th:value="${setting.toPattern()}" th:name="timeFormats" th:checked="${settingsForm.timeFormats.contains(setting)}">
+                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'timeFormats_' + ${setting.toPattern()}" th:value="${setting.toPattern()}" th:name="timeFormats" th:checked="${settingsForm.timeFormats.contains(setting)}">
                                 <label class="form-check-label" th:for="'timeFormats_' + ${setting.toPattern()}" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
                             </div>
                         </div>
@@ -77,7 +86,7 @@
                         <div class="col-sm"
                              th:each="setting : ${dateTimeFormats}">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" th:id="'dateTimeFormats_' + ${setting.toPattern()}" th:value="${setting.toPattern()}" th:name="dateTimeFormats" th:checked="${settingsForm.dateTimeFormats.contains(setting)}">
+                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'dateTimeFormats_' + ${setting.toPattern()}" th:value="${setting.toPattern()}" th:name="dateTimeFormats" th:checked="${settingsForm.dateTimeFormats.contains(setting)}">
                                 <label class="form-check-label" th:for="'dateTimeFormats_' + ${setting.toPattern()}" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
                             </div>
                         </div>
@@ -100,7 +109,7 @@
                                 <div class="row" th:each="synonym, iter : ${setting.getValue()}">
                                     <div class="col-sm">
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" th:id="'aggregateFunctionLang_' + ${setting.getKey()} + '==' + ${synonym}" th:value="${setting.getKey()} + ';' + ${synonym}" th:name="aggregateFunctionLang" th:checked="${settingsForm.aggregateFunctionLang.contains(setting.getKey() + ';' + synonym)}">
+                                            <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'aggregateFunctionLang_' + ${setting.getKey()} + '==' + ${synonym}" th:value="${setting.getKey()} + ';' + ${synonym}" th:name="aggregateFunctionLang" th:checked="${settingsForm.aggregateFunctionLang.contains(setting.getKey() + ';' + synonym)}">
                                             <label class="form-check-label" th:for="'aggregateFunctionLang_' + ${setting.getKey()} + '==' + ${synonym}" th:text="${synonym}">Enable format: "yyyy-MM-dd"</label>
                                         </div>
                                     </div>
@@ -131,7 +140,7 @@
                                 <div class="row" th:each="synonym, iter : ${setting.getValue()}">
                                     <div class="col-sm">
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" th:id="${'datatypeSynonyms'} + ${iterList.index} + ${'_'} +  ${iter.index}" th:value="${setting.getKey()} + ';' + ${synonym}" th:name="datatypeSynonyms" th:checked="${settingsForm.datatypeSynonyms.contains(setting.getKey() + ';' + synonym)}">
+                                            <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="${'datatypeSynonyms'} + ${iterList.index} + ${'_'} +  ${iter.index}" th:value="${setting.getKey()} + ';' + ${synonym}" th:name="datatypeSynonyms" th:checked="${settingsForm.datatypeSynonyms.contains(setting.getKey() + ';' + synonym)}">
                                             <label class="form-check-label" th:for="${'datatypeSynonyms'} + ${iterList.index} + ${'_'} + ${iter.index}" th:text="${synonym}">Enable format: "yyyy-MM-dd"</label>
                                         </div>
                                     </div>
@@ -156,7 +165,7 @@
                                 <div class="row" th:each="synonym, iter : ${setting.getValue()}">
                                     <div class="col-sm">
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" th:id="'otherSynonyms_' + ${setting.getKey()} + '==' + ${synonym}" th:value="${setting.getKey()} + ';' + ${synonym}" th:name="otherSynonyms" th:checked="${settingsForm.otherSynonyms.contains(setting.getKey() + ';' + synonym)}">
+                                            <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'otherSynonyms_' + ${setting.getKey()} + '==' + ${synonym}" th:value="${setting.getKey()} + ';' + ${synonym}" th:name="otherSynonyms" th:checked="${settingsForm.otherSynonyms.contains(setting.getKey() + ';' + synonym)}">
                                             <label class="form-check-label" th:for="'otherSynonyms_' + ${setting.getKey()} + '==' + ${synonym}" th:text="${synonym}">Enable format: "yyyy-MM-dd"</label>
                                         </div>
                                     </div>
@@ -168,6 +177,7 @@
             </div>
         </div>
     </div>
+
     <div class="d-grid gap-2">
         <button th:text="#{conv.convert}" type="submit" id="onSubmitConvertForm" class="btn btn-primary btn-lg mb-2 mt-2 display-6"></button>
     </div>
@@ -177,13 +187,6 @@
     <textarea th:text="${regex}" class="form-control inputHeight" readonly="readonly" id="regexoutput" rows="3" placeholder="Copy your generated RegEx here!"></textarea>
 </div>
 <div th:fragment="settingsform-output" class="text-end">
-    <button onclick="resetUserSettings(document.getElementById('converterForm'))" id="reset_user_settings" class="btn btn-m btn-success copy-button mb-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-filetype-json" viewBox="0 0 16 16">
-            <path d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
-            <path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-1.998 2zM14 2H4a1 1 0 0 0-1 1h9.002a2 2 0 0 1 2 2v7A1 1 0 0 0 15 11V3a1 1 0 0 0-1-1zM2.002 4a1 1 0 0 0-1 1v8l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094l1.777 1.947V5a1 1 0 0 0-1-1h-10z"/>
-        </svg>
-        <span th:text="#{resetUserSettings}"></span>
-    </button>
     <button onclick="window.location.href='/visualization?'+window.location.href.split('?')[1] +'&regex='+encodeURIComponent(document.getElementById('regexoutput').innerHTML)" id="visualization_button" class="btn btn-m btn-quart copy-button mt-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-filetype-json" viewBox="0 0 16 16">
             <path d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>

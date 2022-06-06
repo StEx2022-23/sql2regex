@@ -352,32 +352,26 @@ function loadDefaultLanguageSettings(){
 
 function loadUserFormSettings(formElement){
     let allCheckboxes = formElement.querySelectorAll('input[type="checkbox"]');
-    if(localStorage.getItem("userSettingSavings") === null){
-        let settingsDict = {}
-        allCheckboxes.forEach(checkbox => {
-            settingsDict[checkbox.id] = checkbox.checked;
-            document.getElementById(checkbox.id).checked = true;
-        })
-        localStorage.setItem("userSettingSavings", JSON.stringify(settingsDict));
-    } else if(localStorage.getItem("userSettingSavings") === JSON.stringify("userSettingsReset")){
+    if(localStorage.getItem("savedUserSettings") === null){
         let settingsDict = {}
         allCheckboxes.forEach(checkbox => {
             settingsDict[checkbox.id] = true;
             document.getElementById(checkbox.id).checked = true;
         })
-        localStorage.setItem("userSettingSavings", JSON.stringify(settingsDict));
+        localStorage.setItem("savedUserSettings", JSON.stringify(settingsDict));
     } else {
-        let savings = JSON.parse(localStorage.getItem("userSettingSavings"));
+        let savings = JSON.parse(localStorage.getItem("savedUserSettings"));
         allCheckboxes.forEach(checkbox => {
             checkbox.checked = savings[checkbox.id];
+            document.getElementById(checkbox.id).checked = savings[checkbox.id];
         })
     }
 }
 
 function updateSingleUserSetting(inputElement){
     let settingsDict = {}
-    if(localStorage.getItem("userSettingSavings") !== null){
-        settingsDict = JSON.parse(localStorage.getItem("userSettingSavings"));
+    if(localStorage.getItem("savedUserSettings") !== null){
+        settingsDict = JSON.parse(localStorage.getItem("savedUserSettings"));
     }
 
     if(settingsDict[inputElement.id] !== undefined){
@@ -387,11 +381,11 @@ function updateSingleUserSetting(inputElement){
     } else {
         settingsDict[inputElement.id] = inputElement.checked;
     }
-    localStorage.setItem("userSettingSavings", JSON.stringify(settingsDict));
+    localStorage.setItem("savedUserSettings", JSON.stringify(settingsDict));
 }
 
 function resetUserSettings(formElement){
-    localStorage.setItem("userSettingSavings", JSON.stringify("userSettingsReset"));
+    localStorage.removeItem("savedUserSettings");
     loadUserFormSettings(formElement);
 }
 
