@@ -19,7 +19,7 @@
         <div class="accordion-item">
             <div class="accordion-header" id="headingSpelling">
                 <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseSpellings" aria-controls="collapseSpellings">
-                    <input class="form-check-input me-2 master_toggle" type="checkbox" id="spelling_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'spellings'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.spellings.size() > 0}">
+                    <input class="form-check-input me-2 master_toggle" type="checkbox" id="spellingMistake_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'spellings'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.spellings.size() > 0}">
                     <span th:text="#{settingsform.spellings.heading}"></span>
                 </button>
             </div>
@@ -40,7 +40,7 @@
         <div class="accordion-item">
             <div class="accordion-header" id="headingOrders">
                 <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseOrders" aria-controls="collapseOrders">
-                    <input class="form-check-input me-2 master_toggle" type="checkbox" id="order_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'orders'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.orders.size() > 0}">
+                    <input class="form-check-input me-2 master_toggle" type="checkbox" id="orderRotation_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'orders'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.orders.size() > 0}">
                     <span th:text="#{settingsform.orders.heading}"></span>
                 </button>
             </div>
@@ -71,7 +71,7 @@
                         <div class="col-sm"
                              th:each="setting : ${dateFormats}">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'dateFormats_' + ${setting.toPattern()}" th:value="${setting.toPattern()}" th:name="dateFormats" th:checked="${settingsForm.getDateFormats().contains(setting)}">
+                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'dateAndTime_' + ${setting.toPattern()}" th:value="${setting.toPattern()}" th:name="dateFormats" th:checked="${settingsForm.getDateFormats().contains(setting)}">
                                 <label class="form-check-label" th:for="'dateFormats_' + ${setting.toPattern()}" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
                             </div>
                         </div>
@@ -80,7 +80,7 @@
                         <div class="col-sm"
                              th:each="setting : ${timeFormats}">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'timeFormats_' + ${setting.toPattern()}" th:value="${setting.toPattern()}" th:name="timeFormats" th:checked="${settingsForm.timeFormats.contains(setting)}">
+                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'dateAndTime_' + ${setting.toPattern()}" th:value="${setting.toPattern()}" th:name="timeFormats" th:checked="${settingsForm.timeFormats.contains(setting)}">
                                 <label class="form-check-label" th:for="'timeFormats_' + ${setting.toPattern()}" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
                             </div>
                         </div>
@@ -89,7 +89,7 @@
                         <div class="col-sm"
                              th:each="setting : ${dateTimeFormats}">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'dateTimeFormats_' + ${setting.toPattern()}" th:value="${setting.toPattern()}" th:name="dateTimeFormats" th:checked="${settingsForm.dateTimeFormats.contains(setting)}">
+                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'dateAndTime_' + ${setting.toPattern()}" th:value="${setting.toPattern()}" th:name="dateTimeFormats" th:checked="${settingsForm.dateTimeFormats.contains(setting)}">
                                 <label class="form-check-label" th:for="'dateTimeFormats_' + ${setting.toPattern()}" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
                             </div>
                         </div>
@@ -140,7 +140,7 @@
                                 <div class="row" th:each="synonym, iter : ${setting.getValue()}">
                                     <div class="col-sm">
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="${'datatypeSynonyms'} + ${iterList.index} + ${'_'} +  ${iter.index}" th:value="${setting.getKey()} + ';' + ${synonym}" th:name="datatypeSynonyms" th:checked="${settingsForm.datatypeSynonyms.contains(setting.getKey() + ';' + synonym)}">
+                                            <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="${'datatypeSynonyms'} + ${'_'} + ${iterList.index} + ${'_'} +  ${iter.index}" th:value="${setting.getKey()} + ';' + ${synonym}" th:name="datatypeSynonyms" th:checked="${settingsForm.datatypeSynonyms.contains(setting.getKey() + ';' + synonym)}">
                                             <label class="form-check-label" th:for="${'datatypeSynonyms'} + ${iterList.index} + ${'_'} + ${iter.index}" th:text="${synonym}">Enable format: "yyyy-MM-dd"</label>
                                         </div>
                                     </div>
