@@ -1,12 +1,8 @@
 package sqltoregex.settings.regexgenerator;
 
-import net.sf.jsqlparser.expression.Expression;
 import org.springframework.util.Assert;
 import sqltoregex.settings.SettingsOption;
-import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
-import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
-
-import java.text.SimpleDateFormat;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -14,6 +10,7 @@ import java.util.logging.Logger;
 
 public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
     protected static final String OPTIONAL_WHITE_SPACE = "\\s*";
+    protected static final String ELEMENT_DELIMITER = "|";
     protected boolean isNonCapturingGroup = true;
     private final SettingsOption settingsOption;
 
@@ -22,25 +19,43 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
         this.settingsOption = settingsOption;
     }
 
-    public static String useSpellingMistake(SpellingMistake spellingMistake, String str) {
-        if (null != spellingMistake) return spellingMistake.generateRegExFor(str);
-        else return str;
+    /**
+     * Generates a regular expression part String with the pre-/ and suffixes set <b>including</b> the param.
+     *
+     * @param wordToFindSynonyms
+     * @return
+     */
+    public String generateRegExFor(T wordToFindSynonyms) {
+        return this.joinListToRegEx(this.generateAsList(wordToFindSynonyms));
     }
 
-    public static <T> String useStringSynonymGenerator(SynonymGenerator<?, T> synonymGenerator, T str) {
-        if (null != synonymGenerator) return synonymGenerator.generateRegExFor(str);
-        else return str.toString();
+    public String joinListToRegEx(List<String> elList){
+        return RegExGenerator.joinListToRegEx(this, elList);
     }
 
-    public static String useExpressionSynonymGenerator(SynonymGenerator<SimpleDateFormat, Expression> synonymGenerator,
-                                                       Expression expression) {
-        if (null != synonymGenerator) return synonymGenerator.generateRegExFor(expression);
-        else return new DateAndTimeFormatSynonymGenerator(SettingsOption.DEFAULT).searchSynonymToString(expression);
-    }
+    /**
+     * For joining Lists in a static context. Extracting {@link RegExGenerator#isNonCapturingGroup} from the Parameter for right parsing.
+     * @param regexGenerator
+     * @param elList
+     * @return joined by {@link RegExGenerator#ELEMENT_DELIMITER} string list
+     * @see RegExGenerator#joinListToRegEx(List)
+     */
+    public static String joinListToRegEx(RegExGenerator<?> regexGenerator, List<String> elList){
+        StringBuilder builder = new StringBuilder();
 
-    public static String useOrderRotation(OrderRotation orderRotation, List<String> stringList) {
-        if (null != orderRotation) return orderRotation.generateRegExFor(stringList);
-        return String.join(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE, stringList);
+        boolean isNonCapturingGroup = regexGenerator == null || regexGenerator.isNonCapturingGroup;
+
+        builder.append(isNonCapturingGroup ? "(?:" : '(');
+
+        Iterator<String> iterator = elList.iterator();
+        while (iterator.hasNext()){
+            builder.append(iterator.next());
+            if (iterator.hasNext()){
+                builder.append(ELEMENT_DELIMITER);
+            }
+        }
+        builder.append(")");
+        return builder.toString();
     }
 
     @Override

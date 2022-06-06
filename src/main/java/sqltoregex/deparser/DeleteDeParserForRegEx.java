@@ -8,7 +8,6 @@ import net.sf.jsqlparser.util.deparser.DeleteDeParser;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import java.util.*;
@@ -61,25 +60,25 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.CognitiveComplexity", "PMD.NPathComplexity"})
     public void deParse(Delete delete) {
         if (delete.getWithItemsList() != null && !delete.getWithItemsList().isEmpty()) {
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "WITH"));
+            buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "WITH"));
             buffer.append(REQUIRED_WHITE_SPACE);
             this.buffer.append(this.selectDeParserForRegEx.handleWithItemValueList(delete));
         }
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "DELETE"));
+        buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "DELETE"));
 
         if (delete.getModifierPriority() != null) {
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, String.valueOf(delete.getModifierPriority())));
+            buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, String.valueOf(delete.getModifierPriority())));
         }
 
         if (delete.isModifierQuick()) {
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "QUICK"));
+            buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "QUICK"));
         }
 
         if (delete.isModifierIgnore()) {
             buffer.append(REQUIRED_WHITE_SPACE);
-            buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "IGNORE"));
+            buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "IGNORE"));
         }
 
         if (null == delete.getTables()) {
@@ -94,11 +93,11 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
             for(Table table : unEditedTableList){
                 StringBuilder temp = new StringBuilder();
                 if(table.getFullyQualifiedName().contains(".")){
-                    temp.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, table.getFullyQualifiedName().split("\\.")[0]));
+                    temp.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, table.getFullyQualifiedName().split("\\.")[0]));
                     temp.append("\\.");
-                    temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, table.getFullyQualifiedName().split("\\.")[1]));
+                    temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, table.getFullyQualifiedName().split("\\.")[1]));
                 } else {
-                    temp.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, table.getFullyQualifiedName()));
+                    temp.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, table.getFullyQualifiedName()));
                     temp.append("(\\.\\*)?");
                 }
 
@@ -110,20 +109,20 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
                 tableList.add(temp.toString());
             }
 
-            buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrderRotation, tableList));
+            buffer.append(OrderRotation.useOrDefault(this.columnNameOrderRotation, tableList));
         }
 
         if (delete.getOutputClause()!=null) {
-            buffer.append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "OUTPUT")).append(REQUIRED_WHITE_SPACE);
+            buffer.append(REQUIRED_WHITE_SPACE).append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "OUTPUT")).append(REQUIRED_WHITE_SPACE);
             List<String> outputClauses = new ArrayList<>();
             for(SelectItem selectItem : delete.getOutputClause().getSelectItemList()){
-                outputClauses.add(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, selectItem.toString()));
+                outputClauses.add(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, selectItem.toString()));
             }
-            buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrderRotation, outputClauses));
+            buffer.append(OrderRotation.useOrDefault(this.columnNameOrderRotation, outputClauses));
         }
 
         if (delete.isHasFrom()) {
-            buffer.append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FROM"));
+            buffer.append(REQUIRED_WHITE_SPACE).append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "FROM"));
         }
 
         List<Object> allTablesWithJoin = new LinkedList<>();
@@ -142,25 +141,25 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
             StringBuilder tmpbuffer = new StringBuilder();
             if (o.toString().contains(" ")){
                 this.expressionDeParserForRegEx.addTableNameAlias(o.toString());
-                tmpbuffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, o.toString().split(" ")[0]));
+                tmpbuffer.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, o.toString().split(" ")[0]));
                 tmpbuffer.append("(").append(REQUIRED_WHITE_SPACE).append("(?:ALIAS|AS)").append(")?").append(REQUIRED_WHITE_SPACE);
-                tmpbuffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, o.toString().split(" ")[1]));
+                tmpbuffer.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, o.toString().split(" ")[1]));
             } else {
-                tmpbuffer.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, o.toString()));
+                tmpbuffer.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, o.toString()));
                 tmpbuffer.append("(").append(REQUIRED_WHITE_SPACE).append("(?:ALIAS|AS)").append(".*").append(")?");
             }
             toRotateTables.add(tmpbuffer.toString());
         }
-        buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrderRotation, toRotateTables));
+        buffer.append(OrderRotation.useOrDefault(this.tableNameOrderRotation, toRotateTables));
 
 
         if (delete.getUsingList() != null && !delete.getUsingList().isEmpty()) {
-            buffer.append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "USING")).append(REQUIRED_WHITE_SPACE);
+            buffer.append(REQUIRED_WHITE_SPACE).append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "USING")).append(REQUIRED_WHITE_SPACE);
             List<String> tableNameListAsStrings = new LinkedList<>();
             for(Table table : delete.getUsingList()){
                 tableNameListAsStrings.add(table.toString());
             }
-            buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrderRotation, tableNameListAsStrings));
+            buffer.append(OrderRotation.useOrDefault(this.tableNameOrderRotation, tableNameListAsStrings));
         }
 
         if (delete.getJoins() != null) {
@@ -175,7 +174,7 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
         }
 
         if (delete.getWhere() != null) {
-            buffer.append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "WHERE")).append(REQUIRED_WHITE_SPACE);
+            buffer.append(REQUIRED_WHITE_SPACE).append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "WHERE")).append(REQUIRED_WHITE_SPACE);
             delete.getWhere().accept(this.getExpressionDeParserForRegEx());
         }
 
@@ -191,12 +190,12 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
         }
 
         if (delete.getReturningExpressionList() != null) {
-            buffer.append(REQUIRED_WHITE_SPACE).append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "RETURNING")).append(REQUIRED_WHITE_SPACE);
+            buffer.append(REQUIRED_WHITE_SPACE).append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "RETURNING")).append(REQUIRED_WHITE_SPACE);
             List<String> returningExpressions = new LinkedList<>();
             for(SelectItem selectItem : delete.getReturningExpressionList()){
                 returningExpressions.add(selectItem.toString());
             }
-            buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrderRotation, returningExpressions));
+            buffer.append(OrderRotation.useOrDefault(this.tableNameOrderRotation, returningExpressions));
         }
     }
 

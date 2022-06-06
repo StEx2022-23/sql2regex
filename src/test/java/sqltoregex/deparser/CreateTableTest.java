@@ -3,6 +3,7 @@ package sqltoregex.deparser;
 import org.junit.jupiter.api.Test;
 import sqltoregex.settings.*;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,24 @@ matchingMap.put(SettingsOption.DEFAULT, List.of(
         ));
 
         TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), "CREATE TABLE table1 (column1 datatype1)", matchingMap, true);
+    }
+
+    @Test
+    void dataTypeSynonym() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "CREATE TABLE table1 (column1 BOOL)"
+        ));
+
+        matchingMap.put(SettingsOption.DATATYPESYNONYMS, List.of(
+                "CREATE TABLE table1 (column1 BOOLEAN)"
+        ));
+
+        TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), "CREATE TABLE table1 (column1 BOOL)", matchingMap, true);
+        TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder()
+                                                        .withStringSet(new HashSet<>(List.of("BOOL", "BOOLEAN")),
+                                                                       SettingsOption.DATATYPESYNONYMS)
+                                                        .build(), "CREATE TABLE table1 (column1 BOOL)", matchingMap, true);
     }
 
     @Test

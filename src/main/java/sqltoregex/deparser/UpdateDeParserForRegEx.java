@@ -11,7 +11,6 @@ import net.sf.jsqlparser.util.deparser.UpdateDeParser;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import java.util.*;
@@ -56,7 +55,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "UPDATE", true);
 
         if (update.getModifierPriority() != null) {
-            buffer.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, update.getModifierPriority().toString())).append(REQUIRED_WHITE_SPACE);
+            buffer.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, update.getModifierPriority().toString())).append(REQUIRED_WHITE_SPACE);
         }
         if (update.isModifierIgnore()) {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "IGNORE", true);
@@ -65,7 +64,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         List<String> tableList = new ArrayList<>();
         if(update.getTable().toString().contains(" ")){
             tableList.add(this.extractTableNameAlias(update.getTable().toString()));
-        } else tableList.add(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, update.getTable().toString()));
+        } else tableList.add(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, update.getTable().toString()));
 
         if (update.getStartJoins() != null) {
             for (Join join : update.getStartJoins()) {
@@ -75,7 +74,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             }
         }
 
-        buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrderRotation, tableList));
+        buffer.append(OrderRotation.useOrDefault(this.tableNameOrderRotation, tableList));
 
         if (update.getStartJoins() != null) {
             for (Join join : update.getStartJoins()) {
@@ -111,7 +110,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
 
             insertedSet.add(singleSet.toString());
         }
-        buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrderRotation, insertedSet));
+        buffer.append(OrderRotation.useOrDefault(this.columnNameOrderRotation, insertedSet));
 
         if (update.getOutputClause() != null) {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "OUTPUT", true);
@@ -119,7 +118,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             for(SelectItem selectItem : update.getOutputClause().getSelectItemList()){
                 outputClauses.add(selectItem.toString());
             }
-            buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrderRotation, outputClauses));
+            buffer.append(OrderRotation.useOrDefault(this.columnNameOrderRotation, outputClauses));
         }
 
         if (update.getFromItem() != null) {
@@ -127,7 +126,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             List<String> tableListFromItem = new ArrayList<>();
             if(update.getFromItem().toString().contains(" ")){
                 tableListFromItem.add(this.extractTableNameAlias(update.getFromItem().toString()));
-            } else tableListFromItem.add(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, update.getFromItem().toString()));
+            } else tableListFromItem.add(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, update.getFromItem().toString()));
 
             if (update.getJoins() != null) {
                 for (Join join : update.getJoins()) {
@@ -137,7 +136,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
                 }
             }
 
-            buffer.append(RegExGenerator.useOrderRotation(this.tableNameOrderRotation, tableListFromItem));
+            buffer.append(OrderRotation.useOrDefault(this.tableNameOrderRotation, tableListFromItem));
 
             if (update.getJoins() != null) {
                 for (Join join : update.getJoins()) {
@@ -166,7 +165,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             for(SelectItem selectItem : update.getReturningExpressionList()){
                 returningExpressionList.add(selectItem.toString());
             }
-            buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrderRotation, returningExpressionList));
+            buffer.append(OrderRotation.useOrDefault(this.columnNameOrderRotation, returningExpressionList));
         }
     }
 
@@ -185,7 +184,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
 
     private void setKeywordSpellingMistakeWithRequiredWhitespaces(boolean whiteSpaceBefore, String keyword, boolean whiteSpaceAfter){
         buffer.append(whiteSpaceBefore ? REQUIRED_WHITE_SPACE : "");
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, keyword));
+        buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, keyword));
         buffer.append(whiteSpaceAfter ? REQUIRED_WHITE_SPACE : "");
     }
 
@@ -196,11 +195,11 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             String alias = columnName.split(" ")[1];
             this.tableNameAliasCombinations.put(fullName, alias);
             this.tableNameAliasCombinations.put(alias, fullName);
-            temp.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, fullName));
+            temp.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, fullName));
             temp.append("(" + REQUIRED_WHITE_SPACE + "(?:")
-                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ALIAS"))
+                    .append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "ALIAS"))
                     .append("|")
-                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "AS"))
+                    .append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "AS"))
                     .append(")")
                     .append(")?")
                     .append(REQUIRED_WHITE_SPACE);
@@ -208,11 +207,11 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             return temp.toString();
         } else {
             String fullName = columnName.split(" ")[0];
-            temp.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, fullName));
+            temp.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, fullName));
             temp.append("(" + REQUIRED_WHITE_SPACE + "(?:")
-                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ALIAS"))
+                    .append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "ALIAS"))
                     .append("|")
-                    .append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "AS"))
+                    .append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "AS"))
                     .append(")?")
                     .append(".*")
                     .append(")?");
@@ -226,13 +225,13 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             String tab = column.split("\\.")[0];
             String col = column.split("\\.")[1];
             temp.append("(?:")
-                    .append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, tab))
+                    .append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tab))
                     .append("|")
-                    .append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, this.tableNameAliasCombinations.getOrDefault(tab, tab)))
+                    .append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, this.tableNameAliasCombinations.getOrDefault(tab, tab)))
                     .append(")\\.");
-            temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, col));
+            temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, col));
         } else{
-            temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, column));
+            temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, column));
         }
         return temp.toString();
     }

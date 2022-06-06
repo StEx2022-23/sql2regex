@@ -8,7 +8,6 @@ import net.sf.jsqlparser.util.deparser.OrderByDeParser;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
@@ -42,26 +41,26 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
 
     public void deParse(List<OrderByElement> orderByElementList, FromItem fromItem) {
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ORDER"));
+        buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "ORDER"));
         buffer.append(REQUIRED_WHITE_SPACE);
         buffer.append("(?:");
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "SIBLINGS"));
+        buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "SIBLINGS"));
         buffer.append(REQUIRED_WHITE_SPACE + ")?");
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "BY"));
+        buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "BY"));
         buffer.append(REQUIRED_WHITE_SPACE);
 
         List<String> orderByElementsAsStrings = new LinkedList<>();
         for (OrderByElement orderByElement : orderByElementList) {
             orderByElementsAsStrings.add(deParseElementForOrderRotation(orderByElement, fromItem));
         }
-        buffer.append(RegExGenerator.useOrderRotation(this.columnNameOrder, orderByElementsAsStrings));
+        buffer.append(OrderRotation.useOrDefault(this.columnNameOrder, orderByElementsAsStrings));
     }
 
     public String deParseElementForOrderRotation(OrderByElement orderByElement, FromItem fromItem) {
         StringBuilder temp = new StringBuilder();
         if (orderByElement.getExpression().toString().contains("(") && orderByElement.getExpression().toString()
                 .contains(")")) {
-            temp.append(RegExGenerator.useStringSynonymGenerator(this.aggregateFunctionLang,
+            temp.append(StringSynonymGenerator.useOrDefault(this.aggregateFunctionLang,
                                                                  orderByElement.getExpression().toString()
                                                                          .replaceAll("\\(.*", "")));
             temp.append(OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE);
@@ -70,14 +69,14 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
             if (tempColumn.contains(".")) {
                 temp.append(this.handleTableNameAlias(fromItem, tempColumn));
             } else {
-                temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, tempColumn));
+                temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, tempColumn));
             }
             temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
         } else {
             if (orderByElement.getExpression().toString().contains(".")) {
                 temp.append(this.handleTableNameAlias(fromItem, orderByElement.getExpression().toString()));
             } else {
-                temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake,
+                temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake,
                                                               orderByElement.getExpression().toString()));
             }
         }
@@ -100,13 +99,13 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         if (orderByElement.isAscDescPresent()) {
             if (orderByElement.isAsc()) {
                 temp.append(REQUIRED_WHITE_SPACE);
-                temp.append("(?:").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "ASC"))
-                        .append("|").append(RegExGenerator.useStringSynonymGenerator(this.specialSynonyms, "ASC"))
+                temp.append("(?:").append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "ASC"))
+                        .append("|").append(StringSynonymGenerator.useOrDefault(this.specialSynonyms, "ASC"))
                         .append(")");
             } else {
                 temp.append(REQUIRED_WHITE_SPACE);
-                temp.append("(?:").append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "DESC"))
-                        .append("|").append(RegExGenerator.useStringSynonymGenerator(this.specialSynonyms, "DESC"))
+                temp.append("(?:").append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "DESC"))
+                        .append("|").append(StringSynonymGenerator.useOrDefault(this.specialSynonyms, "DESC"))
                         .append(")");
             }
         }
@@ -119,13 +118,13 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         if (orderByElement.getNullOrdering() != null) {
             temp.append(REQUIRED_WHITE_SPACE);
             if (orderByElement.getNullOrdering() == OrderByElement.NullOrdering.NULLS_FIRST) {
-                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "NULLS"));
+                temp.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "NULLS"));
                 temp.append(REQUIRED_WHITE_SPACE);
-                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "FIRST"));
+                temp.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "FIRST"));
             } else {
-                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "NULLS"));
+                temp.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "NULLS"));
                 temp.append(REQUIRED_WHITE_SPACE);
-                temp.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "LAST"));
+                temp.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "LAST"));
             }
         }
         return temp.toString();
@@ -139,7 +138,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         temp.append("|");
         temp.append(fromItem.getAlias().toString().replace(" ", ""));
         temp.append(")?\\.?");
-        temp.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, columnName));
+        temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, columnName));
         return temp.toString();
     }
 }

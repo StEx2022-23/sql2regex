@@ -369,7 +369,8 @@ class ExpressionDeParserForRegExTest {
                 "NOT 5",
                 "NOT  5",
                 "!5",
-                "!  5"
+                "!  5",
+                "NICHT 5"
         ));
 
         assertIsNonCapturingGroup(
@@ -378,14 +379,15 @@ class ExpressionDeParserForRegExTest {
         );
         assertIsNonCapturingGroup(
                 TestUtils.validateExpressionAgainstRegEx(SettingsContainer.builder()
-                                                                 .withStringSet(new HashSet<>(List.of("!", "NOT")),
+                                                                 .withStringSet(new HashSet<>(List.of("!", "NOT", "NICHT")),
                                                                                 SettingsOption.OTHERSYNONYMS)
                                                                  .build(), sampleSolution, matchingMap, true)
         );
 
         Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "NICHT 5"
+                "NICHT 5",
+                "!5"
         ));
 
         assertIsNonCapturingGroup(

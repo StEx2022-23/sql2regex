@@ -4,7 +4,6 @@ import net.sf.jsqlparser.expression.DateValue;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.TimeValue;
 import net.sf.jsqlparser.expression.TimestampValue;
-import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import org.springframework.util.Assert;
 import sqltoregex.settings.SettingsOption;
 
@@ -12,6 +11,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDateFormat, Expression> {
@@ -45,9 +46,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
             throw new IllegalArgumentException(MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE);
         }
 
-        DateAndTimeExpressionDeParser deParser = new DateAndTimeExpressionDeParser();
-        wordToFindSynonyms.accept(deParser);
-        String stringToCheck = deParser.getBuffer().toString();
+        String stringToCheck = DateAndTimeFormatSynonymGenerator.expressionToString(wordToFindSynonyms);
 
         for (SimpleDateFormat vertexSyn : this.synonymsGraph.vertexSet()) {
             try {
@@ -69,9 +68,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
         //O(n^2) is okay, cause elements will be <<100 for dateFormats
         for (DateFormat vertexSyn : this.synonymsGraph.vertexSet()) {
             try {
-                DateAndTimeExpressionDeParser deParser = new DateAndTimeExpressionDeParser();
-                wordToFindSynonyms.accept(deParser);
-                date = vertexSyn.parse(deParser.getBuffer().toString());
+                date = vertexSyn.parse(DateAndTimeFormatSynonymGenerator.expressionToString(wordToFindSynonyms));
                 return syn.format(date);
             } catch (ParseException e) {
                 //continue to search for other possible patterns without throwing error.
@@ -86,27 +83,33 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
         if (!(wordToFindSynonyms instanceof DateValue) && !(wordToFindSynonyms instanceof TimeValue) && !(wordToFindSynonyms instanceof TimestampValue)) {
             throw new IllegalArgumentException(MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE);
         }
-        DateAndTimeExpressionDeParser deParser = new DateAndTimeExpressionDeParser();
-        wordToFindSynonyms.accept(deParser);
-        return deParser.getBuffer().toString();
+        return DateAndTimeFormatSynonymGenerator.expressionToString(wordToFindSynonyms);
     }
 
-    class DateAndTimeExpressionDeParser extends ExpressionDeParser {
-        @Override
-        public void visit(DateValue value) {
-            getBuffer().append(value.getRawValue());
+    public static String expressionToString(Expression wordToFindSynonyms) {
+        Assert.notNull(wordToFindSynonyms, SYNONYM_MUST_NOT_BE_NULL);
+        if (!(wordToFindSynonyms instanceof DateValue) && !(wordToFindSynonyms instanceof TimeValue) && !(wordToFindSynonyms instanceof TimestampValue)) {
+            throw new IllegalArgumentException(MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE);
         }
 
-        @Override
-        public void visit(TimeValue value) {
-            this.setBuffer(new StringBuilder());
-            getBuffer().append(value.getValue());
+        if (wordToFindSynonyms instanceof  DateValue dateValue){
+            return dateValue.getRawValue();
+        }else if(wordToFindSynonyms instanceof TimeValue timeValue){
+            return timeValue.getValue().toString();
+        }else if(wordToFindSynonyms instanceof TimestampValue timestampValue){
+            return timestampValue.getRawValue();
+        }else{
+            return wordToFindSynonyms.toString();
         }
+    }
 
-        @Override
-        public void visit(TimestampValue value) {
-            this.setBuffer(new StringBuilder());
-            getBuffer().append(value.getRawValue());
-        }
+    public static String useOrDefault(DateAndTimeFormatSynonymGenerator synonymGenerator, Expression str){
+        if (null != synonymGenerator) return synonymGenerator.generateRegExFor(str);
+        else return DateAndTimeFormatSynonymGenerator.expressionToString(str);
+    }
+
+    public static List<String> generateAsListOrDefault(DateAndTimeFormatSynonymGenerator synonymGenerator, Expression str){
+        if (null != synonymGenerator) return synonymGenerator.generateAsList(str);
+        return new LinkedList<>(List.of(DateAndTimeFormatSynonymGenerator.expressionToString(str)));
     }
 }
