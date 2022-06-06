@@ -9,7 +9,6 @@ import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 /**
@@ -52,7 +51,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         this.expressionDeParserForRegEx.setBuffer(this.buffer);
         this.selectDeParserForRegEx.setExpressionVisitor(expressionDeParserForRegEx);
         if (select.getWithItemsList() != null && !select.getWithItemsList().isEmpty()) {
-            this.buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "WITH"));
+            this.buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "WITH"));
             this.buffer.append(REQUIRED_WHITE_SPACE);
             this.buffer.append(this.selectDeParserForRegEx.handleWithItemValueList(select));
         }

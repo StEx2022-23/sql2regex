@@ -13,7 +13,6 @@ import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
@@ -136,7 +135,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     public void visit(NotExpression notExpr) {
         buffer.append("(?:");
         buffer.append(OPTIONAL_WHITE_SPACE)
-            .append(RegExGenerator.useStringSynonymGenerator(this.otherSynonyms, "NOT"))
+            .append(StringSynonymGenerator.useOrDefault(this.otherSynonyms, "NOT"))
             .append(OPTIONAL_WHITE_SPACE).append(")");
         notExpr.getExpression().accept(this);
         buffer.append(OPTIONAL_WHITE_SPACE);
@@ -437,18 +436,18 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
             StringBuilder tableNameWithAlias = new StringBuilder();
             if(this.getRelatedTableNameOrAlias(tableName.toString()) == null){
-                tableNameWithAlias.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, tableName.toString()));
+                tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName.toString()));
             } else {
                 tableNameWithAlias.append("(?:");
-                tableNameWithAlias.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, tableName.toString()));
+                tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName.toString()));
                 tableNameWithAlias.append("|");
-                tableNameWithAlias.append(RegExGenerator.useSpellingMistake(this.tableNameSpellingMistake, this.getRelatedTableNameOrAlias(tableName.toString())));
+                tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, this.getRelatedTableNameOrAlias(tableName.toString())));
                 tableNameWithAlias.append(")");
             }
             buffer.append(tableNameWithAlias).append('.');
         }
 
-        buffer.append(RegExGenerator.useSpellingMistake(this.columnNameSpellingMistake, tableColumn.getColumnName()));
+        buffer.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, tableColumn.getColumnName()));
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
@@ -550,7 +549,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 .append("\\{d").append(OPTIONAL_WHITE_SPACE).append("'").append(dateValue.getValue().toString())
                 .append("'").append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')
-                .append(RegExGenerator.useExpressionSynonymGenerator(this.dateSynonyms, dateValue))
+                .append(DateAndTimeFormatSynonymGenerator.useOrDefault(this.dateSynonyms, dateValue))
                 .append(")");
     }
 
@@ -560,7 +559,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 .append("\\{ts").append(OPTIONAL_WHITE_SPACE).append("'").append(timestampValue.getValue().toString())
                 .append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')
-                .append(RegExGenerator.useExpressionSynonymGenerator(this.timeStampSynonyms, timestampValue))
+                .append(DateAndTimeFormatSynonymGenerator.useOrDefault(this.timeStampSynonyms, timestampValue))
                 .append(")");
     }
 
@@ -570,7 +569,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 .append("\\{t").append(OPTIONAL_WHITE_SPACE).append("'").append(timeValue.getValue().toString())
                 .append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')
-                .append(RegExGenerator.useExpressionSynonymGenerator(this.timeSynonyms, timeValue))
+                .append(DateAndTimeFormatSynonymGenerator.useOrDefault(this.timeSynonyms, timeValue))
                 .append(")");
     }
 

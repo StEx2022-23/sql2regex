@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestUtils{
 
-    private static boolean checkAgainstRegEx(String regex, String toBeChecked) {
+    public static boolean checkAgainstRegEx(String regex, String toBeChecked) {
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(toBeChecked);
         return matcher.matches();

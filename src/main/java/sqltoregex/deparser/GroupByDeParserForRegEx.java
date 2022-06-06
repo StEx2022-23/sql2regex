@@ -6,7 +6,6 @@ import net.sf.jsqlparser.util.deparser.GroupByDeParser;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
-import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import java.util.ArrayList;
@@ -35,9 +34,9 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
     @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     public void deParse(GroupByElement groupBy) {
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "GROUP"));
+        buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "GROUP"));
         buffer.append(REQUIRED_WHITE_SPACE);
-        buffer.append(RegExGenerator.useSpellingMistake(this.keywordSpellingMistake, "BY"));
+        buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "BY"));
         buffer.append(REQUIRED_WHITE_SPACE);
 
         if (groupBy.isUsingBrackets()) {
@@ -47,7 +46,7 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
 
         List<Expression> expressions = groupBy.getGroupByExpressionList().getExpressions();
 
-        buffer.append(RegExGenerator.useOrderRotation(this.groupByOrderRotation, this.expressionListToStringList(expressions)));
+        buffer.append(OrderRotation.useOrDefault(this.groupByOrderRotation, this.expressionListToStringList(expressions)));
         if (groupBy.isUsingBrackets()) {
             buffer.append(OPTIONAL_WHITE_SPACE);
             buffer.append(")");

@@ -1,9 +1,12 @@
 package sqltoregex.settings.regexgenerator;
 
 import sqltoregex.settings.SettingsOption;
+import java.util.List;
 
 public interface IRegExGenerator<T> {
     String generateRegExFor(T input);
+
+    List<String> generateAsList(T input);
 
     SettingsOption getSettingsOption();
 

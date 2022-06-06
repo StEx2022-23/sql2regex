@@ -5,6 +5,7 @@ import sqltoregex.settings.SettingsOption;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -14,28 +15,17 @@ import java.util.List;
  * SELECT (?:table1\s*,\s*table2|table2\s*,\s*table1)
  */
 public class OrderRotation extends RegExGenerator<List<String>> {
-    private final StringBuilder buffer = new StringBuilder();
 
     public OrderRotation(SettingsOption settingsOption) {
         super(settingsOption);
     }
 
-    /**
-     * combine every possible table name order to a non-capturing regex group, optional with alternative writing styles
-     *
-     * @param valueList List<String>
-     * @return Regex (non-capturing group)
-     */
-    public String generateRegExFor(List<String> valueList) {
-        List<String> rekList = new ArrayList<>(valueList);
+    @Override
+    public List<String> generateAsList(List<String> valueList) {
         Assert.notNull(valueList, "Value list must not be null!");
-        buffer.replace(0, buffer.length(),"");
-        buffer.append(isNonCapturingGroup ? "(?:" : "(");
-        Integer amountOfElements = valueList.size();
-        orderRotationRek(amountOfElements, rekList);
-        buffer.replace(buffer.length() - 1, buffer.length(), "");
-        buffer.append(")");
-        return buffer.toString();
+        List<String> stringList = new ArrayList<>(valueList);
+        int amountOfElements = valueList.size();
+        return orderRotationRek(amountOfElements, stringList);
     }
 
     /**
@@ -44,8 +34,9 @@ public class OrderRotation extends RegExGenerator<List<String>> {
      * @param amount    Integer
      * @param valueList List<String>
      */
-    private void orderRotationRek(Integer amount, List<String> valueList) {
+    private List<String> orderRotationRek(int amount, List<String> valueList) {
         StringBuilder singleValue = new StringBuilder();
+        List<String> stringList = new LinkedList<>();
         if (amount == 1) {
             Iterator<String> iterator = valueList.iterator();
             while (iterator.hasNext()) {
@@ -54,10 +45,9 @@ public class OrderRotation extends RegExGenerator<List<String>> {
                     singleValue.append("\\s*,\\s*");
                 }
             }
-            singleValue.append("|");
-            buffer.append(singleValue);
+            stringList.add(singleValue.toString());
         } else {
-            orderRotationRek(amount - 1, valueList);
+            stringList.addAll(orderRotationRek(amount - 1, valueList));
             for (int i = 0; i < amount - 1; i++) {
                 if (amount % 2 == 0) {
                     String temp;
@@ -70,8 +60,19 @@ public class OrderRotation extends RegExGenerator<List<String>> {
                     valueList.set(amount - 1, valueList.get(0));
                     valueList.set(0, temp);
                 }
-                orderRotationRek(amount - 1, valueList);
+                stringList.addAll(orderRotationRek(amount - 1, valueList));
             }
         }
+        return stringList;
+    }
+
+    public static String useOrDefault(OrderRotation orderRotation, List<String> valueList){
+        if (null != orderRotation) return orderRotation.generateRegExFor(valueList);
+        return String.join(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE, valueList);
+    }
+
+    public static List<String> generateAsListOrDefault(OrderRotation orderRotation, List<String> valueList){
+        if (null != orderRotation) return orderRotation.generateAsList(valueList);
+        return valueList;
     }
 }

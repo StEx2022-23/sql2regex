@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import sqltoregex.settings.SettingsOption;
 
 import java.text.SimpleDateFormat;
+import java.util.LinkedList;
+import java.util.List;
 
 class DateAndTimeFormatSynonymGeneratorTest {
 
@@ -65,5 +67,39 @@ class DateAndTimeFormatSynonymGeneratorTest {
                                 dateAndTimeSynonymManager.generateRegExFor(new DateValue("'2012-5-6'")));
         Assertions.assertEquals("(?:2012-05-06)",
                                 dateAndTimeSynonymManager.generateRegExFor(new DateValue("'2012-05-06'")));
+    }
+
+    @Test
+    void testGenerateAsList(){
+        final DateValue dateValue = new DateValue("'2022-06-30'");
+        Assertions.assertEquals(new LinkedList<>(List.of("2022-06-30")), DateAndTimeFormatSynonymGenerator.generateAsListOrDefault(null, dateValue));
+
+        DateAndTimeFormatSynonymGenerator generator = new DateAndTimeFormatSynonymGenerator(SettingsOption.DEFAULT);
+        generator.addSynonym(new SimpleDateFormat("yyyy-MM-dd"));
+        generator.addSynonym(new SimpleDateFormat("yyyy-M-d"));
+
+        List<String> synonyms = List.of("2022-06-30",
+                                        "2022-6-30");
+
+        List<String> generatedSynonyms = DateAndTimeFormatSynonymGenerator.generateAsListOrDefault(generator, dateValue);
+        Assertions.assertEquals(synonyms.size(), generatedSynonyms.size());
+        for (String synonym : generatedSynonyms){
+            Assertions.assertTrue(synonyms.contains(synonym));
+        }
+    }
+
+    @Test
+    void testUseOrDefault() {
+        DateAndTimeFormatSynonymGenerator expressionSynonymGenerator = new DateAndTimeFormatSynonymGenerator(
+                SettingsOption.DEFAULT);
+        expressionSynonymGenerator.addSynonym(new SimpleDateFormat("yyyy-MM-dd"));
+        expressionSynonymGenerator.addSynonym(new SimpleDateFormat("yyyy-M-d"));
+        String regex = DateAndTimeFormatSynonymGenerator.useOrDefault(expressionSynonymGenerator,
+                                                                      new DateValue("'2022-05-03'"));
+        Assertions.assertTrue(regex.contains("2022-05-03"));
+        Assertions.assertTrue(regex.contains("2022-5-3"));
+
+        regex = DateAndTimeFormatSynonymGenerator.useOrDefault(null, new DateValue("'2022-05-03'"));
+        Assertions.assertEquals("2022-05-03", regex);
     }
 }

@@ -7,9 +7,7 @@ import org.jgrapht.traverse.DepthFirstIterator;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Common Interface for all synonym managers. Provides functionality for adding, removing synonyms of a generic Type T.
@@ -35,6 +33,26 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     protected boolean graphForSynonymsOfTwoWords = false;
     private String prefix = "";
     private String suffix = "";
+
+    @Override
+    public List<String> generateAsList(S wordToFindSynonyms) {
+        List<String> stringList = new LinkedList<>();
+        try {
+            A vertexToSearch = this.prepareSynonymForSearch(wordToFindSynonyms);
+            A start = this.synonymsGraph.vertexSet().stream()
+                    .filter(syn -> syn.equals(vertexToSearch)).findAny().get();
+
+            Iterator<A> iterator = new DepthFirstIterator<>(synonymsGraph, start);
+            while (iterator.hasNext()) {
+                stringList.add(this.prefix + this.prepareVertexForRegEx(iterator.next(), wordToFindSynonyms) + this.suffix);
+
+            }
+            return stringList;
+        } catch (NoSuchElementException e) {
+            stringList.add(searchSynonymToString(wordToFindSynonyms));
+            return stringList;
+        }
+    }
 
     protected SynonymGenerator(SettingsOption settingsOption) {
         super(settingsOption);
@@ -121,36 +139,6 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
                 && this.suffix.equals(that.suffix)
                 && this.getSettingsOption() == that.getSettingsOption()
                 && this.isNonCapturingGroup == that.isNonCapturingGroup;
-    }
-
-    /**
-     * Generates a regular expression part String with the pre-/ and suffixes set <b>including</b> the param.
-     *
-     * @param wordToFindSynonyms
-     * @return
-     */
-    public String generateRegExFor(S wordToFindSynonyms) {
-        try {
-            A vertexToSearch = this.prepareSynonymForSearch(wordToFindSynonyms);
-            A start = this.synonymsGraph.vertexSet().stream()
-                    .filter(syn -> syn.equals(vertexToSearch)).findAny().get();
-
-            Iterator<A> iterator = new DepthFirstIterator<>(synonymsGraph, start);
-            StringBuilder strRegEx = new StringBuilder();
-            strRegEx.append(isNonCapturingGroup ? "(?:" : '(');
-            while (iterator.hasNext()) {
-                strRegEx.append(prefix);
-                strRegEx.append(prepareVertexForRegEx(iterator.next(), wordToFindSynonyms));
-                strRegEx.append(suffix);
-                if (iterator.hasNext()) {
-                    strRegEx.append('|');
-                }
-            }
-            strRegEx.append(')');
-            return strRegEx.toString();
-        } catch (NoSuchElementException e) {
-            return (isNonCapturingGroup ? "(?:" : "(") + searchSynonymToString(wordToFindSynonyms) + ')';
-        }
     }
 
     public Graph<A, DefaultWeightedEdge> getGraph() {
