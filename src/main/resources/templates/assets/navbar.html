@@ -8,14 +8,14 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav me-auto" id="navbarlinks">
-                <a th:class="${activeConverter}? 'nav-item nav-link fw-bolder active' : 'nav-item nav-link fw-bolder'" href="/">converter</a>
-                <a th:class="${activeVisualization}? 'nav-item nav-link fw-bolder active' : 'nav-item nav-link fw-bolder'" href="visualization">visualization</a>
-                <a th:class="${activeExamples}? 'nav-item nav-link fw-bolder active' : 'nav-item nav-link fw-bolder'" href="examples">examples</a>
-                <a th:class="${activeAbout}? 'nav-item nav-link fw-bolder active' : 'nav-item nav-link fw-bolder'" href="about">about</a>
+                <a th:class="${activeConverter}? 'nav-item nav-link fw-bolder active' : 'nav-item nav-link fw-bolder'" href="/" th:text="#{nav.converter}">converter</a>
+                <a th:class="${activeVisualization}? 'nav-item nav-link fw-bolder active' : 'nav-item nav-link fw-bolder'" href="visualization" th:text="#{nav.visualization}">visualization</a>
+                <a th:class="${activeExamples}? 'nav-item nav-link fw-bolder active' : 'nav-item nav-link fw-bolder'" href="examples" th:text="#{nav.examples}">examples</a>
+                <a th:class="${activeAbout}? 'nav-item nav-link fw-bolder active' : 'nav-item nav-link fw-bolder'" href="about" th:text="#{nav.about}">about</a>
             </div>
             <div class="navbar-nav">
-                <button type="button" onclick="location.href='https://github.com/StEx2022-23/sql2regex';" class="btn btn-info m-1">Sourcecode @GitHub</button>
-                <button type="button" onclick="location.href='https://tu-dresden.de/ing/informatik/smt/ddi';" class="btn btn-tert m-1">Didaktik der Informatik @TUD</button>
+                <a th:href="#{gitHubLink}" class="btn btn-info m-1" th:text="#{nav.sourceCode}">Sourcecode @GitHub</a>
+                <a href="https://tu-dresden.de/ing/informatik/smt/ddi" class="btn btn-tert m-1" th:text="#{nav.didactics}">Didaktik der Informatik @TUD</a>
                 <button type="button" onclick="languageChange()" class="btn btn-secondary m-1">
                     <svg width="24" height="24" viewBox="0 0 4.2333 4.2333" xmlns="http://www.w3.org/2000/svg">
                         <path d="m2.1251 0.21686a1.8979 1.9655 89.999 0 0-1.9654 1.8981 1.8979 1.9655 89.999 0 0 1.9658 1.8977 1.8979 1.9655 89.999 0 0 1.9654-1.8981 1.8979 1.9655 89.999 0 0-1.9658-1.8977zm3.67e-5 0.31562a1.5825 1.5672 89.974 0 1 1.5676 1.5821 1.5825 1.5672 89.974 0 1-1.5672 1.5829 1.5825 1.5672 89.974 0 1-1.5671-1.5826 1.5825 1.5672 89.974 0 1 1.5667-1.5825z" fill="#808080" stroke-width="1.2256"/>

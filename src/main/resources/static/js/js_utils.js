@@ -298,32 +298,12 @@ class SqlRegExHistory {
 function toggleSlaveCheckboxes(master, slaveName){
     const slaveArray = document.getElementsByName(slaveName);
 
-    console.log(slaveArray);
-
     slaveArray.forEach((el) => {
-        console.log(el);
-        document.getElementById(el.id).checked = master.checked
+        document.getElementById(el.id).checked = master.checked;
+        updateSingleUserSetting(el);
     })
 }
 
-document.addEventListener('submit',  (e) => {
-    const form = e.target;
-    fetch(form.action, {
-        method: form.method,
-        body: new FormData(form),
-    })
-        .then((res) => res.text())
-        .then((text) => new DOMParser().parseFromString(text, 'text/html'))
-        .then((doc) => {
-            const result = document.createElement('div');
-            result.innerHTML = doc.body.innerHTML;
-            result.tabIndex = -1;
-            form.parentNode.parentNode.replaceChild(result, form.parentNode);
-            result.focus();
-        })
-        .then( () => SqlRegExHis.checkUpdatedConverting());
-    e.preventDefault();
-})
 
 function languageChange(){
     let langOption = window.location.href.split("?")[1];
@@ -350,6 +330,78 @@ function loadDefaultLanguageSettings(){
     }
 }
 
+function loadUserFormSettings(formElement){
+    let allCheckboxes = formElement.querySelectorAll('input[type="checkbox"]');
+    if(localStorage.getItem("savedUserSettings") === null){
+        let settingsDict = {}
+        allCheckboxes.forEach(checkbox => {
+            settingsDict[checkbox.id] = true;
+            document.getElementById(checkbox.id).checked = true;
+        })
+        localStorage.setItem("savedUserSettings", JSON.stringify(settingsDict));
+    } else {
+        let savings = JSON.parse(localStorage.getItem("savedUserSettings"));
+        allCheckboxes.forEach(checkbox => {
+            checkbox.checked = savings[checkbox.id];
+            if (checkbox.id.includes("master")){
+                setCheckboxState(checkbox, slaveSelectionState(savings, checkbox.id.split("_")[0]))
+            }
+        })
+    }
+}
+
+function updateSingleUserSetting(inputElement){
+    let settingsDict = {}
+    if(localStorage.getItem("savedUserSettings") !== null){
+        settingsDict = JSON.parse(localStorage.getItem("savedUserSettings"));
+    }
+
+    if(settingsDict[inputElement.id] !== undefined){
+        if(settingsDict[inputElement.id] !== inputElement.checked){
+            settingsDict[inputElement.id] = inputElement.checked;
+        }
+    } else {
+        settingsDict[inputElement.id] = inputElement.checked;
+    }
+
+    const settingsOption = inputElement.id.split("_")[0]
+    setCheckboxState(document.getElementById(settingsOption + "_master"), slaveSelectionState(settingsDict, settingsOption))
+
+    localStorage.setItem("savedUserSettings", JSON.stringify(settingsDict));
+}
+
+function setCheckboxState(checkbox, state){
+    if (state === 0){
+        checkbox.checked = false
+        checkbox.indeterminate = false
+    }else if (state === 1){
+        checkbox.indeterminate = true
+    }else if (state === 2){
+        checkbox.checked = true
+        checkbox.indeterminate = false
+    }
+}
+
+function slaveSelectionState(checkboxDict, groupName){
+    const elOfNameOfEvent = Object.entries(checkboxDict).filter(([k,_v]) => k.includes(groupName) && !k.includes("master"))
+    const elListOfActivated = elOfNameOfEvent.filter(([k,v]) => v === true && !k.includes("master"))
+    if (elOfNameOfEvent.length === elListOfActivated.length){
+        //all elements are activated
+        return 2
+    }else if (elListOfActivated.length === 0){
+        //only the master checkbox is activated
+        return 0
+        //some slave checkboxes are activated, but not all
+    }else{
+        return 1
+    }
+}
+
+function resetUserSettings(formElement){
+    localStorage.removeItem("savedUserSettings");
+    loadUserFormSettings(formElement);
+}
+
 document.onreadystatechange = function () {
     if (document.readyState === "interactive") {
         loadDefaultLanguageSettings();
@@ -358,7 +410,26 @@ document.onreadystatechange = function () {
 
         if(actualPath === ""){
             let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
+            document.addEventListener('submit',  (e) => {
+                const form = e.target;
+                fetch(form.action, {
+                    method: form.method,
+                    body: new FormData(form),
+                })
+                    .then((res) => res.text())
+                    .then((text) => new DOMParser().parseFromString(text, 'text/html'))
+                    .then((doc) => {
+                        const result = document.createElement('div');
+                        result.innerHTML = doc.body.innerHTML;
+                        result.tabIndex = -1;
+                        form.parentNode.parentNode.replaceChild(result, form.parentNode);
+                        result.focus();
+                    })
+                    .then( () => SqlRegExHis.checkUpdatedConverting());
+                e.preventDefault();
+            })
             SqlRegExHis.checkUpdatedConverting();
+            loadUserFormSettings(document.getElementById("converterForm"));
         } else if(actualPath === "visualization"){
             insertVisualizationPage()
         }
