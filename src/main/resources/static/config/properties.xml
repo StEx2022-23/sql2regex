@@ -34,6 +34,10 @@
           <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
           <value>true</value>
       </indexcolumnnameorder>
+      <insertintovaluesorder>
+          <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
+          <value>true</value>
+      </insertintovaluesorder>
   </order>
   <synonyms>
       <datesynonyms>

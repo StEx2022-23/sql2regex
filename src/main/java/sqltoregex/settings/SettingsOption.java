@@ -17,6 +17,7 @@ public enum SettingsOption {
     AGGREGATEFUNCTIONLANG,
     DATATYPESYNONYMS,
     GROUPBYELEMENTORDER,
+    INSERTINTOVALUESORDER,
     OTHERSYNONYMS,
     DEFAULT
     // when extending this class keep the naming of the enums and the xml tags the same

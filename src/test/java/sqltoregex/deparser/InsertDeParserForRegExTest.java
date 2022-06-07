@@ -64,10 +64,13 @@ class InsertDeParserForRegExTest{
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')"
         ));
-        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
+        matchingMap.put(SettingsOption.INSERTINTOVALUESORDER, List.of(
                 "INSERT INTO table (col1, col2) VALUES ('11', '22'), ('1', '2')",
-                "INSERT INTO table (col2, col1) VALUE ('22', '11'), ('2', '1')",
-                "INSERT INTO table (col2, col1) VALUES (22, 11), (2, 1)"
+                "INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')"
+        ));
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
+                "INSERT INTO table (col2, col1) VALUES ('2', '1'), ('22', '11')",
+                "INSERT INTO table (col1, col2) VALUES ('1', '2'), ('11', '22')"
         ));
 
         TestUtils.validateStatementAgainstRegEx(
@@ -76,6 +79,13 @@ class InsertDeParserForRegExTest{
                 matchingMap,
                 true
         );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(SettingsOption.INSERTINTOVALUESORDER).build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(),
                 sampleSolution,
