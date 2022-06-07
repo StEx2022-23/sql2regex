@@ -66,6 +66,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity"})
     public void deparseJoin(Join join) {
+        this.expressionDeParserForRegEx.addTableNameAlias(join.getRightItem().toString());
         if (join.isSimple() && join.isOuter()) {
             buffer.append(",");
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "OUTER", true);
@@ -397,10 +398,18 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         if (plainSelect.getFromItem() != null && plainSelect.getJoins() != null) {
             List<String> simpleJoinElements = new ArrayList<>();
-            simpleJoinElements.add(plainSelect.getFromItem().toString());
+            StringBuilder fromItemWithAlias = new StringBuilder();
+            this.expressionDeParserForRegEx.addTableNameAlias(plainSelect.getFromItem().toString());
+            fromItemWithAlias.append(plainSelect.getFromItem().toString().split(" ")[0]);
+            fromItemWithAlias.append("(").append("(?:ALIAS|AS)"+REQUIRED_WHITE_SPACE).append(")?");
+            fromItemWithAlias.append(REQUIRED_WHITE_SPACE + plainSelect.getFromItem().toString().split(" ")[1]);
+            simpleJoinElements.add(fromItemWithAlias.toString());
 
             for (Join join : plainSelect.getJoins()) {
-                if (join.isSimple()) simpleJoinElements.add(join.toString());
+                if (join.isSimple()){
+                    this.expressionDeParserForRegEx.addTableNameAlias(join.toString());
+                    simpleJoinElements.add(join.toString());
+                }
             }
 
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "FROM", true);
@@ -447,6 +456,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         if (plainSelect.getHaving() != null) {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "HAVING", true);
+
             plainSelect.getHaving().accept(expressionDeParserForRegEx);
         }
 
