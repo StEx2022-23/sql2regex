@@ -445,6 +445,32 @@ class ExpressionDeParserForRegExTest {
                 TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false)
         );
     }
+    /**
+     * https://github.com/StEx2022-23/sql2regex/issues/76
+     */
+    @Test
+    void booleanFieldSynonym(){
+        final String sampleSolution = "col1 = true";
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "col1 = true",
+                "col1"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true)
+        );
+
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "col1"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, "col1 = false", notMatchingMap, false)
+        );
+    }
 
     @Test
     void testFullConstructor() {

@@ -104,6 +104,10 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                                 (equalsTo.getOldOracleJoinSyntax() + equalsTo.getOldOracleJoinSyntax()) % 3)
                         .withOraclePriorPosition(equalsTo.getOraclePriorPosition())
                 , OPTIONAL_WHITE_SPACE + "=" + OPTIONAL_WHITE_SPACE);
+        if (equalsTo.getRightExpression().toString().equalsIgnoreCase("true")){
+            buffer.append('|');
+            equalsTo.getLeftExpression().accept(this);
+        }
         buffer.append(")");
     }
 
