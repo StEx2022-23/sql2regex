@@ -60,8 +60,8 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         this.dateSynonyms = settings.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.DATESYNONYMS);
         this.timeSynonyms = settings.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.TIMESYNONYMS);
         this.timeStampSynonyms = settings.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.DATETIMESYNONYMS);
-        this.otherSynonyms = this.settings.get(StringSynonymGenerator.class).get(SettingsOption.OTHERSYNONYMS);
-        this.aggregateFunctionLang = this.settings.get(StringSynonymGenerator.class).get(SettingsOption.AGGREGATEFUNCTIONLANG);
+        this.aggregateFunctionLang = settings.get(StringSynonymGenerator.class).get(SettingsOption.AGGREGATEFUNCTIONLANG);
+        this.otherSynonyms = settings.get(StringSynonymGenerator.class).get(SettingsOption.OTHERSYNONYMS);
         this.tableNameAliasMap = new HashMap<>();
     }
 
@@ -73,9 +73,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     @Override
     public void visit(AndExpression andExpression) {
         visitCommutativeBinaryExpression(andExpression,
-                                         andExpression.isUseOperator() ?
-                                                 OPTIONAL_WHITE_SPACE + "&&" + OPTIONAL_WHITE_SPACE :
-                                                 OPTIONAL_WHITE_SPACE + "AND" + OPTIONAL_WHITE_SPACE);
+                                         OPTIONAL_WHITE_SPACE + StringSynonymGenerator.useOrDefault(this.otherSynonyms, "AND") + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
@@ -141,8 +139,8 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     public void visit(NotExpression notExpr) {
         buffer.append("(?:");
         buffer.append(OPTIONAL_WHITE_SPACE)
-            .append(StringSynonymGenerator.useOrDefault(this.otherSynonyms, "NOT"))
-            .append(OPTIONAL_WHITE_SPACE).append(")");
+                .append(StringSynonymGenerator.useOrDefault(this.otherSynonyms, "NOT"))
+                .append(OPTIONAL_WHITE_SPACE).append(")");
         notExpr.getExpression().accept(this);
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
