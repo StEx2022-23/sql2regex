@@ -202,6 +202,9 @@ class SelectDeParserForRegExTest{
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
+                "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t2.key = t1.key",
+                "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON table2.key = table1.key",
+                "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON table2.key = t1.key",
                 "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t2.key = t1.key"
         ));
         matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
@@ -488,6 +491,36 @@ class SelectDeParserForRegExTest{
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
                 "SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5",
+                matchingMap,
+                true
+        );
+    }
+
+    @Test
+    void testHavingWithAlias()  {
+        StringSynonymGenerator stringSynonymGenerator = new StringSynonymGenerator(SettingsOption.AGGREGATEFUNCTIONLANG);
+        stringSynonymGenerator.addSynonymFor("SUM", "SUMME");
+
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5 HAVING SUM(t1.id) > 5 && AVG(costs) > 5",
+                "SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5 HAVING AVG(costs) > 5 && SUM(t1.id) > 5"
+        ));
+        matchingMap.put(SettingsOption.AGGREGATEFUNCTIONLANG, List.of(
+                "SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5 HAVING SUMME(tab1.id) > 5 && AVG(costs) > 5",
+                "SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5 HAVING AVG(costs) > 5 && SUMME(tab1.id) > 5"
+        ));
+
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5 HAVING SUM(t1.id) > 5 && AVG(costs) > 5",
+                matchingMap,
+                true
+        );
+
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().with(stringSynonymGenerator).build(),
+                "SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5 HAVING SUM(t1.id) < 5 && AVG(costs) < 5",
                 matchingMap,
                 true
         );
