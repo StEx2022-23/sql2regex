@@ -149,6 +149,9 @@ public class SqlToRegexController {
         settingsManager.getSettingBySettingsOption(SettingsOption.GROUPBYELEMENTORDER, OrderRotation.class,
                         settingsType)
                 .ifPresent(expressionOrder -> orders.add(expressionOrder.getSettingsOption()));
+        settingsManager.getSettingBySettingsOption(SettingsOption.INSERTINTOVALUESORDER, OrderRotation.class,
+                        settingsType)
+                .ifPresent(expressionOrder -> orders.add(expressionOrder.getSettingsOption()));
         return orders;
     }
 

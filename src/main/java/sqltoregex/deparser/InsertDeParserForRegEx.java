@@ -26,6 +26,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     private final SpellingMistake columnNameSpellingMistake;
     private final OrderRotation columnNameOrder;
     private final OrderRotation tableNameOrder;
+    private final OrderRotation insertIntoValuesOrder;
     List<String> quotationMarkList = Arrays.asList("'", "`", "\"");
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
@@ -46,6 +47,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         this.tableNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
         this.tableNameOrder = settings.get(OrderRotation.class).get(SettingsOption.TABLENAMEORDER);
         this.columnNameOrder = settings.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
+        this.insertIntoValuesOrder = settings.get(OrderRotation.class).get(SettingsOption.INSERTINTOVALUESORDER);
     }
 
     @Override
@@ -135,7 +137,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                     valueListInRightOrder.add(temp.toString());
                 }
 
-                buffer.append(OrderRotation.useOrDefault(this.columnNameOrder, valueListInRightOrder));
+                buffer.append(OrderRotation.useOrDefault(this.insertIntoValuesOrder, valueListInRightOrder));
                 buffer.append(columnsOrderOptionsIterator.hasNext() ? "|" : "");
             }
             buffer.append(")");
