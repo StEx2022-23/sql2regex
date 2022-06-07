@@ -22,11 +22,11 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
     /**
      * Generates a regular expression part String with the pre-/ and suffixes set <b>including</b> the param.
      *
-     * @param wordToFindSynonyms
+     * @param value
      * @return
      */
-    public String generateRegExFor(T wordToFindSynonyms) {
-        return this.joinListToRegEx(this.generateAsList(wordToFindSynonyms));
+    public String generateRegExFor(T value) {
+        return this.joinListToRegEx(this.generateAsList(value));
     }
 
     public String joinListToRegEx(List<String> elList){
