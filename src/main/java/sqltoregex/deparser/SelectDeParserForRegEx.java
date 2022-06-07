@@ -66,6 +66,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity"})
     public void deparseJoin(Join join) {
+        this.expressionDeParserForRegEx.addTableNameAlias(join.getRightItem().toString());
         if (join.isSimple() && join.isOuter()) {
             buffer.append(",");
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "OUTER", true);
@@ -397,21 +398,36 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         if (plainSelect.getFromItem() != null && plainSelect.getJoins() != null) {
             List<String> simpleJoinElements = new ArrayList<>();
-            simpleJoinElements.add(plainSelect.getFromItem().toString());
+            StringBuilder fromItemWithAlias = new StringBuilder();
+            this.expressionDeParserForRegEx.addTableNameAlias(plainSelect.getFromItem().toString());
+            if(plainSelect.getFromItem().toString().split(" ").length >= 2){
+                fromItemWithAlias.append(plainSelect.getFromItem().toString().split(" ")[0]);
+                fromItemWithAlias.append("(").append("(?:ALIAS|AS)"+REQUIRED_WHITE_SPACE).append(")?");
+                String[] getFromItem = plainSelect.getFromItem().toString().split(" ");
+                if(getFromItem.length > 1) fromItemWithAlias.append(REQUIRED_WHITE_SPACE + getFromItem[getFromItem.length - 1]);
+
+            } else {
+                fromItemWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, plainSelect.getFromItem().toString()));
+            }
+            simpleJoinElements.add(fromItemWithAlias.toString());
+
 
             for (Join join : plainSelect.getJoins()) {
-                if (join.isSimple()) simpleJoinElements.add(join.toString());
+                if (join.isSimple()){
+                    this.expressionDeParserForRegEx.addTableNameAlias(join.toString());
+                    simpleJoinElements.add(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, join.toString()));
+                }
             }
 
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "FROM", true);
 
             if (simpleJoinElements.size() == 1) {
-                buffer.append(OrderRotation.useOrDefault(this.tableNameOrder, simpleJoinElements.stream().map(join -> SpellingMistake.useOrDefault(this.tableNameSpellingMistake, join)).toList()));
+                buffer.append(OrderRotation.useOrDefault(this.tableNameOrder, simpleJoinElements));
                 for (Join join : plainSelect.getJoins()) {
                     deparseJoin(join);
                 }
             } else {
-                buffer.append(OrderRotation.useOrDefault(this.tableNameOrder, simpleJoinElements.stream().map(join -> SpellingMistake.useOrDefault(this.tableNameSpellingMistake, join)).toList()));
+                buffer.append(OrderRotation.useOrDefault(this.tableNameOrder, simpleJoinElements));
             }
         } else if (plainSelect.getFromItem() != null) {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "FROM", true);
@@ -447,6 +463,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         if (plainSelect.getHaving() != null) {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "HAVING", true);
+
             plainSelect.getHaving().accept(expressionDeParserForRegEx);
         }
 

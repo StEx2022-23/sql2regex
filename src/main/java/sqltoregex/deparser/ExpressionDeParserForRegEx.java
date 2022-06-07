@@ -36,6 +36,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     private final DateAndTimeFormatSynonymGenerator timeStampSynonyms;
     private final DateAndTimeFormatSynonymGenerator timeSynonyms;
     private final StringSynonymGenerator otherSynonyms;
+    private final StringSynonymGenerator aggregateFunctionLang;
     private final OrderByDeParserForRegEx orderByDeParser;
     Map<String, String> tableNameAliasMap;
     private final SettingsContainer settings;
@@ -60,6 +61,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         this.timeSynonyms = settings.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.TIMESYNONYMS);
         this.timeStampSynonyms = settings.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.DATETIMESYNONYMS);
         this.otherSynonyms = this.settings.get(StringSynonymGenerator.class).get(SettingsOption.OTHERSYNONYMS);
+        this.aggregateFunctionLang = this.settings.get(StringSynonymGenerator.class).get(SettingsOption.AGGREGATEFUNCTIONLANG);
         this.tableNameAliasMap = new HashMap<>();
     }
 
@@ -480,12 +482,12 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             buffer.append("\\{fn ");
         }
 
-        buffer.append(function.getName());
+        buffer.append(StringSynonymGenerator.useOrDefault(this.aggregateFunctionLang, function.getName()));
+        buffer.append(OPTIONAL_WHITE_SPACE);
         if (function.getParameters() == null && function.getNamedParameters() == null) {
-            buffer.append("()");
+            buffer.append("\\(\\)");
         } else {
-            buffer.append("(").append(OPTIONAL_WHITE_SPACE);
-            buffer.append(OPTIONAL_WHITE_SPACE);
+            buffer.append("\\(").append(OPTIONAL_WHITE_SPACE);
             if (function.isDistinct()) {
                 buffer.append("DISTINCT").append(REQUIRED_WHITE_SPACE);
             } else if (function.isAllColumns()) {
@@ -497,7 +499,30 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 visit(function.getNamedParameters());
             }
             if (function.getParameters() != null) {
-                visit(function.getParameters());
+                Iterator<Expression> expressionIterator = function.getParameters().getExpressions().iterator();
+                while(expressionIterator.hasNext()){
+                    String singleExpression = expressionIterator.next().toString();
+                    StringBuilder tableNameWithAlias = new StringBuilder();
+                    if(singleExpression.contains(".")){
+                        String tableName = singleExpression.split("\\.")[0];
+                        if(this.getRelatedTableNameOrAlias(tableName) == null){
+                            tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName));
+                        } else {
+                            tableNameWithAlias.append("(?:");
+                            tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName));
+                            tableNameWithAlias.append("|");
+                            tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, this.getRelatedTableNameOrAlias(tableName)));
+                            tableNameWithAlias.append(")");
+                        }
+                        tableNameWithAlias.append(".");
+                    }
+                    String[] columnName = singleExpression.split("\\.");
+                    buffer.append(tableNameWithAlias).append(columnName[columnName.length - 1]);
+
+                    if(expressionIterator.hasNext()){
+                        buffer.append(OPTIONAL_WHITE_SPACE).append(",").append(OPTIONAL_WHITE_SPACE);
+                    }
+                }
             }
             if (function.getOrderByElements() != null) {
                 buffer.append(REQUIRED_WHITE_SPACE).append("ORDER").append(REQUIRED_WHITE_SPACE).append("BY").append(REQUIRED_WHITE_SPACE);
@@ -513,7 +538,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                     orderByDeParser.deParseElement(orderByElement);
                 }
             }
-            buffer.append(OPTIONAL_WHITE_SPACE).append(")");
+            buffer.append(OPTIONAL_WHITE_SPACE).append("\\)");
         }
 
         if (function.getAttribute() != null) {
