@@ -50,7 +50,7 @@ class EquivalentStatementTest extends UserSettingsPreparer {
             ParserConfigurationException, SAXException {
         this.parseTextFile(SupportedStatementType.SELECT);
         for (String key : this.equivalentStatements.keySet()) {
-            Pattern pattern = Pattern.compile(this.converterManagement.deparse(key, false, false));
+            Pattern pattern = Pattern.compile(this.converterManagement.deparse(key, false, false, SettingsType.ALL));
             for (String toValidateStatements : this.equivalentStatements.get(key)) {
                 Matcher matcher = pattern.matcher(toValidateStatements);
                 Assertions.assertTrue(matcher.matches());

@@ -157,12 +157,30 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(GreaterThan greaterThan) {
+        buffer.append("(?:");
         visitOldOracleJoinBinaryExpression(greaterThan, OPTIONAL_WHITE_SPACE + ">" + OPTIONAL_WHITE_SPACE);
+        buffer.append('|');
+        visitOldOracleJoinBinaryExpression(new MinorThan()
+                                                   .withLeftExpression(greaterThan.getRightExpression())
+                                                   .withRightExpression(greaterThan.getLeftExpression())
+                                                   .withOldOracleJoinSyntax(greaterThan.getOldOracleJoinSyntax())
+                                                   .withOraclePriorPosition(greaterThan.getOraclePriorPosition())
+                , OPTIONAL_WHITE_SPACE + "<" + OPTIONAL_WHITE_SPACE);
+        buffer.append(")");
     }
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
+        buffer.append("(?:");
         visitOldOracleJoinBinaryExpression(greaterThanEquals, OPTIONAL_WHITE_SPACE + ">=" + OPTIONAL_WHITE_SPACE);
+        buffer.append('|');
+        visitOldOracleJoinBinaryExpression(new GreaterThanEquals()
+                                                   .withLeftExpression(greaterThanEquals.getRightExpression())
+                                                   .withRightExpression(greaterThanEquals.getLeftExpression())
+                                                   .withOldOracleJoinSyntax(greaterThanEquals.getOldOracleJoinSyntax())
+                                                   .withOraclePriorPosition(greaterThanEquals.getOraclePriorPosition())
+                , OPTIONAL_WHITE_SPACE + "<=" + OPTIONAL_WHITE_SPACE);
+        buffer.append(")");
     }
 
     @Override
