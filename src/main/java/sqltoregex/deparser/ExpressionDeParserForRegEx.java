@@ -73,7 +73,10 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     @Override
     public void visit(AndExpression andExpression) {
         visitCommutativeBinaryExpression(andExpression,
-                                         OPTIONAL_WHITE_SPACE + StringSynonymGenerator.useOrDefault(this.otherSynonyms, "AND") + OPTIONAL_WHITE_SPACE);
+                                         OPTIONAL_WHITE_SPACE
+                                                 + StringSynonymGenerator.useOrDefault(this.otherSynonyms,
+                                                               andExpression.isUseOperator() ? "&&" : "AND")
+                                                 + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
