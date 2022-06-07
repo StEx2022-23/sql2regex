@@ -161,7 +161,6 @@ class SqlRegExHistory {
 
     checkUpdatedConverting() {
         if(null !== document.getElementById("convertbodycontainer")) {
-            document.getElementById("convertbodycontainer").style.display = "none";
             let sqlinput = document.getElementById("sqlinput").value;
             let regexinput = document.getElementById("regexoutput").value;
             if (!this.sql.includes(sqlinput) && sqlinput.length !== 0) this.addToLocalStorage(sqlinput, regexinput);
@@ -170,7 +169,6 @@ class SqlRegExHistory {
     }
 
     showConvertingHistory() {
-        document.getElementById("convertbodycontainer").style.display = "block";
         document.getElementById("jsonFeedbackHistory").style.display = "none";
         document.getElementById("jsonFeedbackHistoryFailed").style.display = "none";
         document.getElementById("clearLocalStorage").style.display = "none";
@@ -249,6 +247,9 @@ class SqlRegExHistory {
             }
         }
         body.appendChild(outerDiv);
+        if (!document.getElementById("convertbodycontainer").classList.contains("show")){
+            new bootstrap.Collapse(document.getElementById("convertbodycontainer"))
+        }
     }
 
     clearLocalStorage(clearStorageFeedbackId) {
@@ -260,8 +261,7 @@ class SqlRegExHistory {
             console.log(e);
             document.getElementById(clearStorageFeedbackId).style.display = "block";
         }
-        document.getElementById("convertbodycontainer").style.display = "none";
-
+        new bootstrap.Collapse(document.getElementById("convertbodycontainer"))
     }
 
     downloadJsonOfHistory(JsonHistoryFeedbackId) {
@@ -402,6 +402,8 @@ function resetUserSettings(formElement){
     loadUserFormSettings(formElement);
 }
 
+let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
+
 document.onreadystatechange = function () {
     if (document.readyState === "interactive") {
         loadDefaultLanguageSettings();
@@ -409,9 +411,9 @@ document.onreadystatechange = function () {
         let actualPath = currentDomain[currentDomain.length - 1].split("?")[0];
 
         if(actualPath === ""){
-            let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
             document.addEventListener('submit',  (e) => {
                 const form = e.target;
+                form.parentNode.parentNode.style.minHeight = form.clientHeight
                 fetch(form.action, {
                     method: form.method,
                     body: new FormData(form),
@@ -421,12 +423,12 @@ document.onreadystatechange = function () {
                     .then((doc) => {
                         const result = document.createElement('div');
                         result.innerHTML = doc.body.innerHTML;
-                        result.tabIndex = -1;
                         form.parentNode.parentNode.replaceChild(result, form.parentNode);
                         result.focus();
                     })
                     .then( () => SqlRegExHis.checkUpdatedConverting());
                 e.preventDefault();
+                form.parentNode.parentNode.style.removeProperty("minHeight");
             })
             SqlRegExHis.checkUpdatedConverting();
             loadUserFormSettings(document.getElementById("converterForm"));

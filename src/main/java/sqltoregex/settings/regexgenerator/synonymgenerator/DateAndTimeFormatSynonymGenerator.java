@@ -25,11 +25,11 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
     }
 
     @Override
-    public String generateRegExFor(Expression wordToFindSynonyms) {
-        if (!(wordToFindSynonyms instanceof DateValue) && !(wordToFindSynonyms instanceof TimeValue) && !(wordToFindSynonyms instanceof TimestampValue)) {
+    public String generateRegExFor(Expression value) {
+        if (!(value instanceof DateValue) && !(value instanceof TimeValue) && !(value instanceof TimestampValue)) {
             throw new IllegalArgumentException(MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE);
         }
-        return super.generateRegExFor(wordToFindSynonyms);
+        return super.generateRegExFor(value);
     }
 
     @Override
@@ -103,13 +103,13 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
         }
     }
 
-    public static String useOrDefault(DateAndTimeFormatSynonymGenerator synonymGenerator, Expression str){
-        if (null != synonymGenerator) return synonymGenerator.generateRegExFor(str);
-        else return DateAndTimeFormatSynonymGenerator.expressionToString(str);
+    public static String useOrDefault(DateAndTimeFormatSynonymGenerator synonymGenerator, Expression expression){
+        if (null != synonymGenerator) return synonymGenerator.generateRegExFor(expression);
+        else return DateAndTimeFormatSynonymGenerator.expressionToString(expression);
     }
 
-    public static List<String> generateAsListOrDefault(DateAndTimeFormatSynonymGenerator synonymGenerator, Expression str){
-        if (null != synonymGenerator) return synonymGenerator.generateAsList(str);
-        return new LinkedList<>(List.of(DateAndTimeFormatSynonymGenerator.expressionToString(str)));
+    public static List<String> generateAsListOrDefault(DateAndTimeFormatSynonymGenerator synonymGenerator, Expression expression){
+        if (null != synonymGenerator) return synonymGenerator.generateAsList(expression);
+        return new LinkedList<>(List.of(DateAndTimeFormatSynonymGenerator.expressionToString(expression)));
     }
 }

@@ -65,14 +65,22 @@ class ExpressionDeParserForRegExTest {
         final String sampleSolution = "1 AND 2";
         SettingsContainer settingsContainer = SettingsContainer.builder().build();
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-        matchingMap.put(SettingsOption.DEFAULT, List.of(
+//        matchingMap.put(SettingsOption.DEFAULT, List.of(
+//                "1 AND 2",
+//                "1   AND   2",
+//                "2 AND 1"
+//        ));
+        matchingMap.put(SettingsOption.OTHERSYNONYMS, List.of(
                 "1 AND 2",
-                "1   AND   2",
-                "2 AND 1"
+                "1 && 2",
+                "2 && 1"
         ));
 
+//        assertIsNonCapturingGroup(
+//                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true)
+//        );
         assertIsNonCapturingGroup(
-                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true)
+                TestUtils.validateExpressionAgainstRegEx(SettingsContainer.builder().withStringSet(new HashSet<>(List.of("AND","&&")), SettingsOption.OTHERSYNONYMS).build(), sampleSolution, matchingMap, true)
         );
 
         Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
