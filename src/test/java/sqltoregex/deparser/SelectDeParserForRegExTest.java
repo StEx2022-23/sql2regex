@@ -520,7 +520,7 @@ class SelectDeParserForRegExTest{
 
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().with(stringSynonymGenerator).build(),
-                "SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5 HAVING SUM(t1.id) < 5 && AVG(costs) < 5",
+                "SELECT col1 AS c1 FROM tab1 t1 WHERE t1.c1 = 5 HAVING SUM(t1.id) > 5 && AVG(costs) > 5",
                 matchingMap,
                 true
         );
