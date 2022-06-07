@@ -7,18 +7,17 @@ import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
-import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import net.sf.jsqlparser.util.validation.Validation;
 import net.sf.jsqlparser.util.validation.ValidationError;
 import net.sf.jsqlparser.util.validation.feature.DatabaseType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import sqltoregex.deparser.ExpressionDeParserForRegEx;
 import sqltoregex.deparser.StatementDeParserForRegEx;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsType;
+import sqltoregex.visitor.StatementVisitorJoinToWhere;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -84,16 +83,20 @@ public class ConverterManagement {
         return this.buildOutputRegex(expressionDeParser.getBuffer().toString());
     }
 
-    private String deParseStatement(String sqlStatement, StringBuilder buffer) throws JSQLParserException {
+    private String deParseStatement(String sqlStatement, StringBuilder buffer, SettingsType settingsType) throws JSQLParserException {
         Statement statement;
         statement = this.parseStatement(sqlStatement);
-        StatementDeParserForRegEx defaultStatementDeParser = new StatementDeParserForRegEx(buffer, SettingsContainer.builder().with(settingsManager, SettingsType.USER));
+        StatementDeParserForRegEx defaultStatementDeParser = new StatementDeParserForRegEx(buffer, SettingsContainer.builder().with(settingsManager, settingsType));
         statement.accept(defaultStatementDeParser);
         String regExOne = defaultStatementDeParser.getBuffer().toString();
-        ExpressionDeParserForRegEx expressionDeParser = new ExpressionDeParserForRegEx(SettingsContainer.builder().with(settingsManager, SettingsType.USER));
-        StatementDeParser joinWhereStatementDeParser = new StatementDeParserForRegEx(expressionDeParser, buffer,
-                                                                                     SettingsContainer.builder().with(settingsManager, SettingsType.USER));
-        String regExTwo = joinWhereStatementDeParser.getBuffer().toString();
+
+        statement.accept(new StatementVisitorJoinToWhere());
+
+        StringBuilder bufferTwo = new StringBuilder();
+        defaultStatementDeParser.setBuffer(bufferTwo);
+        statement.accept(defaultStatementDeParser);
+
+        String regExTwo = defaultStatementDeParser.getBuffer().toString();
         return this.buildOutputRegex(Arrays.asList(regExOne, regExTwo));
     }
 
@@ -109,15 +112,15 @@ public class ConverterManagement {
         if (!this.validate(sqlStatement)) {
             throw new IllegalArgumentException();
         }
-        return this.deParseStatement(sqlStatement, buffer);
+        return this.deParseStatement(sqlStatement, buffer, SettingsType.USER);
     }
 
     public String deparse(String sqlStatement, boolean isOnlyExpression) throws JSQLParserException {
-        return deparse(sqlStatement, isOnlyExpression, true);
+        return deparse(sqlStatement, isOnlyExpression, true, SettingsType.USER);
     }
 
     public String deparse(String sqlStatement, boolean isOnlyExpression,
-                          boolean toBeValidated) throws JSQLParserException {
+                          boolean toBeValidated, SettingsType settingsType) throws JSQLParserException {
         StringBuilder buffer = new StringBuilder();
         if (isOnlyExpression) {
             return this.deParseExpression(sqlStatement);
@@ -125,7 +128,7 @@ public class ConverterManagement {
             if (toBeValidated && !this.validate(sqlStatement)) {
                 throw new IllegalArgumentException();
             }
-            return this.deParseStatement(sqlStatement, buffer);
+            return this.deParseStatement(sqlStatement, buffer, settingsType);
         }
     }
 

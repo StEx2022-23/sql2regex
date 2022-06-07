@@ -4,12 +4,18 @@ import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
+import sqltoregex.deparser.TestUtils;
 import sqltoregex.settings.SettingsManager;
+import sqltoregex.settings.SettingsOption;
+import sqltoregex.settings.SettingsType;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 
 class ConverterManagementTest {
@@ -21,39 +27,50 @@ class ConverterManagementTest {
     }
 
     @Test
-    void testExpressionDeparsing() throws JSQLParserException, XPathExpressionException, ParserConfigurationException
-            , IOException, SAXException {
+    void rightConcatOfJoinStatements() throws JSQLParserException {
+        final String sampleSolution = "SELECT col1 FROM table1 INNER JOIN table2 ON (col1=col2) AND col3 = col4";
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT col1 FROM table1 INNER JOIN table2 ON (col1=col2) AND col3 = col4",
+                "SELECT col1 FROM table1 INNER JOIN table2 WHERE (col1=col2) AND col3 = col4"
+        ));
+
+        Assertions.assertTrue(TestUtils.checkAgainstRegEx(converterManagement.deparse(sampleSolution, false, false, SettingsType.ALL), "SELECT col1 FROM table1 INNER JOIN table2 ON (col1=col2) AND col3 = col4"));
+        Assertions.assertTrue(TestUtils.checkAgainstRegEx(converterManagement.deparse(sampleSolution, false, false,SettingsType.ALL), "SELECT col1 FROM table1 INNER JOIN table2 WHERE (col1=col2) AND col3 = col4"));
+
+    }
+
+    @Test
+    void testExpressionDeparsing() throws JSQLParserException {
         Assertions.assertEquals(
                 "^col1 + col2$",
-                converterManagement.deparse("col1+col2", true, false)
+                converterManagement.deparse("col1+col2", true, false, SettingsType.ALL)
         );
         Assertions.assertThrows(JSQLParserException.class, () ->
-                converterManagement.deparse("SELECT col1, col2 FROM table", true, false)
+                converterManagement.deparse("SELECT col1, col2 FROM table", true, false,SettingsType.ALL)
         );
     }
 
     @Test
-    void testStatementDeparsingWithValidation() throws JSQLParserException, XPathExpressionException,
-            ParserConfigurationException, IOException, SAXException {
+    void testStatementDeparsingWithValidation() {
 //        Assertions.assertEquals(
 //                "^SELECT col1, col2 FROM table$",
 //                converterManagement.deparse("SELECT col1, col2 FROM table", false, true)
 //        );
         Assertions.assertThrows(IllegalArgumentException.class, () ->
-                converterManagement.deparse("col1, col2", false, true)
+                converterManagement.deparse("col1, col2", false, true, SettingsType.ALL)
         );
     }
 
     @Test
-    void testStatementDeparsingWithoutValidation() throws JSQLParserException, XPathExpressionException,
-            ParserConfigurationException, IOException, SAXException {
+    void testStatementDeparsingWithoutValidation() throws JSQLParserException {
 //        Assertions.assertEquals(
 //                "^SELECT col1, col2 FROM table$",
 //                converterManagement.deparse("SELECT col1, col2 FROM table", false, false)
 //        );
         Assertions.assertEquals(
                 "^col1 + col2$",
-                converterManagement.deparse("col1+col2", true, false)
+                converterManagement.deparse("col1+col2", true, false, SettingsType.ALL)
         );
     }
 
