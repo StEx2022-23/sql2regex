@@ -32,7 +32,7 @@ public class OrderRotation extends RegExGenerator<List<String>> {
      * helper function for recursive tablename order concatenation
      *
      * @param amount    Integer
-     * @param valueList List<String>
+     * @param valueList List of String
      */
     private List<String> orderRotationRek(int amount, List<String> valueList) {
         StringBuilder singleValue = new StringBuilder();

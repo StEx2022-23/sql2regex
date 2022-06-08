@@ -21,6 +21,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
+/**
+ * Realize a spring boot service which handles all settings operations (parsing and specific getters)
+ */
 @Service
 public class SettingsManager {
     private final Map<SettingsType, SettingsContainer> settingsMap = new EnumMap<>(SettingsType.class);
@@ -54,10 +57,19 @@ public class SettingsManager {
         return Optional.empty();
     }
 
+    /**
+     * Return a SettingsContainer with the preset for SettingsType.USER.
+     * @return SettingsContainer
+     */
     public SettingsContainer getSettingsContainer() {
         return this.getSettingsContainer(SettingsType.USER);
     }
 
+    /**
+     * Return a SettingsContainer with the preset for a given SettingsType.
+     * @param settingsType wanted SettingsType, like: ALL, USER; DEFAULT_SCHOOL
+     * @return SettingsContainer
+     */
     public SettingsContainer getSettingsContainer(SettingsType settingsType) {
         Assert.notNull(settingsType, "settingsType must not be null");
         if (settingsType == SettingsType.USER) {
@@ -66,6 +78,14 @@ public class SettingsManager {
         return this.settingsMap.get(settingsType);
     }
 
+    /**
+     * Read the properties.xml and parse all settings. Saves parsing result in a Map with key = SettingsType and value = SettingsContainer.
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws SAXException
+     * @throws XPathExpressionException
+     * @throws URISyntaxException
+     */
     private void parseSettings() throws ParserConfigurationException, IOException, SAXException,
             XPathExpressionException, URISyntaxException {
         SettingsOption relatedOption;
@@ -113,7 +133,11 @@ public class SettingsManager {
         }
     }
 
-
+    /**
+     * Parse the settings, set by the user, from the given SettingsForm
+     * @param form SettingsForm
+     * @return builded SettingsContainer
+     */
     public SettingsContainer parseUserSettingsInput(SettingsForm form) {
         SettingsContainer.Builder settingsContainerBuilder = SettingsContainer.builder();
 
@@ -135,7 +159,6 @@ public class SettingsManager {
 
     /**
      * Removes insignificant whitespaces from an XML DOM tree.
-     *
      * @param doc Document
      * @throws XPathExpressionException if xp.evaluate("//text()[normalize-space(.)='']" goes wrong
      */

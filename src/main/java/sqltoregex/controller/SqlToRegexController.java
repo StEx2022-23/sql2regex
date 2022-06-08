@@ -174,7 +174,7 @@ public class SqlToRegexController {
     /**
      * Helper function to return all order settings.
      * @param settingsType SettingsType defines presets.
-     * @return Set<SettingsOption>
+     * @return Set of SettingsOption
      */
     private Set<SettingsOption> getOrders(SettingsType settingsType) {
         Set<SettingsOption> orders = new HashSet<>();
@@ -194,7 +194,7 @@ public class SqlToRegexController {
     /**
      * Helper function to return all spelling settings.
      * @param settingsType SettingsType defines presets.
-     * @return Set<SettingsOption>
+     * @return Set of SettingsOption
      */
     private Set<SettingsOption> getSpellings(SettingsType settingsType) {
         Set<SettingsOption> spellings = new HashSet<>();

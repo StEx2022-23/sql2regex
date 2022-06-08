@@ -24,11 +24,15 @@ function copy2clipbord(id, idFeedback) {
     copyText.setSelectionRange(0, 99999); /* for mobile devices */
 
     navigator.clipboard.writeText(copyText.value).then(function() {
-        let copyFeedbackAlert = document.getElementById(idFeedback);
-        copyFeedbackAlert.style.display = "block";
+        if(idFeedback !== null){
+            let copyFeedbackAlert = document.getElementById(idFeedback);
+            copyFeedbackAlert.style.display = "block";
+        }
     }, function() {
-        let copyFeedbackAlertFailed = document.getElementById(idFeedback+"Failed");
-        copyFeedbackAlertFailed.style.display = "block";
+        if(idFeedback !== null){
+            let copyFeedbackAlertFailed = document.getElementById(idFeedback+"Failed");
+            copyFeedbackAlertFailed.style.display = "block";
+        }
     });
 }
 
@@ -443,7 +447,8 @@ document.onreadystatechange = function () {
                         form.parentNode.parentNode.replaceChild(result, form.parentNode);
                         result.focus();
                     })
-                    .then( () => SqlRegExHis.checkUpdatedConverting());
+                    .then( () => SqlRegExHis.checkUpdatedConverting())
+                    .then( () => copy2clipbord('regexoutput', null));
                 e.preventDefault();
                 form.parentNode.parentNode.style.removeProperty("minHeight");
             })

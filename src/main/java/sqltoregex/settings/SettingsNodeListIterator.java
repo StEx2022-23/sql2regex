@@ -7,13 +7,13 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * iterator for the settings xml
+ * Iterator for the settings xml.
  */
 public class SettingsNodeListIterator implements Iterable<Node> {
     private final NodeList nodeList;
 
     /**
-     * constructor of SettingsNodeListIterator
+     * Constructor of SettingsNodeListIterator.
      * @param nodeList to iterate nodes
      */
     public SettingsNodeListIterator(final NodeList nodeList) {
