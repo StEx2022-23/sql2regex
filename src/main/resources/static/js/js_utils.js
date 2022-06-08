@@ -411,7 +411,7 @@ function isCookiesAccepted(){
 }
 
 function handleCookieBanner(){
-    var cookieBanner = new bootstrap.Modal(document.getElementById('cockieBanner'), {
+    let cookieBanner = new bootstrap.Modal(document.getElementById('cockieBanner'), {
         keyboard: false,
         backdrop: 'static'
     });

@@ -15,6 +15,14 @@ public class GraphPreProcessor {
     public static final String COULD_NOT_CAST = "Could not cast";
 
     /**
+     * Private constructor to hide the implicit public one.
+     * Utility classes, which are collections of static members, are not meant to be instantiated.
+     */
+    private GraphPreProcessor() {
+        throw new IllegalStateException("Utility class.");
+    }
+
+    /**
      * Return a set of synonyms from given graph.
      * @param graph to process graph
      * @return set of synonyms
