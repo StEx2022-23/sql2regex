@@ -33,19 +33,45 @@ public class SettingsManager {
         this.parseSettings();
     }
 
+    /**
+     * Returns related settings by passing a class.
+     * @param clazz class of object, which is instanceof IRegExGenerator
+     * @param settingsType SettingsType
+     * @param <T> instanceof IRegExGenerator
+     * @return Set of object, which are instanceof IRegExGenerator
+     */
     public <T extends IRegExGenerator<?>> Set<T> getSettingByClass(Class<T> clazz,
                                                          SettingsType settingsType) {
         return new LinkedHashSet<>(this.getSettingsContainer(settingsType).get(clazz).values());
     }
 
+    /**
+     * Return a boolean for the question, if a specific Setting is present in the SettingsContainer, with the preset SettingsType.USER.
+     * @param settingsOption one of enum SettingsOption
+     * @return boolean → the SettingsOption is given in the SettingsContainer
+     */
     public boolean getSettingBySettingsOption(SettingsOption settingsOption) {
         return this.getSettingBySettingsOption(settingsOption, SettingsType.USER);
     }
 
+    /**
+     * Return a boolean for the question, if a specific Setting is present in the SettingsContainer, by passing a specific SettingsOption, with variable SettingsType.
+     * @param settingsOption one of enum SettingsOption
+     * @param settingsType one of enum SettingsType
+     * @return boolean → the SettingsOption is given in the SettingsContainer
+     */
     public boolean getSettingBySettingsOption(SettingsOption settingsOption, SettingsType settingsType) {
         return this.getSettingsContainer(settingsType).get(settingsOption) != null;
     }
 
+    /**
+     * Get a Object, which is related to a selected Setting, as Optional of T.
+     * @param settingsOption one of enum SettingsOption
+     * @param clazz class of object, which is instanceof IRegExGenerator
+     * @param settingsType one of enum SettingsType
+     * @param <T> instanceof IRegExGenerator
+     * @return Optional object, which is instanceof IRegExGenerator
+     */
     public <T extends IRegExGenerator<?>> Optional<T> getSettingBySettingsOption(SettingsOption settingsOption,
                                                                                     Class<T> clazz,
                                                                                     SettingsType settingsType) {
