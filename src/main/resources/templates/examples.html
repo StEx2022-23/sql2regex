@@ -10,11 +10,12 @@
         <div class="container mt-3">
             <div class="card">
                 <div class="card-body">
-                    <h1 class="pb-2 border-bottom">Example #1</h1>
+                    <h1 class="pb-3" th:text="#{examples.h1}"></h1>
+                    <h2 class="pb-2 border-bottom" th:text="#{examples.example} + '#1'"></h2>
                     <div class="accordion" id="example#1">
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="panelsStayOpen-headingOne">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne" th:text="#{examples.sqlStatemenmt}">
                                     SQL-Statement
                                 </button>
                             </h2>
@@ -26,7 +27,7 @@
                         </div>
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo" th:text="#{examples.regEx}">
                                     RegEx
                                 </button>
                             </h2>
@@ -34,13 +35,13 @@
                                 <div class="accordion-body" >
                                     <code id="RegEx#1">^(?:SELECT|SELEC|SELET|SELCT|SEECT|SLECT|ELECT)\s.*\s(?:FROM|FOM|FRM|FRO|ROM).*\stable$</code>
                                     <br/> <br/>
-                                    <strong>Flags:</strong> <code>/gmi</code> (global, multi line, insensitive)
+                                    <strong>Flags:</strong> <code>/gmi</code> (global, multi line, case insensitive)
                                 </div>
                             </div>
                         </div>
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="panelsStayOpen-headingThree">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree" th:text="#{examples.tryIt}">
                                     Try it!
                                 </button>
                             </h2>
@@ -49,15 +50,15 @@
                                     <div class="container">
                                         <div class="row">
                                             <div class="col-sm-8">
-                                                <label for="TestSQL#1" class="form-label">Check against your alternative SQL-Statement:</label>
+                                                <label for="TestSQL#1" class="form-label" th:text="#{examples.checkAgainstAlternative}">Check against your alternative SQL-Statement:</label>
                                                 <br>
                                                 <input type="text" id="TestSQL#1" class="form-control"/>
                                             </div>
                                             <div class="col-sm-4">
-                                                <label for="RadioExampleTestSQL#1" class="form-label">Select preset:</label>
+                                                <label for="RadioExampleTestSQL#1" class="form-label" th:text="#{examples.preset}">Select preset:</label>
                                                 <br>
                                                 <select class="form-select" id="RadioExampleTestSQL#1" onchange="onChangePresetSelect('TestSQL#1', 'RadioExampleTestSQL#1')">
-                                                    <option value="" selected>none preset selected</option>
+                                                    <option value="" selected th:text="#{examples.noPreset}">none preset selected</option>
                                                     <option value="SELECT *  FROM  table">SELECT *  FROM  table</option>
                                                     <option value="SELECT *  Frm  table">SELECT *  Frm  table</option>
                                                     <option value="SelcT * FROM  table">SelcT * FROM  table</option>
@@ -66,19 +67,19 @@
                                         </div>
                                     </div>
                                     <div id="RegEx#1pos" class="alert alert-success mt-3 examplesfeedback" role="alert">
-                                        <strong>Perfect!</strong> This SQL-Statement match with the RegEx!
+                                        <strong th:text="#{examples.perfect}">Perfect!</strong><span th:text="#{examples.matches}"></span>
                                     </div>
 
                                     <div id="RegEx#1neg" class="alert alert-danger mt-3 examplesfeedback" role="alert">
-                                        <strong>Oooooops!</strong> This SQL-Statement don't match with the RegEx!
+                                        <strong th:text="#{examples.oops}">Oooooops!</strong><span th:text="#{examples.doesntMatch}"></span>
                                     </div>
 
                                     <div id="RegEx#1hint" class="alert alert-light mt-3 examplesfeedback" role="alert">
-                                        <strong>Oooooops!</strong> Insert your SQL-Statement or select a preset!
+                                        <strong th:text="#{examples.oops}">Oooooops!</strong> <span th:text="#{examples.insertAStatement}"></span>
                                     </div>
 
                                     <div class="d-grid gap-2 col-6 mx-auto mt-3">
-                                        <button type="submit" class="btn btn-primary" onclick="checkRegExExample('TestSQL#1','RegEx#1')">Check against RegEx</button>
+                                        <button type="submit" class="btn btn-primary" onclick="checkRegExExample('TestSQL#1','RegEx#1')" th:text="#{examples.checkAgainstRegex}">Check against RegEx</button>
                                     </div>
                                 </div>
                             </div>
