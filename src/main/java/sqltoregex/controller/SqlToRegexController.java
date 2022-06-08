@@ -23,6 +23,9 @@ import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 import javax.validation.Valid;
 import java.util.*;
 
+/**
+ * Handles frontend pages for this applications.
+ */
 @Controller
 public class SqlToRegexController {
     private static final String TITLE = "title";
@@ -30,6 +33,11 @@ public class SqlToRegexController {
     SettingsManager settingsManager;
     ConverterManagement converterManagement;
 
+    /**
+     * Set SettingsManager and ConverterManagement for the converting process.
+     * @param settingsManager SettingsManager, autowired, no action required.
+     * @param converterManagement ConverterManagement, autowired, no action required.
+     */
     @Autowired
     SqlToRegexController(SettingsManager settingsManager, ConverterManagement converterManagement) {
         Assert.notNull(settingsManager, "Settings management must not be null");
@@ -38,6 +46,11 @@ public class SqlToRegexController {
         this.converterManagement = converterManagement;
     }
 
+    /**
+     * Prepare and return the about page when requesting "/about".
+     * @param model Model, autowired, no action required.
+     * @return about page
+     */
     @GetMapping("/about")
     public String aboutus(Model model) {
         model.addAttribute(TITLE, "sql2regex - about us");
@@ -45,6 +58,11 @@ public class SqlToRegexController {
         return "about";
     }
 
+    /**
+     * Prepare settings for displaying on frontend.
+     * @param model Model, autowired, no action required.
+     * @return SettingsForm, html asset
+     */
     private SettingsForm addSettingsFormFields(Model model) {
         model.addAttribute("spellings", this.getSpellings(SettingsType.ALL));
         model.addAttribute("orders", this.getOrders(SettingsType.ALL));
@@ -103,6 +121,14 @@ public class SqlToRegexController {
         );
     }
 
+    /**
+     * Performe converting Process by post request.
+     * @param model Model, autowired, no action required.
+     * @param settingsForm SettingsForm
+     * @param result Errors
+     * @return filled form
+     * @throws JSQLParserException
+     */
     @PostMapping("/convert")
     public String convert(Model model, @Valid @ModelAttribute SettingsForm settingsForm,
                           Errors result) throws JSQLParserException {
@@ -133,6 +159,11 @@ public class SqlToRegexController {
         return "assets/settingsform/form";
     }
 
+    /**
+     * Prepare and return the examples page when requesting "/examples".
+     * @param model Model, autowired, no action required.
+     * @return examples page
+     */
     @GetMapping("/examples")
     public String examples(Model model) {
         model.addAttribute(TITLE, "sql2regex - examples");
@@ -140,6 +171,11 @@ public class SqlToRegexController {
         return "examples";
     }
 
+    /**
+     * Helper function to return all order settings.
+     * @param settingsType SettingsType defines presets.
+     * @return Set<SettingsOption>
+     */
     private Set<SettingsOption> getOrders(SettingsType settingsType) {
         Set<SettingsOption> orders = new HashSet<>();
         settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMEORDER, OrderRotation.class, settingsType)
@@ -155,6 +191,11 @@ public class SqlToRegexController {
         return orders;
     }
 
+    /**
+     * Helper function to return all spelling settings.
+     * @param settingsType SettingsType defines presets.
+     * @return Set<SettingsOption>
+     */
     private Set<SettingsOption> getSpellings(SettingsType settingsType) {
         Set<SettingsOption> spellings = new HashSet<>();
         settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class, settingsType)
@@ -168,6 +209,13 @@ public class SqlToRegexController {
         return spellings;
     }
 
+    /**
+     * Helper function to return all synonym generators.
+     * @param synonymGenerator Defines class of the specific synonym generator.
+     * @param settingsOption SettingsOption to define a specific synonym generator.
+     * @param settingsType SettingsType defines presets.
+     * @return Set of synonym generators
+     */
     private <T, S> Set<T> getSynonymGenerators(Class<? extends SynonymGenerator<T, S>> synonymGenerator,
                                                SettingsOption settingsOption, SettingsType settingsType) {
         return settingsManager.getSettingBySettingsOption(settingsOption, synonymGenerator, settingsType)
@@ -175,6 +223,11 @@ public class SqlToRegexController {
                 .orElse(new LinkedHashSet<>());
     }
 
+    /**
+     * Prepare and return the landing page when requesting "/".
+     * @param model Model, autowired, no action required.
+     * @return landing page
+     */
     @GetMapping("/")
     public String home(Model model) {
         model.addAttribute(TITLE, "sql2regex");
@@ -183,18 +236,33 @@ public class SqlToRegexController {
         return "home";
     }
 
+    /**
+     * Prepare and return the impressum page when requesting "/impressum".
+     * @param model Model, autowired, no action required.
+     * @return impressum page
+     */
     @GetMapping("/impressum")
     public String impressum(Model model) {
         model.addAttribute(TITLE, "sql2regex - impressum");
         return "impressum";
     }
 
+    /**
+     * Prepare and return the privacy policy page when requesting "/privacy".
+     * @param model Model, autowired, no action required.
+     * @return privacy policy page
+     */
     @GetMapping("/privacy")
     public String privacy(Model model) {
         model.addAttribute(TITLE, "sql2regex - privacy");
         return "privacy";
     }
 
+    /**
+     * Prepare and return the visualization page when requesting "/visualization".
+     * @param model Model, autowired, no action required.
+     * @return visualization page
+     */
     @GetMapping("/visualization")
     public String visualization(Model model) {
         model.addAttribute(TITLE, "sql2regex - visualization");
