@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 
 /**
- * realize a spring service for handling the converting process
+ * Realize a spring service for handling the converting process.
  */
 @Service
 public class ConverterManagement {
@@ -33,27 +33,28 @@ public class ConverterManagement {
     private final SettingsManager settingsManager;
 
     /**
-     * Validate inserted SQL-statements for oracle, mysql, sqlserver, mariadb
-     * return true or false, with a console output about the error messages
-     *
-     * @return boolean
+     * Constructor of converter management.
+     * @param settingsManager which handles usersettings and presets, its autowired, no required action here
      */
-
     @Autowired
     public ConverterManagement(SettingsManager settingsManager) {
         Assert.notNull(settingsManager, "Settings manager must not be null");
         this.settingsManager = settingsManager;
     }
 
+    /**
+     * Build output regex with ^ in the beginning and $ at the end.
+     * @param regex generated regex
+     * @return builded regex
+     */
     private String buildOutputRegex(String regex) {
         return "^" + regex + "$";
     }
 
     /**
-     * logical OR-concat, if the exprission-visitor detect an alternative statement
-     *
-     * @param regexList List<String>
-     * @return concatOutputString - String
+     * Logical OR-concat, if the expression-visitor detect an alternative statement, to allow both of them in the regex.
+     * @param regexList List<String> with alternative regex
+     * @return concated regex
      */
     private String buildOutputRegex(List<String> regexList) {
         StringBuilder outputRegex = new StringBuilder();
@@ -73,6 +74,12 @@ public class ConverterManagement {
         return outputRegex.toString();
     }
 
+    /**
+     * Deparse expressions.
+     * @param sqlstatement current sql statement
+     * @return generated regex
+     * @throws JSQLParserException
+     */
     private String deParseExpression(String sqlstatement) throws JSQLParserException {
         Expression expression;
         expression = this.parseExpression(sqlstatement);
@@ -83,6 +90,14 @@ public class ConverterManagement {
         return this.buildOutputRegex(expressionDeParser.getBuffer().toString());
     }
 
+    /**
+     * Deparse statements.
+     * @param sqlStatement current sql statement
+     * @param buffer StringBuilder
+     * @param settingsType UserSettings or presets
+     * @return  generated regex
+     * @throws JSQLParserException
+     */
     private String deParseStatement(String sqlStatement, StringBuilder buffer, SettingsType settingsType) throws JSQLParserException {
         Statement statement;
         statement = this.parseStatement(sqlStatement);
@@ -101,11 +116,10 @@ public class ConverterManagement {
     }
 
     /**
-     * (de-)parsing the given statement
-     *
-     * @param sqlStatement String
-     * @return deparsed Statement as RegEx - String
-     * @throws JSQLParserException is thrown if parsing goes wrong
+     * Handle statement deparsing.
+     * @param sqlStatement current sql statement
+     * @return generated regex
+     * @throws JSQLParserException
      */
     public String deparse(String sqlStatement) throws JSQLParserException {
         StringBuilder buffer = new StringBuilder();
@@ -115,10 +129,26 @@ public class ConverterManagement {
         return this.deParseStatement(sqlStatement, buffer, SettingsType.USER);
     }
 
+    /**
+     * Handle statement deparsing.
+     * @param sqlStatement current sql statement
+     * @param isOnlyExpression must be set true, if you only want to deparse an expression
+     * @return generated regex
+     * @throws JSQLParserException
+     */
     public String deparse(String sqlStatement, boolean isOnlyExpression) throws JSQLParserException {
         return deparse(sqlStatement, isOnlyExpression, true, SettingsType.USER);
     }
 
+    /**
+     * Extended deparse method, to allow all options by setting the follow parameters.
+     * @param sqlStatement current sql statement
+     * @param isOnlyExpression must be set true, if you only want to deparse an expression
+     * @param toBeValidated turn validation on/off
+     * @param settingsType UserSettings or presets
+     * @return generated regex
+     * @throws JSQLParserException
+     */
     public String deparse(String sqlStatement, boolean isOnlyExpression,
                           boolean toBeValidated, SettingsType settingsType) throws JSQLParserException {
         StringBuilder buffer = new StringBuilder();
@@ -133,8 +163,7 @@ public class ConverterManagement {
     }
 
     /**
-     * compared list elements about unique elements
-     *
+     * Compare list elements about unique elements.
      * @param list List<String>
      * @return boolean
      */
@@ -144,14 +173,31 @@ public class ConverterManagement {
         return (set.size() == list.size());
     }
 
+    /**
+     * Parse an expression.
+     * @param sqlstatement current sql-statement
+     * @return Expression object
+     * @throws JSQLParserException
+     */
     private Expression parseExpression(String sqlstatement) throws JSQLParserException {
         return CCJSqlParserUtil.parseExpression(sqlstatement);
     }
 
+    /**
+     * Parse a statement.
+     * @param sqlstatement current sql-statement
+     * @return Statement object
+     * @throws JSQLParserException
+     */
     private Statement parseStatement(String sqlstatement) throws JSQLParserException {
         return CCJSqlParserUtil.parse(sqlstatement);
     }
 
+    /**
+     * Validate statements against oracle, mysql, sqlserver or mariadb grammar.
+     * @param sqlstatement current sql-statement
+     * @return
+     */
     public boolean validate(String sqlstatement) {
         List<DatabaseType> supportedDBMS = new ArrayList<>();
         supportedDBMS.add(DatabaseType.ORACLE);
