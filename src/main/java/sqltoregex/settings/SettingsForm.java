@@ -5,8 +5,14 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Set;
 
+/**
+ * SettingsForm is the connection between front- and backend. In this class is the sent form data's stored.
+ */
 public class SettingsForm {
 
+    /**
+     * Realize an empty form SettingsForm to enable specific testing options.
+     */
     public static final SettingsForm EMPTY_FORM = new SettingsForm(Collections.emptySet(),
                                                                    Collections.emptySet(),
                                                                    Collections.emptySet(),
@@ -26,6 +32,18 @@ public class SettingsForm {
     Set<String> otherSynonyms;
     @NotEmpty(message = "{settingsForm.sql.NotEmpty}") String sql;
 
+    /**
+     * Constructor for the SettingsForm.
+     * @param spellings all spelling settings as Set of SettingsOption
+     * @param orders all orders settings as Set of SettingsOption
+     * @param dateFormats all dateFormats settings as Set of SimpleDateFormat
+     * @param timeFormats all timeFormats settings as Set of SimpleDateFormat
+     * @param dateTimeFormats all dateTimeFormats settings as Set of SimpleDateFormat
+     * @param aggregateFunctionLang All aggregateFunctionLanguage settings as String-Set
+     * @param datatypeSynonyms all datatypeSynonyms settings as String-Set
+     * @param otherSynonyms all otherSynonyms settings as String-Set
+     * @param sql the given SQL-Statement as String
+     */
     public SettingsForm(Set<SettingsOption> spellings,
                         Set<SettingsOption> orders,
                         Set<SimpleDateFormat> dateFormats,
