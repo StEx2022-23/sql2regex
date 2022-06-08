@@ -8,18 +8,26 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Prepares graphs for displaying on the frontend.
+ */
 public class GraphPreProcessor {
-
     public static final String COULD_NOT_CAST = "Could not cast";
 
-    private GraphPreProcessor() {
-
-    }
-
+    /**
+     * Return a set of synonyms from given graph.
+     * @param graph to process graph
+     * @return set of synonyms
+     */
     static <T> Set<T> getSynonymSet(Graph<T, DefaultWeightedEdge> graph) {
         return new LinkedHashSet<>(graph.vertexSet());
     }
 
+    /**
+     * Return a set of synonyms from given graph, which are delimited.
+     * @param graph to process graph
+     * @return set of synonyms as delimited entrys
+     */
     static Set<String> getSynonymSetWithDelimiter(Graph<String, DefaultWeightedEdge> graph, String delimiter) {
         Set<String> synonymSet = new LinkedHashSet<>();
         try {
@@ -37,6 +45,11 @@ public class GraphPreProcessor {
         }
     }
 
+    /**
+     * Return a set of synonyms from given graph, only as strings.
+     * @param graph to process graph
+     * @return set of synonyms
+     */
     static Set<String> getSynonymSetAsString(Graph<?, DefaultWeightedEdge> graph) {
         try {
             Set<String> stringSet = new LinkedHashSet<>();
@@ -60,6 +73,11 @@ public class GraphPreProcessor {
         }
     }
 
+    /**
+     * Generate a map of keywords and they related synonyms.
+     * @param graph to process graph
+     * @return map with keywords as key and they related synonyms as set
+     */
     static <T> Map<T, Set<T>> getSynonymMap(Graph<T, DefaultWeightedEdge> graph) {
         try {
             Map<T, Set<T>> map = new HashMap<>();
