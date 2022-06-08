@@ -402,10 +402,23 @@ function resetUserSettings(formElement){
     loadUserFormSettings(formElement);
 }
 
+function setCookiesAccepted(){
+    localStorage.setItem("cookiesAccepted", "true");
+}
+
+function isCookiesAccepted(){
+    return localStorage.getItem("cookiesAccepted") !== null;
+}
+
 let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
 
 document.onreadystatechange = function () {
     if (document.readyState === "interactive") {
+        var cookieBanner = new bootstrap.Modal(document.getElementById('cockieBanner'), {
+            keyboard: false,
+            backdrop: 'static'
+        });
+        if(!isCookiesAccepted()) cookieBanner.show();
         loadDefaultLanguageSettings();
         let currentDomain = window.location.href.split("/");
         let actualPath = currentDomain[currentDomain.length - 1].split("?")[0];
@@ -433,7 +446,7 @@ document.onreadystatechange = function () {
             SqlRegExHis.checkUpdatedConverting();
             loadUserFormSettings(document.getElementById("converterForm"));
         } else if(actualPath === "visualization"){
-            insertVisualizationPage()
+            insertVisualizationPage();
         }
     }
 }
