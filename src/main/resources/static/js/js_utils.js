@@ -410,16 +410,20 @@ function isCookiesAccepted(){
     return localStorage.getItem("cookiesAccepted") !== null;
 }
 
+function handleCookieBanner(){
+    var cookieBanner = new bootstrap.Modal(document.getElementById('cockieBanner'), {
+        keyboard: false,
+        backdrop: 'static'
+    });
+    if(!isCookiesAccepted()) cookieBanner.show();
+    loadDefaultLanguageSettings();
+}
+
 let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
 
 document.onreadystatechange = function () {
     if (document.readyState === "interactive") {
-        var cookieBanner = new bootstrap.Modal(document.getElementById('cockieBanner'), {
-            keyboard: false,
-            backdrop: 'static'
-        });
-        if(!isCookiesAccepted()) cookieBanner.show();
-        loadDefaultLanguageSettings();
+        handleCookieBanner();
         let currentDomain = window.location.href.split("/");
         let actualPath = currentDomain[currentDomain.length - 1].split("?")[0];
 
