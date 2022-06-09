@@ -25,13 +25,13 @@
                                         <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z"/>
                                         <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z"/>
                                     </svg>
-                                    student of teaching, 10th semester (physics and computer science)
+                                    <span th:text="#{aboutUs.courseOfStudies}"></span>
                                 </p>
                                 <p class="mb-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bank2" viewBox="0 0 16 16">
                                         <path d="M8.277.084a.5.5 0 0 0-.554 0l-7.5 5A.5.5 0 0 0 .5 6h1.875v7H1.5a.5.5 0 0 0 0 1h13a.5.5 0 1 0 0-1h-.875V6H15.5a.5.5 0 0 0 .277-.916l-7.5-5zM12.375 6v7h-1.25V6h1.25zm-2.5 0v7h-1.25V6h1.25zm-2.5 0v7h-1.25V6h1.25zm-2.5 0v7h-1.25V6h1.25zM8 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM.5 15a.5.5 0 0 0 0 1h15a.5.5 0 1 0 0-1H.5z"/>
                                     </svg>
-                                    Technische Universität Dresden
+                                    <span th:text="#{aboutUs.tuDresden}"></span>
                                 </p>
                                 <p class="mb-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
@@ -39,7 +39,7 @@
                                     </svg>
                                     https://github.com/alletkla
                                 </p>
-                                <button onclick="location.href='mailto:maximilian.foerster@mailbox.tu-dresden.de'" id="contactMF" class="btn btn-primary btn-lg mb-3">Contact me!</button>
+                                <button onclick="location.href='mailto:maximilian.foerster@mailbox.tu-dresden.de'" id="contactMF" class="btn btn-primary btn-lg mb-3" th:text="#{aboutUs.contact}">Contact me!</button>
                             </div>
                         </div>
                     </div>
@@ -54,13 +54,13 @@
                                         <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z"/>
                                         <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z"/>
                                     </svg>
-                                    student of teaching, 10th semester (physics and computer science)
+                                    <span th:text="#{aboutUs.courseOfStudies}"></span>
                                 </p>
                                 <p class="mb-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bank2" viewBox="0 0 16 16">
                                         <path d="M8.277.084a.5.5 0 0 0-.554 0l-7.5 5A.5.5 0 0 0 .5 6h1.875v7H1.5a.5.5 0 0 0 0 1h13a.5.5 0 1 0 0-1h-.875V6H15.5a.5.5 0 0 0 .277-.916l-7.5-5zM12.375 6v7h-1.25V6h1.25zm-2.5 0v7h-1.25V6h1.25zm-2.5 0v7h-1.25V6h1.25zm-2.5 0v7h-1.25V6h1.25zM8 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM.5 15a.5.5 0 0 0 0 1h15a.5.5 0 1 0 0-1H.5z"/>
                                     </svg>
-                                    Technische Universität Dresden
+                                    <span th:text="#{aboutUs.tuDresden}"></span>
                                 </p>
                                 <p class="mb-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
@@ -68,7 +68,7 @@
                                     </svg>
                                     https://github.com/binkertpat
                                 </p>
-                                <button onclick="location.href='mailto:contact@binkert-patrick.de'" id="contactPB" class="btn btn-primary btn-lg mb-3">Contact me!</button>
+                                <button onclick="location.href='mailto:contact@binkert-patrick.de'" id="contactPB" class="btn btn-primary btn-lg mb-3" th:text="#{aboutUs.contact}">Contact me!</button>
                             </div>
                             <div class="col-sm-4">
                                 <img src="https://avatars.githubusercontent.com/u/58105072?v=4" class="card-img-top m-auto" alt="...">
