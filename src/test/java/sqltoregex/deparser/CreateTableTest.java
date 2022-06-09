@@ -190,7 +190,7 @@ class CreateTableTest {
     }
 
     /**
-     *  Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+     *  Map of SettingsOption and list of string matchingMap = new EnumMap(SettingsOption.class);
      *  matchingMap.put(SettingsOption.DEFAULT, List.of(
      *      "CREATE TABLE table1 (col1 type1) PARTITION BY KEY (col1) (PARTITION partName COMMENT =
      *      'String')"

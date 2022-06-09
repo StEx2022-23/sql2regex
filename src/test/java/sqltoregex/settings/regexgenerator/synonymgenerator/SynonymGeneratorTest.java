@@ -10,12 +10,12 @@ import java.util.Set;
 /**
  * weighted Graph testing ist not possible due to lack of equals and hashcode method overriding in Framework
  *
- * @ Test void add2VerticesImplicitWeightedEdge(){
+ * void add2VerticesImplicitWeightedEdge(){
  * stringSynonymGenerator.addSynonym("Mittelwert");
  * stringSynonymGenerator.addSynonym("AVG", 2L);
  * Assertions.assertEquals(2, stringSynonymGenerator.synonymsGraph.edgeSet().toArray()[0]);
  * }
- * @ Test void add2VerticesAndExplicitWeightedEdge(){
+ * void add2VerticesAndExplicitWeightedEdge(){
  * stringSynonymGenerator.addSynonymFor("Mittelwert", "AVG", 2L);
  * Assertions.assertEquals(2, stringSynonymGenerator.synonymsGraph.vertexSet().size());
  * Assertions.assertEquals(1, stringSynonymGenerator.synonymsGraph.edgeSet().size());
