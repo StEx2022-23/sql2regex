@@ -20,15 +20,15 @@ class TestMain {
     @Autowired
     private SqlToRegexController sql2RegexController;
 
-//    @Autowired
-//    private RestApiController restApiController;
+    @Autowired
+    private RestApiController restApiController;
 
     @Test
     void contextLoads() {
         assertNotNull(myErrorController);
         assertNotNull(resourceConfig);
         assertNotNull(sql2RegexController);
-//        assertNotNull(restApiController);
+        assertNotNull(restApiController);
     }
 
     @Test
