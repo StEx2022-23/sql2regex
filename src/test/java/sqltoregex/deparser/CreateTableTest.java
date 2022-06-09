@@ -12,7 +12,7 @@ class CreateTableTest {
     @Test
     void createTableSimple() {
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-matchingMap.put(SettingsOption.DEFAULT, List.of(
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "CREATE TABLE table1 (column1 datatype1)"
         ));
 
@@ -40,7 +40,7 @@ matchingMap.put(SettingsOption.DEFAULT, List.of(
     @Test
     void createTemporaryAndIfNotExists(){
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-matchingMap.put(SettingsOption.DEFAULT, List.of(
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "CREATE TEMPORARY TABLE IF NOT EXISTS table1 (column1 datatype1)"
         ));
 
@@ -60,7 +60,7 @@ matchingMap.put(SettingsOption.DEFAULT, List.of(
     @Test
     void createLIKE(){
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-matchingMap.put(SettingsOption.DEFAULT, List.of(
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "CREATE TABLE table1 (column1 datatype1) LIKE old_tbl_name"
         ));
 
@@ -70,7 +70,7 @@ matchingMap.put(SettingsOption.DEFAULT, List.of(
     @Test
     void withSingleColumnAndIndex() {
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-matchingMap.put(SettingsOption.DEFAULT, List.of(
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "CREATE TABLE table1 (col1 type1, INDEX index_name (col1))"
         ));
 
@@ -83,7 +83,7 @@ matchingMap.put(SettingsOption.DEFAULT, List.of(
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "CREATE TABLE table1 (column1 datatype1, column2 datatype2, column3 datatype3)"
         ));
-matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
+        matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
                 "CREATE TABLE table1 (column2 datatype2, column1 datatype1, column3 datatype3)"
         ));
 
@@ -94,7 +94,7 @@ matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
     @Test
     void withConstraint() {
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-matchingMap.put(SettingsOption.DEFAULT, List.of(
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col1))"
         ));
 
@@ -138,7 +138,7 @@ matchingMap.put(SettingsOption.DEFAULT, List.of(
     @Test
     void withOneTableOption(){
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-matchingMap.put(SettingsOption.DEFAULT, List.of(
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "CREATE TABLE table1 (col1 type1) AUTO_INCREMENT 1"
         ));
 
@@ -148,7 +148,7 @@ matchingMap.put(SettingsOption.DEFAULT, List.of(
     @Test
     void withOneTableOptionWithEquals(){
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-matchingMap.put(SettingsOption.DEFAULT, List.of(
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "CREATE TABLE table1 (col1 type1) AUTO_INCREMENT 1",
                 "CREATE TABLE table1 (col1 type1) AUTO_INCREMENT = 1",
                 "CREATE TABLE table1 (col1 type1) AUTO_INCREMENT =1",
@@ -172,7 +172,7 @@ matchingMap.put(SettingsOption.DEFAULT, List.of(
     @Test
     void withMultipleTableOptions(){
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-matchingMap.put(SettingsOption.DEFAULT, List.of(
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "CREATE TABLE table1 (col1 type1) AUTO_INCREMENT 1 COMMENT = 'comment'"
         ));
 
@@ -182,7 +182,7 @@ matchingMap.put(SettingsOption.DEFAULT, List.of(
     @Test
     void withOnePartitionOption(){
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-matchingMap.put(SettingsOption.DEFAULT, List.of(
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "CREATE TABLE table1 (col1 type1) PARTITION BY KEY (col1)"
         ));
 
@@ -190,19 +190,19 @@ matchingMap.put(SettingsOption.DEFAULT, List.of(
     }
 
     /**
-     *  Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-matchingMap.put(SettingsOption.DEFAULT, List.of(
-     *                 "CREATE TABLE table1 (col1 type1) PARTITION BY KEY (col1) (PARTITION partName COMMENT =
-     *                 'String')"
-     *         ));
+     *  Map of SettingsOption and list of string matchingMap = new EnumMap(SettingsOption.class);
+     *  matchingMap.put(SettingsOption.DEFAULT, List.of(
+     *      "CREATE TABLE table1 (col1 type1) PARTITION BY KEY (col1) (PARTITION partName COMMENT =
+     *      'String')"
+     *  ));
      *
-     *         validateListAgainstRegEx("CREATE TABLE table1 (col1 type1) PARTITION BY KEY (col1) (PARTITION partName
-     *         VALUES IN (val1, val2))", alternativeStatements, true);
+     *  validateListAgainstRegEx("CREATE TABLE table1 (col1 type1) PARTITION BY KEY (col1) (PARTITION partName
+     *  VALUES IN (val1, val2))", alternativeStatements, true);
      */
     @Test
     void withOnePartitionOptionAndOnePartitionDefinition(){
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-matchingMap.put(SettingsOption.DEFAULT, List.of(
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
                 //"CREATE TABLE table1 (col1 type1) PARTITION BY KEY (col1) (PARTITION partName COMMENT = 'String')"
         ));
 

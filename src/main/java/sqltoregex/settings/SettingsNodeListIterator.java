@@ -6,9 +6,16 @@ import org.w3c.dom.NodeList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+/**
+ * Iterator for the settings xml.
+ */
 public class SettingsNodeListIterator implements Iterable<Node> {
     private final NodeList nodeList;
 
+    /**
+     * Constructor of SettingsNodeListIterator.
+     * @param nodeList to iterate nodes
+     */
     public SettingsNodeListIterator(final NodeList nodeList) {
         this.nodeList = nodeList;
     }

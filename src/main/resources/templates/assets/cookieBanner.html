@@ -1,0 +1,14 @@
+<div th:fragment="cookieBanner" class="modal fade" id="cockieBanner" tabindex="-1" aria-labelledby="cockieBannerLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cockieBannerLabel" th:text="#{cookies.head}"></h5>
+            </div>
+            <div class="modal-body" th:text="#{cookies.text}"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="setCookiesAccepted(); window.location.href='/privacy';" data-bs-dismiss="modal" th:text="#{cookies.learnMore}"></button>
+                <button type="button" class="btn btn-primary" onclick="setCookiesAccepted()" data-bs-dismiss="modal" th:text="#{cookies.thanks}"></button>
+            </div>
+        </div>
+    </div>
+</div>

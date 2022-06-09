@@ -46,8 +46,7 @@ class EquivalentStatementTest extends UserSettingsPreparer {
     }
 
     @Test
-    void testSelectStatements() throws IOException, JSQLParserException, XPathExpressionException,
-            ParserConfigurationException, SAXException {
+    void testSelectStatements() throws IOException, JSQLParserException {
         this.parseTextFile(SupportedStatementType.SELECT);
         for (String key : this.equivalentStatements.keySet()) {
             Pattern pattern = Pattern.compile(this.converterManagement.deparse(key, false, false, SettingsType.ALL));

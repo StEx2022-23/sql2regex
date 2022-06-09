@@ -24,11 +24,15 @@ function copy2clipbord(id, idFeedback) {
     copyText.setSelectionRange(0, 99999); /* for mobile devices */
 
     navigator.clipboard.writeText(copyText.value).then(function() {
-        let copyFeedbackAlert = document.getElementById(idFeedback);
-        copyFeedbackAlert.style.display = "block";
+        if(idFeedback !== null){
+            let copyFeedbackAlert = document.getElementById(idFeedback);
+            copyFeedbackAlert.style.display = "block";
+        }
     }, function() {
-        let copyFeedbackAlertFailed = document.getElementById(idFeedback+"Failed");
-        copyFeedbackAlertFailed.style.display = "block";
+        if(idFeedback !== null){
+            let copyFeedbackAlertFailed = document.getElementById(idFeedback+"Failed");
+            copyFeedbackAlertFailed.style.display = "block";
+        }
     });
 }
 
@@ -402,11 +406,28 @@ function resetUserSettings(formElement){
     loadUserFormSettings(formElement);
 }
 
+function setCookiesAccepted(){
+    localStorage.setItem("cookiesAccepted", "true");
+}
+
+function isCookiesAccepted(){
+    return localStorage.getItem("cookiesAccepted") !== null;
+}
+
+function handleCookieBanner(){
+    let cookieBanner = new bootstrap.Modal(document.getElementById('cockieBanner'), {
+        keyboard: false,
+        backdrop: 'static'
+    });
+    if(!isCookiesAccepted()) cookieBanner.show();
+    loadDefaultLanguageSettings();
+}
+
 let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
 
 document.onreadystatechange = function () {
     if (document.readyState === "interactive") {
-        loadDefaultLanguageSettings();
+        handleCookieBanner();
         let currentDomain = window.location.href.split("/");
         let actualPath = currentDomain[currentDomain.length - 1].split("?")[0];
 
@@ -426,14 +447,15 @@ document.onreadystatechange = function () {
                         form.parentNode.parentNode.replaceChild(result, form.parentNode);
                         result.focus();
                     })
-                    .then( () => SqlRegExHis.checkUpdatedConverting());
+                    .then( () => SqlRegExHis.checkUpdatedConverting())
+                    .then( () => copy2clipbord('regexoutput', null));
                 e.preventDefault();
                 form.parentNode.parentNode.style.removeProperty("minHeight");
             })
             SqlRegExHis.checkUpdatedConverting();
             loadUserFormSettings(document.getElementById("converterForm"));
         } else if(actualPath === "visualization"){
-            insertVisualizationPage()
+            insertVisualizationPage();
         }
     }
 }

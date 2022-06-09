@@ -8,8 +8,16 @@ import net.sf.jsqlparser.statement.select.*;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Another StatementVisitor which allows to translate JOIN-ON → WHERE-Expressions.
+ */
 public class StatementVisitorJoinToWhere extends StatementVisitorAdapter {
     SelectVisitor selectVisitorJoinToWhere = new SelectVisitorJoinToWhere();
+
+    /**
+     * Overrides the default visit(Select select) method to accept these new Visitor.
+     * @param select Select statement
+     */
     @Override
     public void visit(Select select) {
         select.getSelectBody().accept(selectVisitorJoinToWhere);

@@ -1,21 +1,16 @@
 package sqltoregex.settings.regexgenerator;
 
-import net.sf.jsqlparser.expression.DateValue;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 import sqltoregex.deparser.UserSettingsPreparer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.SettingsType;
-import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
-import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 

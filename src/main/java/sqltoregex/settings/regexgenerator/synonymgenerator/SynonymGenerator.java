@@ -34,6 +34,13 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     private String prefix = "";
     private String suffix = "";
 
+
+    /**
+     * Generate a list of strings with the searched item a the related synonyms.
+     * Implement generateAsList method from {@link sqltoregex.settings.regexgenerator.IRegExGenerator}.
+     * @param wordToFindSynonyms item to find synonyms for
+     * @return list of string with the searched item and the related synonyms
+     */
     @Override
     public List<String> generateAsList(S wordToFindSynonyms) {
         List<String> stringList = new LinkedList<>();
@@ -54,27 +61,32 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
         }
     }
 
+    /**
+     * SynonymGenerator constructor. Need one of enum {@link SettingsOption}.
+     * Init the super class {@link RegExGenerator}.
+     * Init a {@link SimpleWeightedGraph}.
+     * @param settingsOption one of enum {@link SettingsOption}
+     * @see SettingsOption
+     */
     protected SynonymGenerator(SettingsOption settingsOption) {
         super(settingsOption);
         this.synonymsGraph = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
     }
 
     /**
-     * Add a synonym to all prior existing synonyms with default weight after {@link #prepareSynonymForAdd}
-     *
-     * @param syn
-     * @return
+     * Add a synonym to all prior existing synonyms with default weight after {@link #prepareSynonymForAdd}.
+     * @param syn synonym
+     * @return boolean for add operation success
      */
     public boolean addSynonym(A syn) {
         return addSynonym(syn, DEFAULT_WEIGHT);
     }
 
     /**
-     * Add a synonym to all prior existing synonyms with custom weight after {@link #prepareSynonymForAdd}
-     *
-     * @param syn
-     * @param weight
-     * @return
+     * Add a synonym to all prior existing synonyms with custom weight after {@link #prepareSynonymForAdd}.
+     * @param syn synonym
+     * @param weight specific weight in the graph
+     * @return boolean for add operation success
      */
     public boolean addSynonym(A syn, Long weight) {
         if (synonymsGraph.addVertex(this.prepareSynonymForAdd(syn))) {
@@ -90,20 +102,21 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     }
 
     /**
-     * Add a synonym to a second given synonym with default weight after {@link #prepareSynonymForAdd}
-     *
-     * @param syn
-     * @return
+     * Add a synonym to a second given synonym with default weight after {@link #prepareSynonymForAdd}.
+     * @param syn base synonym
+     * @param synFor new synonym
+     * @return boolean for add operation success
      */
     public boolean addSynonymFor(A syn, A synFor) {
         return addSynonymFor(syn, synFor, DEFAULT_WEIGHT);
     }
 
     /**
-     * Add a synonym to a second given synonym with custom weight after {@link #prepareSynonymForAdd}
-     *
-     * @param syn
-     * @return
+     * Add a synonym to a second given synonym with custom weight after {@link #prepareSynonymForAdd}.
+     * @param syn base synonym
+     * @param synFor new synonym
+     * @param weight specific weight in the graph
+     * @return boolean for add operation success
      */
     public boolean addSynonymFor(A syn, A synFor, Long weight) {
         this.graphForSynonymsOfTwoWords = true;
@@ -124,10 +137,9 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     }
 
     /**
-     * Not using graph equals method cause wrong implementation in JGraphT
-     *
-     * @param o
-     * @return
+     * Overrides default equals method. Not using graph equals method cause wrong implementation in JGraphT.
+     * @param o to compare object
+     * @return boolean for comparison of the two objects
      */
     @Override
     public boolean equals(Object o) {
@@ -149,6 +161,10 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
         }
     }
 
+    /**
+     * Overrides default hashCode() methode. Use all attributes of the class {@link SynonymGenerator}.
+     * @return hashcode as int
+     */
     @Override
     public int hashCode() {
         return Objects.hash(
@@ -163,7 +179,6 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
 
     /**
      * Preprocessed input into a String that will be stored in the graph.
-     *
      * @param syn
      * @return
      */
@@ -171,7 +186,6 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
 
     /**
      * Preprocesses input for search. Changing the search class into the vertex class.
-     *
      * @param wordToFindSynonyms
      * @return
      */
@@ -180,7 +194,6 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     /**
      * Makes it possible to manipulate the way a synonym class is converted into a {@literal String} for RegEx usage
      * without changing {@link Object#toString}. Especially useful when A and S generics are different.
-     *
      * @param syn
      * @param wordToFindSynonyms
      * @return
@@ -189,27 +202,24 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
 
     /**
      * Removes a synonym from the graph.
-     *
-     * @param syn
-     * @return
+     * @param syn the selected synonym
+     * @return boolean for remove operation success
      */
     public boolean removeSynonym(A syn) {
         return synonymsGraph.removeVertex(this.prepareSynonymForAdd(syn));
     }
 
     /**
-     * Converts the search synonym to a string.
-     *
-     * @param wordToFindSynonyms
-     * @return
+     * Convert input to a string.
+     * @param wordToFindSynonyms input of unspecified type
+     * @return input as string
      */
     public String searchSynonymToString(S wordToFindSynonyms) {
         return wordToFindSynonyms.toString();
     }
 
     /**
-     * Sets a common prefix for all concatenations of {@link #generateRegExFor}
-     *
+     * Sets a common prefix for all concatenations of {@link #generateRegExFor}.
      * @param prefix prefix to add
      */
     public void setPrefix(String prefix) {
@@ -217,8 +227,7 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     }
 
     /**
-     * Sets a common suffix for all concatenations of {@link #generateRegExFor}
-     *
+     * Sets a common suffix for all concatenations of {@link #generateRegExFor}.
      * @param suffix suffix to add
      */
     public void setSuffix(String suffix) {

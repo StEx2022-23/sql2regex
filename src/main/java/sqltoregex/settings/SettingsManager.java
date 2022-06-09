@@ -21,6 +21,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
+/**
+ * Realize a spring boot service which handles all settings operations (parsing and specific getters)
+ */
 @Service
 public class SettingsManager {
     private final Map<SettingsType, SettingsContainer> settingsMap = new EnumMap<>(SettingsType.class);
@@ -30,19 +33,45 @@ public class SettingsManager {
         this.parseSettings();
     }
 
+    /**
+     * Returns related settings by passing a class.
+     * @param clazz class of object, which is instanceof IRegExGenerator
+     * @param settingsType SettingsType
+     * @param <T> instanceof IRegExGenerator
+     * @return Set of object, which are instanceof IRegExGenerator
+     */
     public <T extends IRegExGenerator<?>> Set<T> getSettingByClass(Class<T> clazz,
                                                          SettingsType settingsType) {
         return new LinkedHashSet<>(this.getSettingsContainer(settingsType).get(clazz).values());
     }
 
+    /**
+     * Return a boolean for the question, if a specific Setting is present in the SettingsContainer, with the preset SettingsType.USER.
+     * @param settingsOption one of enum SettingsOption
+     * @return boolean → the SettingsOption is given in the SettingsContainer
+     */
     public boolean getSettingBySettingsOption(SettingsOption settingsOption) {
         return this.getSettingBySettingsOption(settingsOption, SettingsType.USER);
     }
 
+    /**
+     * Return a boolean for the question, if a specific Setting is present in the SettingsContainer, by passing a specific SettingsOption, with variable SettingsType.
+     * @param settingsOption one of enum SettingsOption
+     * @param settingsType one of enum SettingsType
+     * @return boolean → the SettingsOption is given in the SettingsContainer
+     */
     public boolean getSettingBySettingsOption(SettingsOption settingsOption, SettingsType settingsType) {
         return this.getSettingsContainer(settingsType).get(settingsOption) != null;
     }
 
+    /**
+     * Get a Object, which is related to a selected Setting, as Optional of T.
+     * @param settingsOption one of enum SettingsOption
+     * @param clazz class of object, which is instanceof IRegExGenerator
+     * @param settingsType one of enum SettingsType
+     * @param <T> instanceof IRegExGenerator
+     * @return Optional object, which is instanceof IRegExGenerator
+     */
     public <T extends IRegExGenerator<?>> Optional<T> getSettingBySettingsOption(SettingsOption settingsOption,
                                                                                     Class<T> clazz,
                                                                                     SettingsType settingsType) {
@@ -54,10 +83,19 @@ public class SettingsManager {
         return Optional.empty();
     }
 
+    /**
+     * Return a SettingsContainer with the preset for SettingsType.USER.
+     * @return SettingsContainer
+     */
     public SettingsContainer getSettingsContainer() {
         return this.getSettingsContainer(SettingsType.USER);
     }
 
+    /**
+     * Return a SettingsContainer with the preset for a given SettingsType.
+     * @param settingsType wanted SettingsType, like: ALL, USER; DEFAULT_SCHOOL
+     * @return SettingsContainer
+     */
     public SettingsContainer getSettingsContainer(SettingsType settingsType) {
         Assert.notNull(settingsType, "settingsType must not be null");
         if (settingsType == SettingsType.USER) {
@@ -66,6 +104,14 @@ public class SettingsManager {
         return this.settingsMap.get(settingsType);
     }
 
+    /**
+     * Read the properties.xml and parse all settings. Saves parsing result in a Map with key = SettingsType and value = SettingsContainer.
+     * @throws ParserConfigurationException
+     * @throws IOException
+     * @throws SAXException
+     * @throws XPathExpressionException
+     * @throws URISyntaxException
+     */
     private void parseSettings() throws ParserConfigurationException, IOException, SAXException,
             XPathExpressionException, URISyntaxException {
         SettingsOption relatedOption;
@@ -113,7 +159,11 @@ public class SettingsManager {
         }
     }
 
-
+    /**
+     * Parse the settings, set by the user, from the given SettingsForm
+     * @param form SettingsForm
+     * @return builded SettingsContainer
+     */
     public SettingsContainer parseUserSettingsInput(SettingsForm form) {
         SettingsContainer.Builder settingsContainerBuilder = SettingsContainer.builder();
 
@@ -135,7 +185,6 @@ public class SettingsManager {
 
     /**
      * Removes insignificant whitespaces from an XML DOM tree.
-     *
      * @param doc Document
      * @throws XPathExpressionException if xp.evaluate("//text()[normalize-space(.)='']" goes wrong
      */

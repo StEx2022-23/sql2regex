@@ -17,9 +17,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-
 class ConverterManagementTest {
-
     ConverterManagement converterManagement = new ConverterManagement(new SettingsManager());
 
     ConverterManagementTest() throws XPathExpressionException, ParserConfigurationException, IOException,
@@ -37,7 +35,6 @@ class ConverterManagementTest {
 
         Assertions.assertTrue(TestUtils.checkAgainstRegEx(converterManagement.deparse(sampleSolution, false, false, SettingsType.ALL), "SELECT col1 FROM table1 INNER JOIN table2 ON (col1=col2) AND col3 = col4"));
         Assertions.assertTrue(TestUtils.checkAgainstRegEx(converterManagement.deparse(sampleSolution, false, false,SettingsType.ALL), "SELECT col1 FROM table1 INNER JOIN table2 WHERE (col1=col2) AND col3 = col4"));
-
     }
 
     @Test
@@ -52,11 +49,12 @@ class ConverterManagementTest {
     }
 
     @Test
-    void testStatementDeparsingWithValidation() {
-//        Assertions.assertEquals(
-//                "^SELECT col1, col2 FROM table$",
-//                converterManagement.deparse("SELECT col1, col2 FROM table", false, true)
-//        );
+    void testStatementDeparsingWithValidation() throws JSQLParserException {
+        String sampleSolution = "SELECT col1, col2 FROM table";
+        String parsingSolution = converterManagement.deparse(sampleSolution, false, true, SettingsType.ALL);
+        Assertions.assertTrue(parsingSolution.startsWith("^"));
+        Assertions.assertTrue(parsingSolution.endsWith("$"));
+
         Assertions.assertThrows(IllegalArgumentException.class, () ->
                 converterManagement.deparse("col1, col2", false, true, SettingsType.ALL)
         );
@@ -64,10 +62,11 @@ class ConverterManagementTest {
 
     @Test
     void testStatementDeparsingWithoutValidation() throws JSQLParserException {
-//        Assertions.assertEquals(
-//                "^SELECT col1, col2 FROM table$",
-//                converterManagement.deparse("SELECT col1, col2 FROM table", false, false)
-//        );
+        String sampleSolution = "SELECT col1, col2 FROM table";
+        String parsingSolution = converterManagement.deparse(sampleSolution, false, false, SettingsType.ALL);
+        Assertions.assertTrue(parsingSolution.startsWith("^"));
+        Assertions.assertTrue(parsingSolution.endsWith("$"));
+
         Assertions.assertEquals(
                 "^col1 + col2$",
                 converterManagement.deparse("col1+col2", true, false, SettingsType.ALL)

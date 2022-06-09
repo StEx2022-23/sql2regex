@@ -77,6 +77,15 @@ statementlist = [
 r = requests.post('http://localhost:8080/multiconvert', headers=headers, json=statementlist)
 print(r.json())
 ```
+
+## documentation
+
+### javadoc
+The current javadoc is available here: https://stex2022-23.github.io/index.html
+
+### top-level-architecture
+coming soon
+
 ## contributers
 - Patrick Binkert, Technische Universität Dresden, student of teaching, 10th semester (physics and computer science)
 - Maximilian Förster, Technische Universität Dresden, student of teaching, 10th semester (physics and computer science)
