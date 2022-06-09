@@ -16,10 +16,20 @@ import java.util.List;
  */
 public class OrderRotation extends RegExGenerator<List<String>> {
 
+    /**
+     * Constructor of OrderRotation. Init the super class.
+     * @param settingsOption one of enum {@link SettingsOption}
+     * @see RegExGenerator
+     */
     public OrderRotation(SettingsOption settingsOption) {
         super(settingsOption);
     }
 
+    /**
+     * Generate a list of strings with all possible orders.
+     * @param valueList with all items
+     * @return list of string with all possible orders
+     */
     @Override
     public List<String> generateAsList(List<String> valueList) {
         Assert.notNull(valueList, "Value list must not be null!");
@@ -30,9 +40,8 @@ public class OrderRotation extends RegExGenerator<List<String>> {
 
     /**
      * helper function for recursive tablename order concatenation
-     *
-     * @param amount    Integer
-     * @param valueList List of String
+     * @param amount amount of items to order rotate
+     * @param valueList List of String with to order rotate items
      */
     private List<String> orderRotationRek(int amount, List<String> valueList) {
         StringBuilder singleValue = new StringBuilder();
@@ -66,11 +75,25 @@ public class OrderRotation extends RegExGenerator<List<String>> {
         return stringList;
     }
 
+    /**
+     * Generate a regex with all possible orders, if the param orderRotation isn't null.
+     * Otherwise, only the joined string list returned.
+     * @param orderRotation OrderRotation object
+     * @param valueList list of strings to order rotate
+     * @return generated regex or str
+     */
     public static String useOrDefault(OrderRotation orderRotation, List<String> valueList){
         if (null != orderRotation) return orderRotation.generateRegExFor(valueList);
         return String.join(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE, valueList);
     }
 
+    /**
+     * Generate a list of strings with all possible orders, if the param orderRotation isn't null.
+     * Otherwise, the given list of string is returned.
+     * @param orderRotation OrderRotation object
+     * @param valueList list of strings to order rotate
+     * @return generated list of orders as string or given list
+     */
     public static List<String> generateAsListOrDefault(OrderRotation orderRotation, List<String> valueList){
         if (null != orderRotation) return orderRotation.generateAsList(valueList);
         return valueList;

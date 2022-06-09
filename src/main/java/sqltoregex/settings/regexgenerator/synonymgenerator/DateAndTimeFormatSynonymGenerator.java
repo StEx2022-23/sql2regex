@@ -15,15 +15,28 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+/**
+ * SynonymGenerator for dateformats, timeformats and datetimeformats. Need SimpleDateFormat and Expression as type.
+ */
 public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDateFormat, Expression> {
     public static final String SYNONYM_MUST_NOT_BE_NULL = "Synonym must not be null";
     public static final String MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE = "Query Expression must be of type " +
             "Date-/Time-/TimestampValue";
 
+    /**
+     * Constructor of DateAndTimeFormatSynonymGenerator. Init the super class.
+     * @param settingsOption one of enum {@link SettingsOption}
+     */
     public DateAndTimeFormatSynonymGenerator(SettingsOption settingsOption) {
         super(settingsOption);
     }
 
+    /**
+     * Generates a regular expression for the {@link SimpleDateFormat} synonyms.
+     * Check if given value is instanceof {@link DateValue}, {@link TimeValue} or {@link TimestampValue}
+     * @param value value to handle
+     * @return generated regex
+     */
     @Override
     public String generateRegExFor(Expression value) {
         if (!(value instanceof DateValue) && !(value instanceof TimeValue) && !(value instanceof TimestampValue)) {

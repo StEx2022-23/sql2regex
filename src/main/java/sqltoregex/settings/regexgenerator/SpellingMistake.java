@@ -6,16 +6,26 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * The OrderRotation class allows creating a RegEx expression that takes into account different spelling variants
+ * The SpellingMistake class allows creating a RegEx expression that takes into account different spelling variants
  * of a word. It is assumed that omitting a character is "okay".
  * Example:
  * test ↔ (?:test|est|tst|tet|tes) or (test|est|tst|tet|tes)
  */
 public class SpellingMistake extends RegExGenerator<String> {
+    /**
+     * Constructor of SpellingMistake. Init the super class.
+     * @param settingsOption one of enum {@link SettingsOption}
+     * @see RegExGenerator
+     */
     public SpellingMistake(SettingsOption settingsOption) {
         super(settingsOption);
     }
 
+    /**
+     * Generate a list of strings which allowed spelling mistakes. We assume, that one wrong character in the string is "okay".
+     * @param str current word
+     * @return list of string with alternative spellings
+     */
     @Override
     public List<String> generateAsList(String str) {
         if (str.isEmpty()) {
@@ -32,11 +42,25 @@ public class SpellingMistake extends RegExGenerator<String> {
         return stringList;
     }
 
+    /**
+     * Generate a regex with allowed spelling mistakes, if the param spellingMistake isn't null.
+     * Otherwise, only the string is returned.
+     * @param spellingMistake SpellingMistake object
+     * @param str string to handle
+     * @return generated regex or str
+     */
     public static String useOrDefault(SpellingMistake spellingMistake, String str){
         if (null != spellingMistake) return spellingMistake.generateRegExFor(str);
         else return str;
     }
 
+    /**
+     * Generate a list of strings with allowed spelling mistakes, if the param spellingMistake isn't null.
+     * Otherwise, a list of string with only one entry is returned. The entry is the given string.
+     * @param spellingMistake SpellingMistake object
+     * @param str string to handle
+     * @return generated list of strings (with one ore more entries)
+     */
     public static List<String> generateAsListOrDefault(SpellingMistake spellingMistake, String str){
         if (null != spellingMistake) return spellingMistake.generateAsList(str);
         return new LinkedList<>(List.of(str));

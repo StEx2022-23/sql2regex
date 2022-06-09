@@ -12,14 +12,26 @@ import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerato
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * The SettingsContainer hold all enabled/selected Settings.
+ */
 public class SettingsContainer {
     private final Map<SettingsOption, IRegExGenerator<?>> allSettings;
 
+    /**
+     * Constructor for the SettingsContainer, with a not null Builder.
+     * @param builder SettingsContainerBuilder
+     */
     private SettingsContainer(Builder builder){
         Assert.notNull(builder.unModifiableMap, "Builder must not be null!");
         this.allSettings = builder.unModifiableMap;
     }
 
+    /**
+     * Return a object which is instanceof IRegExGenerator by passing a SettingsOption.
+     * @param settingsOption one of enum SettingsOption
+     * @return Object instanceof IRegExGenerator
+     */
     public IRegExGenerator<?> get(SettingsOption settingsOption){
         for (IRegExGenerator<?> generator : this.allSettings.values()){
             if (generator.getSettingsOption() == settingsOption){
@@ -29,6 +41,12 @@ public class SettingsContainer {
         return null;
     }
 
+    /**
+     * Return a map with objects which are instanceof IRegExGenerator by passing a class.
+     * @param clazz Class of object which is instanceof IRegExGenerator
+     * @param <T> instanceof IRegExGenerator
+     * @return Map with key = SettingsOption and value = object instanceof IRegExGenerator
+     */
     public <T extends IRegExGenerator<?>> Map<SettingsOption, T> get(Class<T> clazz){
         Map<SettingsOption, T> map = new EnumMap<>(SettingsOption.class);
 
@@ -42,40 +60,68 @@ public class SettingsContainer {
         return Collections.unmodifiableMap(map);
     }
 
+    /**
+     * Get all currently saved Settings.
+     * @return Map with key = SettingsOption and value = object instanceof IRegExGenerator
+     */
     public Map<SettingsOption, IRegExGenerator<?>> getAllSettings(){
         return this.allSettings;
     }
 
-
+    /**
+     * Get a new SettingsContainer-Builder
+     * @return Builder
+     */
     public static Builder builder(){
         return new Builder();
     }
 
+    /**
+     * Specific builder static inner class, to build the SettingsContainer.
+     */
     public static final class Builder {
         private static final String UNSUPPORTED_BUILD_WITH = "Unsupported build with:";
         private static final String STRING_SYNONYM_DELIMITER = ";";
         private final Map<SettingsOption,IRegExGenerator<?>> modifiableMap = new EnumMap<>(SettingsOption.class);
         Map<SettingsOption,IRegExGenerator<?>> unModifiableMap;
 
-
-        private Builder(){
-        }
-
+        /**
+         * Append an entry to the builder map, which holds SettingOptions and related setting objects. In this case, by passing an object instanceof {@link IRegExGenerator}.
+         * @param regExGenerator object instanceof {@link IRegExGenerator}
+         * @return this builder
+         */
         public Builder with(IRegExGenerator<?> regExGenerator){
             this.modifiableMap.put(regExGenerator.getSettingsOption(), regExGenerator);
             return this;
         }
 
+        /**
+         * Append an or multiple entry to the builder map, which holds SettingOptions and related setting objects. In this case, by passing a settings container.
+         * @param settingsContainer SettingsContainer
+         * @return this builder
+         */
         public Builder with(SettingsContainer settingsContainer) {
             modifiableMap.putAll(settingsContainer.getAllSettings());
             return this;
         }
 
+        /**
+         * Append an or multiple entry to the builder map, which holds SettingOptions and related setting objects. In this case, by passing the SettingsManager and one of enum SettingsType.
+         * @param settingsManager SettingsManager
+         * @param settingsType one of enum SettingsType
+         * @return this builder
+         */
         public SettingsContainer with(SettingsManager settingsManager, SettingsType settingsType){
             this.with(settingsManager.getSettingsContainer(settingsType));
             return this.build();
         }
 
+        /**
+         * Append an entry to the builder map, which holds SettingOptions and related setting objects. In this case, by passing a NodeList and one of enum SettingsOption.
+         * @param nodeList NodeList from the xml parsing process
+         * @param settingsOption one of enum SettingsOption
+         * @return this builder
+         */
         public Builder withNodeList(NodeList nodeList, SettingsOption settingsOption) {
             if (nodeList.item(0).getTextContent().equals("false")) {
                 return this;
@@ -135,6 +181,8 @@ public class SettingsContainer {
             }
             return this;
         }
+
+
 
         public Builder withSimpleDateFormatSet(Set<SimpleDateFormat> synonyms, SettingsOption settingsOption) {
             Assert.notNull(synonyms, "Set of simple date formats options must not be null");
@@ -199,6 +247,11 @@ public class SettingsContainer {
 
     }
 
+    /**
+     * Overrides default equals method. Objects are equal, if the allSettings map is equal.
+     * @param o to compare object
+     * @return boolean if equal
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -206,6 +259,10 @@ public class SettingsContainer {
         return allSettings.equals(that.allSettings);
     }
 
+    /**
+     * Overrides default hashCode() method. HashCode candidate is the allSettings map.
+     * @return hashcode as int
+     */
     @Override
     public int hashCode() {
         return Objects.hash(allSettings);

@@ -53,7 +53,7 @@ public class ConverterManagement {
 
     /**
      * Logical OR-concat, if the expression-visitor detect an alternative statement, to allow both of them in the regex.
-     * @param regexList List<String> with alternative regex
+     * @param regexList List of String with alternative regex
      * @return concated regex
      */
     private String buildOutputRegex(List<String> regexList) {
@@ -78,7 +78,7 @@ public class ConverterManagement {
      * Deparse expressions.
      * @param sqlstatement current sql statement
      * @return generated regex
-     * @throws JSQLParserException
+     * @throws JSQLParserException if parsing goes wrong
      */
     private String deParseExpression(String sqlstatement) throws JSQLParserException {
         Expression expression;
@@ -96,7 +96,7 @@ public class ConverterManagement {
      * @param buffer StringBuilder
      * @param settingsType UserSettings or presets
      * @return  generated regex
-     * @throws JSQLParserException
+     * @throws JSQLParserException if parsing goes wrong
      */
     private String deParseStatement(String sqlStatement, StringBuilder buffer, SettingsType settingsType) throws JSQLParserException {
         Statement statement;
@@ -119,7 +119,7 @@ public class ConverterManagement {
      * Handle statement deparsing.
      * @param sqlStatement current sql statement
      * @return generated regex
-     * @throws JSQLParserException
+     * @throws JSQLParserException if parsing goes wrong
      */
     public String deparse(String sqlStatement) throws JSQLParserException {
         StringBuilder buffer = new StringBuilder();
@@ -134,7 +134,7 @@ public class ConverterManagement {
      * @param sqlStatement current sql statement
      * @param isOnlyExpression must be set true, if you only want to deparse an expression
      * @return generated regex
-     * @throws JSQLParserException
+     * @throws JSQLParserException if parsing goes wrong
      */
     public String deparse(String sqlStatement, boolean isOnlyExpression) throws JSQLParserException {
         return deparse(sqlStatement, isOnlyExpression, true, SettingsType.USER);
@@ -147,7 +147,7 @@ public class ConverterManagement {
      * @param toBeValidated turn validation on/off
      * @param settingsType UserSettings or presets
      * @return generated regex
-     * @throws JSQLParserException
+     * @throws JSQLParserException if parsing goes wrong
      */
     public String deparse(String sqlStatement, boolean isOnlyExpression,
                           boolean toBeValidated, SettingsType settingsType) throws JSQLParserException {
@@ -164,7 +164,7 @@ public class ConverterManagement {
 
     /**
      * Compare list elements about unique elements.
-     * @param list List<String>
+     * @param list List of String
      * @return boolean
      */
     private boolean isDistinctList(List<String> list) {
@@ -177,7 +177,7 @@ public class ConverterManagement {
      * Parse an expression.
      * @param sqlstatement current sql-statement
      * @return Expression object
-     * @throws JSQLParserException
+     * @throws JSQLParserException if parsing goes wrong
      */
     private Expression parseExpression(String sqlstatement) throws JSQLParserException {
         return CCJSqlParserUtil.parseExpression(sqlstatement);
@@ -187,7 +187,7 @@ public class ConverterManagement {
      * Parse a statement.
      * @param sqlstatement current sql-statement
      * @return Statement object
-     * @throws JSQLParserException
+     * @throws JSQLParserException if parsing goes wrong
      */
     private Statement parseStatement(String sqlstatement) throws JSQLParserException {
         return CCJSqlParserUtil.parse(sqlstatement);
@@ -196,7 +196,7 @@ public class ConverterManagement {
     /**
      * Validate statements against oracle, mysql, sqlserver or mariadb grammar.
      * @param sqlstatement current sql-statement
-     * @return
+     * @return boolean if the statement is valid
      */
     public boolean validate(String sqlstatement) {
         List<DatabaseType> supportedDBMS = new ArrayList<>();
