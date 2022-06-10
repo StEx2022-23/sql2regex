@@ -20,9 +20,6 @@ function topFunction() {
 function copy2clipbord(id, idFeedback) {
     let copyText = document.getElementById(id);
 
-    copyText.select();
-    copyText.setSelectionRange(0, 99999); /* for mobile devices */
-
     navigator.clipboard.writeText(copyText.value).then(function() {
         if(idFeedback !== null){
             let copyFeedbackAlert = document.getElementById(idFeedback);
@@ -167,8 +164,8 @@ class SqlRegExHistory {
         if(null !== document.getElementById("convertbodycontainer")) {
             let sqlinput = document.getElementById("sqlinput").value;
             let regexinput = document.getElementById("regexoutput").value;
-            if (!this.sql.includes(sqlinput) && sqlinput.length !== 0) this.addToLocalStorage(sqlinput, regexinput);
-            if (this.sql.length !== 0) this.showConvertingHistory();
+            if (!this.sql.includes(regexinput) && regexinput.length !== 0 && sqlinput.length !== 0) this.addToLocalStorage(sqlinput, regexinput);
+            if (this.regex.length !== 0) this.showConvertingHistory();
         }
     }
 
@@ -208,52 +205,89 @@ class SqlRegExHistory {
                 button.innerHTML = arrayOfSqlAndArrayOfRegex[0][i];
                 topHeading.append(button);
 
-                let innerInnerDiv = document.createElement('div');
-                innerInnerDiv.setAttribute("id", "collapse-"+String(i));
-                innerInnerDiv.setAttribute("aria-labelledby", "heading-"+String(i));
-                innerInnerDiv.setAttribute("data-bs-parent", "#historyAccordion");
-                innerInnerDiv.classList.add("accordion-collapse","collapse");
-                innerInnerDiv.style.position = "relative";
+                let alreadyFound = false;
+                for(let j = 0; j < i; j++){
+                    if(arrayOfSqlAndArrayOfRegex[0][i] === arrayOfSqlAndArrayOfRegex[0][j]){
+                        let existingAccordionBodys = [];
+                        outerDiv.childNodes.forEach(el => {existingAccordionBodys.push(el.childNodes[1].childNodes[0])});
+                        console.log(existingAccordionBodys);
+                        existingAccordionBodys.forEach(el => {
+                            if(el.id === "accordionBodyId-"+String(j)){
+                                let divider = document.createElement("hr");
+                                el.append(divider);
+                                el.append(this.generateCopyIconAndCodeContainer(i));
+                                alreadyFound = true;
+                            }
+                        });
+                    }
+                }
 
-                let innerInnerInnerDiv = document.createElement('div');
-                innerInnerInnerDiv.classList.add("accordion-body");
+                if(!alreadyFound){
+                    let innerInnerDiv = document.createElement('div');
+                    innerInnerDiv.setAttribute("id", "collapse-"+String(i));
+                    innerInnerDiv.setAttribute("aria-labelledby", "heading-"+String(i));
+                    innerInnerDiv.setAttribute("data-bs-parent", "#historyAccordion");
+                    innerInnerDiv.classList.add("accordion-collapse","collapse");
 
-                let codeTag = document.createElement("code");
-                codeTag.setAttribute("id", "copyHistoryCodeId-"+String(i))
-                codeTag.innerHTML = arrayOfSqlAndArrayOfRegex[1][i];
-                innerInnerInnerDiv.append(codeTag);
-                innerInnerDiv.append(innerInnerInnerDiv);
+                    let innerInnerInnerDiv = document.createElement('div');
+                    innerInnerInnerDiv.classList.add("accordion-body");
+                    innerInnerInnerDiv.setAttribute("id", "accordionBodyId-"+String(i))
 
-                let copyDiv = document.createElement("div");
-                copyDiv.setAttribute("id","copyHistory");
-                let copyEntryId = "copyHistoryCodeId-".concat(String(i));
-                copyDiv.setAttribute("onclick", "copyHistoryEntry('"+copyEntryId+"')");
-                innerInnerDiv.append(copyDiv);
-                let copyIcon = document.createElementNS('http://www.w3.org/2000/svg', "svg");
-                copyIcon.setAttribute("width", "30");
-                copyIcon.setAttribute("height", "30");
-                copyIcon.setAttribute("fill", "black");
-                copyIcon.setAttribute("viewBox", "0 0 16 16");
-                copyIcon.setAttribute("class", "icon");
-                let copyIconPathEins = document.createElementNS('http://www.w3.org/2000/svg', "path");
-                copyIconPathEins.setAttribute("d", "M9.5 0a.5.5 0 0 1 .5.5.5.5 0 0 0 .5.5.5.5 0 0 1 .5.5V2a.5.5 0 0 1-.5.5h-5A.5.5 0 0 1 5 2v-.5a.5.5 0 0 1 .5-.5.5.5 0 0 0 .5-.5.5.5 0 0 1 .5-.5h3Z");
-                copyIcon.append(copyIconPathEins);
-                let copyIconPathZwei = document.createElementNS('http://www.w3.org/2000/svg', "path");
-                copyIconPathZwei.setAttribute("d", "M3 2.5a.5.5 0 0 1 .5-.5H4a.5.5 0 0 0 0-1h-.5A1.5 1.5 0 0 0 2 2.5v12A1.5 1.5 0 0 0 3.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-12A1.5 1.5 0 0 0 12.5 1H12a.5.5 0 0 0 0 1h.5a.5.5 0 0 1 .5.5v12a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-12Z");
-                copyIcon.append(copyIconPathZwei);
-                let copyIconPathDrei = document.createElementNS('http://www.w3.org/2000/svg', "path");
-                copyIconPathDrei.setAttribute("d", "M10.854 7.854a.5.5 0 0 0-.708-.708L7.5 9.793 6.354 8.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3Z");
-                copyIcon.append(copyIconPathDrei);
-                copyDiv.append(copyIcon);
-                tempAccordionDiv.append(topHeading);
-                tempAccordionDiv.append(innerInnerDiv);
-                outerDiv.append(tempAccordionDiv);
+                    innerInnerInnerDiv.append(this.generateCopyIconAndCodeContainer(i))
+                    innerInnerDiv.append(innerInnerInnerDiv);
+
+                    tempAccordionDiv.append(topHeading);
+                    tempAccordionDiv.append(innerInnerDiv);
+                    outerDiv.append(tempAccordionDiv);
+                }
             }
         }
         body.appendChild(outerDiv);
-        if (!document.getElementById("convertbodycontainer").classList.contains("show")){
+
+
+
+        if (!document.getElementById("convertbodycontainer").classList.contains("show")) {
             new bootstrap.Collapse(document.getElementById("convertbodycontainer"))
         }
+    }
+
+    generateCopyIconAndCodeContainer(i) {
+        let copyIconHolder = document.createElement('div');
+        copyIconHolder.setAttribute("id", "copyIconHolderFor-"+String(i));
+        copyIconHolder.style.position = "relative";
+
+        let codeTag = document.createElement("code");
+        codeTag.setAttribute("id", "copyHistoryCodeId-"+String(i))
+        codeTag.innerHTML = this.readSqlRegExFromLocalStorage()[1][i];
+
+        let copyDiv = document.createElement("div");
+        copyDiv.setAttribute("id","copyHistory");
+        let copyEntryId = "copyHistoryCodeId-".concat(String(i));
+        copyDiv.setAttribute("onclick", "copyHistoryEntry('"+copyEntryId+"')");
+        copyDiv.append(this.generateCopyIcon());
+
+        copyIconHolder.append(codeTag);
+        copyIconHolder.append(copyDiv);
+
+        return copyIconHolder;
+    }
+    generateCopyIcon() {
+        let copyIcon = document.createElementNS('http://www.w3.org/2000/svg', "svg");
+        copyIcon.setAttribute("width", "30");
+        copyIcon.setAttribute("height", "30");
+        copyIcon.setAttribute("fill", "black");
+        copyIcon.setAttribute("viewBox", "0 0 16 16");
+        copyIcon.setAttribute("class", "icon");
+        let copyIconPathEins = document.createElementNS('http://www.w3.org/2000/svg', "path");
+        copyIconPathEins.setAttribute("d", "M9.5 0a.5.5 0 0 1 .5.5.5.5 0 0 0 .5.5.5.5 0 0 1 .5.5V2a.5.5 0 0 1-.5.5h-5A.5.5 0 0 1 5 2v-.5a.5.5 0 0 1 .5-.5.5.5 0 0 0 .5-.5.5.5 0 0 1 .5-.5h3Z");
+        copyIcon.append(copyIconPathEins);
+        let copyIconPathZwei = document.createElementNS('http://www.w3.org/2000/svg', "path");
+        copyIconPathZwei.setAttribute("d", "M3 2.5a.5.5 0 0 1 .5-.5H4a.5.5 0 0 0 0-1h-.5A1.5 1.5 0 0 0 2 2.5v12A1.5 1.5 0 0 0 3.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-12A1.5 1.5 0 0 0 12.5 1H12a.5.5 0 0 0 0 1h.5a.5.5 0 0 1 .5.5v12a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-12Z");
+        copyIcon.append(copyIconPathZwei);
+        let copyIconPathDrei = document.createElementNS('http://www.w3.org/2000/svg', "path");
+        copyIconPathDrei.setAttribute("d", "M10.854 7.854a.5.5 0 0 0-.708-.708L7.5 9.793 6.354 8.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3Z");
+        copyIcon.append(copyIconPathDrei);
+        return copyIcon;
     }
 
     clearLocalStorage(clearStorageFeedbackId) {
