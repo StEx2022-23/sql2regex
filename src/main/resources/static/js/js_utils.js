@@ -30,6 +30,14 @@ function copy2clipbord(id, idFeedback) {
             let copyFeedbackAlertFailed = document.getElementById(idFeedback+"Failed");
             copyFeedbackAlertFailed.style.display = "block";
         }
+    }).catch(function () {
+        let copyElement = document.createElement('input');
+        copyElement.setAttribute('value', copyText.value);
+        document.body.appendChild(copyElement);
+        copyElement.focus();
+        copyElement.select();
+        document.execCommand('copy');
+        document.body.removeChild(copyElement);
     });
 }
 
@@ -228,7 +236,6 @@ class SqlRegExHistory {
                     if(arrayOfSqlAndArrayOfRegex[0][i] === arrayOfSqlAndArrayOfRegex[0][j]){
                         let existingAccordionBodys = [];
                         outerDiv.childNodes.forEach(el => {existingAccordionBodys.push(el.childNodes[1].childNodes[0])});
-                        console.log(existingAccordionBodys);
                         existingAccordionBodys.forEach(el => {
                             if(el.id === "accordionBodyId-"+String(j)){
                                 let divider = document.createElement("hr");
