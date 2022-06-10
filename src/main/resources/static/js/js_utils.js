@@ -53,7 +53,7 @@ function insertVisualizationPage() {
     iframe.setAttribute("id", "visualizationOption1");
     iframe.setAttribute("src", src);
 
-    let container = document.getElementById("visualizationOption1Heading");
+    let container = document.getElementById("visualizationOption1ResourceHint");
     container.appendChild(iframe);
 }
 

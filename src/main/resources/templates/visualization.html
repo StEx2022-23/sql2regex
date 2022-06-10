@@ -11,13 +11,19 @@
             <div class="card">
                 <div class="card-body">
                     <div id="visualizationOption1Heading">
-                        <h1 class="fw-bolder border-bottom mb-3 mt-3" id="visualizationOption1" th:text="#{visualization.heading1}">Visualization</h1>
+                        <h1 class="fw-bolder border-bottom mb-3 mt-3" id="visualizationOption1h1" th:text="#{visualization.heading1}">Visualization</h1>
+                    </div>
+                    <div class="text-end" id="visualizationOption1ResourceHint">
+                        <span class="badge rounded-pill bg-warning text-dark mb-3">external resource</span>
                     </div>
                     <hr>
                     <div id="visualizationOption2Heading">
-                        <h1 class="fw-bolder border-bottom mb-3 mt-3" id="visualizationOption2" th:text="#{visualization.heading2}">Advanced Visualization</h1>
+                        <h1 class="fw-bolder border-bottom mb-3 mt-3" id="visualizationOption2h1" th:text="#{visualization.heading2}">Advanced Visualization</h1>
                     </div>
-                    <iframe src="https://www.debuggex.com/" width="100%" height="800" scrollbar="scrollbar" title="W3Schools Free Online Web Tutorials">
+                    <div class="text-end" id="visualizationOption2ResourceHint">
+                        <span class="badge rounded-pill bg-warning text-dark mb-3">external resource</span>
+                    </div>
+                    <iframe src="https://www.debuggex.com/" id="visualizationOption2" width="100%" height="800" scrollbar="scrollbar" title="W3Schools Free Online Web Tutorials">
                     </iframe>
                 </div>
             </div>
