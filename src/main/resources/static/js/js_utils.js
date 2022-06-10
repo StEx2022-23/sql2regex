@@ -38,12 +38,12 @@ function copyHistoryEntry(id) {
 }
 
 function insertVisualizationPage() {
-    let src = "https://jex.im/regulex/#!flags=i";
+    let src = "https://regexper.com/#";
     let params = new URLSearchParams(document.location.search);
     if(null !== params.get("regex") && params.get("regex").length !== 0){
-        src = src + "&re=" + params.get("regex");
+        src = src + params.get("regex");
     } else {
-        src = src + "&re=" + encodeURIComponent("SELECT \\* FROM table");
+        src = src + encodeURIComponent("SELECT \\* FROM table");
     }
 
     let iframe = document.createElement('iframe');
@@ -87,10 +87,25 @@ function generateJsonFormatFile(id_sql, id_regex, id_jsonFeedback) {
     jsonFeedbackAlert.style.display = "block";
 }
 
+const animateRegExCheck = [
+    { transform: 'scale(0.98)' },
+    { transform: 'scale(1.02)' },
+    { transform: 'scale(1.0)' }
+];
+
+const animateRegExCheckTiming = {
+    duration: 500,
+    iterations: 1,
+}
+
 function checkRegExExample(sql, regex) {
     let text = document.getElementById(sql).value;
+    let parsedRegEx = document.getElementById(regex).innerHTML;
+    parsedRegEx = parsedRegEx.substring(parsedRegEx.indexOf("^"), parsedRegEx.length);
+    parsedRegEx = parsedRegEx.substring(0, parsedRegEx.indexOf("$") + 1);
+    parsedRegEx = parsedRegEx.replaceAll("&amp;", "&");
     let nullInputHint = document.getElementById(regex + "hint");
-    let pattern = new RegExp(document.getElementById(regex).innerHTML, 'gmi');
+    let pattern = new RegExp(parsedRegEx, 'gmi');
     let checkPositive = document.getElementById(regex + "pos");
     let checkNegative = document.getElementById(regex + "neg");
 
@@ -99,6 +114,7 @@ function checkRegExExample(sql, regex) {
 
     if (text.length === 0) {
         nullInputHint.style.display = "block";
+        nullInputHint.animate(animateRegExCheck, animateRegExCheckTiming);
         return;
     } else {
         nullInputHint.style.display = "none";
@@ -106,8 +122,10 @@ function checkRegExExample(sql, regex) {
 
     if (pattern.test(text)) {
         checkPositive.style.display = "block";
+        checkPositive.animate(animateRegExCheck, animateRegExCheckTiming);
     } else {
         checkNegative.style.display = "block";
+        checkNegative.animate(animateRegExCheck, animateRegExCheckTiming);
     }
 }
 
