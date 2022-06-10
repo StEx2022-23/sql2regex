@@ -233,17 +233,22 @@ class SqlRegExHistory {
 
                 let alreadyFound = false;
                 for(let j = 0; j < i; j++){
+                    // check if sql is equal
                     if(arrayOfSqlAndArrayOfRegex[0][i] === arrayOfSqlAndArrayOfRegex[0][j]){
-                        let existingAccordionBodys = [];
-                        outerDiv.childNodes.forEach(el => {existingAccordionBodys.push(el.childNodes[1].childNodes[0])});
-                        existingAccordionBodys.forEach(el => {
-                            if(el.id === "accordionBodyId-"+String(j)){
-                                let divider = document.createElement("hr");
-                                el.append(divider);
-                                el.append(this.generateCopyIconAndCodeContainer(i));
-                                alreadyFound = true;
-                            }
-                        });
+                        // check if regex is equal
+                        if(arrayOfSqlAndArrayOfRegex[1][i] === arrayOfSqlAndArrayOfRegex[1][j]) alreadyFound = true;
+                        else {
+                            let existingAccordionBodys = [];
+                            outerDiv.childNodes.forEach(el => {existingAccordionBodys.push(el.childNodes[1].childNodes[0])});
+                            existingAccordionBodys.forEach(el => {
+                                if(el.id === "accordionBodyId-"+String(j)){
+                                    let divider = document.createElement("hr");
+                                    el.append(divider);
+                                    el.append(this.generateCopyIconAndCodeContainer(i));
+                                    alreadyFound = true;
+                                }
+                            });
+                         }
                     }
                 }
 
@@ -268,9 +273,7 @@ class SqlRegExHistory {
             }
         }
         body.appendChild(outerDiv);
-
-
-
+        
         if (!document.getElementById("convertbodycontainer").classList.contains("show")) {
             new bootstrap.Collapse(document.getElementById("convertbodycontainer"))
         }
