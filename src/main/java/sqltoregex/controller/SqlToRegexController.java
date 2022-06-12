@@ -24,7 +24,7 @@ import javax.validation.Valid;
 import java.util.*;
 
 /**
- * Handles frontend pages for this applications.
+ * Provides frontend pages for this application.
  */
 @Controller
 public class SqlToRegexController {
@@ -34,20 +34,20 @@ public class SqlToRegexController {
     ConverterManagement converterManagement;
 
     /**
-     * Set SettingsManager and ConverterManagement for the converting process.
+     * Sets SettingsManager and ConverterManagement for the converting process.
      * @param settingsManager SettingsManager, autowired, no action required.
      * @param converterManagement ConverterManagement, autowired, no action required.
      */
     @Autowired
     SqlToRegexController(SettingsManager settingsManager, ConverterManagement converterManagement) {
-        Assert.notNull(settingsManager, "Settings management must not be null");
+        Assert.notNull(settingsManager, "Settings manager must not be null");
         Assert.notNull(converterManagement, "Converter management must not be null");
         this.settingsManager = settingsManager;
         this.converterManagement = converterManagement;
     }
 
     /**
-     * Prepare and return the about page when requesting "/about".
+     * Prepares and returns the about page when requesting "/about".
      * @param model Model, autowired, no action required.
      * @return about page
      */
@@ -122,7 +122,7 @@ public class SqlToRegexController {
     }
 
     /**
-     * Performe converting Process by post request.
+     * Performes converting process by a post request.
      * @param model Model, autowired, no action required.
      * @param settingsForm SettingsForm
      * @param result Errors
@@ -160,7 +160,7 @@ public class SqlToRegexController {
     }
 
     /**
-     * Prepare and return the examples page when requesting "/examples".
+     * Prepares and returns the examples page when requesting "/examples".
      * @param model Model, autowired, no action required.
      * @return examples page
      */
@@ -224,7 +224,7 @@ public class SqlToRegexController {
     }
 
     /**
-     * Prepare and return the landing page when requesting "/".
+     * Prepares and returns the landing page when requesting "/".
      * @param model Model, autowired, no action required.
      * @return landing page
      */
@@ -237,7 +237,7 @@ public class SqlToRegexController {
     }
 
     /**
-     * Prepare and return the impressum page when requesting "/impressum".
+     * Prepares and returns the impressum page when requesting "/impressum".
      * @param model Model, autowired, no action required.
      * @return impressum page
      */
@@ -248,7 +248,7 @@ public class SqlToRegexController {
     }
 
     /**
-     * Prepare and return the privacy policy page when requesting "/privacy".
+     * Prepares and returns the privacy policy page when requesting "/privacy".
      * @param model Model, autowired, no action required.
      * @return privacy policy page
      */
@@ -259,7 +259,7 @@ public class SqlToRegexController {
     }
 
     /**
-     * Prepare and return the visualization page when requesting "/visualization".
+     * Prepares and returns the visualization page when requesting "/visualization".
      * @param model Model, autowired, no action required.
      * @return visualization page
      */

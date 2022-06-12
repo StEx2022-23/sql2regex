@@ -16,7 +16,7 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
 import java.util.*;
 
 /**
- * Implements own {@link UpdateDeParser} to generate regex.
+ * Implements an own {@link UpdateDeParser} to generate regex.
  */
 public class UpdateDeParserForRegEx extends UpdateDeParser {
     private final Map<String, String> tableNameAliasCombinations = new HashMap<>();
@@ -32,7 +32,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     private final SettingsContainer settingsContainer;
 
     /**
-     * Short constructor for UpdateDeParserForRegEx. Init the expanded constructor.
+     * Short constructor for UpdateDeParserForRegEx. Inits the expanded constructor.
      * @param settingsContainer {@link SettingsContainer}
      * @param buffer {@link StringBuilder}
      */
@@ -60,7 +60,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     }
 
     /**
-     * Deparse the whole {@link Update} object.
+     * Deparses the whole {@link Update} object.
      * {@link SuppressWarnings}: PMD.CyclomaticComplexity, PMD.ExcessiveMethodLength and PMD.NPathComplexity
      * @param update {@link Update}
      */
@@ -190,7 +190,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     }
 
     /**
-     * Get the set {@link ExpressionDeParserForRegEx}.
+     * Gets the set {@link ExpressionDeParserForRegEx}.
      * @return {@link ExpressionDeParserForRegEx}.
      */
     public ExpressionDeParserForRegEx getExpressionDeParserForRegEx() {
@@ -198,7 +198,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     }
 
     /**
-     * Set the {@link ExpressionDeParserForRegEx}.
+     * Sets the {@link ExpressionDeParserForRegEx}.
      * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
      */
     public void setExpressionDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx) {
@@ -206,7 +206,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     }
 
     /**
-     * Handle {@link OrderByElement} deparsing.
+     * Performs {@link OrderByElement} deparsing.
      * @param orderBy {@link OrderByElement}
      * @throws UnsupportedOperationException forbidden in this implementation
      */
@@ -216,7 +216,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     }
 
     /**
-     * Handle keyword spelling mistake with required whitespaces before and after.
+     * Performs keyword spelling mistakes with required whitespaces as suffix and prefix.
      * @param whiteSpaceBefore boolean for whitespace before
      * @param keyword keyword to handle by keyword spelling mistake {@link SpellingMistake}
      * @param whiteSpaceAfter boolean for whitespace after
@@ -228,7 +228,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     }
 
     /**
-     * Generate table name alias from a column list string type of tab1.col1
+     * Generates table name alias from a column list string, which is a type of tab1.col1.
      * @param columnName to handle column name
      * @return generated regex
      */
@@ -264,7 +264,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     }
 
     /**
-     * Handle existing table name alias.
+     * Extracts table name alias.
      * @param column to handle column
      * @return generated regex
      */

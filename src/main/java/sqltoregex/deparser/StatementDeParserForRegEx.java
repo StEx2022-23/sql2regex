@@ -12,7 +12,7 @@ import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 /**
- * implements own statement deparser for regular expressions
+ * Implements an own statement deparser to generate regular expressions.
  */
 public class StatementDeParserForRegEx extends StatementDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
@@ -22,7 +22,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     SettingsContainer settings;
 
     /**
-     * Short constructor for StatementDeParserForRegEx. Init the expanded constructor.
+     * Short constructor for StatementDeParserForRegEx. Inits the expanded constructor.
      * @param buffer {@link StringBuilder}
      * @param settings {@link SettingsContainer}
      */
@@ -31,7 +31,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     }
 
     /**
-     * Shorter constructor for StatementDeParserForRegEx. Init the expanded constructor.
+     * Shorter constructor for StatementDeParserForRegEx. Inits the expanded constructor.
      * @param expressionDeParser {@link ExpressionDeParserForRegEx}
      * @param buffer {@link StringBuilder}
      * @param settings {@link SettingsContainer}
@@ -59,7 +59,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     }
 
     /**
-     * override visit method for {@link Select} statements
+     * Overrides visit method for {@link Select} statements.
      * @param select {@link Select} statement
      */
     @Override
@@ -77,7 +77,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     }
 
     /**
-     * override visit method for {@link Insert} statements
+     * Overrides visit method for {@link Insert} statements.
      * @param insert {@link Insert} statement
      */
     @Override
@@ -95,7 +95,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     }
 
     /**
-     * override visit method for {@link CreateTable} statements
+     * Overrides visit method for {@link CreateTable} statements.
      * @param createTable {@link CreateTable} statement
      */
     @Override
@@ -105,7 +105,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     }
 
     /**
-     * override visit method for {@link Update} statements
+     * Overrides visit method for {@link Update} statements.
      * @param update {@link Update} statement
      */
     @Override
@@ -123,7 +123,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     }
 
     /**
-     * override visit method for {@link Delete} statements
+     * Overrides visit method for {@link Delete} statements.
      * @param delete {@link Delete} statement
      */
     @Override
@@ -137,7 +137,7 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     }
 
     /**
-     * override visit method for {@link Statements}
+     * Overrides visit method for {@link Statements}.
      * @param stmts {@link Statements}
      */
     @Override

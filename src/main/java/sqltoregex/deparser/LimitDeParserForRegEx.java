@@ -17,7 +17,7 @@ public class LimitDeParserForRegEx extends LimitDeparser {
     private SpellingMistake keywordSpellingMistake;
 
     /**
-     * Short constructor for LimitDeParserForRegEx. Init the expanded constructor.
+     * Short constructor for LimitDeParserForRegEx. Inits the expanded constructor.
      * @param buffer {@link StringBuilder}
      */
     public LimitDeParserForRegEx(StringBuilder buffer) {
@@ -35,7 +35,7 @@ public class LimitDeParserForRegEx extends LimitDeparser {
     }
 
     /**
-     * Deparse the whole {@link Limit} object.
+     * Deparses the whole {@link Limit} object.
      * {@link SuppressWarnings}: PMD.CyclomaticComplexity
      * @param limit {@link Limit}
      */

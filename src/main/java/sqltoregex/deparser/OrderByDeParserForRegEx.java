@@ -28,7 +28,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     private ExpressionVisitor expressionDeParserForRegEx;
 
     /**
-     * Short constructor for OrderByDeParserForRegEx. Init the expanded constructor.
+     * Short constructor for OrderByDeParserForRegEx. Inits the expanded constructor.
      * @param settings {@link SettingsContainer}
      */
     public OrderByDeParserForRegEx(SettingsContainer settings) {
@@ -53,7 +53,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     /**
-     * Handle deparsing for {@link OrderByElement}. Need a {@link FromItem} object to handle table name alias.
+     * Performs deparsing for {@link OrderByElement}. Needs an {@link FromItem} object to extract table name alias.
      * @param orderByElementList list of {@link OrderByElement}
      * @param fromItem {@link FromItem}
      */
@@ -75,7 +75,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     /**
-     * Prepare {@link OrderByElement} for {@link OrderRotation}. Need a {@link FromItem} object to handle table name alias.
+     * Prepares {@link OrderByElement} for {@link OrderRotation}. Needs an {@link FromItem} object to extract table name alias.
      * @param orderByElement {@link OrderByElement}
      * @param fromItem {@link FromItem}
      * @return generated regex
@@ -110,7 +110,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     /**
-     * Get set {@link ExpressionVisitor}.
+     * Gets the set {@link ExpressionVisitor}.
      * @return {@link ExpressionVisitor}
      */
     public ExpressionVisitor getExpressionVisitor() {
@@ -118,7 +118,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     /**
-     * Set {@link ExpressionVisitor}.
+     * Sets a {@link ExpressionVisitor}.
      * @param expressionVisitor {@link ExpressionVisitor}
      */
     public void setExpressionVisitor(ExpressionVisitor expressionVisitor) {
@@ -126,7 +126,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     /**
-     * Get set {@link ExpressionDeParserForRegEx}.
+     * Gets the set {@link ExpressionDeParserForRegEx}.
      * @return {@link ExpressionDeParserForRegEx}
      */
     public ExpressionDeParserForRegEx getExpressionDeParserForRegEx() {
@@ -134,7 +134,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     /**
-     * Set {@link ExpressionDeParserForRegEx}.
+     * Sets {@link ExpressionDeParserForRegEx}.
      * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
      */
     public void setExpressionDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx) {
@@ -142,7 +142,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     /**
-     * Handle asc and desc deparsing from a {@link OrderByElement}.
+     * Generates asc and desc expression from a {@link OrderByElement}.
      * @param orderByElement {@link OrderByElement}
      * @return generated regex
      */
@@ -167,7 +167,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     /**
-     * Handle null first or last keyword.
+     * Generates null first or last keyword expression.
      * @param orderByElement {@link OrderByElement}
      * @return generated regex
      */
@@ -189,7 +189,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     /**
-     * Handle table name alias. Extracted from a {@link FromItem}.
+     * Performs inserting of the table name alias. Extracted from a {@link FromItem}.
      * @param fromItem {@link FromItem}
      * @param col column name
      * @return generated regex

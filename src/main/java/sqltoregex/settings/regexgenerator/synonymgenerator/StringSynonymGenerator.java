@@ -7,14 +7,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Default implementation of {@link SynonymGenerator}. Saves Strings and searches with exact representation of them.
+ * Default implementation of {@link SynonymGenerator}. Saves strings and searches with exact representation of them.
  * e.g. used for: Data-Type synonyms
  */
 public class StringSynonymGenerator extends SynonymGenerator<String, String> {
 
     /**
-     * SynonymGenerator constructor. Need one of enum {@link SettingsOption}.
-     * Init the super class {@link SynonymGenerator}.
+     * SynonymGenerator constructor. Needs one of enum {@link SettingsOption}.
+     * Inits the super class {@link SynonymGenerator}.
      * @param settingsOption one of enum {@link SettingsOption}
      * @see SettingsOption
      * @see SynonymGenerator
@@ -24,18 +24,18 @@ public class StringSynonymGenerator extends SynonymGenerator<String, String> {
     }
 
     /**
-     * Just assert that the string is not null. Return the input string.
+     * Ensures that the string is not null. Returns the input string.
      * @param syn string synonym
      * @return input string
      */
     @Override
     protected String prepareSynonymForAdd(String syn) {
-        Assert.notNull(syn, "Added string must be not null");
+        Assert.notNull(syn, "Added string must not be null");
         return syn;
     }
 
     /**
-     * Just assert that the string is not null. Return the input string.
+     * Ensures that the string is not null. Returns the input string.
      * @param wordToFindSynonyms string synonym
      * @return input string
      */
@@ -46,7 +46,7 @@ public class StringSynonymGenerator extends SynonymGenerator<String, String> {
     }
 
     /**
-     * Just assert that the strings are not null. Return the input strings.
+     * Ensures that the strings are not null. Returns the input strings.
      * @param syn base synonym
      * @param wordToFindSynonyms word to find synonyms for
      * @return input string
@@ -59,7 +59,7 @@ public class StringSynonymGenerator extends SynonymGenerator<String, String> {
     }
 
     /**
-     * Generate a regex with all possible synonyms, if the param synonymGenerator isn't null.
+     * Generates a regex with all possible synonyms, if the param synonymGenerator isn't null.
      * Otherwise, only the input string returned.
      * @param synonymGenerator StringSynonymGenerator object
      * @param str input string
@@ -71,7 +71,7 @@ public class StringSynonymGenerator extends SynonymGenerator<String, String> {
     }
 
     /**
-     * Generate a list of strings with all possible synonyms, if the param synonymGenerator isn't null.
+     * Generates a list of strings with all possible synonyms, if the param synonymGenerator isn't null.
      * @param synonymGenerator StringSynonymGenerator
      * @param str input string
      * @return generated list of synonyms as string or given string as one entry in the string list

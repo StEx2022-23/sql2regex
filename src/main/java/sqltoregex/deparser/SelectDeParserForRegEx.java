@@ -57,7 +57,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Generate an optional alias regex block.
+     * Generates an optional alias regex block.
      * @param isOptional boolean for optional block
      * @return generated regex
      */
@@ -75,7 +75,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Handle join deparsing.
+     * Performs join deparsing.
      * @param join {@link Join}
      */
     @Override
@@ -146,7 +146,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Handle offset deparsing.
+     * Performs offset deparsing.
      * @param offset {@link Offset}
      */
     @Override
@@ -160,7 +160,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Handle optimize for deparsing.
+     * Performs optimize for deparsing.
      * @param optimizeFor {@link OptimizeFor}
      */
     private void deparseOptimizeForForRegEx(OptimizeFor optimizeFor) {
@@ -171,7 +171,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Return the ExpressionVisitor. The ExpressionVisitor is instanceof {@link ExpressionDeParserForRegEx}
+     * Returns the ExpressionVisitor. The ExpressionVisitor is instanceof {@link ExpressionDeParserForRegEx}
      * @return ExpressionVisitor instanceof {@link ExpressionDeParserForRegEx}
      */
     public ExpressionDeParserForRegEx getExpressionDeParserForRegEx() {
@@ -179,7 +179,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Set the ExpressionVisitor. The ExpressionVisitor must be instanceof {@link ExpressionDeParserForRegEx}
+     * Sets the ExpressionVisitor. The ExpressionVisitor must be instanceof {@link ExpressionDeParserForRegEx}
      * @param visitor ExpressionVisitor instanceof {@link ExpressionDeParserForRegEx}
      * @throws IllegalArgumentException if the ExpressionVisitor isn't instanceof {@link ExpressionDeParserForRegEx}
      */
@@ -193,7 +193,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Generate regex for alias and aggregate functions.
+     * Generates regex for alias and aggregate functions.
      * @param o Object instanceof {@link net.sf.jsqlparser.statement.Statement}
      * @return generated regex
      */
@@ -233,7 +233,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Handle {@link WithItem} deparsing.
+     * Performs {@link WithItem} deparsing.
      * @param withItem {@link WithItem}
      * @return generated regex
      */
@@ -259,7 +259,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Handle value list of {@link WithItem} from specific {@link net.sf.jsqlparser.statement.Statement} object.
+     * Extracts value list of {@link WithItem} from a specific {@link net.sf.jsqlparser.statement.Statement} object.
      * @param select {@link Select}
      * @return generated regex for value list
      */
@@ -269,7 +269,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Handle value list of {@link WithItem} from specific {@link net.sf.jsqlparser.statement.Statement} object.
+     * Extracts value list of {@link WithItem} from a specific {@link net.sf.jsqlparser.statement.Statement} object.
      * @param subSelect {@link SubSelect}
      * @return generated regex for value list
      */
@@ -279,7 +279,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Handle value list of {@link WithItem} from specific {@link net.sf.jsqlparser.statement.Statement} object.
+     * Extracts value list of {@link WithItem} from a specific {@link net.sf.jsqlparser.statement.Statement} object.
      * @param update {@link Update}
      * @return generated regex for value list
      */
@@ -289,7 +289,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Handle value list of {@link WithItem} from specific {@link net.sf.jsqlparser.statement.Statement} object.
+     * Extracts value list of {@link WithItem} from a specific {@link net.sf.jsqlparser.statement.Statement} object.
      * @param delete {@link Delete}
      * @return generated regex for value list
      */
@@ -299,7 +299,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link WithItem} list from specific {@link net.sf.jsqlparser.statement.Statement} object.
+     * Extracts {@link WithItem} list from a specific {@link net.sf.jsqlparser.statement.Statement} object.
      * @param listOfWithItems list of {@link WithItem}
      * @return list of string with deparsed items
      */
@@ -334,7 +334,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse fetch statement.
+     * Deparses fetch statement.
      * @param fetch {@link Fetch}
      */
     @Override
@@ -359,7 +359,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse the whole {@link PlainSelect} object.
+     * Deparses the whole {@link PlainSelect} object.
      * {@link SuppressWarnings}: PMD.CyclomaticComplexity, PMD.ExcessiveMethodLength and PMD.NPathComplexity
      * @param plainSelect {@link PlainSelect}
      */
@@ -579,7 +579,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link AllTableColumns}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link AllTableColumns}.
      * @param allTableColumns {@link AllTableColumns}
      */
     @Override
@@ -589,7 +589,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link SelectExpressionItem}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link SelectExpressionItem}.
      * @param selectExpressionItem {@link SelectExpressionItem}
      */
     @Override
@@ -601,7 +601,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link SubSelect}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link SubSelect}.
      * @param subSelect {@link SubSelect}
      */
     @Override
@@ -637,7 +637,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link Table}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link Table}.
      * @param tableName {@link Table}
      */
     @Override
@@ -673,7 +673,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link Pivot}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link Pivot}.
      * @param pivot {@link Pivot}
      */
     @Override
@@ -724,7 +724,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link UnPivot}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link UnPivot}.
      * @param unpivot {@link UnPivot}
      */
     @Override
@@ -788,7 +788,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link PivotXml}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link PivotXml}.
      * @param pivot {@link PivotXml}
      */
     @Override
@@ -837,7 +837,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link SubJoin}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link SubJoin}.
      * @param subjoin {@link SubJoin}
      */
     @Override
@@ -855,7 +855,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link SetOperationList}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link SetOperationList}.
      * @param list {@link SetOperationList}
      */
     @Override
@@ -900,7 +900,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link WithItem}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link WithItem}.
      * @param withItem {@link WithItem}
      * @throws UnsupportedOperationException not supported in this implementation
      */
@@ -910,7 +910,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link LateralSubSelect}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link LateralSubSelect}.
      * @param lateralSubSelect {@link LateralSubSelect}
      */
     @Override
@@ -919,7 +919,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link ValuesList}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link ValuesList}.
      * @param valuesList {@link ValuesList}
      */
     @Override
@@ -928,7 +928,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link AllColumns}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link AllColumns}.
      * @param allColumns {@link AllColumns}
      */
     @Override
@@ -937,7 +937,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link TableFunction}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link TableFunction}.
      * @param tableFunction {@link TableFunction}
      */
     @Override
@@ -946,7 +946,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link ParenthesisFromItem}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link ParenthesisFromItem}.
      * @param parenthesis {@link ParenthesisFromItem}
      */
     @Override
@@ -961,7 +961,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link ValuesStatement}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link ValuesStatement}.
      * @param values {@link ValuesStatement}
      */
     @Override
@@ -970,7 +970,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link ExpressionList}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link ExpressionList}.
      * @param expressionList {@link ExpressionList}
      */
     @Override
@@ -979,7 +979,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link NamedExpressionList}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link NamedExpressionList}.
      * @param namedExpressionList {@link NamedExpressionList}
      */
     @Override
@@ -988,7 +988,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link MultiExpressionList}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link MultiExpressionList}.
      * @param multiExprList {@link MultiExpressionList}
      */
     @Override
@@ -997,7 +997,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link WithItem}.
+     * Deparses {@link net.sf.jsqlparser.statement.Statement} instanceof {@link WithItem}.
      * @param withItem {@link WithItem}
      * @return generated regex
      */
@@ -1013,7 +1013,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Handle value list of {@link WithItem} from specific {@link net.sf.jsqlparser.statement.Statement} object.
+     * Extracts value list of {@link WithItem} from a specific {@link net.sf.jsqlparser.statement.Statement} object.
      * @param insert {@link Insert}
      * @return generated regex for value list
      */
@@ -1022,7 +1022,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
-     * Handle keyword spelling mistake with required whitespaces before and after.
+     * Performs keyword spelling mistakes with required whitespaces as suffix and prefix.
      * @param whiteSpaceBefore boolean for whitespace before
      * @param keyword keyword to handle by keyword spelling mistake {@link SpellingMistake}
      * @param whiteSpaceAfter boolean for whitespace after

@@ -41,7 +41,7 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
     }
 
     /**
-     * Handle deparsing for {@link GroupByElement}.
+     * Performs deparsing for {@link GroupByElement}.
      * {@link SuppressWarnings}: PMD.CyclomaticComplexity and PMD.NPathComplexity
      * @param groupBy {@link GroupByElement}
      */
@@ -68,7 +68,7 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
     }
 
     /**
-     * Get set {@link ExpressionDeParserForRegEx}.
+     * Get the set {@link ExpressionDeParserForRegEx}.
      * @return {@link ExpressionDeParserForRegEx}
      */
     public ExpressionDeParserForRegEx getExpressionDeParserForRegEx(){
@@ -76,7 +76,7 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
     }
 
     /**
-     * Set map with table names and related alias.
+     * Sets a map with table names and related alias.
      * @param tableNameAliasMap map with key instanceof string and value instanceof string
      */
     public void setTableNameAliasMap(Map<String, String> tableNameAliasMap){
@@ -84,7 +84,7 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
     }
 
     /**
-     * Get table name alias map.
+     * Gets the table name alias map.
      * @return map with key instanceof string and value instanceof string
      */
     public Map<String, String> getTableNameAliasMap(){
@@ -92,7 +92,7 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
     }
 
     /**
-     * Deparse an expression list to a string list.
+     * Converts an expression list to a string list.
      * @param expressionList list of {@link Expression}
      * @return list of string
      */

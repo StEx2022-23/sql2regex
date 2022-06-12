@@ -13,7 +13,7 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
 import java.util.*;
 
 /**
- * implements own delete statement deparser for regular expressions
+ * Implements an own delete statement deparser to generate regular expressions.
  */
 public class DeleteDeParserForRegEx extends DeleteDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
@@ -53,7 +53,7 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
     }
 
     /**
-     * Overrides deparse method for implement regular expressions while deparsing the {@link Delete} statement
+     * Overrides deparse method for implement regular expressions while deparsing the {@link Delete} statement.
      * {@link SuppressWarnings}: PMD.CyclomaticComplexity, PMD.ExcessiveMethodLength and PMD.NPathComplexity
      * @param delete {@link Delete}
      */
@@ -217,7 +217,7 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
     }
 
     /**
-     * Get private final settings container, init while construct the object.
+     * Gets the private final settings container which is init, while the object was being constructed.
      * @return {@link SettingsContainer}
      */
     private SettingsContainer getSettingsContainer(){

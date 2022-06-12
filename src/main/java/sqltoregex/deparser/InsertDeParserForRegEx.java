@@ -30,7 +30,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     private final OrderRotation columnNameOrder;
     private final OrderRotation tableNameOrder;
     private final OrderRotation insertIntoValuesOrder;
-    List<String> quotationMarkList = Arrays.asList("'", "`", "\"");
+    List<String> quotationMarkList = Arrays.asList("'", "`", "\"", "´");
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
     SettingsContainer settings;
@@ -64,7 +64,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     }
 
     /**
-     * Deparse the whole {@link Insert} object.
+     * Deparses the whole {@link Insert} object.
      * {@link SuppressWarnings}: PMD.CyclomaticComplexity, PMD.ExcessiveMethodLength and PMD.NPathComplexity
      * @param insert {@link Insert}
      */
@@ -253,7 +253,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     }
 
     /**
-     * Handle {@link NamedExpressionList} deparsing.
+     *Performs  {@link NamedExpressionList} deparsing.
      * @param namedExpressionList {@link NamedExpressionList}
      * @throws UnsupportedOperationException forbidden in this implementation
      */
@@ -263,7 +263,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     }
 
     /**
-     * Handle {@link ExpressionList} deparsing.
+     * Performs {@link ExpressionList} deparsing.
      * @param expressionList {@link ExpressionList}
      */
     @Override
@@ -281,7 +281,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     }
 
     /**
-     * Handle {@link MultiExpressionList} deparsing.
+     * Performs {@link MultiExpressionList} deparsing.
      * @param multiExprList {@link MultiExpressionList}
      */
     @Override
@@ -306,7 +306,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     }
 
     /**
-     * Handle {@link SubSelect} deparsing.
+     * Performs {@link SubSelect} deparsing.
      * @param subSelect {@link SubSelect}
      */
     @Override
@@ -315,8 +315,8 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     }
 
     /**
-     * Map columns and related values. Write in a map, instantiated in {@link InsertDeParserForRegEx#deParse(Insert)}.
-     * Return a string list with all columns.
+     * It maps columns and related values. Writes in a map, instantiated in {@link InsertDeParserForRegEx#deParse(Insert)}.
+     * Returns a string list with all columns.
      * @param mappedColumnsAndRelatedValues map with string (columns) as keys and list of string as values for the mapped values
      * @param insert {@link Insert}
      * @return column list
@@ -337,8 +337,8 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     }
 
     /**
-     * Map columns and related values. Write in a map, instantiated in {@link InsertDeParserForRegEx#deParse(Insert)}.
-     * Return a string list with all columns.
+     * It maps columns and related values. Writes in a map, instantiated in {@link InsertDeParserForRegEx#deParse(Insert)}.
+     * Returns a string list with all columns.
      * @param mappedColumnsAndRelatedValues map with string (columns) as keys and list of string as values for the mapped values
      * @param insert {@link Insert}
      * @return column list
@@ -354,7 +354,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     }
 
     /**
-     * Rotate column name orders.
+     * Rotates column name orders.
      * @param keySet set of string
      * @return list of strings with all possible orders
      */
@@ -366,9 +366,9 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     }
 
     /**
-     * Rotate column name orders.
+     * Rotates column name orders.
      * @param columnsOrderOptionsIterator string {@link Iterator} for column name orders
-     * @return list of strings with all possible orders with finalized regex and appended value keyword.
+     * @return list of strings with all possible orders with finalized regex and appended value keyword
      */
     private String[] generateColumnArray(Iterator<String> columnsOrderOptionsIterator) {
         String singleColumnOrderOption = columnsOrderOptionsIterator.next();
@@ -386,7 +386,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     }
 
     /**
-     * Prepare set-expressions for deparsing.
+     * Prepares set-expressions for deparsing.
      * @param expressionList {@link ExpressionList}
      * @param expressionListAsString list of strings
      */
@@ -414,7 +414,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     }
 
     /**
-     * Generate string for multiple quotation marks options.
+     * Generates a string for multiple quotation marks options.
      * @return generated regex
      */
     private String generateRegExForQuotationMarks() {

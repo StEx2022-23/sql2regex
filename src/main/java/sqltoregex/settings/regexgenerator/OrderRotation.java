@@ -49,6 +49,7 @@ public class OrderRotation extends RegExGenerator<List<String>> {
         if (amount == 1) {
             Iterator<String> iterator = valueList.iterator();
             while (iterator.hasNext()) {
+//                singleValue.append("[`´\"']?").append(iterator.next()).append("[`´\"']?");
                 singleValue.append(iterator.next());
                 if (iterator.hasNext()) {
                     singleValue.append("\\s*,\\s*");
