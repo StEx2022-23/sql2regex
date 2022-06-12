@@ -18,6 +18,9 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import java.util.*;
 
+/**
+ * Implements own {@link InsertDeParser} to generate regex.
+ */
 public class InsertDeParserForRegEx extends InsertDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
@@ -32,11 +35,21 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     SelectDeParserForRegEx selectDeParserForRegEx;
     SettingsContainer settings;
 
+    /**
+     * Short constructor for InsertDeParserForRegEx. Init the expanded constructor.
+     * @param settings {@link SettingsContainer}
+     */
     public InsertDeParserForRegEx(SettingsContainer settings) {
         this(new ExpressionDeParserForRegEx(settings), new SelectDeParserForRegEx(settings), new StringBuilder(), settings);
-        this.settings = settings;
     }
 
+    /**
+     * Extended constructor for InsertDeParserForRegEx.
+     * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
+     * @param selectDeParserForRegEx {@link SelectDeParserForRegEx}
+     * @param buffer {@link StringBuilder}
+     * @param settings {@link SettingsContainer}
+     */
     public InsertDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx, SelectDeParserForRegEx selectDeParserForRegEx, StringBuilder buffer, SettingsContainer settings) {
         super(expressionDeParserForRegEx, selectDeParserForRegEx, buffer);
         this.settings = settings;
@@ -50,6 +63,11 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         this.insertIntoValuesOrder = settings.get(OrderRotation.class).get(SettingsOption.INSERTINTOVALUESORDER);
     }
 
+    /**
+     * Deparse the whole {@link Insert} object.
+     * {@link SuppressWarnings}: PMD.CyclomaticComplexity, PMD.ExcessiveMethodLength and PMD.NPathComplexity
+     * @param insert {@link Insert}
+     */
     @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.ExcessiveMethodLength", "PMD.NPathComplexity"})
     public void deParse(Insert insert) {
@@ -234,11 +252,20 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         }
     }
 
+    /**
+     * Handle {@link NamedExpressionList} deparsing.
+     * @param namedExpressionList {@link NamedExpressionList}
+     * @throws UnsupportedOperationException forbidden in this implementation
+     */
     @Override
     public void visit(NamedExpressionList namedExpressionList) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Handle {@link ExpressionList} deparsing.
+     * @param expressionList {@link ExpressionList}
+     */
     @Override
     public void visit(ExpressionList expressionList) {
         buffer.append(
@@ -253,6 +280,10 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         buffer.append(OPTIONAL_WHITE_SPACE).append("\\)");
     }
 
+    /**
+     * Handle {@link MultiExpressionList} deparsing.
+     * @param multiExprList {@link MultiExpressionList}
+     */
     @Override
     public void visit(MultiExpressionList multiExprList) {
         buffer.append(
@@ -274,11 +305,22 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         buffer.append(OrderRotation.useOrDefault(this.tableNameOrder, multiExpressionListAsString));
     }
 
+    /**
+     * Handle {@link SubSelect} deparsing.
+     * @param subSelect {@link SubSelect}
+     */
     @Override
     public void visit(SubSelect subSelect) {
         subSelect.getSelectBody().accept(this.selectDeParserForRegEx);
     }
 
+    /**
+     * Map columns and related values. Write in a map, instantiated in {@link InsertDeParserForRegEx#deParse(Insert)}.
+     * Return a string list with all columns.
+     * @param mappedColumnsAndRelatedValues map with string (columns) as keys and list of string as values for the mapped values
+     * @param insert {@link Insert}
+     * @return column list
+     */
     private String[] generateListOfColumnsOrderOptionForMultipleValues(Map<String, List<String>> mappedColumnsAndRelatedValues, Insert insert) {
         for (int i = 0; i < insert.getColumns().size(); i++) {
             List<Expression> expression = insert.getItemsList(ExpressionList.class).getExpressions();
@@ -294,6 +336,13 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         return this.generateColumnsRotatedArray(mappedColumnsAndRelatedValues.keySet());
     }
 
+    /**
+     * Map columns and related values. Write in a map, instantiated in {@link InsertDeParserForRegEx#deParse(Insert)}.
+     * Return a string list with all columns.
+     * @param mappedColumnsAndRelatedValues map with string (columns) as keys and list of string as values for the mapped values
+     * @param insert {@link Insert}
+     * @return column list
+     */
     private String[] generateListOfColumnsOrderOption(Map<String, String> mappedColumnsAndRelatedValues, Insert insert) {
         for (int i = 0; i < insert.getColumns().size(); i++) {
             mappedColumnsAndRelatedValues.put(
@@ -304,16 +353,23 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         return this.generateColumnsRotatedArray(mappedColumnsAndRelatedValues.keySet());
     }
 
+    /**
+     * Rotate column name orders.
+     * @param keySet set of string
+     * @return list of strings with all possible orders
+     */
     private String[] generateColumnsRotatedArray(Set<String> keySet) {
-        List<String> mappedColumnsAndRelatedValuesKeySet = new ArrayList<>();
-        for (String string : keySet) {
-            mappedColumnsAndRelatedValuesKeySet.add(string);
-        }
+        List<String> mappedColumnsAndRelatedValuesKeySet = new ArrayList<>(keySet);
         String columnsRotated = OrderRotation.useOrDefault(this.columnNameOrder, mappedColumnsAndRelatedValuesKeySet);
         columnsRotated = columnsRotated.replace(OPTIONAL_WHITE_SPACE, "").replace("(?:", "").replace(")", "");
         return columnsRotated.split("\\|");
     }
 
+    /**
+     * Rotate column name orders.
+     * @param columnsOrderOptionsIterator string {@link Iterator} for column name orders
+     * @return list of strings with all possible orders with finalized regex and appended value keyword.
+     */
     private String[] generateColumnArray(Iterator<String> columnsOrderOptionsIterator) {
         String singleColumnOrderOption = columnsOrderOptionsIterator.next();
 
@@ -329,6 +385,11 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         return singleColumnOrderOption.replace(" ", "").split(",");
     }
 
+    /**
+     * Prepare set-expressions for deparsing.
+     * @param expressionList {@link ExpressionList}
+     * @param expressionListAsString list of strings
+     */
     private void prepareExpressionListForOrderRotation(ExpressionList expressionList, List<String> expressionListAsString) {
         for (Expression expression : expressionList.getExpressions()) {
             String expressionFixed = expression.toString();
@@ -352,6 +413,10 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         }
     }
 
+    /**
+     * Generate string for multiple quotation marks options.
+     * @return generated regex
+     */
     private String generateRegExForQuotationMarks() {
         StringBuilder str = new StringBuilder();
         str.append("[");

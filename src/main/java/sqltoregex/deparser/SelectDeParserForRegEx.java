@@ -25,10 +25,12 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Implements own {@link SelectDeParser} to generate regex.
+ */
 public class SelectDeParserForRegEx extends SelectDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
-    private boolean flagForOrderRotationWithOutSpellingMistake = false;
     private final SpellingMistake keywordSpellingMistake;
     private final SpellingMistake columnNameSpellingMistake;
     private final SpellingMistake tableNameSpellingMistake;
@@ -38,6 +40,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     private final SettingsContainer settingsContainer;
     private ExpressionDeParserForRegEx expressionDeParserForRegEx;
 
+    /**
+     * Constructor for SelectDeParserForRegEx. Needs a {@link SettingsContainer}.
+     * @param settingsContainer holds all actual settings
+     */
     public SelectDeParserForRegEx(SettingsContainer settingsContainer) {
         super();
         this.settingsContainer = settingsContainer;
@@ -50,6 +56,11 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         this.tableNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
     }
 
+    /**
+     * Generate an optional alias regex block.
+     * @param isOptional boolean for optional block
+     * @return generated regex
+     */
     public String addOptionalAliasKeywords(boolean isOptional) {
         StringBuilder temp = new StringBuilder();
         temp.append(OPTIONAL_WHITE_SPACE);
@@ -63,6 +74,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         return temp.toString();
     }
 
+    /**
+     * Handle join deparsing.
+     * @param join {@link Join}
+     */
     @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity"})
     public void deparseJoin(Join join) {
@@ -130,6 +145,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
     }
 
+    /**
+     * Handle offset deparsing.
+     * @param offset {@link Offset}
+     */
     @Override
     public void deparseOffset(Offset offset) {
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "OFFSET", true);
@@ -140,6 +159,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
     }
 
+    /**
+     * Handle optimize for deparsing.
+     * @param optimizeFor {@link OptimizeFor}
+     */
     private void deparseOptimizeForForRegEx(OptimizeFor optimizeFor) {
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "OPTIMIZE", true);
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "FOR", true);
@@ -147,20 +170,33 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "ROWS", false);
     }
 
-    @Override
-    public ExpressionVisitor getExpressionVisitor() {
-        return expressionDeParserForRegEx;
+    /**
+     * Return the ExpressionVisitor. The ExpressionVisitor is instanceof {@link ExpressionDeParserForRegEx}
+     * @return ExpressionVisitor instanceof {@link ExpressionDeParserForRegEx}
+     */
+    public ExpressionDeParserForRegEx getExpressionDeParserForRegEx() {
+        return this.expressionDeParserForRegEx;
     }
 
+    /**
+     * Set the ExpressionVisitor. The ExpressionVisitor must be instanceof {@link ExpressionDeParserForRegEx}
+     * @param visitor ExpressionVisitor instanceof {@link ExpressionDeParserForRegEx}
+     * @throws IllegalArgumentException if the ExpressionVisitor isn't instanceof {@link ExpressionDeParserForRegEx}
+     */
     @Override
     public void setExpressionVisitor(ExpressionVisitor visitor) {
         if (!(visitor instanceof ExpressionDeParserForRegEx)) {
             throw new IllegalArgumentException(
                     "ExpressionVisitor must be of type ExpressionDeParserForRegex for this implementation");
         }
-        expressionDeParserForRegEx = (ExpressionDeParserForRegEx) visitor;
+        this.expressionDeParserForRegEx = (ExpressionDeParserForRegEx) visitor;
     }
 
+    /**
+     * Generate regex for alias and aggregate functions.
+     * @param o Object instanceof {@link net.sf.jsqlparser.statement.Statement}
+     * @return generated regex
+     */
     private String handleAliasAndAggregateFunction(Object o) {
         StringBuilder temp = new StringBuilder();
         if (o.toString().contains("(") && o.toString().contains(")")) {
@@ -174,20 +210,17 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         if (!o.toString().contains("AS") && !o.toString().contains("(") && !o.toString().contains(")")) {
             temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, o.toString()));
-            this.setFlagForOrderRotationWithOutSpellingMistake(true);
         }
 
         if (o.toString().contains("AS") && o.toString().contains("(") && o.toString().contains(")")) {
             temp.append(this.addOptionalAliasKeywords(false));
             temp.append(o.toString().split("AS")[1].replace(" ", ""));
-            this.setFlagForOrderRotationWithOutSpellingMistake(true);
         }
 
         if (o.toString().contains("AS") && !o.toString().contains("(") && !o.toString().contains(")")) {
             temp.append(o.toString().split("AS")[0].replace(" ", ""));
             temp.append(this.addOptionalAliasKeywords(false));
             temp.append(o.toString().split("AS")[1].replace(" ", ""));
-            this.setFlagForOrderRotationWithOutSpellingMistake(true);
         }
 
         if (!o.toString().contains("AS")) {
@@ -195,29 +228,23 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             temp.append("(");
             temp.append(this.addOptionalAliasKeywords(false));
             temp.append(".*)?");
-            this.setFlagForOrderRotationWithOutSpellingMistake(true);
         }
         return temp.toString();
     }
 
-    private String handleOrderRotationWithExplicitNoneSpellingMistake(List<String> stringList) {
-        StringBuilder temp = new StringBuilder();
-        if (this.flagForOrderRotationWithOutSpellingMistake) {
-            List<String> selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake = new ArrayList<>(stringList);
-            temp.append(OrderRotation.useOrDefault(this.columnNameOrder,
-                                                        selectedColumnNamesAsStringsWithExplicitNoneSpellingMistake));
-        } else {
-            temp.append(OrderRotation.useOrDefault(this.columnNameOrder, stringList));
-        }
-        return temp.toString();
-    }
-
+    /**
+     * Handle {@link WithItem} deparsing.
+     * @param withItem {@link WithItem}
+     * @return generated regex
+     */
     private String handleWithGetItemListIsUsingValue(WithItem withItem) {
         StringBuilder temp = new StringBuilder();
         ItemsList itemsList = withItem.getItemsList();
-        this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "VALUES", true);
+        this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "VALUE", true);
+        temp.append("S?");
         temp.append("\\(").append(OPTIONAL_WHITE_SPACE);
-        this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "VALUES", true);
+        this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "VALUE", true);
+        temp.append("S?");
         ExpressionList expressionList = (ExpressionList) itemsList;
         Iterator<Expression> expressionIterator = expressionList.getExpressions().iterator();
         List<String> expressionListAsStrings = new LinkedList<>();
@@ -231,26 +258,51 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         return temp.toString();
     }
 
+    /**
+     * Handle value list of {@link WithItem} from specific {@link net.sf.jsqlparser.statement.Statement} object.
+     * @param select {@link Select}
+     * @return generated regex for value list
+     */
     public String handleWithItemValueList(Select select) {
         return OrderRotation.useOrDefault(this.tableNameOrder,
                                                helperFunctionForHandleWithItemValueList(select.getWithItemsList()));
     }
 
-    public String handleWithItemValueList(SubSelect select) {
+    /**
+     * Handle value list of {@link WithItem} from specific {@link net.sf.jsqlparser.statement.Statement} object.
+     * @param subSelect {@link SubSelect}
+     * @return generated regex for value list
+     */
+    public String handleWithItemValueList(SubSelect subSelect) {
         return OrderRotation.useOrDefault(this.tableNameOrder,
-                                               helperFunctionForHandleWithItemValueList(select.getWithItemsList()));
+                                               helperFunctionForHandleWithItemValueList(subSelect.getWithItemsList()));
     }
 
+    /**
+     * Handle value list of {@link WithItem} from specific {@link net.sf.jsqlparser.statement.Statement} object.
+     * @param update {@link Update}
+     * @return generated regex for value list
+     */
     public String handleWithItemValueList(Update update) {
         return OrderRotation.useOrDefault(this.tableNameOrder,
                 helperFunctionForHandleWithItemValueList(update.getWithItemsList()));
     }
 
+    /**
+     * Handle value list of {@link WithItem} from specific {@link net.sf.jsqlparser.statement.Statement} object.
+     * @param delete {@link Delete}
+     * @return generated regex for value list
+     */
     public String handleWithItemValueList(Delete delete) {
         return OrderRotation.useOrDefault(this.tableNameOrder,
                 helperFunctionForHandleWithItemValueList(delete.getWithItemsList()));
     }
 
+    /**
+     * Deparse {@link WithItem} list from specific {@link net.sf.jsqlparser.statement.Statement} object.
+     * @param listOfWithItems list of {@link WithItem}
+     * @return list of string with deparsed items
+     */
     private List<String> helperFunctionForHandleWithItemValueList(List<WithItem> listOfWithItems) {
         List<String> withItemStringList = new LinkedList<>();
         for (WithItem withItem : listOfWithItems) {
@@ -281,10 +333,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         return withItemStringList;
     }
 
-    private void setFlagForOrderRotationWithOutSpellingMistake(boolean flag) {
-        this.flagForOrderRotationWithOutSpellingMistake = flag;
-    }
-
+    /**
+     * Deparse fetch statement.
+     * @param fetch {@link Fetch}
+     */
     @Override
     public void deparseFetch(Fetch fetch) {
         buffer.append(REQUIRED_WHITE_SPACE);
@@ -306,6 +358,11 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     }
 
+    /**
+     * Deparse the whole {@link PlainSelect} object.
+     * {@link SuppressWarnings}: PMD.CyclomaticComplexity, PMD.ExcessiveMethodLength and PMD.NPathComplexity
+     * @param plainSelect {@link PlainSelect}
+     */
     @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.ExcessiveMethodLength", "PMD.NPathComplexity"})
     public void visit(PlainSelect plainSelect) {
@@ -374,7 +431,6 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             buffer.append(OPTIONAL_WHITE_SPACE);
         }
 
-        this.setFlagForOrderRotationWithOutSpellingMistake(false);
         List<String> selectedColumnNamesAsStrings = new ArrayList<>();
         if (plainSelect.getSelectItems().get(0) instanceof AllColumns) {
             plainSelect.getSelectItems().get(0).accept(this);
@@ -382,7 +438,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             for (SelectItem selectItem : plainSelect.getSelectItems()) {
                 selectedColumnNamesAsStrings.add(this.handleAliasAndAggregateFunction(selectItem));
             }
-            buffer.append(this.handleOrderRotationWithExplicitNoneSpellingMistake(selectedColumnNamesAsStrings));
+            buffer.append(OrderRotation.useOrDefault(this.columnNameOrder, selectedColumnNamesAsStrings));
         }
         if (plainSelect.getIntoTables() != null) {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "FROM", true);
@@ -404,7 +460,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
                 fromItemWithAlias.append(plainSelect.getFromItem().toString().split(" ")[0]);
                 fromItemWithAlias.append("(").append("(?:ALIAS|AS)"+REQUIRED_WHITE_SPACE).append(")?");
                 String[] getFromItem = plainSelect.getFromItem().toString().split(" ");
-                if(getFromItem.length > 1) fromItemWithAlias.append(REQUIRED_WHITE_SPACE + getFromItem[getFromItem.length - 1]);
+                if(getFromItem.length > 1) fromItemWithAlias.append(REQUIRED_WHITE_SPACE).append(getFromItem[getFromItem.length - 1]);
 
             } else {
                 fromItemWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, plainSelect.getFromItem().toString()));
@@ -444,7 +500,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             buffer.append(OPTIONAL_WHITE_SPACE);
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(false, "WHERE", true);
             this.expressionDeParserForRegEx.addTableNameAlias(plainSelect.getFromItem().toString());
-            plainSelect.getWhere().accept(this.getExpressionVisitor());
+            plainSelect.getWhere().accept(this.getExpressionDeParserForRegEx());
         }
 
         if (plainSelect.getOracleHierarchical() != null) {
@@ -463,13 +519,12 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
         if (plainSelect.getHaving() != null) {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "HAVING", true);
-
             plainSelect.getHaving().accept(expressionDeParserForRegEx);
         }
 
         if (plainSelect.getOrderByElements() != null) {
             new OrderByDeParserForRegEx(
-                    this.getExpressionVisitor(),
+                    this.getExpressionDeParserForRegEx(),
                     buffer,
                     this.settingsContainer).deParse(
                         plainSelect.getOrderByElements(),
@@ -523,12 +578,20 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link AllTableColumns}.
+     * @param allTableColumns {@link AllTableColumns}
+     */
     @Override
     public void visit(AllTableColumns allTableColumns) {
         buffer.append(allTableColumns.getTable().getFullyQualifiedName())
                 .append("." + OPTIONAL_WHITE_SPACE + "(?:ALL|\\*);");
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link SelectExpressionItem}.
+     * @param selectExpressionItem {@link SelectExpressionItem}
+     */
     @Override
     public void visit(SelectExpressionItem selectExpressionItem) {
         selectExpressionItem.getExpression().accept(expressionDeParserForRegEx);
@@ -537,6 +600,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link SubSelect}.
+     * @param subSelect {@link SubSelect}
+     */
     @Override
     public void visit(SubSelect subSelect) {
         buffer.append(subSelect.isUseBrackets() ? "\\(" + OPTIONAL_WHITE_SPACE : OPTIONAL_WHITE_SPACE);
@@ -568,6 +635,11 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
     }
 
+
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link Table}.
+     * @param tableName {@link Table}
+     */
     @Override
     public void visit(Table tableName) {
         buffer.append(
@@ -600,6 +672,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link Pivot}.
+     * @param pivot {@link Pivot}
+     */
     @Override
     public void visit(Pivot pivot) {
         List<Column> forColumns = pivot.getForColumns();
@@ -611,7 +687,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         for (FunctionItem functionItem : pivot.getFunctionItems()) {
             functionItemList.add(this.handleAliasAndAggregateFunction(functionItem));
         }
-        buffer.append(this.handleOrderRotationWithExplicitNoneSpellingMistake(functionItemList));
+        buffer.append(OrderRotation.useOrDefault(this.columnNameOrder, functionItemList));
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "FOR", true);
 
         List<String> forColumnsList = new LinkedList<>();
@@ -647,6 +723,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link UnPivot}.
+     * @param unpivot {@link UnPivot}
+     */
     @Override
     public void visit(UnPivot unpivot) {
         boolean showOptions = unpivot.getIncludeNullsSpecified();
@@ -707,6 +787,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link PivotXml}.
+     * @param pivot {@link PivotXml}
+     */
     @Override
     public void visit(PivotXml pivot) {
         List<String> forColumnsAsStringList = new LinkedList<>();
@@ -723,7 +807,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         for (FunctionItem functionItem : pivot.getFunctionItems()) {
             functionItemList.add(this.handleAliasAndAggregateFunction(functionItem));
         }
-        buffer.append(this.handleOrderRotationWithExplicitNoneSpellingMistake(functionItemList));
+        buffer.append(OrderRotation.useOrDefault(this.columnNameOrder, functionItemList));
         this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "FOR", true);
 
         buffer.append(forColumns.size() > 1 ? "\\(" : "");
@@ -752,6 +836,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE).append("\\)");
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link SubJoin}.
+     * @param subjoin {@link SubJoin}
+     */
     @Override
     public void visit(SubJoin subjoin) {
         buffer.append("\\(");
@@ -766,7 +854,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
     }
 
-
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link SetOperationList}.
+     * @param list {@link SetOperationList}
+     */
     @Override
     public void visit(SetOperationList list) {
         for (int i = 0; i < list.getSelects().size(); i++) {
@@ -808,31 +899,56 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link WithItem}.
+     * @param withItem {@link WithItem}
+     * @throws UnsupportedOperationException not supported in this implementation
+     */
     @Override
     public void visit(WithItem withItem) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link LateralSubSelect}.
+     * @param lateralSubSelect {@link LateralSubSelect}
+     */
     @Override
     public void visit(LateralSubSelect lateralSubSelect) {
         buffer.append(lateralSubSelect.toString());
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link ValuesList}.
+     * @param valuesList {@link ValuesList}
+     */
     @Override
     public void visit(ValuesList valuesList) {
         buffer.append(valuesList.toString());
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link AllColumns}.
+     * @param allColumns {@link AllColumns}
+     */
     @Override
     public void visit(AllColumns allColumns) {
         buffer.append("(?:").append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "ALL")).append("|\\*)");
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link TableFunction}.
+     * @param tableFunction {@link TableFunction}
+     */
     @Override
     public void visit(TableFunction tableFunction) {
         buffer.append(tableFunction.toString());
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link ParenthesisFromItem}.
+     * @param parenthesis {@link ParenthesisFromItem}
+     */
     @Override
     public void visit(ParenthesisFromItem parenthesis) {
         buffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
@@ -844,26 +960,47 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         }
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link ValuesStatement}.
+     * @param values {@link ValuesStatement}
+     */
     @Override
     public void visit(ValuesStatement values) {
         new ValuesStatementDeParser(this, buffer).deParse(values);
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link ExpressionList}.
+     * @param expressionList {@link ExpressionList}
+     */
     @Override
     public void visit(ExpressionList expressionList) {
         buffer.append(expressionList.toString());
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link NamedExpressionList}.
+     * @param namedExpressionList {@link NamedExpressionList}
+     */
     @Override
     public void visit(NamedExpressionList namedExpressionList) {
         buffer.append(namedExpressionList.toString());
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link MultiExpressionList}.
+     * @param multiExprList {@link MultiExpressionList}
+     */
     @Override
     public void visit(MultiExpressionList multiExprList) {
         buffer.append(multiExprList.toString());
     }
 
+    /**
+     * Deparse {@link net.sf.jsqlparser.statement.Statement} instanceof {@link WithItem}.
+     * @param withItem {@link WithItem}
+     * @return generated regex
+     */
     private String handleWithGetItemList(WithItem withItem){
         StringBuilder temp = new StringBuilder();
         temp.append(REQUIRED_WHITE_SPACE);
@@ -875,10 +1012,21 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         return temp.toString();
     }
 
+    /**
+     * Handle value list of {@link WithItem} from specific {@link net.sf.jsqlparser.statement.Statement} object.
+     * @param insert {@link Insert}
+     * @return generated regex for value list
+     */
     public String handleWithItemValueList(Insert insert){
         return OrderRotation.useOrDefault(this.columnNameOrder, helperFunctionForHandleWithItemValueList(insert.getWithItemsList()));
     }
 
+    /**
+     * Handle keyword spelling mistake with required whitespaces before and after.
+     * @param whiteSpaceBefore boolean for whitespace before
+     * @param keyword keyword to handle by keyword spelling mistake {@link SpellingMistake}
+     * @param whiteSpaceAfter boolean for whitespace after
+     */
     private void setKeywordSpellingMistakeWithRequiredWhitespaces(boolean whiteSpaceBefore, String keyword, boolean whiteSpaceAfter){
         buffer.append(whiteSpaceBefore ? REQUIRED_WHITE_SPACE : "");
         buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, keyword));

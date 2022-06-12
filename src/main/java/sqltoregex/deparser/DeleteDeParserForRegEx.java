@@ -27,18 +27,18 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
     private final OrderRotation tableNameOrderRotation;
 
     /**
-     * default constructor
-     * @param settingsContainer SettingsContainer
+     * Short constructor for DeleteDeParserForRegEx.
+     * @param settingsContainer {@link SettingsContainer}
      */
     public DeleteDeParserForRegEx(SettingsContainer settingsContainer) {
         this(settingsContainer, new ExpressionDeParserForRegEx(settingsContainer), new StringBuilder());
     }
 
     /**
-     * explicit constructor with specific ExpressionDeParserForRegEx and StringBuilder
-     * @param settingsContainer SettingsContainer
-     * @param expressionDeParserForRegEx ExpressionDeParserForRegEx
-     * @param buffer StringBuilder
+     * Extended constructor for DeleteDeParserForRegEx.
+     * @param settingsContainer {@link SettingsContainer}
+     * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
+     * @param buffer {@link StringBuilder}
      */
     public DeleteDeParserForRegEx(SettingsContainer settingsContainer, ExpressionDeParserForRegEx expressionDeParserForRegEx, StringBuilder buffer) {
         super(expressionDeParserForRegEx, buffer);
@@ -53,8 +53,9 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
     }
 
     /**
-     * overrides deparse method for implement regular expressions while deparsing the update statement
-     * @param delete Delete
+     * Overrides deparse method for implement regular expressions while deparsing the {@link Delete} statement
+     * {@link SuppressWarnings}: PMD.CyclomaticComplexity, PMD.ExcessiveMethodLength and PMD.NPathComplexity
+     * @param delete {@link Delete}
      */
     @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.CognitiveComplexity", "PMD.NPathComplexity"})
@@ -200,24 +201,24 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
     }
 
     /**
-     * get ExpressionDeParserForRegEx
-     * @return ExpressionDeParserForRegEx
+     * Get set {@link ExpressionDeParserForRegEx}.
+     * @return {@link ExpressionDeParserForRegEx}
      */
     public ExpressionDeParserForRegEx getExpressionDeParserForRegEx() {
         return this.expressionDeParserForRegEx;
     }
 
     /**
-     * set ExpressionDeParserForRegEx
-     * @param expressionDeParserForRegEx ExpressionDeParserForRegEx
+     * Set {@link ExpressionDeParserForRegEx}
+     * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
      */
     public void setExpressionDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx) {
         this.expressionDeParserForRegEx = expressionDeParserForRegEx;
     }
 
     /**
-     * get private final settings container, init while construct the object
-     * @return SettingsContainer
+     * Get private final settings container, init while construct the object.
+     * @return {@link SettingsContainer}
      */
     private SettingsContainer getSettingsContainer(){
         return this.settingsContainer;

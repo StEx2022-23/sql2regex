@@ -8,20 +8,37 @@ import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
+/**
+ * Implements own {@link LimitDeparser} to generate regex.
+ */
 public class LimitDeParserForRegEx extends LimitDeparser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private SpellingMistake keywordSpellingMistake;
 
+    /**
+     * Short constructor for LimitDeParserForRegEx. Init the expanded constructor.
+     * @param buffer {@link StringBuilder}
+     */
     public LimitDeParserForRegEx(StringBuilder buffer) {
         super(buffer);
     }
 
+    /**
+     * Extended constructor for LimitDeParserForRegEx.
+     * @param buffer {@link StringBuilder}
+     * @param settingsContainer {@link SettingsContainer}
+     */
     public LimitDeParserForRegEx(StringBuilder buffer, SettingsContainer settingsContainer) {
         super(buffer);
         this.keywordSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
     }
 
+    /**
+     * Deparse the whole {@link Limit} object.
+     * {@link SuppressWarnings}: PMD.CyclomaticComplexity
+     * @param limit {@link Limit}
+     */
     @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity"})
     public void deParse(Limit limit) {
