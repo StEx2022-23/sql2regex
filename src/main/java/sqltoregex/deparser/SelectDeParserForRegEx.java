@@ -20,10 +20,7 @@ import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Implements own {@link SelectDeParser} to generate regex.
@@ -39,6 +36,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     private final StringSynonymGenerator aggregateFunctionLang;
     private final SettingsContainer settingsContainer;
     private ExpressionDeParserForRegEx expressionDeParserForRegEx;
+    private final List<String> quotationMarkList = Arrays.asList("'", "`", "\"", "´");
 
     /**
      * Constructor for SelectDeParserForRegEx. Needs a {@link SettingsContainer}.
@@ -1031,5 +1029,27 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         buffer.append(whiteSpaceBefore ? REQUIRED_WHITE_SPACE : "");
         buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, keyword));
         buffer.append(whiteSpaceAfter ? REQUIRED_WHITE_SPACE : "");
+    }
+
+    /**
+     * Generates a string for multiple quotation marks options.
+     * @return generated regex
+     */
+    public String generateRegExForQuotationMarks() {
+        StringBuilder str = new StringBuilder();
+        str.append("[");
+        for (String quotationMark : this.quotationMarkList) {
+            str.append(quotationMark);
+        }
+        str.append("]");
+        return str.toString();
+    }
+
+    /**
+     * Returns the collection of all possible quotations marks.
+     * @return list of strings with quotation marks
+     */
+    public List<String> getQuotationMarkList() {
+        return this.quotationMarkList;
     }
 }

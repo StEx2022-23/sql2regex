@@ -30,7 +30,6 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     private final OrderRotation columnNameOrder;
     private final OrderRotation tableNameOrder;
     private final OrderRotation insertIntoValuesOrder;
-    List<String> quotationMarkList = Arrays.asList("'", "`", "\"", "´");
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
     SettingsContainer settings;
@@ -97,14 +96,14 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 buffer.append("\\(");
                 buffer.append(OPTIONAL_WHITE_SPACE);
                 while (extractedColumnsIterator.hasNext()) {
-                    buffer.append(this.generateRegExForQuotationMarks()).append("?");
+                    buffer.append(this.selectDeParserForRegEx.generateRegExForQuotationMarks()).append("?");
                     buffer.append(
                             SpellingMistake.useOrDefault(
                                     this.tableNameSpellingMistake,
                                     mappedColumnsAndRelatedValues.get(extractedColumnsIterator.next())
-                            ).replaceAll(this.generateRegExForQuotationMarks(), "")
+                            ).replaceAll(this.selectDeParserForRegEx.generateRegExForQuotationMarks(), "")
                     );
-                    buffer.append(this.generateRegExForQuotationMarks()).append("?");
+                    buffer.append(this.selectDeParserForRegEx.generateRegExForQuotationMarks()).append("?");
                     if (extractedColumnsIterator.hasNext()) {
                         buffer.append(OPTIONAL_WHITE_SPACE);
                         buffer.append(",");
@@ -142,13 +141,13 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                     temp.append("\\(").append(OPTIONAL_WHITE_SPACE);
                     Iterator<String> stringIterator = tempValuesRelatedToActualCol.iterator();
                     while (stringIterator.hasNext()) {
-                        temp.append(this.generateRegExForQuotationMarks()).append("?");
+                        temp.append(this.selectDeParserForRegEx.generateRegExForQuotationMarks()).append("?");
                         temp.append(
                                 SpellingMistake.useOrDefault(
                                         this.tableNameSpellingMistake,
                                         stringIterator.next().split(",")[i + 1]
-                                ).replaceAll(this.generateRegExForQuotationMarks(), ""));
-                        temp.append(this.generateRegExForQuotationMarks()).append("?");
+                                ).replaceAll(this.selectDeParserForRegEx.generateRegExForQuotationMarks(), ""));
+                        temp.append(this.selectDeParserForRegEx.generateRegExForQuotationMarks()).append("?");
                         if (stringIterator.hasNext()) temp.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
                     }
                     temp.append(OPTIONAL_WHITE_SPACE).append("\\)");
@@ -394,36 +393,24 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         for (Expression expression : expressionList.getExpressions()) {
             String expressionFixed = expression.toString();
             boolean hasQuotationMarks = false;
-            for (String str : this.quotationMarkList) {
+            for (String str : this.selectDeParserForRegEx.getQuotationMarkList()) {
                 if (expressionFixed.contains(str)) {
                     hasQuotationMarks = true;
                     break;
                 }
             }
             if (hasQuotationMarks) {
-                expressionFixed = this.generateRegExForQuotationMarks() + "?"
-                        + SpellingMistake.useOrDefault(this.columnNameSpellingMistake, expressionFixed.replaceAll(this.generateRegExForQuotationMarks(), ""))
-                        + this.generateRegExForQuotationMarks() + "?";
+                expressionFixed = this.selectDeParserForRegEx.generateRegExForQuotationMarks() + "?"
+                        + SpellingMistake.useOrDefault(this.columnNameSpellingMistake, expressionFixed.replaceAll(this.selectDeParserForRegEx.generateRegExForQuotationMarks(), ""))
+                        + this.selectDeParserForRegEx.generateRegExForQuotationMarks() + "?";
             } else {
-                expressionFixed = this.generateRegExForQuotationMarks() + "?"
+                expressionFixed = this.selectDeParserForRegEx.generateRegExForQuotationMarks() + "?"
                         + SpellingMistake.useOrDefault(this.columnNameSpellingMistake, expressionFixed)
-                        + this.generateRegExForQuotationMarks() + "?";
+                        + this.selectDeParserForRegEx.generateRegExForQuotationMarks() + "?";
             }
             expressionListAsString.add(expressionFixed);
         }
     }
 
-    /**
-     * Generates a string for multiple quotation marks options.
-     * @return generated regex
-     */
-    private String generateRegExForQuotationMarks() {
-        StringBuilder str = new StringBuilder();
-        str.append("[");
-        for (String quotationMark : this.quotationMarkList) {
-            str.append(quotationMark);
-        }
-        str.append("]");
-        return str.toString();
-    }
+
 }
