@@ -24,7 +24,8 @@ class ApiConvertObjectTest {
     @Test
     void testSqlSetterAndGetter() {
         ApiConvertObject apiConvertObject = new ApiConvertObject();
-        Assertions.assertThrows(IllegalArgumentException.class, () -> apiConvertObject.setSql(new LinkedList<>()));
+        LinkedList<String> linkedList = new LinkedList<>();
+        Assertions.assertThrows(IllegalArgumentException.class, () -> apiConvertObject.setSql(linkedList));
 
         LinkedList<String> testList = new LinkedList<>();
         testList.add("test1");

@@ -45,7 +45,7 @@ public class ApiConvertObject {
      */
     public void setSql(List<String> sql) {
         Assert.notNull(sql, "Minimum one SQL input is required.");
-        if(sql.size() == 0) throw new IllegalArgumentException("Minimum one SQL input is required.");
+        if(sql.isEmpty()) throw new IllegalArgumentException("Minimum one SQL input is required.");
         this.sql = sql;
     }
 
