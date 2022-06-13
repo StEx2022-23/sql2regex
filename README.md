@@ -44,38 +44,53 @@ compile changes on runtime:
 
 ## REST-Api
 
-### single request with command line
+### example request over command line
 
 ```cmd
-curl -X POST http://localhost:8080/convert -H "Content-Type: application/json" -d "{\"sql\":\"SELECT * FROM table\"}"
+curl -X POST http://localhost:8080/api/convert -H "Content-Type: application/json" -d "{\"sql\":[\"SELECT * FROM table\"],\"settingsType\":\"ALL\"}"
 ```
 
-### single request with python
+### requests with python and examples
 
 ```python
 import requests
 
 headers = {'Content-Type': 'application/json'}
-r = requests.post('http://localhost:8080/convert', headers=headers, json={"sql":"SELECT * "})
-print(r.json())
-```
 
-### multiple statements with python
+r = requests.post('http://localhost:8080/api/docs', headers=headers)
+print(r.text)
+# Available endpoints:
+#    - /convert
+#    - /settingstypes
+#    - /settingsoptions
+#    - /specificsettingsoption
 
-```python
-import requests
-import json
+r = requests.post('http://localhost:8080/api/convert', headers=headers, json={"sql":["SELECT col1, col2 FROM table", "INSERT INTO tab1 VALUES ('col1', 'col2')"], "settingsType":"ALL"})
+print(r.text)
+# {
+#    "sql":[
+#       "SELECT col1, col2 FROM table",
+#       "INSERT INTO tab1 VALUES ('col1', 'col2')"
+#    ],
+#    "settingsType":"ALL",
+#    "regex":[
+#       "^(?:SELECT|ELECT|SLECT|SEECT|SELCT|SELET|SELEC)\\s+(?:(?:col1|ol1|cl1|co1|col)\\s*(\\s*(?:(?:ALIAS|LIAS|AIAS|ALAS|ALIS|ALIA)|(?:AS|S|A))\\s+.*)?\\s*,\\s*(?:col2|ol2|cl2|co2|col)\\s*(\\s*(?:(?:ALIAS|LIAS|AIAS|ALAS|ALIS|ALIA)|(?:AS|S|A))\\s+.*)?|(?:col2|ol2|cl2|co2|col)\\s*(\\s*(?:(?:ALIAS|LIAS|AIAS|ALAS|ALIS|ALIA)|(?:AS|S|A))\\s+.*)?\\s*,\\s*(?:col1|ol1|cl1|co1|col)\\s*(\\s*(?:(?:ALIAS|LIAS|AIAS|ALAS|ALIS|ALIA)|(?:AS|S|A))\\s+.*)?)\\s+(?:FROM|ROM|FOM|FRM|FRO)\\s+(?:table|able|tble|tale|tabe|tabl)(\\s*(?:(?:ALIAS|LIAS|AIAS|ALAS|ALIS|ALIA)|(?:AS|S|A))?\\s+.*)?$",
+#       "^(?:INSERT|NSERT|ISERT|INERT|INSRT|INSET|INSER)\\s+(?:INTO|NTO|ITO|INO|INT)\\s+(?:tab1|ab1|tb1|ta1|tab)\\s+(?:VALUE|ALUE|VLUE|VAUE|VALE|VALU)S?\\s+\\(\\s*(?:['`\"]?(?:col1|ol1|cl1|co1|col)['`\"]?\\s*,\\s*['`\"]?(?:col2|ol2|cl2|co2|col)['`\"]?|['`\"]?(?:col2|ol2|cl2|co2|col)['`\"]?\\s*,\\s*['`\"]?(?:col1|ol1|cl1|co1|col)['`\"]?)\\s*\\)\\s*$"
+#    ]
+# }
 
-headers = {'Content-Type': 'application/json'}
-statementlist = [
-    {"sql":"SELECT * FROM table"},
-    {"sql":"SELECT * FROM table"},
-    {"sql":"SELECT * FROM table"},
-    {"sql":"SELECT * FROM table"},
-    {"sql":"SELECT * FROM table"}
-]
-r = requests.post('http://localhost:8080/multiconvert', headers=headers, json=statementlist)
-print(r.json())
+r = requests.post('http://localhost:8080/api/settingstypes', headers=headers)
+print(r.text)
+# ["ALL","DEFAULT_SCHOOL","USER"]
+
+r = requests.post('http://localhost:8080/api/settingsoptions', headers=headers)
+print(r.text)
+# ["COLUMNNAMESPELLING","KEYWORDSPELLING","TABLENAMESPELLING","COLUMNNAMEORDER","TABLENAMEORDER","INDEXCOLUMNNAMEORDER","INDEXCOLUMNNAMESPELLING","DATESYNONYMS","DATETIMESYNONYMS","TIMESYNONYMS","AGGREGATEFUNCTIONLANG","DATATYPESYNONYMS","GROUPBYELEMENTORDER","INSERTINTOVALUESORDER","OTHERSYNONYMS","DEFAULT"]
+
+r = requests.post('http://localhost:8080/api/specificsettingsoption', headers=headers, data="ALL")
+print(r.text)
+# ["COLUMNNAMESPELLING","KEYWORDSPELLING","TABLENAMESPELLING","COLUMNNAMEORDER","TABLENAMEORDER","INDEXCOLUMNNAMEORDER","INDEXCOLUMNNAMESPELLING","DATESYNONYMS","DATETIMESYNONYMS","TIMESYNONYMS","AGGREGATEFUNCTIONLANG","DATATYPESYNONYMS","GROUPBYELEMENTORDER","INSERTINTOVALUESORDER","OTHERSYNONYMS"]
+
 ```
 
 ## documentation

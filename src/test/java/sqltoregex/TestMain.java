@@ -3,6 +3,7 @@ package sqltoregex;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import sqltoregex.api.RestApiController;
 import sqltoregex.controller.MyErrorController;
 import sqltoregex.controller.SqlToRegexController;
 
