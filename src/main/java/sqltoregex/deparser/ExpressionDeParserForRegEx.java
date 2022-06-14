@@ -38,8 +38,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     private final StringSynonymGenerator otherSynonyms;
     private final StringSynonymGenerator aggregateFunctionLang;
     private final OrderByDeParserForRegEx orderByDeParser;
-    Map<String, String> tableNameAliasMap;
-    private final SettingsContainer settings;
+    private Map<String, String> tableNameAliasMap;
 
     public ExpressionDeParserForRegEx(SettingsContainer settingsContainer) {
         this(new SelectDeParserForRegEx(settingsContainer), new StringBuilder(), settingsContainer);
@@ -54,7 +53,6 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                                OrderByDeParserForRegEx orderByDeParser, SettingsContainer settings) {
         super(selectVisitor, buffer);
         this.orderByDeParser = orderByDeParser;
-        this.settings = settings;
         this.columnNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
         this.tableNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
         this.dateSynonyms = settings.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.DATESYNONYMS);

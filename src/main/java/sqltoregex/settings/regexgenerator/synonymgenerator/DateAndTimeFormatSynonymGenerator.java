@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
- * SynonymGenerator for dateformats, timeformats and datetimeformats. Need SimpleDateFormat and Expression as type.
+ * SynonymGenerator for dateformats, timeformats and datetimeformats. Needs SimpleDateFormat and Expression as type.
  */
 public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDateFormat, Expression> {
     public static final String SYNONYM_MUST_NOT_BE_NULL = "Synonym must not be null";
@@ -24,7 +24,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
             "Date-/Time-/TimestampValue";
 
     /**
-     * Constructor of DateAndTimeFormatSynonymGenerator. Init the super class.
+     * Constructor of DateAndTimeFormatSynonymGenerator. Inits the super class.
      * @param settingsOption one of enum {@link SettingsOption}
      */
     public DateAndTimeFormatSynonymGenerator(SettingsOption settingsOption) {
@@ -33,7 +33,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
 
     /**
      * Generates a regular expression for the {@link SimpleDateFormat} synonyms.
-     * Check if given value is instanceof {@link DateValue}, {@link TimeValue} or {@link TimestampValue}
+     * Checks if given value is instanceof {@link DateValue}, {@link TimeValue} or {@link TimestampValue}
      * @param value value to handle
      * @return generated regex
      */
@@ -46,7 +46,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
     }
 
     /**
-     * Prepare {@link SimpleDateFormat} for using with {@link SimpleDateFormat}.setLenient(false)
+     * Prepares {@link SimpleDateFormat} for using with {@link SimpleDateFormat}.setLenient(false)
      * @param syn SimpleDateFormat
      * @return parsed SimpleDateFormat
      */
@@ -58,7 +58,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
     }
 
     /**
-     * Parse expression to a {@link SimpleDateFormat}.
+     * Parses expression to a {@link SimpleDateFormat}.
      * @param wordToFindSynonyms expression to parse
      * @return parsed SimpleDateFormat
      * @throws NoSuchElementException if there are no synonym formats
@@ -84,7 +84,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
     }
 
     /**
-     * Prepare vertex by passing a {@link SimpleDateFormat} and a {@link Expression} with the item to find synonyms for.
+     * Prepares vertex by passing a {@link SimpleDateFormat} and a {@link Expression} with the item to find synonyms for.
      * @param syn the specified {@link SimpleDateFormat}
      * @param wordToFindSynonyms  the item to find synonyms for as {@link Expression}
      * @return parsed string
@@ -109,7 +109,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
     }
 
     /**
-     * Finds a Synonym for a passed {@link Expression} with the item to find synonyms for
+     * Finds a Synonym for a passed {@link Expression} with the item to find synonyms for.
      * @param wordToFindSynonyms the item to find synonyms for as {@link Expression}
      * @return found synonym as string
      * @throws IllegalArgumentException if the {@link Expression} isn't instanceof {@link DateValue}, {@link TimeValue} or {@link TimestampValue}
@@ -124,7 +124,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
     }
 
     /**
-     * Convert an expression to the string equivalent.
+     * Converts an expression to the string equivalent.
      * @param wordToFindSynonyms to parsed expression
      * @return expression as string
      * @throws IllegalArgumentException if the {@link Expression} isn't instanceof {@link DateValue}, {@link TimeValue} or {@link TimestampValue}
@@ -147,7 +147,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
     }
 
     /**
-     * Generate a regex with all possible synonyms, if the param synonymGenerator isn't null.
+     * Generates a regex with all possible synonyms, if the param synonymGenerator isn't null.
      * @param synonymGenerator {@link DateAndTimeFormatSynonymGenerator} object
      * @param expression input expression
      * @return generated regex or str
@@ -158,7 +158,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
     }
 
     /**
-     * Generate a list of strings with all possible synonyms, if the param synonymGenerator isn't null.
+     * Generates a list of strings with all possible synonyms, if the param synonymGenerator isn't null.
      * @param synonymGenerator {@link DateAndTimeFormatSynonymGenerator} object
      * @param expression input expression
      * @return generated list of synonyms as string or given string as one entry in the string list

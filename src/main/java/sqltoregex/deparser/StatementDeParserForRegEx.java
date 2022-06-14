@@ -12,7 +12,7 @@ import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 /**
- * implements own statement deparser for regular expressions
+ * Implements an own statement deparser to generate regular expressions.
  */
 public class StatementDeParserForRegEx extends StatementDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
@@ -21,15 +21,33 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     SelectDeParserForRegEx selectDeParserForRegEx;
     SettingsContainer settings;
 
+    /**
+     * Short constructor for StatementDeParserForRegEx. Inits the expanded constructor.
+     * @param buffer {@link StringBuilder}
+     * @param settings {@link SettingsContainer}
+     */
     public StatementDeParserForRegEx(StringBuilder buffer, SettingsContainer settings) {
         this(new ExpressionDeParserForRegEx(settings), buffer, settings);
     }
 
+    /**
+     * Shorter constructor for StatementDeParserForRegEx. Inits the expanded constructor.
+     * @param expressionDeParser {@link ExpressionDeParserForRegEx}
+     * @param buffer {@link StringBuilder}
+     * @param settings {@link SettingsContainer}
+     */
     public StatementDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, StringBuilder buffer,
                                      SettingsContainer settings) {
         this(expressionDeParser, new SelectDeParserForRegEx(settings), buffer, settings);
     }
 
+    /**
+     * Extended constructor for StatementDeParserForRegEx.
+     * @param expressionDeParser {@link ExpressionDeParserForRegEx}
+     * @param selectDeParser {@link SelectDeParserForRegEx}
+     * @param buffer {@link StringBuilder}
+     * @param settings {@link SettingsContainer}
+     */
     public StatementDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser,
                                      SelectDeParserForRegEx selectDeParser, StringBuilder buffer,
                                      SettingsContainer settings) {
@@ -41,8 +59,8 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     }
 
     /**
-     * override visit method for select statements
-     * @param select select statement
+     * Overrides visit method for {@link Select} statements.
+     * @param select {@link Select} statement
      */
     @Override
     public void visit(Select select) {
@@ -59,8 +77,8 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     }
 
     /**
-     * override visit method for insert statements
-     * @param insert insert statement
+     * Overrides visit method for {@link Insert} statements.
+     * @param insert {@link Insert} statement
      */
     @Override
     public void visit(Insert insert) {
@@ -77,8 +95,8 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     }
 
     /**
-     * override visit method for createTable statements
-     * @param createTable createTable statement
+     * Overrides visit method for {@link CreateTable} statements.
+     * @param createTable {@link CreateTable} statement
      */
     @Override
     public void visit(CreateTable createTable) {
@@ -87,8 +105,8 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     }
 
     /**
-     * override visit method for update statements
-     * @param update update statement
+     * Overrides visit method for {@link Update} statements.
+     * @param update {@link Update} statement
      */
     @Override
     public void visit(Update update) {
@@ -105,8 +123,8 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     }
 
     /**
-     * override visit method for delete statements
-     * @param delete delete statement
+     * Overrides visit method for {@link Delete} statements.
+     * @param delete {@link Delete} statement
      */
     @Override
     public void visit(Delete delete) {
@@ -119,8 +137,8 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     }
 
     /**
-     * override visit method for statements
-     * @param stmts statement
+     * Overrides visit method for {@link Statements}.
+     * @param stmts {@link Statements}
      */
     @Override
     public void visit(Statements stmts) {

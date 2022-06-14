@@ -15,6 +15,9 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import java.util.*;
 
+/**
+ * Implements an own {@link UpdateDeParser} to generate regex.
+ */
 public class UpdateDeParserForRegEx extends UpdateDeParser {
     private final Map<String, String> tableNameAliasCombinations = new HashMap<>();
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
@@ -28,10 +31,22 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     SelectDeParserForRegEx selectDeParserForRegEx;
     private final SettingsContainer settingsContainer;
 
+    /**
+     * Short constructor for UpdateDeParserForRegEx. Inits the expanded constructor.
+     * @param settingsContainer {@link SettingsContainer}
+     * @param buffer {@link StringBuilder}
+     */
     public UpdateDeParserForRegEx(SettingsContainer settingsContainer, StringBuilder buffer) {
         this(new ExpressionDeParserForRegEx(settingsContainer), new SelectDeParserForRegEx(settingsContainer), buffer, settingsContainer);
     }
 
+    /**
+     * Extended constructor for UpdateDeParserForRegEx.
+     * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
+     * @param selectDeParserForRegEx {@link SelectDeParserForRegEx}
+     * @param buffer {@link StringBuilder}
+     * @param settingsManager {@link sqltoregex.settings.SettingsManager}
+     */
     public UpdateDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx, SelectDeParserForRegEx selectDeParserForRegEx, StringBuilder buffer, SettingsContainer settingsManager) {
         super(expressionDeParserForRegEx, buffer);
         this.settingsContainer = settingsManager;
@@ -44,6 +59,11 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         this.tableNameOrderRotation = settingsManager.get(OrderRotation.class).get(SettingsOption.TABLENAMEORDER);
     }
 
+    /**
+     * Deparses the whole {@link Update} object.
+     * {@link SuppressWarnings}: PMD.CyclomaticComplexity, PMD.ExcessiveMethodLength and PMD.NPathComplexity
+     * @param update {@link Update}
+     */
     @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity", "PMD.ExcessiveMethodLength"})
     public void deParse(Update update) {
@@ -169,25 +189,49 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         }
     }
 
+    /**
+     * Gets the set {@link ExpressionDeParserForRegEx}.
+     * @return {@link ExpressionDeParserForRegEx}.
+     */
     public ExpressionDeParserForRegEx getExpressionDeParserForRegEx() {
         return this.expressionDeParserForRegEx;
     }
 
+    /**
+     * Sets the {@link ExpressionDeParserForRegEx}.
+     * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
+     */
     public void setExpressionDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx) {
         this.expressionDeParserForRegEx = expressionDeParserForRegEx;
     }
 
+    /**
+     * Performs {@link OrderByElement} deparsing.
+     * @param orderBy {@link OrderByElement}
+     * @throws UnsupportedOperationException forbidden in this implementation
+     */
     @Override
     public void visit(OrderByElement orderBy) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Performs keyword spelling mistakes with required whitespaces as suffix and prefix.
+     * @param whiteSpaceBefore boolean for whitespace before
+     * @param keyword keyword to handle by keyword spelling mistake {@link SpellingMistake}
+     * @param whiteSpaceAfter boolean for whitespace after
+     */
     private void setKeywordSpellingMistakeWithRequiredWhitespaces(boolean whiteSpaceBefore, String keyword, boolean whiteSpaceAfter){
         buffer.append(whiteSpaceBefore ? REQUIRED_WHITE_SPACE : "");
         buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, keyword));
         buffer.append(whiteSpaceAfter ? REQUIRED_WHITE_SPACE : "");
     }
 
+    /**
+     * Generates table name alias from a column list string, which is a type of tab1.col1.
+     * @param columnName to handle column name
+     * @return generated regex
+     */
     private String extractTableNameAlias(String columnName){
         StringBuilder temp = new StringBuilder();
         if (columnName.contains(" ")){
@@ -219,6 +263,11 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
         }
     }
 
+    /**
+     * Extracts table name alias.
+     * @param column to handle column
+     * @return generated regex
+     */
     private String checkOfExistingTableNameAndAlias(String column){
         StringBuilder temp = new StringBuilder();
         if(column.contains(".")){

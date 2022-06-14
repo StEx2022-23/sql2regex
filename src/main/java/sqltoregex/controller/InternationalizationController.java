@@ -13,7 +13,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import java.util.Locale;
 
 /**
- * Internationalization controller to handle multiple language sets. In this case german and english.
+ * Internationalization controller to handle multiple language sets. In this case German and English.
  */
 @Configuration
 public class InternationalizationController implements WebMvcConfigurer {
@@ -31,7 +31,7 @@ public class InternationalizationController implements WebMvcConfigurer {
     }
 
     /**
-     * Set default language, through setting the default location to Locale.US.
+     * Sets default language, through setting the default location to Locale.US.
      * @return related LocaleResolver
      */
     @Bean
@@ -43,7 +43,7 @@ public class InternationalizationController implements WebMvcConfigurer {
 
     /**
      * Defines location and encoding of message sources, return current language messages.
-     * @return
+     * @return message source
      */
     @Bean("messageSource")
     public MessageSource messageSource() {

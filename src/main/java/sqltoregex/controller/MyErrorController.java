@@ -9,12 +9,12 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Controller for error handling on frontend page.
+ * The controller for error handling on the frontend page.
  */
 @Controller
 public class MyErrorController implements ErrorController {
     /**
-     * Print funny error pages, with cats, if an 4xx error occured.
+     * Prints funny error pages, with cats, if a 4xx error occures.
      * @param request HttpServletRequest, autowired, no action required
      * @param model Model, autowired, no action required
      * @return ErrorPage

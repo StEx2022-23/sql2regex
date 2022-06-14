@@ -12,14 +12,14 @@ import java.util.*;
 /**
  * Common Interface for all synonym managers. Provides functionality for adding, removing synonyms of a generic Type T.
  * Generates RegEx with TemplateMethod generateSynonymRegexFor with implementations of preprocessor in concrete classes.
- * With {@link #prepareSynonymForAdd(Object)} and {@link #prepareSynonymForSearch(Object)} It's possible to use a
+ * With {@link #prepareSynonymForAdd(Object)} and {@link #prepareSynonymForSearch(Object)}. It's possible to use a
  * different syntax for Vertexes and SearchTerms as it's needed for Dates.
  * <p>
  * All of these methods are modeled on the java.util collections framework,accept for accessing so:
  * <p>
- * adding a duplicate object to a set (e.g. when adding a vertex) is not an error, but the duplicate is discarded
- * attempting to remove an object which was not part of the graph is not an error
- * but attempting to access an object which is not part of the graph is not allowed. Then there is just the synonym
+ * Adds a duplicate object to a set (e.g. when adding a vertex) is not an error, but the duplicate is discarded.
+ * Attempts to remove an object which was not part of the graph is not an error.
+ * But attempting to access an object which is not part of the graph is not allowed. Then there is just the synonym
  * query returned.
  *
  * @param <A> class of added objects and class in which the synonym graph is built.
@@ -36,8 +36,8 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
 
 
     /**
-     * Generate a list of strings with the searched item a the related synonyms.
-     * Implement generateAsList method from {@link sqltoregex.settings.regexgenerator.IRegExGenerator}.
+     * Generates a list of strings with the searched item and the related synonyms.
+     * Implements generateAsList method from {@link sqltoregex.settings.regexgenerator.IRegExGenerator}.
      * @param wordToFindSynonyms item to find synonyms for
      * @return list of string with the searched item and the related synonyms
      */
@@ -63,8 +63,8 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
 
     /**
      * SynonymGenerator constructor. Need one of enum {@link SettingsOption}.
-     * Init the super class {@link RegExGenerator}.
-     * Init a {@link SimpleWeightedGraph}.
+     * Inits the super class {@link RegExGenerator}.
+     * Inits a {@link SimpleWeightedGraph}.
      * @param settingsOption one of enum {@link SettingsOption}
      * @see SettingsOption
      */
@@ -74,7 +74,7 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     }
 
     /**
-     * Add a synonym to all prior existing synonyms with default weight after {@link #prepareSynonymForAdd}.
+     * Adds a synonym to all prior existing synonyms with default weight after {@link #prepareSynonymForAdd}.
      * @param syn synonym
      * @return boolean for add operation success
      */
@@ -83,7 +83,7 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     }
 
     /**
-     * Add a synonym to all prior existing synonyms with custom weight after {@link #prepareSynonymForAdd}.
+     * Adds a synonym to all prior existing synonyms with custom weight after {@link #prepareSynonymForAdd}.
      * @param syn synonym
      * @param weight specific weight in the graph
      * @return boolean for add operation success
@@ -102,7 +102,7 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     }
 
     /**
-     * Add a synonym to a second given synonym with default weight after {@link #prepareSynonymForAdd}.
+     * Adds a synonym to a second given synonym with default weight after {@link #prepareSynonymForAdd}.
      * @param syn base synonym
      * @param synFor new synonym
      * @return boolean for add operation success
@@ -112,7 +112,7 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     }
 
     /**
-     * Add a synonym to a second given synonym with custom weight after {@link #prepareSynonymForAdd}.
+     * Adds a synonym to a second given synonym with custom weight after {@link #prepareSynonymForAdd}.
      * @param syn base synonym
      * @param synFor new synonym
      * @param weight specific weight in the graph
@@ -162,7 +162,7 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     }
 
     /**
-     * Overrides default hashCode() methode. Use all attributes of the class {@link SynonymGenerator}.
+     * Overrides default hashCode() method. Uses all attributes of the class {@link SynonymGenerator}.
      * @return hashcode as int
      */
     @Override
@@ -210,7 +210,7 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     }
 
     /**
-     * Convert input to a string.
+     * Converts input to a string.
      * @param wordToFindSynonyms input of unspecified type
      * @return input as string
      */

@@ -20,9 +20,8 @@ import java.util.*;
 public class CreateTableDeParserForRegEx extends CreateTableDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
-
     private final SettingsContainer settings;
-    private StatementDeParser statementDeParser;
+    private final StatementDeParser statementDeParser;
     private final OrderRotation indexColumnNameOrder;
     private final OrderRotation columnNameOrder;
     private final SpellingMistake keywordSpellingMistake;

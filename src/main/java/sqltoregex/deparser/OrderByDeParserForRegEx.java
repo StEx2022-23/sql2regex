@@ -14,6 +14,9 @@ import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerato
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Implements own {@link OrderByDeParser} to generate regex.
+ */
 public class OrderByDeParserForRegEx extends OrderByDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
@@ -22,16 +25,26 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     private final SpellingMistake columnNameSpellingMistake;
     private final SpellingMistake keywordSpellingMistake;
     private final StringSynonymGenerator specialSynonyms;
-    private ExpressionVisitor regExExpressionVisitor;
+    private ExpressionVisitor expressionDeParserForRegEx;
 
-    public OrderByDeParserForRegEx(SettingsContainer settingsContainer) {
-        this(new ExpressionVisitorAdapter(), new StringBuilder(), settingsContainer);
+    /**
+     * Short constructor for OrderByDeParserForRegEx. Inits the expanded constructor.
+     * @param settings {@link SettingsContainer}
+     */
+    public OrderByDeParserForRegEx(SettingsContainer settings) {
+        this(new ExpressionVisitorAdapter(), new StringBuilder(), settings);
     }
 
-    public OrderByDeParserForRegEx(ExpressionVisitor expressionVisitor, StringBuilder buffer,
+    /**
+     * Extended constructor for OrderByDeParserForRegEx.
+     * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
+     * @param buffer {@link StringBuilder}
+     * @param settings {@link SettingsContainer}
+     */
+    public OrderByDeParserForRegEx(ExpressionVisitor expressionDeParserForRegEx, StringBuilder buffer,
                                    SettingsContainer settings) {
-        super(expressionVisitor, buffer);
-        this.regExExpressionVisitor = expressionVisitor;
+        super(expressionDeParserForRegEx, buffer);
+        this.expressionDeParserForRegEx = expressionDeParserForRegEx;
         this.columnNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
         this.keywordSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
         this.columnNameOrder = settings.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
@@ -39,6 +52,11 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         this.aggregateFunctionLang = settings.get(StringSynonymGenerator.class).get(SettingsOption.AGGREGATEFUNCTIONLANG);
     }
 
+    /**
+     * Performs deparsing for {@link OrderByElement}. Needs an {@link FromItem} object to extract table name alias.
+     * @param orderByElementList list of {@link OrderByElement}
+     * @param fromItem {@link FromItem}
+     */
     public void deParse(List<OrderByElement> orderByElementList, FromItem fromItem) {
         buffer.append(REQUIRED_WHITE_SPACE);
         buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "ORDER"));
@@ -56,6 +74,12 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         buffer.append(OrderRotation.useOrDefault(this.columnNameOrder, orderByElementsAsStrings));
     }
 
+    /**
+     * Prepares {@link OrderByElement} for {@link OrderRotation}. Needs an {@link FromItem} object to extract table name alias.
+     * @param orderByElement {@link OrderByElement}
+     * @param fromItem {@link FromItem}
+     * @return generated regex
+     */
     public String deParseElementForOrderRotation(OrderByElement orderByElement, FromItem fromItem) {
         StringBuilder temp = new StringBuilder();
         if (orderByElement.getExpression().toString().contains("(") && orderByElement.getExpression().toString()
@@ -85,14 +109,43 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         return temp.toString();
     }
 
+    /**
+     * Gets the set {@link ExpressionVisitor}.
+     * @return {@link ExpressionVisitor}
+     */
     public ExpressionVisitor getExpressionVisitor() {
-        return this.regExExpressionVisitor;
+        return this.expressionDeParserForRegEx;
     }
 
+    /**
+     * Sets a {@link ExpressionVisitor}.
+     * @param expressionVisitor {@link ExpressionVisitor}
+     */
     public void setExpressionVisitor(ExpressionVisitor expressionVisitor) {
-        this.regExExpressionVisitor = expressionVisitor;
+        this.expressionDeParserForRegEx = expressionVisitor;
     }
 
+    /**
+     * Gets the set {@link ExpressionDeParserForRegEx}.
+     * @return {@link ExpressionDeParserForRegEx}
+     */
+    public ExpressionDeParserForRegEx getExpressionDeParserForRegEx() {
+        return (ExpressionDeParserForRegEx) this.expressionDeParserForRegEx;
+    }
+
+    /**
+     * Sets {@link ExpressionDeParserForRegEx}.
+     * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
+     */
+    public void setExpressionDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx) {
+        this.expressionDeParserForRegEx = expressionDeParserForRegEx;
+    }
+
+    /**
+     * Generates asc and desc expression from a {@link OrderByElement}.
+     * @param orderByElement {@link OrderByElement}
+     * @return generated regex
+     */
     private String handleAscDesc(OrderByElement orderByElement) {
         StringBuilder temp = new StringBuilder();
 
@@ -113,6 +166,11 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         return temp.toString();
     }
 
+    /**
+     * Generates null first or last keyword expression.
+     * @param orderByElement {@link OrderByElement}
+     * @return generated regex
+     */
     private String handleNullFirstLast(OrderByElement orderByElement) {
         StringBuilder temp = new StringBuilder();
         if (orderByElement.getNullOrdering() != null) {
@@ -130,9 +188,15 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         return temp.toString();
     }
 
-    private String handleTableNameAlias(FromItem fromItem, String tempColumn) {
+    /**
+     * Performs inserting of the table name alias. Extracted from a {@link FromItem}.
+     * @param fromItem {@link FromItem}
+     * @param col column name
+     * @return generated regex
+     */
+    private String handleTableNameAlias(FromItem fromItem, String col) {
         StringBuilder temp = new StringBuilder();
-        String columnName = tempColumn.split("\\.")[1];
+        String columnName = col.split("\\.")[1];
         temp.append("(?:");
         temp.append(fromItem.toString().split(" ")[0]);
         temp.append("|");

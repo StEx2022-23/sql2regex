@@ -9,13 +9,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Prepares graphs for displaying on the frontend.
+ * They prepare graphs for displaying on the frontend.
  */
 public class GraphPreProcessor {
     public static final String COULD_NOT_CAST = "Could not cast";
 
     /**
-     * Private constructor to hide the implicit public one.
+     * The private constructor to hide the implicit public one.
      * Utility classes, which are collections of static members, are not meant to be instantiated.
      */
     private GraphPreProcessor() {
@@ -23,7 +23,7 @@ public class GraphPreProcessor {
     }
 
     /**
-     * Return a set of synonyms from given graph.
+     * Return a set of synonyms from the given graph.
      * @param graph to process graph
      * @return set of synonyms
      */
@@ -32,7 +32,7 @@ public class GraphPreProcessor {
     }
 
     /**
-     * Return a set of synonyms from given graph, which are delimited.
+     * Return a set of synonyms from the given graph, which are delimited.
      * @param graph to process graph
      * @return set of synonyms as delimited entrys
      */
@@ -54,7 +54,7 @@ public class GraphPreProcessor {
     }
 
     /**
-     * Return a set of synonyms from given graph, only as strings.
+     * Return a set of synonyms from the given graph, only as strings.
      * @param graph to process graph
      * @return set of synonyms
      */
@@ -82,9 +82,9 @@ public class GraphPreProcessor {
     }
 
     /**
-     * Generate a map of keywords and they related synonyms.
+     * Generate a map of keywords and their related synonyms.
      * @param graph to process graph
-     * @return map with keywords as key and they related synonyms as set
+     * @return map with keywords as key and their related synonyms as set
      */
     static <T> Map<T, Set<T>> getSynonymMap(Graph<T, DefaultWeightedEdge> graph) {
         try {
