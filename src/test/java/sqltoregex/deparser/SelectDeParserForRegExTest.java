@@ -525,4 +525,18 @@ class SelectDeParserForRegExTest{
                 true
         );
     }
+
+    @Test
+    void testQuotationMarks() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT \"col1\", `col2` FROM 'table1'"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "SELECT col1, col2 FROM table1",
+                matchingMap,
+                true
+        );
+    }
 }
