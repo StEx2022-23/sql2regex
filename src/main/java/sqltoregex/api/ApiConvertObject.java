@@ -17,7 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Hold values from post api requests.
+ * Holds values from post api requests.
  */
 public class ApiConvertObject {
     private List<String> sql;
@@ -32,7 +32,7 @@ public class ApiConvertObject {
     }
 
     /**
-     * Get current set multiple sql statements.
+     * Gets current set multiple sql statements.
      * @return sql input as list of string
      */
     public List<String> getSql() {
@@ -40,7 +40,7 @@ public class ApiConvertObject {
     }
 
     /**
-     * Set multiple sql statements.
+     * Sets multiple sql statements.
      * @param sql list of string with multiple sql statements
      */
     public void setSql(List<String> sql) {
@@ -50,7 +50,7 @@ public class ApiConvertObject {
     }
 
     /**
-     * Set {@link SettingsType} for the converting process.
+     * Sets {@link SettingsType} for the converting process.
      * @param settingsType {@link SettingsType}
      */
     public void setSettingsType(SettingsType settingsType) {
@@ -64,7 +64,7 @@ public class ApiConvertObject {
     }
 
     /**
-     * Set {@link SettingsType} for the converting process from a input {@link String}.
+     * Sets {@link SettingsType} for the converting process from a input {@link String}.
      * @param settingsType {@link String} represent the {@link SettingsType}
      */
     public void setSettingsType(String settingsType) {
@@ -78,7 +78,7 @@ public class ApiConvertObject {
     }
 
     /**
-     * Get current set {@link SettingsType}.
+     * Gets current set {@link SettingsType}.
      * @return {@link SettingsType}
      */
     public SettingsType getSettingsType() {
@@ -86,7 +86,7 @@ public class ApiConvertObject {
     }
 
     /**
-     * Get solution from converting process.
+     * Gets solution from converting process.
      * @return list of string with generated regex
      * @throws XPathExpressionException if xml parsing error occurs
      * @throws ParserConfigurationException if xml parsing error occurs

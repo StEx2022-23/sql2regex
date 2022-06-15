@@ -29,7 +29,6 @@ import java.util.*;
 @Controller
 public class SqlToRegexController {
     private static final String TITLE = "title";
-
     SettingsManager settingsManager;
     ConverterManagement converterManagement;
 

@@ -2,6 +2,8 @@ package sqltoregex.settings;
 
 /**
  * Enum representing all possible setting options.
+ * @author Patrick Binkert
+ * @author Maximilian Förster
  */
 public enum SettingsOption {
     COLUMNNAMESPELLING,

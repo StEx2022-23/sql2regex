@@ -7,6 +7,8 @@ import java.util.Set;
 
 /**
  * SettingsForm is the connection between front- and backend. In this class is the sent form data's stored.
+ * @author Patrick Binkert
+ * @author Maximilian Förster
  */
 public class SettingsForm {
 
@@ -34,11 +36,11 @@ public class SettingsForm {
 
     /**
      * Constructor for the SettingsForm.
-     * @param spellings all spelling settings as Set of SettingsOption
-     * @param orders all orders settings as Set of SettingsOption
-     * @param dateFormats all dateFormats settings as Set of SimpleDateFormat
-     * @param timeFormats all timeFormats settings as Set of SimpleDateFormat
-     * @param dateTimeFormats all dateTimeFormats settings as Set of SimpleDateFormat
+     * @param spellings all spelling settings as Set of {@link SettingsOption}
+     * @param orders all orders settings as Set of {@link SettingsOption}
+     * @param dateFormats all dateFormats settings as Set of {@link SimpleDateFormat}
+     * @param timeFormats all timeFormats settings as Set of {@link SimpleDateFormat}
+     * @param dateTimeFormats all dateTimeFormats settings as Set of {@link SimpleDateFormat}
      * @param aggregateFunctionLang All aggregateFunctionLanguage settings as String-Set
      * @param datatypeSynonyms all datatypeSynonyms settings as String-Set
      * @param otherSynonyms all otherSynonyms settings as String-Set
@@ -67,7 +69,10 @@ public class SettingsForm {
     public Set<String> getAggregateFunctionLang() {
         return aggregateFunctionLang;
     }
-    public Set<String> getDatatypeSynonyms(){return this.datatypeSynonyms;}
+
+    public Set<String> getDatatypeSynonyms() {
+        return this.datatypeSynonyms;
+    }
 
     public Set<String> getOtherSynonyms() {
         return otherSynonyms;
