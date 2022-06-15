@@ -9,7 +9,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-public class CreateDatabaseTest {
+class CreateDatabaseTest {
     @Test
     void testShortConstructor(){
         SettingsContainer settingsContainer = SettingsContainer.builder().build();
