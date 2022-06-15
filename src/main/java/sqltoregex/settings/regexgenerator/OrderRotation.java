@@ -15,6 +15,7 @@ import java.util.List;
  * SELECT (?:table1\s*,\s*table2|table2\s*,\s*table1)
  */
 public class OrderRotation extends RegExGenerator<List<String>> {
+    private static final String QUOTATION_MARK_REGEX = "[`´'\"]";
 
     /**
      * Constructor of OrderRotation. Init the super class.
@@ -49,7 +50,7 @@ public class OrderRotation extends RegExGenerator<List<String>> {
         if (amount == 1) {
             Iterator<String> iterator = valueList.iterator();
             while (iterator.hasNext()) {
-                singleValue.append(iterator.next());
+                singleValue.append(QUOTATION_MARK_REGEX + "*").append(iterator.next()).append(QUOTATION_MARK_REGEX + "*");
                 if (iterator.hasNext()) {
                     singleValue.append("\\s*,\\s*");
                 }
@@ -84,7 +85,15 @@ public class OrderRotation extends RegExGenerator<List<String>> {
      */
     public static String useOrDefault(OrderRotation orderRotation, List<String> valueList){
         if (null != orderRotation) return orderRotation.generateRegExFor(valueList);
-        return String.join(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE, valueList);
+        StringBuilder stringBuilder = new StringBuilder();
+        Iterator<String> stringIterator = valueList.iterator();
+        while(stringIterator.hasNext()){
+            stringBuilder.append(QUOTATION_MARK_REGEX + "*").append(stringIterator.next()).append(QUOTATION_MARK_REGEX + "*");
+            if(stringIterator.hasNext()){
+                stringBuilder.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
+            }
+        }
+        return stringBuilder.toString();
     }
 
     /**
@@ -96,6 +105,11 @@ public class OrderRotation extends RegExGenerator<List<String>> {
      */
     public static List<String> generateAsListOrDefault(OrderRotation orderRotation, List<String> valueList){
         if (null != orderRotation) return orderRotation.generateAsList(valueList);
-        return valueList;
+        Iterator<String> stringIterator = valueList.iterator();
+        List<String> stringList = new LinkedList<>();
+        while(stringIterator.hasNext()){
+            stringList.add(QUOTATION_MARK_REGEX + "*" + stringIterator.next() + QUOTATION_MARK_REGEX + "*");
+        }
+        return stringList;
     }
 }
