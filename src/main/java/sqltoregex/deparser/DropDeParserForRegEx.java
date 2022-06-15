@@ -7,16 +7,28 @@ import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
+/**
+ * Implements an own create drop statement deparser to generate regular expressions.
+ */
 public class DropDeParserForRegEx extends DropDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private final SpellingMistake keywordSpellingMistake;
     private final SpellingMistake tableNameSpellingMistake;
     private final OrderRotation tableNameOrderRotation;
 
+    /**
+     * Short constructor for DropDeParserForRegEx.
+     * @param settings {@link SettingsContainer}
+     */
     public DropDeParserForRegEx(SettingsContainer settings){
         this(new StringBuilder(), settings);
     }
 
+    /**
+     * Extended constructor for DropDeParserForRegEx.
+     * @param buffer {@link StringBuilder}
+     * @param settings {@link SettingsContainer}
+     */
     public DropDeParserForRegEx(StringBuilder buffer, SettingsContainer settings) {
         super(buffer);
         this.keywordSpellingMistake =  settings.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
@@ -24,6 +36,10 @@ public class DropDeParserForRegEx extends DropDeParser {
         this.tableNameOrderRotation = settings.get(OrderRotation.class).get(SettingsOption.TABLENAMEORDER);
     }
 
+    /**
+     * Deparses the whole {@link Drop} object.
+     * @param drop {@link Drop}
+     */
     @Override
     public void deParse(Drop drop) {
         buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "DROP"));

@@ -13,6 +13,7 @@ import net.sf.jsqlparser.util.validation.feature.DatabaseType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import sqltoregex.deparser.CreateDatabaseDeParserForRegEx;
 import sqltoregex.deparser.StatementDeParserForRegEx;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
@@ -41,16 +42,16 @@ public class ConverterManagement {
     }
 
     /**
-     * Builds output regex with ^ in the beginning and $ at the end.
+     * Builds output regex with ^ in the beginning and $ at the end, including optional semicolon.
      * @param regex generated regex
      * @return builded regex
      */
     private String buildOutputRegex(String regex) {
-        return "^" + regex + "$";
+        return "^" + regex + ";?$";
     }
 
     /**
-     * Logical OR-concat, if the expression-visitor detect an alternative statement, to allow both of them in the regex.
+     * Logical OR-concat, if the expression-visitor detect an alternative statement, to allow both of them in the regex, including optional semicolon.
      * @param regexList List of String with alternative regex
      * @return concated regex
      */
@@ -64,7 +65,7 @@ public class ConverterManagement {
             for (String str : regexList) {
                 outputRegex.append("(");
                 outputRegex.append(str);
-                outputRegex.append(")|");
+                outputRegex.append(";?)|");
             }
             outputRegex.replace(outputRegex.length() - 1, outputRegex.length(), "");
         }
@@ -97,8 +98,13 @@ public class ConverterManagement {
      * @throws JSQLParserException if parsing goes wrong
      */
     private String deParseStatement(String sqlStatement, StringBuilder buffer, SettingsType settingsType) throws JSQLParserException {
+        if(sqlStatement.contains("CREATE") && sqlStatement.contains("DATABASE")){
+            SettingsContainer settingsContainer = SettingsContainer.builder().with(settingsManager, settingsType);
+            return new CreateDatabaseDeParserForRegEx(settingsContainer).deParse(sqlStatement);
+        }
         Statement statement;
         statement = this.parseStatement(sqlStatement);
+
         StatementDeParserForRegEx defaultStatementDeParser = new StatementDeParserForRegEx(buffer, SettingsContainer.builder().with(settingsManager, settingsType));
         statement.accept(defaultStatementDeParser);
         String regExOne = defaultStatementDeParser.getBuffer().toString();
@@ -122,7 +128,7 @@ public class ConverterManagement {
     public String deparse(String sqlStatement) throws JSQLParserException {
         StringBuilder buffer = new StringBuilder();
         if (!this.validate(sqlStatement)) {
-            throw new IllegalArgumentException();
+            this.handleInvalidSqlInputAndHandleExceptions(sqlStatement);
         }
         return this.deParseStatement(sqlStatement, buffer, SettingsType.USER);
     }
@@ -154,7 +160,7 @@ public class ConverterManagement {
             return this.deParseExpression(sqlStatement);
         } else {
             if (toBeValidated && !this.validate(sqlStatement)) {
-                throw new IllegalArgumentException();
+                this.handleInvalidSqlInputAndHandleExceptions(sqlStatement);
             }
             return this.deParseStatement(sqlStatement, buffer, settingsType);
         }
@@ -223,5 +229,16 @@ public class ConverterManagement {
             }
         }
         return isMinOneValidationOkay;
+    }
+
+    public void handleInvalidSqlInputAndHandleExceptions(String sqlinput) {
+        // TODO: Error to frontend
+        Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+        if(!(sqlinput.contains("CREATE") && sqlinput.contains("DATABASE"))){
+            logger.log(Level.WARNING, "Validation failed. Input: {0}", sqlinput);
+        } else {
+            logger.log(Level.INFO, "CREATE DATABASE manually deparsed. Input: {0}", sqlinput);
+        }
+
     }
 }

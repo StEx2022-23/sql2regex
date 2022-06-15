@@ -40,7 +40,7 @@ class ConverterManagementTest {
     @Test
     void testExpressionDeparsing() throws JSQLParserException {
         Assertions.assertEquals(
-                "^col1 + col2$",
+                "^col1 + col2;?$",
                 converterManagement.deparse("col1+col2", true, false, SettingsType.ALL)
         );
         Assertions.assertThrows(JSQLParserException.class, () ->
@@ -54,10 +54,6 @@ class ConverterManagementTest {
         String parsingSolution = converterManagement.deparse(sampleSolution, false, true, SettingsType.ALL);
         Assertions.assertTrue(parsingSolution.startsWith("^"));
         Assertions.assertTrue(parsingSolution.endsWith("$"));
-
-        Assertions.assertThrows(IllegalArgumentException.class, () ->
-                converterManagement.deparse("col1, col2", false, true, SettingsType.ALL)
-        );
     }
 
     @Test
@@ -68,7 +64,7 @@ class ConverterManagementTest {
         Assertions.assertTrue(parsingSolution.endsWith("$"));
 
         Assertions.assertEquals(
-                "^col1 + col2$",
+                "^col1 + col2;?$",
                 converterManagement.deparse("col1+col2", true, false, SettingsType.ALL)
         );
     }
