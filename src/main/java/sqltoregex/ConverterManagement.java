@@ -10,6 +10,7 @@ import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import net.sf.jsqlparser.util.validation.Validation;
 import net.sf.jsqlparser.util.validation.ValidationError;
 import net.sf.jsqlparser.util.validation.feature.DatabaseType;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -199,22 +200,31 @@ public class ConverterManagement {
      * @return boolean if the statement is valid
      */
     public boolean validate(String sqlstatement) {
-        List<DatabaseType> supportedDBMS = new ArrayList<>();
-        supportedDBMS.add(DatabaseType.ORACLE);
-        supportedDBMS.add(DatabaseType.MYSQL);
-        supportedDBMS.add(DatabaseType.SQLSERVER);
-        supportedDBMS.add(DatabaseType.MARIADB);
+        Map<Validation, Boolean> validationList = new HashMap<>();
+        validationList.put(new Validation(List.of(DatabaseType.ORACLE), sqlstatement), false);
+        validationList.put(new Validation(List.of(DatabaseType.MYSQL), sqlstatement), false);
+        validationList.put(new Validation(List.of(DatabaseType.SQLSERVER), sqlstatement), false);
+        validationList.put(new Validation(List.of(DatabaseType.MARIADB), sqlstatement), false);
 
-        Validation validation = new Validation(supportedDBMS, sqlstatement);
-        List<ValidationError> validationErrors = validation.validate();
-        if (validationErrors.isEmpty()) {
-            return true;
-        } else {
-            for (ValidationError va : validationErrors) {
-                Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-                logger.log(Level.WARNING, "Error while validating the statement: {0}", va);
+        for(Validation validation : validationList.keySet()){
+            List<ValidationError> validationErrors = validation.validate();
+            if (!validationErrors.isEmpty()) {
+                for (ValidationError va : validationErrors) {
+                    Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+                    logger.log(Level.WARNING, "Error while validating the statement: {0}", va);
+                }
+            } else {
+                validationList.put(validation, true);
             }
-            return false;
         }
+
+        boolean isMinOneValidationOkay = false;
+        for (Map.Entry<Validation, Boolean> entry : validationList.entrySet()) {
+            if(entry.getValue().equals(Boolean.TRUE)) {
+                isMinOneValidationOkay = true;
+                break;
+            }
+        }
+        return isMinOneValidationOkay;
     }
 }
