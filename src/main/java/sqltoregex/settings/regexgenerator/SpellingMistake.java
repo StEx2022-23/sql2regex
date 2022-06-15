@@ -22,7 +22,7 @@ public class SpellingMistake extends RegExGenerator<String> {
     }
 
     /**
-     * Generate a list of strings which allowed spelling mistakes. We assume, that one wrong character in the string is "okay".
+     * Generates a list of strings which allowed spelling mistakes. We assume, that one wrong character in the string is "okay".
      * @param str current word
      * @return list of string with alternative spellings
      */
@@ -43,7 +43,7 @@ public class SpellingMistake extends RegExGenerator<String> {
     }
 
     /**
-     * Generate a regex with allowed spelling mistakes, if the param spellingMistake isn't null.
+     * Generates a regex with allowed spelling mistakes, if the param spellingMistake isn't null.
      * Otherwise, only the string is returned.
      * @param spellingMistake SpellingMistake object
      * @param str string to handle
@@ -55,7 +55,7 @@ public class SpellingMistake extends RegExGenerator<String> {
     }
 
     /**
-     * Generate a list of strings with allowed spelling mistakes, if the param spellingMistake isn't null.
+     * Generates a list of strings with allowed spelling mistakes, if the param spellingMistake isn't null.
      * Otherwise, a list of string with only one entry is returned. The entry is the given string.
      * @param spellingMistake SpellingMistake object
      * @param str string to handle

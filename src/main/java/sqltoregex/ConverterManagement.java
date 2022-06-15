@@ -24,18 +24,16 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 /**
- * Realize a spring service for handling the converting process.
+ * Realizes a spring service for handling the converting process.
  */
 @Service
 public class ConverterManagement {
-
     private final SettingsManager settingsManager;
 
     /**
      * Constructor of converter management.
-     * @param settingsManager which handles usersettings and presets, its autowired, no required action here
+     * @param settingsManager which handles {@link sqltoregex.settings.UserSettings} and presets, its autowired, no required action here
      */
     @Autowired
     public ConverterManagement(SettingsManager settingsManager) {
@@ -44,7 +42,7 @@ public class ConverterManagement {
     }
 
     /**
-     * Build output regex with ^ in the beginning and $ at the end.
+     * Builds output regex with ^ in the beginning and $ at the end.
      * @param regex generated regex
      * @return builded regex
      */
@@ -76,7 +74,7 @@ public class ConverterManagement {
     }
 
     /**
-     * Deparse expressions.
+     * Deparses expressions.
      * @param sqlstatement current sql statement
      * @return generated regex
      * @throws JSQLParserException if parsing goes wrong
@@ -92,10 +90,10 @@ public class ConverterManagement {
     }
 
     /**
-     * Deparse statements.
+     * Deparses statements.
      * @param sqlStatement current sql statement
-     * @param buffer StringBuilder
-     * @param settingsType UserSettings or presets
+     * @param buffer StringBuilder {@link StringBuilder}
+     * @param settingsType {@link sqltoregex.settings.UserSettings} or presets
      * @return  generated regex
      * @throws JSQLParserException if parsing goes wrong
      */
@@ -117,7 +115,7 @@ public class ConverterManagement {
     }
 
     /**
-     * Handle statement deparsing.
+     * Performs statement deparsing.
      * @param sqlStatement current sql statement
      * @return generated regex
      * @throws JSQLParserException if parsing goes wrong
@@ -131,7 +129,7 @@ public class ConverterManagement {
     }
 
     /**
-     * Handle statement deparsing.
+     * Performs statement deparsing.
      * @param sqlStatement current sql statement
      * @param isOnlyExpression must be set true, if you only want to deparse an expression
      * @return generated regex
@@ -164,7 +162,7 @@ public class ConverterManagement {
     }
 
     /**
-     * Compare list elements about unique elements.
+     * Compares list elements about unique elements.
      * @param list List of String
      * @return boolean
      */
@@ -175,7 +173,7 @@ public class ConverterManagement {
     }
 
     /**
-     * Parse an expression.
+     * Parses an expression.
      * @param sqlstatement current sql-statement
      * @return Expression object
      * @throws JSQLParserException if parsing goes wrong
@@ -185,7 +183,7 @@ public class ConverterManagement {
     }
 
     /**
-     * Parse a statement.
+     * Parses a statement.
      * @param sqlstatement current sql-statement
      * @return Statement object
      * @throws JSQLParserException if parsing goes wrong
@@ -195,7 +193,7 @@ public class ConverterManagement {
     }
 
     /**
-     * Validate statements against oracle, mysql, sqlserver or mariadb grammar.
+     * Validates a statements against oracle, mysql, sqlserver or mariadb grammar.
      * @param sqlstatement current sql-statement
      * @return boolean if the statement is valid
      */
