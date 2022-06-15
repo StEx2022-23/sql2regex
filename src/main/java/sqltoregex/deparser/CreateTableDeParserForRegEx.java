@@ -17,6 +17,9 @@ import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerato
 
 import java.util.*;
 
+/**
+ * Implements an own create table statement deparser to generate regular expressions.
+ */
 public class CreateTableDeParserForRegEx extends CreateTableDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
@@ -30,6 +33,11 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
     private final SpellingMistake columnNameSpellingMistake;
     private final StringSynonymGenerator datatypeSynonymGenerator;
 
+    /**
+     * Short constrcutor for CreateTableDeParserForRegEx.
+     * @param buffer {@link StringBuilder}
+     * @param settingsContainer
+     */
     public CreateTableDeParserForRegEx(StringBuilder buffer, SettingsContainer settingsContainer) {
         this(new StatementDeParserForRegEx(buffer, settingsContainer), buffer, settingsContainer);
     }

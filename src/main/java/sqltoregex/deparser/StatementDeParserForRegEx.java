@@ -2,6 +2,7 @@ package sqltoregex.deparser;
 
 import net.sf.jsqlparser.statement.Statements;
 import net.sf.jsqlparser.statement.delete.Delete;
+import net.sf.jsqlparser.statement.drop.Drop;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.select.Select;
@@ -134,6 +135,16 @@ public class StatementDeParserForRegEx extends StatementDeParser {
         this.selectDeParserForRegEx.setExpressionVisitor(this.expressionDeParserForRegEx);
         DeleteDeParserForRegEx deleteDeParserForRegEx = new DeleteDeParserForRegEx(this.settings, this.expressionDeParserForRegEx, buffer);
         deleteDeParserForRegEx.deParse(delete);
+    }
+
+    /**
+     * Overrides visit method for {@link Drop} statements.
+     * @param drop {@link Drop} statement
+     */
+    @Override
+    public void visit(Drop drop) {
+        DropDeParserForRegEx dropDeParserForRegEx = new DropDeParserForRegEx(buffer, this.settings);
+        dropDeParserForRegEx.deParse(drop);
     }
 
     /**

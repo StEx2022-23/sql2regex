@@ -58,7 +58,7 @@ public class SqlToRegexController {
     }
 
     /**
-     * Prepare settings for displaying on frontend.
+     * Prepares settings for displaying on frontend.
      * @param model Model, autowired, no action required.
      * @return SettingsForm, html asset
      */
