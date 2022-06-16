@@ -87,7 +87,8 @@ class SettingsManagerTest {
                                                                 Collections.emptySet(),
                                                                 Collections.emptySet(),
                                                                 Collections.emptySet(),
-                                                                "")
+                                                                "",
+                                                        "")
         );
 
         for (SettingsOption settingsOption : SettingsOption.values()) {

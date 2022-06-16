@@ -23,7 +23,8 @@ public class SettingsForm {
                                                                    Collections.emptySet(),
                                                                    Collections.emptySet(),
                                                                    Collections.emptySet(),
-                                                                   "EMPTY");
+                                                                   "EMPTY",
+                                                            "EMPTY");
     Set<SettingsOption> spellings;
     Set<SettingsOption> orders;
     Set<SimpleDateFormat> dateFormats;
@@ -33,6 +34,7 @@ public class SettingsForm {
     Set<String> datatypeSynonyms;
     Set<String> otherSynonyms;
     @NotEmpty(message = "{settingsForm.sql.NotEmpty}") String sql;
+    String validation;
 
     /**
      * Constructor for the SettingsForm.
@@ -54,7 +56,8 @@ public class SettingsForm {
                         Set<String> aggregateFunctionLang,
                         Set<String> datatypeSynonyms,
                         Set<String> otherSynonyms,
-                        String sql) {
+                        String sql,
+                        String validation) {
         this.spellings = spellings == null ? Collections.emptySet() : spellings;
         this.orders = orders == null ? Collections.emptySet() : orders;
         this.dateFormats = dateFormats == null ? Collections.emptySet() : dateFormats;
@@ -64,10 +67,11 @@ public class SettingsForm {
         this.datatypeSynonyms= datatypeSynonyms == null ? Collections.emptySet() : datatypeSynonyms;
         this.otherSynonyms = otherSynonyms == null ? Collections.emptySet() : otherSynonyms;
         this.sql = sql;
+        this.validation = validation;
     }
 
     public Set<String> getAggregateFunctionLang() {
-        return aggregateFunctionLang;
+        return this.aggregateFunctionLang;
     }
 
     public Set<String> getDatatypeSynonyms() {
@@ -75,30 +79,38 @@ public class SettingsForm {
     }
 
     public Set<String> getOtherSynonyms() {
-        return otherSynonyms;
+        return this.otherSynonyms;
     }
 
     public Set<SimpleDateFormat> getDateFormats() {
-        return dateFormats;
+        return this.dateFormats;
     }
 
     public Set<SimpleDateFormat> getDateTimeFormats() {
-        return dateTimeFormats;
+        return this.dateTimeFormats;
     }
 
     public Set<SettingsOption> getOrders() {
-        return orders;
+        return this.orders;
     }
 
     public Set<SettingsOption> getSpellings() {
-        return spellings;
+        return this.spellings;
     }
 
     public String getSql() {
-        return sql;
+        return this.sql;
     }
 
     public Set<SimpleDateFormat> getTimeFormats() {
-        return timeFormats;
+        return this.timeFormats;
+    }
+
+    public String getValidation() {
+        return this.validation;
+    }
+
+    public void setValidation(String validation) {
+        this.validation = validation;
     }
 }

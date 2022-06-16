@@ -98,10 +98,8 @@ public class ConverterManagement {
      * @throws JSQLParserException if parsing goes wrong
      */
     private String deParseStatement(String sqlStatement, StringBuilder buffer, SettingsType settingsType) throws JSQLParserException {
-        if(sqlStatement.contains("CREATE") && sqlStatement.contains("DATABASE")){
-            SettingsContainer settingsContainer = SettingsContainer.builder().with(settingsManager, settingsType);
-            return new CreateDatabaseDeParserForRegEx(settingsContainer).deParse(sqlStatement);
-        }
+        if(checkIfStatementTypeOfCreateDatabase(sqlStatement)) return new CreateDatabaseDeParserForRegEx(SettingsContainer.builder().with(settingsManager, settingsType)).deParse(sqlStatement);
+
         Statement statement;
         statement = this.parseStatement(sqlStatement);
 
@@ -231,14 +229,14 @@ public class ConverterManagement {
         return isMinOneValidationOkay;
     }
 
-    public void handleInvalidSqlInputAndHandleExceptions(String sqlinput) {
+    private void handleInvalidSqlInputAndHandleExceptions(String sqlStatement) {
         // TODO: Error to frontend
         Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-        if(!(sqlinput.contains("CREATE") && sqlinput.contains("DATABASE"))){
-            logger.log(Level.WARNING, "Validation failed. Input: {0}", sqlinput);
-        } else {
-            logger.log(Level.INFO, "CREATE DATABASE manually deparsed. Input: {0}", sqlinput);
-        }
+        if(checkIfStatementTypeOfCreateDatabase(sqlStatement)) logger.log(Level.INFO, "CREATE DATABASE manually deparsed. Input: {0}", sqlStatement);
+        else logger.log(Level.WARNING, "Validation failed. Input: {0}", sqlStatement);
+    }
 
+    private boolean checkIfStatementTypeOfCreateDatabase(String sqlStatement) {
+        return sqlStatement.contains("CREATE") && sqlStatement.contains("DATABASE");
     }
 }

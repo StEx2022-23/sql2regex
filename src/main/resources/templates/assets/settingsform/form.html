@@ -6,6 +6,13 @@
             title error
         </div>
     </div>
+
+    <div id="isValid" th:hidden="*{validation eq 'invalid' or sql eq ''}" class="alert alert-success mt-3" role="alert" th:utext="#{convValid}">
+    </div>
+
+    <div id="isInValid" th:hidden="*{validation eq 'valid' or sql eq ''}" class="alert alert-warning mt-3" role="alert" th:utext="#{convInvalid}">
+    </div>
+
     <div class="text-end">
         <button type="button" onclick="resetUserSettings(document.getElementById('converterForm'))" id="reset_user_settings" class="btn btn-m btn-success copy-button mb-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-filetype-json" viewBox="0 0 16 16">

@@ -24,7 +24,7 @@ class SettingsFormTest {
                 Collections.emptySet(),
                 Collections.emptySet(),
                 Collections.emptySet(),
-                ""
+                "", ""
         ));
         Assertions.assertEquals(1, constraintViolations.size(),
                                 "Form constraint validation should contain 1 violation");
@@ -44,7 +44,7 @@ class SettingsFormTest {
                 Collections.emptySet(),
                 Collections.emptySet(),
                 Collections.emptySet(),
-                "SQL STRING"
+                "SQL STRING", ""
         ));
 
         Assertions.assertTrue(constraintViolations.isEmpty(), "Form constraint validation should be empty");
@@ -61,7 +61,8 @@ class SettingsFormTest {
                 null,
                 null,
                 null,
-                "SQL STRING"
+                "SQL STRING",
+                ""
         ));
 
         Assertions.assertTrue(constraintViolations.isEmpty(), "Form constraint validation should be empty");
