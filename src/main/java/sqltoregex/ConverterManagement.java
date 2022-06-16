@@ -230,10 +230,9 @@ public class ConverterManagement {
     }
 
     private void handleInvalidSqlInputAndHandleExceptions(String sqlStatement) {
-        // TODO: Error to frontend
         Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-        if(checkIfStatementTypeOfCreateDatabase(sqlStatement)) logger.log(Level.INFO, "CREATE DATABASE manually deparsed. Input: {0}", sqlStatement);
-        else logger.log(Level.WARNING, "Validation failed. Input: {0}", sqlStatement);
+        if(checkIfStatementTypeOfCreateDatabase(sqlStatement)) logger.log(Level.INFO, "CREATE DATABASE manually deparsed.");
+        else logger.log(Level.WARNING, "Validation failed.");
     }
 
     private boolean checkIfStatementTypeOfCreateDatabase(String sqlStatement) {
