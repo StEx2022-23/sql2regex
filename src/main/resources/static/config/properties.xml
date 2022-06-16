@@ -78,6 +78,7 @@
           <value>NOT;!</value>
           <value>NOT;NICHT</value>
           <value>AND;&amp;&amp;</value>
+          <value>KEY;INDEX</value>
       </othersynonyms>
   </synonyms>
 </properties>
