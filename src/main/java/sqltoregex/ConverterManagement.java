@@ -7,12 +7,10 @@ import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
-import net.sf.jsqlparser.util.validation.Validation;
-import net.sf.jsqlparser.util.validation.ValidationError;
-import net.sf.jsqlparser.util.validation.feature.DatabaseType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import sqltoregex.deparser.CreateDatabaseDeParserForRegEx;
 import sqltoregex.deparser.StatementDeParserForRegEx;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
@@ -20,21 +18,17 @@ import sqltoregex.settings.SettingsType;
 import sqltoregex.visitor.StatementVisitorJoinToWhere;
 
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 
 /**
- * Realize a spring service for handling the converting process.
+ * Realizes a spring service for handling the converting process.
  */
 @Service
 public class ConverterManagement {
-
     private final SettingsManager settingsManager;
 
     /**
      * Constructor of converter management.
-     * @param settingsManager which handles usersettings and presets, its autowired, no required action here
+     * @param settingsManager which handles {@link sqltoregex.settings.UserSettings} and presets, its autowired, no required action here
      */
     @Autowired
     public ConverterManagement(SettingsManager settingsManager) {
@@ -43,16 +37,16 @@ public class ConverterManagement {
     }
 
     /**
-     * Build output regex with ^ in the beginning and $ at the end.
+     * Builds output regex with ^ in the beginning and $ at the end, including optional semicolon.
      * @param regex generated regex
      * @return builded regex
      */
     private String buildOutputRegex(String regex) {
-        return "^" + regex + "$";
+        return "^" + regex + ";?$";
     }
 
     /**
-     * Logical OR-concat, if the expression-visitor detect an alternative statement, to allow both of them in the regex.
+     * Logical OR-concat, if the expression-visitor detect an alternative statement, to allow both of them in the regex, including optional semicolon.
      * @param regexList List of String with alternative regex
      * @return concated regex
      */
@@ -66,7 +60,7 @@ public class ConverterManagement {
             for (String str : regexList) {
                 outputRegex.append("(");
                 outputRegex.append(str);
-                outputRegex.append(")|");
+                outputRegex.append(";?)|");
             }
             outputRegex.replace(outputRegex.length() - 1, outputRegex.length(), "");
         }
@@ -75,7 +69,7 @@ public class ConverterManagement {
     }
 
     /**
-     * Deparse expressions.
+     * Deparses expressions.
      * @param sqlstatement current sql statement
      * @return generated regex
      * @throws JSQLParserException if parsing goes wrong
@@ -91,16 +85,19 @@ public class ConverterManagement {
     }
 
     /**
-     * Deparse statements.
+     * Deparses statements.
      * @param sqlStatement current sql statement
-     * @param buffer StringBuilder
-     * @param settingsType UserSettings or presets
+     * @param buffer StringBuilder {@link StringBuilder}
+     * @param settingsType {@link sqltoregex.settings.UserSettings} or presets
      * @return  generated regex
      * @throws JSQLParserException if parsing goes wrong
      */
     private String deParseStatement(String sqlStatement, StringBuilder buffer, SettingsType settingsType) throws JSQLParserException {
+        if(checkIfStatementTypeOfCreateDatabase(sqlStatement)) return new CreateDatabaseDeParserForRegEx(SettingsContainer.builder().with(settingsManager, settingsType)).deParse(sqlStatement);
+
         Statement statement;
         statement = this.parseStatement(sqlStatement);
+
         StatementDeParserForRegEx defaultStatementDeParser = new StatementDeParserForRegEx(buffer, SettingsContainer.builder().with(settingsManager, settingsType));
         statement.accept(defaultStatementDeParser);
         String regExOne = defaultStatementDeParser.getBuffer().toString();
@@ -116,54 +113,46 @@ public class ConverterManagement {
     }
 
     /**
-     * Handle statement deparsing.
+     * Performs statement deparsing.
      * @param sqlStatement current sql statement
      * @return generated regex
      * @throws JSQLParserException if parsing goes wrong
      */
     public String deparse(String sqlStatement) throws JSQLParserException {
         StringBuilder buffer = new StringBuilder();
-        if (!this.validate(sqlStatement)) {
-            throw new IllegalArgumentException();
-        }
         return this.deParseStatement(sqlStatement, buffer, SettingsType.USER);
     }
 
     /**
-     * Handle statement deparsing.
+     * Performs statement deparsing.
      * @param sqlStatement current sql statement
      * @param isOnlyExpression must be set true, if you only want to deparse an expression
      * @return generated regex
      * @throws JSQLParserException if parsing goes wrong
      */
     public String deparse(String sqlStatement, boolean isOnlyExpression) throws JSQLParserException {
-        return deparse(sqlStatement, isOnlyExpression, true, SettingsType.USER);
+        return deparse(sqlStatement, isOnlyExpression, SettingsType.USER);
     }
 
     /**
      * Extended deparse method, to allow all options by setting the follow parameters.
      * @param sqlStatement current sql statement
      * @param isOnlyExpression must be set true, if you only want to deparse an expression
-     * @param toBeValidated turn validation on/off
      * @param settingsType UserSettings or presets
      * @return generated regex
      * @throws JSQLParserException if parsing goes wrong
      */
-    public String deparse(String sqlStatement, boolean isOnlyExpression,
-                          boolean toBeValidated, SettingsType settingsType) throws JSQLParserException {
+    public String deparse(String sqlStatement, boolean isOnlyExpression, SettingsType settingsType) throws JSQLParserException {
         StringBuilder buffer = new StringBuilder();
         if (isOnlyExpression) {
             return this.deParseExpression(sqlStatement);
         } else {
-            if (toBeValidated && !this.validate(sqlStatement)) {
-                throw new IllegalArgumentException();
-            }
             return this.deParseStatement(sqlStatement, buffer, settingsType);
         }
     }
 
     /**
-     * Compare list elements about unique elements.
+     * Compares list elements about unique elements.
      * @param list List of String
      * @return boolean
      */
@@ -174,7 +163,7 @@ public class ConverterManagement {
     }
 
     /**
-     * Parse an expression.
+     * Parses an expression.
      * @param sqlstatement current sql-statement
      * @return Expression object
      * @throws JSQLParserException if parsing goes wrong
@@ -184,7 +173,7 @@ public class ConverterManagement {
     }
 
     /**
-     * Parse a statement.
+     * Parses a statement.
      * @param sqlstatement current sql-statement
      * @return Statement object
      * @throws JSQLParserException if parsing goes wrong
@@ -193,28 +182,7 @@ public class ConverterManagement {
         return CCJSqlParserUtil.parse(sqlstatement);
     }
 
-    /**
-     * Validate statements against oracle, mysql, sqlserver or mariadb grammar.
-     * @param sqlstatement current sql-statement
-     * @return boolean if the statement is valid
-     */
-    public boolean validate(String sqlstatement) {
-        List<DatabaseType> supportedDBMS = new ArrayList<>();
-        supportedDBMS.add(DatabaseType.ORACLE);
-        supportedDBMS.add(DatabaseType.MYSQL);
-        supportedDBMS.add(DatabaseType.SQLSERVER);
-        supportedDBMS.add(DatabaseType.MARIADB);
-
-        Validation validation = new Validation(supportedDBMS, sqlstatement);
-        List<ValidationError> validationErrors = validation.validate();
-        if (validationErrors.isEmpty()) {
-            return true;
-        } else {
-            for (ValidationError va : validationErrors) {
-                Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-                logger.log(Level.WARNING, "Error while validating the statement: {0}", va);
-            }
-            return false;
-        }
+    private boolean checkIfStatementTypeOfCreateDatabase(String sqlStatement) {
+        return sqlStatement.contains("CREATE") && sqlStatement.contains("DATABASE");
     }
 }

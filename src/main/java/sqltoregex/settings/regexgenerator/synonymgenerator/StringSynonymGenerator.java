@@ -61,7 +61,7 @@ public class StringSynonymGenerator extends SynonymGenerator<String, String> {
     /**
      * Generates a regex with all possible synonyms, if the param synonymGenerator isn't null.
      * Otherwise, only the input string returned.
-     * @param synonymGenerator StringSynonymGenerator object
+     * @param synonymGenerator {@link StringSynonymGenerator} object
      * @param str input string
      * @return generated regex or str
      */
@@ -72,7 +72,7 @@ public class StringSynonymGenerator extends SynonymGenerator<String, String> {
 
     /**
      * Generates a list of strings with all possible synonyms, if the param synonymGenerator isn't null.
-     * @param synonymGenerator StringSynonymGenerator
+     * @param synonymGenerator {@link StringSynonymGenerator}
      * @param str input string
      * @return generated list of synonyms as string or given string as one entry in the string list
      */

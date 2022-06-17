@@ -29,7 +29,6 @@ import java.util.*;
 @Controller
 public class SqlToRegexController {
     private static final String TITLE = "title";
-
     SettingsManager settingsManager;
     ConverterManagement converterManagement;
 
@@ -59,7 +58,7 @@ public class SqlToRegexController {
     }
 
     /**
-     * Prepare settings for displaying on frontend.
+     * Prepares settings for displaying on frontend.
      * @param model Model, autowired, no action required.
      * @return SettingsForm, html asset
      */
@@ -127,17 +126,13 @@ public class SqlToRegexController {
      * @param settingsForm SettingsForm
      * @param result Errors
      * @return filled form
-     * @throws JSQLParserException
+     * @throws JSQLParserException if parsing goes wrong
      */
     @PostMapping("/convert")
     public String convert(Model model, @Valid @ModelAttribute SettingsForm settingsForm,
                           Errors result) throws JSQLParserException {
         addSettingsFormFields(model);
-
-        if (result.hasErrors()) {
-            return "assets/settingsform/form";
-        }
-
+        if (result.hasErrors()) return "assets/settingsform/form";
         this.settingsManager.parseUserSettingsInput(settingsForm);
 
         model.addAttribute("settingsForm",

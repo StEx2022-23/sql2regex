@@ -34,9 +34,12 @@ public class TestUtils{
                 expression.accept(deParser);
             }else {
                 StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(buffer, settings);
-
-                Statement statement = CCJSqlParserUtil.parse(sampleSolution);
-                statement.accept(statementDeParserForRegEx);
+                if(sampleSolution.contains("CREATE") && sampleSolution.contains("DATABASE")){
+                    return new CreateDatabaseDeParserForRegEx(settings).deParse(sampleSolution);
+                } else {
+                    Statement statement = CCJSqlParserUtil.parse(sampleSolution);
+                    statement.accept(statementDeParserForRegEx);
+                }
             }
             return buffer.toString();
         }catch(JSQLParserException e){

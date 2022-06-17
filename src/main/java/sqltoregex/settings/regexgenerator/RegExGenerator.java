@@ -37,7 +37,7 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
     }
 
     /**
-     * Generate a regex like (?:obj1|obj2|ob3) from a List of String.
+     * Generates a regex like (?:obj1|obj2|ob3) from a List of String.
      * @param elList list of string, with alternative options
      * @return generated regex
      */
@@ -54,11 +54,8 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
      */
     public static String joinListToRegEx(RegExGenerator<?> regexGenerator, List<String> elList){
         StringBuilder builder = new StringBuilder();
-
         boolean isNonCapturingGroup = regexGenerator == null || regexGenerator.isNonCapturingGroup;
-
         builder.append(isNonCapturingGroup ? "(?:" : '(');
-
         Iterator<String> iterator = elList.iterator();
         while (iterator.hasNext()){
             builder.append(iterator.next());
@@ -71,7 +68,7 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
     }
 
     /**
-     * Implement method from {@link IRegExGenerator}.
+     * Implements method from {@link IRegExGenerator}.
      * @return one of enum {@link SettingsOption}
      * @see IRegExGenerator
      */
@@ -81,7 +78,7 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
     }
 
     /**
-     * Define if the generated regex is a capturing group (obj1|obj2) or a non-capturing group (?:obj1|obj2).
+     * Defines if the generated regex is a capturing group (obj1|obj2) or a non-capturing group (?:obj1|obj2).
      * @param nonCapturingGroup false for capturing group and true for non-capturing group
      * @see IRegExGenerator
      */
@@ -91,7 +88,7 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
     }
 
     /**
-     * Overrides default hashCode() method. The object hash is related to the capturing group setting and the SettingsOption.
+     * Overrides default hashCode() method. The object hash is related to the capturing group setting and the {@link SettingsOption}.
      * @return hashcode as int
      */
     @Override
@@ -100,7 +97,7 @@ public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
     }
 
     /**
-     * Overrides default equals() method. Two objects are equal, if the capturing group setting and the SettingsOption are equal.
+     * Overrides default equals() method. Two objects are equal, if the capturing group setting and the {@link SettingsOption} are equal.
      * @param o to compare object
      * @return boolean if equal
      */

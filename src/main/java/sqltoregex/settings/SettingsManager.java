@@ -23,11 +23,21 @@ import java.util.*;
 
 /**
  * Realize a spring boot service which handles all settings operations (parsing and specific getters)
+ * @author Patrick Binkert
+ * @author Maximilian Förster
  */
 @Service
 public class SettingsManager {
     private final Map<SettingsType, SettingsContainer> settingsMap = new EnumMap<>(SettingsType.class);
 
+    /**
+     * Constructor for the {@link SettingsManager}. Parses the <a href="{@docRoot}/src/main/resources/static/config/properties.xml">properties.xml</a>.
+     * @throws ParserConfigurationException if xml parsing error occurs
+     * @throws IOException if xml parsing error occurs
+     * @throws SAXException if xml parsing error occurs
+     * @throws XPathExpressionException if xml parsing error occurs
+     * @throws URISyntaxException if xml parsing error occurs
+     */
     public SettingsManager() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException
             , URISyntaxException {
         this.parseSettings();
@@ -35,10 +45,10 @@ public class SettingsManager {
 
     /**
      * Returns related settings by passing a class.
-     * @param clazz class of object, which is instanceof IRegExGenerator
-     * @param settingsType SettingsType
-     * @param <T> instanceof IRegExGenerator
-     * @return Set of object, which are instanceof IRegExGenerator
+     * @param clazz class of object, which is instanceof {@link IRegExGenerator}
+     * @param settingsType {@link SettingsType}
+     * @param <T> instanceof {@link IRegExGenerator}
+     * @return Set of object, which are instanceof {@link IRegExGenerator}
      */
     public <T extends IRegExGenerator<?>> Set<T> getSettingByClass(Class<T> clazz,
                                                          SettingsType settingsType) {
@@ -46,31 +56,31 @@ public class SettingsManager {
     }
 
     /**
-     * Return a boolean for the question, if a specific Setting is present in the SettingsContainer, with the preset SettingsType.USER.
-     * @param settingsOption one of enum SettingsOption
-     * @return boolean → the SettingsOption is given in the SettingsContainer
+     * Returns a boolean for the question, if a specific {@link SettingsOption} is present in the {@link SettingsContainer}, with the preset {@link SettingsType}.USER.
+     * @param settingsOption one of enum {@link SettingsOption}
+     * @return boolean → the SettingsOption is given in the {@link SettingsContainer}
      */
     public boolean getSettingBySettingsOption(SettingsOption settingsOption) {
         return this.getSettingBySettingsOption(settingsOption, SettingsType.USER);
     }
 
     /**
-     * Return a boolean for the question, if a specific Setting is present in the SettingsContainer, by passing a specific SettingsOption, with variable SettingsType.
-     * @param settingsOption one of enum SettingsOption
-     * @param settingsType one of enum SettingsType
-     * @return boolean → the SettingsOption is given in the SettingsContainer
+     * Returns a boolean for the question, if a specific Setting is present in the {@link SettingsContainer}, by passing a specific {@link SettingsOption}, with variable {@link SettingsType}.
+     * @param settingsOption one of enum {@link SettingsOption}
+     * @param settingsType one of enum {@link SettingsType}
+     * @return boolean → the SettingsOption is given in the  {@link SettingsContainer}
      */
     public boolean getSettingBySettingsOption(SettingsOption settingsOption, SettingsType settingsType) {
         return this.getSettingsContainer(settingsType).get(settingsOption) != null;
     }
 
     /**
-     * Get a Object, which is related to a selected Setting, as Optional of T.
-     * @param settingsOption one of enum SettingsOption
-     * @param clazz class of object, which is instanceof IRegExGenerator
-     * @param settingsType one of enum SettingsType
-     * @param <T> instanceof IRegExGenerator
-     * @return Optional object, which is instanceof IRegExGenerator
+     * Gets an Object, which is related to a selected {@link IRegExGenerator}, as Optional of T.
+     * @param settingsOption one of enum {@link SettingsOption}
+     * @param clazz class of object, which is instanceof {@link IRegExGenerator}
+     * @param settingsType one of enum {@link SettingsType}
+     * @param <T> instanceof {@link IRegExGenerator}
+     * @return Optional object, which is instanceof {@link IRegExGenerator}
      */
     public <T extends IRegExGenerator<?>> Optional<T> getSettingBySettingsOption(SettingsOption settingsOption,
                                                                                     Class<T> clazz,
@@ -84,17 +94,17 @@ public class SettingsManager {
     }
 
     /**
-     * Return a SettingsContainer with the preset for SettingsType.USER.
-     * @return SettingsContainer
+     * Returns a {@link SettingsContainer} with the preset for {@link SettingsType}.USER.
+     * @return SettingsContainer {@link SettingsContainer}
      */
     public SettingsContainer getSettingsContainer() {
         return this.getSettingsContainer(SettingsType.USER);
     }
 
     /**
-     * Return a SettingsContainer with the preset for a given SettingsType.
-     * @param settingsType wanted SettingsType, like: ALL, USER; DEFAULT_SCHOOL
-     * @return SettingsContainer
+     * Return a  {@link SettingsContainer} with the preset for a given {@link SettingsType}.
+     * @param settingsType wanted {@link SettingsType}, like: ALL, USER; DEFAULT_SCHOOL
+     * @return SettingsContainer  {@link SettingsContainer}
      */
     public SettingsContainer getSettingsContainer(SettingsType settingsType) {
         Assert.notNull(settingsType, "settingsType must not be null");
@@ -105,12 +115,12 @@ public class SettingsManager {
     }
 
     /**
-     * Read the properties.xml and parse all settings. Saves parsing result in a Map with key = SettingsType and value = SettingsContainer.
-     * @throws ParserConfigurationException
-     * @throws IOException
-     * @throws SAXException
-     * @throws XPathExpressionException
-     * @throws URISyntaxException
+     * Reads the properties.xml and parse all settings. Saves parsing result in a Map with key = {@link SettingsType} and value = {@link SettingsContainer}.
+     * @throws ParserConfigurationException if xml parsing error occurs
+     * @throws IOException if xml parsing error occurs
+     * @throws SAXException if xml parsing error occurs
+     * @throws XPathExpressionException if xml parsing error occurs
+     * @throws URISyntaxException if xml parsing error occurs
      */
     private void parseSettings() throws ParserConfigurationException, IOException, SAXException,
             XPathExpressionException, URISyntaxException {
@@ -160,9 +170,9 @@ public class SettingsManager {
     }
 
     /**
-     * Parse the settings, set by the user, from the given SettingsForm
+     * Parses the settings, set by the user, from the given SettingsForm.
      * @param form SettingsForm
-     * @return builded SettingsContainer
+     * @return builded SettingsContainer {@link SettingsContainer}
      */
     public SettingsContainer parseUserSettingsInput(SettingsForm form) {
         SettingsContainer.Builder settingsContainerBuilder = SettingsContainer.builder();

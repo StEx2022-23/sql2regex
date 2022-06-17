@@ -23,6 +23,10 @@ public class RestApiController {
     public static final String LISTSTYLE = "   - ";
     public static final String LINEBREAK = "\n";
 
+    /**
+     * Print all available endpoints from {@link RestApiController}.
+     * @return list of endpoints
+     */
     @PostMapping("/docs")
     public String getAllEndpoints(){
         StringBuilder endpoints = new StringBuilder();

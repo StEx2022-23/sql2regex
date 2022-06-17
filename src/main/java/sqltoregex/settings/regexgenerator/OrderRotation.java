@@ -27,7 +27,7 @@ public class OrderRotation extends RegExGenerator<List<String>> {
     }
 
     /**
-     * Generate a list of strings with all possible orders.
+     * Generates a list of strings with all possible orders.
      * @param valueList with all items
      * @return list of string with all possible orders
      */
@@ -40,7 +40,7 @@ public class OrderRotation extends RegExGenerator<List<String>> {
     }
 
     /**
-     * helper function for recursive tablename order concatenation
+     * Helper function for recursive table/column/value-name order concatenation.
      * @param amount amount of items to order rotate
      * @param valueList List of String with to order rotate items
      */
@@ -77,9 +77,9 @@ public class OrderRotation extends RegExGenerator<List<String>> {
     }
 
     /**
-     * Generate a regex with all possible orders, if the param orderRotation isn't null.
+     * Generates a regex with all possible orders, if the param orderRotation isn't null.
      * Otherwise, only the joined string list returned.
-     * @param orderRotation OrderRotation object
+     * @param orderRotation {@link OrderRotation} object
      * @param valueList list of strings to order rotate
      * @return generated regex or str
      */
@@ -99,7 +99,7 @@ public class OrderRotation extends RegExGenerator<List<String>> {
     /**
      * Generate a list of strings with all possible orders, if the param orderRotation isn't null.
      * Otherwise, the given list of string is returned.
-     * @param orderRotation OrderRotation object
+     * @param orderRotation {@link OrderRotation}  object
      * @param valueList list of strings to order rotate
      * @return generated list of orders as string or given list
      */

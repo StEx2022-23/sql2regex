@@ -67,7 +67,7 @@ class SqlToRegexControllerTest {
                                     new BasicNameValuePair("dateFormats", "yyyy-MM-dd"),
                                     new BasicNameValuePair("timeFormats", "HH:MM:SS"),
                                     new BasicNameValuePair("dateTimeFormats", "YYYY-MM-DD HH:MM:SS"),
-                                    new BasicNameValuePair("sql", ""),
+                                    new BasicNameValuePair("SELECT * FROM table1", ""),
                                     new BasicNameValuePair("aggregateFunctionLang", "Mittelwert; AVG")
                             ))))
                             .accept(MediaType.APPLICATION_JSON))

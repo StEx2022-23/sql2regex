@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 
 /**
  * Iterator for the settings xml.
+ * @author Patrick Binkert
  */
 public class SettingsNodeListIterator implements Iterable<Node> {
     private final NodeList nodeList;

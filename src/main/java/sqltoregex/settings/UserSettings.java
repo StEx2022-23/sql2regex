@@ -6,7 +6,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * singleton UserSettings for store only one SettingsSet while generating regex
+ * Singleton UserSettings for store only one SettingsSet while generating regex.
+ * @author Patrick Binkert
+ * @author Maximilian Förster
  */
 @RequestScope
 public class UserSettings {
@@ -14,17 +16,17 @@ public class UserSettings {
     private final SettingsContainer settingsContainer;
 
     /**
-     * constructor for user settings
-     * @param settingsContainer with saved selected settings
+     * Constructor for user settings.
+     * @param settingsContainer {@link SettingsContainer} with saved selected settings
      */
     private UserSettings(SettingsContainer settingsContainer) {
         this.settingsContainer = SettingsContainer.builder().with(settingsContainer).build();
     }
 
     /**
-     * return current user settings instance, or write new settings
-     * @param settingsContainer
-     * @return
+     * Returns the current user settings instance, or write new settings.
+     * @param settingsContainer {@link SettingsContainer}
+     * @return {@link UserSettings} instance
      */
     public static UserSettings getInstance(SettingsContainer settingsContainer) {
         if (instance == null) {
@@ -40,8 +42,8 @@ public class UserSettings {
     }
 
     /**
-     * return current user settings instance
-     * @return
+     * Returns the current user settings instance.
+     * @return {@link UserSettings} instance
      */
     public static UserSettings getInstance() {
         if (instance == null) {
@@ -51,16 +53,16 @@ public class UserSettings {
     }
 
     /**
-     * check if user settings instance is set
-     * @return
+     * Checks if user settings instance is set.
+     * @return boolean for is instance set?
      */
     public static boolean areSet() {
         return instance != null;
     }
 
     /**
-     * return current SettingsContainer
-     * @return
+     * Returns current SettingsContainer.
+     * @return get current {@link SettingsContainer}
      */
     public SettingsContainer getSettingsContainer() {
         return this.settingsContainer;

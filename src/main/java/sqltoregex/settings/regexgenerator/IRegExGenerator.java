@@ -11,20 +11,20 @@ import java.util.List;
 public interface IRegExGenerator<T> {
     /**
      * Generate a regex string.
-     * @param input  String, List of String or SimpleDateFormat
+     * @param input String, List of String or SimpleDateFormat
      * @return generated regex
      */
     String generateRegExFor(T input);
 
     /**
      * Generate a List of strings with the specific behave of the regex generator.
-     * @param input  String, List of String or SimpleDateFormat
+     * @param input String, List of String or SimpleDateFormat
      * @return generated list of regex behave for the respective regex generator
      */
     List<String> generateAsList(T input);
 
     /**
-     * Gives the specified SettingsOption. One of enum {@link SettingsOption}.
+     * Gives the specified {@link SettingsOption}. One of enum {@link SettingsOption}.
      * @return one of enum {@link SettingsOption}
      * @see SettingsOption
      */

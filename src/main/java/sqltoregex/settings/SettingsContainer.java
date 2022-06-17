@@ -14,13 +14,15 @@ import java.util.*;
 
 /**
  * The SettingsContainer hold all enabled/selected Settings.
+ * @author Patrick Binkert
+ * @author Maximilian Förster
  */
 public class SettingsContainer {
     private final Map<SettingsOption, IRegExGenerator<?>> allSettings;
 
     /**
-     * Constructor for the SettingsContainer, with a not null Builder.
-     * @param builder SettingsContainerBuilder
+     * Constructor for the SettingsContainer, with a not null {@link Builder}.
+     * @param builder SettingsContainer {@link Builder}
      */
     private SettingsContainer(Builder builder){
         Assert.notNull(builder.unModifiableMap, "Builder must not be null!");
@@ -28,9 +30,9 @@ public class SettingsContainer {
     }
 
     /**
-     * Return a object which is instanceof IRegExGenerator by passing a SettingsOption.
-     * @param settingsOption one of enum SettingsOption
-     * @return Object instanceof IRegExGenerator
+     * Returns an object which is instanceof {@link IRegExGenerator} by passing a {@link SettingsOption}.
+     * @param settingsOption one of enum {@link SettingsOption}
+     * @return Object instanceof {@link IRegExGenerator}
      */
     public IRegExGenerator<?> get(SettingsOption settingsOption){
         for (IRegExGenerator<?> generator : this.allSettings.values()){
@@ -42,10 +44,10 @@ public class SettingsContainer {
     }
 
     /**
-     * Return a map with objects which are instanceof IRegExGenerator by passing a class.
-     * @param clazz Class of object which is instanceof IRegExGenerator
-     * @param <T> instanceof IRegExGenerator
-     * @return Map with key = SettingsOption and value = object instanceof IRegExGenerator
+     * Returns a map with objects which are instanceof {@link IRegExGenerator} by passing a class.
+     * @param clazz Class of object which is instanceof {@link IRegExGenerator}
+     * @param <T> instanceof {@link IRegExGenerator}
+     * @return Map with key = {@link SettingsOption} and value = object instanceof {@link IRegExGenerator}
      */
     public <T extends IRegExGenerator<?>> Map<SettingsOption, T> get(Class<T> clazz){
         Map<SettingsOption, T> map = new EnumMap<>(SettingsOption.class);
@@ -61,8 +63,8 @@ public class SettingsContainer {
     }
 
     /**
-     * Get all currently saved Settings.
-     * @return Map with key = SettingsOption and value = object instanceof IRegExGenerator
+     * Gets all currently saved Settings.
+     * @return Map with key = {@link SettingsOption} and value = object instanceof {@link IRegExGenerator}
      */
     public Map<SettingsOption, IRegExGenerator<?>> getAllSettings(){
         return this.allSettings;
@@ -77,7 +79,7 @@ public class SettingsContainer {
     }
 
     /**
-     * Specific builder static inner class, to build the SettingsContainer.
+     * Specific builder static inner class, to build the  {@link SettingsContainer}.
      */
     public static final class Builder {
         private static final String UNSUPPORTED_BUILD_WITH = "Unsupported build with:";
@@ -86,9 +88,9 @@ public class SettingsContainer {
         Map<SettingsOption,IRegExGenerator<?>> unModifiableMap;
 
         /**
-         * Append an entry to the builder map, which holds SettingOptions and related setting objects. In this case, by passing an object instanceof {@link IRegExGenerator}.
+         * Append an entry to the builder map, which holds {@link SettingsOption} and related setting objects. In this case, by passing an object instanceof {@link IRegExGenerator}.
          * @param regExGenerator object instanceof {@link IRegExGenerator}
-         * @return this builder
+         * @return this {@link Builder}
          */
         public Builder with(IRegExGenerator<?> regExGenerator){
             this.modifiableMap.put(regExGenerator.getSettingsOption(), regExGenerator);
@@ -96,9 +98,9 @@ public class SettingsContainer {
         }
 
         /**
-         * Append an or multiple entry to the builder map, which holds SettingOptions and related setting objects. In this case, by passing a settings container.
-         * @param settingsContainer SettingsContainer
-         * @return this builder
+         * Append an or multiple entry to the builder map, which holds {@link SettingsOption} and related setting objects. In this case, by passing  {@link SettingsContainer}.
+         * @param settingsContainer  {@link SettingsContainer}
+         * @return this {@link Builder}
          */
         public Builder with(SettingsContainer settingsContainer) {
             modifiableMap.putAll(settingsContainer.getAllSettings());
@@ -106,10 +108,10 @@ public class SettingsContainer {
         }
 
         /**
-         * Append an or multiple entry to the builder map, which holds SettingOptions and related setting objects. In this case, by passing the SettingsManager and one of enum SettingsType.
-         * @param settingsManager SettingsManager
-         * @param settingsType one of enum SettingsType
-         * @return this builder
+         * Append an or multiple entry to the builder map, which holds {@link SettingsOption} and related setting objects. In this case, by passing the {@link SettingsManager} and one of enum {@link SettingsType}.
+         * @param settingsManager {@link SettingsManager}
+         * @param settingsType one of enum {@link SettingsType}
+         * @return this {@link Builder}
          */
         public SettingsContainer with(SettingsManager settingsManager, SettingsType settingsType){
             this.with(settingsManager.getSettingsContainer(settingsType));
@@ -117,10 +119,10 @@ public class SettingsContainer {
         }
 
         /**
-         * Append an entry to the builder map, which holds SettingOptions and related setting objects. In this case, by passing a NodeList and one of enum SettingsOption.
+         * Append an entry to the builder map, which holds {@link SettingsOption} and related setting objects. In this case, by passing a {@link NodeList} and one of enum {@link SettingsOption}.
          * @param nodeList NodeList from the xml parsing process
-         * @param settingsOption one of enum SettingsOption
-         * @return this builder
+         * @param settingsOption one of enum {@link SettingsOption}
+         * @return this {@link Builder}
          */
         public Builder withNodeList(NodeList nodeList, SettingsOption settingsOption) {
             if (nodeList.item(0).getTextContent().equals("false")) {
@@ -182,8 +184,6 @@ public class SettingsContainer {
             return this;
         }
 
-
-
         public Builder withSimpleDateFormatSet(Set<SimpleDateFormat> synonyms, SettingsOption settingsOption) {
             Assert.notNull(synonyms, "Set of simple date formats options must not be null");
             switch (settingsOption) {
@@ -201,13 +201,12 @@ public class SettingsContainer {
         }
 
         /**
-         * Creates a {@link IRegExGenerator} depending on the provided settingsOption and synonym Set.
-         * If the synonymSet consists of delimited Strings they can splitted
+         * Creates a {@link IRegExGenerator} depending on the provided {@link SettingsOption} and synonym Set.
+         * If the synonymSet consists of delimited Strings they can split
          * and added with {@link sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator#addSynonymFor(Object, Object)}
-         *
-         * @param synonyms
-         * @param settingsOption
-         * @return
+         * @param synonyms synonym set as set of string
+         * @param settingsOption {@link SettingsOption}
+         * @return this {@link Builder}
          */
         public Builder withStringSet(Set<String> synonyms, SettingsOption settingsOption) {
             switch (settingsOption) {

@@ -485,6 +485,50 @@ function handleCookieBanner(){
     loadDefaultLanguageSettings();
 }
 
+function scrollToInValidInput(el) {
+    if(el !== null){
+        let bodyRect = document.body.getBoundingClientRect()
+        let elemRect = document.getElementById("isInValid").parentNode.getBoundingClientRect()
+        let offset = (elemRect.top - bodyRect.top) * 0.9;
+
+        window.scroll({
+            top: offset,
+            behavior: "smooth"
+        });
+    }
+}
+
+function handleDateValue(el) {
+    let dateValue = el.value;
+    let regexDate = /(?=\d\d\d\d-\d\d-\d\d$)(?<!{d')(\d\d\d\d-\d\d-\d\d)(?!')/gi;
+    let regexDateTime = /(?=\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?)(?!')/gi
+    let regexTime = /(?=\d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d:\d\d(?::\d\d)?)(?!')/gi
+    if(dateValue.match(regexDate) || dateValue.match(regexDateTime) || dateValue.match(regexTime)) {
+        document.getElementById("dateHint").classList.add("show");
+    }
+}
+
+function performDateValueDeParsing(id) {
+    let sqlInput = document.getElementById(id);
+    let regexDate = /(?=\d\d\d\d-\d\d-\d\d$)(?<!{d')(\d\d\d\d-\d\d-\d\d)(?!')/gi;
+    let regexDateTime = /(?=\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?)(?!')/gi;
+    let regexTime = /(?=\d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d:\d\d(?::\d\d)?)(?!')/gi;
+
+    if(sqlInput.value.match(regexDate)){
+        sqlInput.value = sqlInput.value.replace(regexDate, "{d'$&'}");
+    } else if (sqlInput.value.match(regexDateTime)) {
+        sqlInput.value = sqlInput.value.replace(regexDateTime, "{ts'$&'}");
+    } else if (sqlInput.value.match(regexTime)) {
+        sqlInput.value = sqlInput.value.replace(regexTime, "{t'$&'}");
+    }
+
+    document.getElementById("dateHint").classList.remove("show");
+}
+
+function hideDateValueHint(){
+    document.getElementById("dateHint").classList.remove("show")
+}
+
 let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
 
 document.onreadystatechange = function () {
@@ -510,7 +554,8 @@ document.onreadystatechange = function () {
                         result.focus();
                     })
                     .then( () => SqlRegExHis.checkUpdatedConverting())
-                    .then( () => copy2clipbord('regexoutput', null));
+                    .then( () => copy2clipbord('regexoutput', null))
+                    .then( () => scrollToInValidInput(document.getElementById("isInValid")));
                 e.preventDefault();
                 form.parentNode.parentNode.style.removeProperty("minHeight");
             })

@@ -137,7 +137,7 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     }
 
     /**
-     * Overrides default equals method. Not using graph equals method cause wrong implementation in JGraphT.
+     * Overrides default equals method. Not using graph equals method cause wrong implementation in <a href="https://jgrapht.org/">JGRAPHT</a>>.
      * @param o to compare object
      * @return boolean for comparison of the two objects
      */
