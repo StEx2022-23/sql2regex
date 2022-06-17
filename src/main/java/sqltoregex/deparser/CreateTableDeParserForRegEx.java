@@ -17,6 +17,8 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Implements an own create table statement deparser to generate regular expressions.
@@ -268,14 +270,26 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         }
         buffer.append(RegExGenerator.joinListToRegEx(this.datatypeSynonymGenerator, synsWithSpellingMistake));
         if (columnDefinition.getColumnSpecs() != null) {
+            StringBuilder stringBuilder = new StringBuilder();
             for (String s : columnDefinition.getColumnSpecs()) {
                 if (s.contains("(") && s.contains(")")){
                    s = s.replace("(", "\\(");
                    s = s.replace(")", "\\)");
                 }
-                buffer.append(REQUIRED_WHITE_SPACE);
-                buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, s));
+                stringBuilder.append(REQUIRED_WHITE_SPACE);
+                stringBuilder.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, s));
             }
+
+            String columnDefinitionString = stringBuilder.toString();
+            Pattern pPrimary = Pattern.compile("(?<!UNIQUE.*)(PRIMARY)?\\s*KEY");
+            Matcher mPrimary = pPrimary.matcher(columnDefinitionString);
+            columnDefinitionString = mPrimary.replaceFirst("(PRIMARY)?\sKEY");
+
+            Pattern pUnique = Pattern.compile("UNIQUE\\s*(KEY)?");
+            Matcher mUnique = pUnique.matcher(columnDefinitionString);
+            columnDefinitionString = mUnique.replaceFirst("UNIQUE\s(KEY)?");
+
+            buffer.append(columnDefinitionString);
         }
     }
 }
