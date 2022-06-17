@@ -481,6 +481,22 @@ class ExpressionDeParserForRegExTest {
     }
 
     @Test
+    void testQuotationMarksColumn(){
+        final String sampleSolution = "col1";
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "col1",
+                "'col1'",
+                "\"col1\"",
+                "`col1`",
+                "´col1´"
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true);
+    }
+
+    @Test
     void testFullConstructor() {
         StringBuilder buffer = new StringBuilder();
         SettingsContainer settings = SettingsContainer.builder().build();

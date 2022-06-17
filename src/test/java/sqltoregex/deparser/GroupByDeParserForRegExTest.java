@@ -142,7 +142,7 @@ class GroupByDeParserForRegExTest{
         SettingsContainer settingsContainer = SettingsContainer.builder().build();
         GroupByDeParserForRegEx groupByDeParserForRegEx = new GroupByDeParserForRegEx(new ExpressionDeParserForRegEx(settingsContainer), new StringBuilder(), settingsContainer);
         for(String str : groupByDeParserForRegEx.expressionListToStringList(expressionList)){
-            Assertions.assertTrue(str.equals("\\s*col1\\s*") || str.equals("\\s*col2\\s*"), str);
+            Assertions.assertTrue(str.equals("\\s*[`´'\"]*col1[`´'\"]*\\s*") || str.equals("\\s*[`´'\"]*col2[`´'\"]*\\s*"), str);
         }
     }
 }

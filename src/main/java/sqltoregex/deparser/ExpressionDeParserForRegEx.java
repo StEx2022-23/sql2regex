@@ -30,6 +30,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     public static final String OLD_ORACLE_JOIN = "\\(\\+\\)";
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
+    private static final String QUOTATION_MARK_REGEX = "[`´'\"]";
     private final SpellingMistake columnNameSpellingMistake;
     private final SpellingMistake tableNameSpellingMistake;
     private final DateAndTimeFormatSynonymGenerator dateSynonyms;
@@ -406,7 +407,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             buffer.append(stringValue.getPrefix());
         }
         buffer.append(OPTIONAL_WHITE_SPACE)
-                .append("['\"]").append(stringValue.getValue()).append("['\"]")
+                .append(QUOTATION_MARK_REGEX).append("+").append(stringValue.getValue()).append(QUOTATION_MARK_REGEX).append("+")
                 .append(OPTIONAL_WHITE_SPACE);
     }
 
@@ -451,6 +452,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         buffer.append(OPTIONAL_WHITE_SPACE);
         final Table table = tableColumn.getTable();
         StringBuilder tableName = new StringBuilder();
+        buffer.append(QUOTATION_MARK_REGEX).append("*");
         if (table != null && !table.getFullyQualifiedName().isEmpty()) {
             tableName.append(table.getFullyQualifiedName());
             if (table.getAlias() != null) {
@@ -471,6 +473,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         }
 
         buffer.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, tableColumn.getColumnName()));
+        buffer.append(QUOTATION_MARK_REGEX).append("*");
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
