@@ -485,6 +485,19 @@ function handleCookieBanner(){
     loadDefaultLanguageSettings();
 }
 
+function scrollToInValidInput(el) {
+    if(el.hidden === false){
+        let bodyRect = document.body.getBoundingClientRect()
+        let elemRect = document.getElementById("isInValid").parentNode.getBoundingClientRect()
+        let offset = (elemRect.top - bodyRect.top) * 0.9;
+
+        window.scroll({
+            top: offset,
+            behavior: "smooth"
+        });
+    }
+}
+
 let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
 
 document.onreadystatechange = function () {
@@ -510,7 +523,8 @@ document.onreadystatechange = function () {
                         result.focus();
                     })
                     .then( () => SqlRegExHis.checkUpdatedConverting())
-                    .then( () => copy2clipbord('regexoutput', null));
+                    .then( () => copy2clipbord('regexoutput', null))
+                    .then( () => scrollToInValidInput(document.getElementById("isInValid")));
                 e.preventDefault();
                 form.parentNode.parentNode.style.removeProperty("minHeight");
             })

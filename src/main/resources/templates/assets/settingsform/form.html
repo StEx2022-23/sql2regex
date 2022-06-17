@@ -1,16 +1,18 @@
 <form th:fragment="settingsform" id="converterForm"  action="#" th:action="@{/convert}" th:object="${settingsForm}" method="POST">
     <div class="mb-3">
         <label for="sqlinput" class="form-label"><strong th:text="#{settingsform.sqlInput.heading}">SQL-Input</strong></label>
-        <textarea th:field="*{sql}" class="form-control inputHeight" id="sqlinput" rows="3" th:placeholder="#{settingsform.sqlInput}"></textarea>
+        <div class="textareainputinvalid">
+            <textarea th:field="*{sql}" class="form-control inputHeight" id="sqlinput" rows="3" th:placeholder="#{settingsform.sqlInput}"></textarea>
+
+            <div id="isValid" th:hidden="*{validation eq 'invalid' or sql eq ''}" class="alert alert-success mt-3 overlayinvalidhint" role="alert" th:utext="#{convValid}">
+            </div>
+
+            <div id="isInValid" th:hidden="*{validation eq 'valid' or sql eq ''}" class="alert alert-warning mt-3 overlayinvalidhint" role="alert" th:utext="#{convInvalid}">
+            </div>
+        </div>
         <div th:if="${#fields.hasErrors('sql')}" th:errors="*{sql}" th:errorclass="bg-danger">
             title error
         </div>
-    </div>
-
-    <div id="isValid" th:hidden="*{validation eq 'invalid' or sql eq ''}" class="alert alert-success mt-3" role="alert" th:utext="#{convValid}">
-    </div>
-
-    <div id="isInValid" th:hidden="*{validation eq 'valid' or sql eq ''}" class="alert alert-warning mt-3" role="alert" th:utext="#{convInvalid}">
     </div>
 
     <div class="text-end">
