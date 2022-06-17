@@ -14,11 +14,9 @@
                             <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
                         </svg>
                     </div>
-                    <div class="col-sm-8 text-center">
-                        <strong>Ein Datum wurde erkannt!</strong> <br/> Zur korrekten Verarbeitung muss dieses in ein Literal überführt werden.
-                    </div>
+                    <div class="col-sm-8 text-center" th:utext="#{conv.dateDetected}"></div>
                     <div class="col-sm-3 text-center">
-                        <p class="fw-bolder">Umwandeln?</p>
+                        <p class="fw-bolder" th:utext="#{conv.DateValueParsing}"></p>
                         <div class="row align-items-center">
                             <div class="col text-center">
                                 <button type="button" id="dateHintApprove" class="btn btn-primary" onclick="performDateValueDeParsing('sqlinput')">
