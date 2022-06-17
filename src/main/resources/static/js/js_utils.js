@@ -486,7 +486,7 @@ function handleCookieBanner(){
 }
 
 function scrollToInValidInput(el) {
-    if(el.hidden === false){
+    if(el !== null){
         let bodyRect = document.body.getBoundingClientRect()
         let elemRect = document.getElementById("isInValid").parentNode.getBoundingClientRect()
         let offset = (elemRect.top - bodyRect.top) * 0.9;

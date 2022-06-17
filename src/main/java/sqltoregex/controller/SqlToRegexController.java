@@ -116,7 +116,6 @@ public class SqlToRegexController {
                                 SettingsOption.OTHERSYNONYMS, StringSynonymGenerator.class, SettingsType.ALL)
                         .map(synonymGenerator -> GraphPreProcessor.getSynonymSetWithDelimiter(synonymGenerator.getGraph(), ";"))
                         .orElse(new HashSet<>()),
-                "",
                 ""
         );
     }
@@ -136,8 +135,6 @@ public class SqlToRegexController {
         if (result.hasErrors()) return "assets/settingsform/form";
         this.settingsManager.parseUserSettingsInput(settingsForm);
 
-        boolean isValid = converterManagement.validate(settingsForm.getSql());
-        settingsForm.setValidation(isValid ? "valid" : "invalid");
         model.addAttribute("settingsForm",
                 new SettingsForm(
                         settingsForm.getSpellings(),
@@ -148,14 +145,12 @@ public class SqlToRegexController {
                         settingsForm.getAggregateFunctionLang(),
                         settingsForm.getDatatypeSynonyms(),
                         settingsForm.getOtherSynonyms(),
-                        settingsForm.getSql(),
-                        settingsForm.getValidation()
+                        settingsForm.getSql()
                 )
         );
 
-        if(isValid) {
-            model.addAttribute("regex", converterManagement.deparse(settingsForm.getSql()));
-        }
+        model.addAttribute("regex", converterManagement.deparse(settingsForm.getSql()));
+
         return "assets/settingsform/form";
     }
 

@@ -7,9 +7,6 @@ import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
-import net.sf.jsqlparser.util.validation.Validation;
-import net.sf.jsqlparser.util.validation.ValidationError;
-import net.sf.jsqlparser.util.validation.feature.DatabaseType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -21,8 +18,6 @@ import sqltoregex.settings.SettingsType;
 import sqltoregex.visitor.StatementVisitorJoinToWhere;
 
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Realizes a spring service for handling the converting process.
@@ -125,9 +120,6 @@ public class ConverterManagement {
      */
     public String deparse(String sqlStatement) throws JSQLParserException {
         StringBuilder buffer = new StringBuilder();
-        if (!this.validate(sqlStatement)) {
-            this.handleInvalidSqlInputAndHandleExceptions(sqlStatement);
-        }
         return this.deParseStatement(sqlStatement, buffer, SettingsType.USER);
     }
 
@@ -139,27 +131,22 @@ public class ConverterManagement {
      * @throws JSQLParserException if parsing goes wrong
      */
     public String deparse(String sqlStatement, boolean isOnlyExpression) throws JSQLParserException {
-        return deparse(sqlStatement, isOnlyExpression, true, SettingsType.USER);
+        return deparse(sqlStatement, isOnlyExpression, SettingsType.USER);
     }
 
     /**
      * Extended deparse method, to allow all options by setting the follow parameters.
      * @param sqlStatement current sql statement
      * @param isOnlyExpression must be set true, if you only want to deparse an expression
-     * @param toBeValidated turn validation on/off
      * @param settingsType UserSettings or presets
      * @return generated regex
      * @throws JSQLParserException if parsing goes wrong
      */
-    public String deparse(String sqlStatement, boolean isOnlyExpression,
-                          boolean toBeValidated, SettingsType settingsType) throws JSQLParserException {
+    public String deparse(String sqlStatement, boolean isOnlyExpression, SettingsType settingsType) throws JSQLParserException {
         StringBuilder buffer = new StringBuilder();
         if (isOnlyExpression) {
             return this.deParseExpression(sqlStatement);
         } else {
-            if (toBeValidated && !this.validate(sqlStatement)) {
-                this.handleInvalidSqlInputAndHandleExceptions(sqlStatement);
-            }
             return this.deParseStatement(sqlStatement, buffer, settingsType);
         }
     }
@@ -193,46 +180,6 @@ public class ConverterManagement {
      */
     private Statement parseStatement(String sqlstatement) throws JSQLParserException {
         return CCJSqlParserUtil.parse(sqlstatement);
-    }
-
-    /**
-     * Validates a statements against oracle, mysql, sqlserver or mariadb grammar.
-     * @param sqlstatement current sql-statement
-     * @return boolean if the statement is valid
-     */
-    public boolean validate(String sqlstatement) {
-        Map<Validation, Boolean> validationList = new HashMap<>();
-        validationList.put(new Validation(List.of(DatabaseType.ORACLE), sqlstatement), false);
-        validationList.put(new Validation(List.of(DatabaseType.MYSQL), sqlstatement), false);
-        validationList.put(new Validation(List.of(DatabaseType.SQLSERVER), sqlstatement), false);
-        validationList.put(new Validation(List.of(DatabaseType.MARIADB), sqlstatement), false);
-
-        for(Validation validation : validationList.keySet()){
-            List<ValidationError> validationErrors = validation.validate();
-            if (!validationErrors.isEmpty()) {
-                for (ValidationError va : validationErrors) {
-                    Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-                    logger.log(Level.WARNING, "Error while validating the statement: {0}", va);
-                }
-            } else {
-                validationList.put(validation, true);
-            }
-        }
-
-        boolean isMinOneValidationOkay = false;
-        for (Map.Entry<Validation, Boolean> entry : validationList.entrySet()) {
-            if(entry.getValue().equals(Boolean.TRUE)) {
-                isMinOneValidationOkay = true;
-                break;
-            }
-        }
-        return isMinOneValidationOkay;
-    }
-
-    private void handleInvalidSqlInputAndHandleExceptions(String sqlStatement) {
-        Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-        if(checkIfStatementTypeOfCreateDatabase(sqlStatement)) logger.log(Level.INFO, "CREATE DATABASE manually deparsed.");
-        else logger.log(Level.WARNING, "Validation failed.");
     }
 
     private boolean checkIfStatementTypeOfCreateDatabase(String sqlStatement) {
