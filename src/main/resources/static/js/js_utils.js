@@ -498,6 +498,24 @@ function scrollToInValidInput(el) {
     }
 }
 
+function handleDateValue(el) {
+    let dateValue = el.value;
+    let regex = /(?=\d\d\d\d-\d\d-\d\d$)(?<!{d')(\d\d\d\d-\d\d-\d\d)(?!')/gi;
+    if(dateValue.match(regex)) {
+        document.getElementById("dateHint").classList.add("show");
+    }
+}
+
+function performDateValueDeParsing(elChecked, sqlInput) {
+    let regex = /(?=\d\d\d\d-\d\d-\d\d$)(?<!{d')(\d\d\d\d-\d\d-\d\d)(?!')/gi;
+    sqlInput.value = sqlInput.value.replace(regex, "{d'$&'}");
+    document.getElementById("dateHint").classList.remove("show");
+}
+
+function hideDateValueHint(){
+    document.getElementById("dateHint").classList.remove("show")
+}
+
 let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
 
 document.onreadystatechange = function () {
