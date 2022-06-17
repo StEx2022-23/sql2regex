@@ -22,6 +22,7 @@ import java.util.*;
  * Implements own {@link InsertDeParser} to generate regex.
  */
 public class InsertDeParserForRegEx extends InsertDeParser {
+    private static final String QUOTATION_MARK_REGEX = "[`´'\"]";
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SpellingMistake keywordSpellingMistake;
@@ -96,14 +97,12 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 buffer.append("\\(");
                 buffer.append(OPTIONAL_WHITE_SPACE);
                 while (extractedColumnsIterator.hasNext()) {
-                    buffer.append(this.selectDeParserForRegEx.generateRegExForQuotationMarks()).append("?");
                     buffer.append(
                             SpellingMistake.useOrDefault(
                                     this.tableNameSpellingMistake,
-                                    mappedColumnsAndRelatedValues.get(extractedColumnsIterator.next())
-                            ).replaceAll(this.selectDeParserForRegEx.generateRegExForQuotationMarks(), "")
+                                    mappedColumnsAndRelatedValues.get(extractedColumnsIterator.next().replace(QUOTATION_MARK_REGEX + "*", ""))
+                            )
                     );
-                    buffer.append(this.selectDeParserForRegEx.generateRegExForQuotationMarks()).append("?");
                     if (extractedColumnsIterator.hasNext()) {
                         buffer.append(OPTIONAL_WHITE_SPACE);
                         buffer.append(",");
@@ -124,7 +123,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 List<String> tempValuesRelatedToActualCol = new ArrayList<>();
                 int valueDepth = 0;
                 while (extractedColumnsIterator.hasNext()) {
-                    String tempCol = extractedColumnsIterator.next();
+                    String tempCol = extractedColumnsIterator.next().replace(QUOTATION_MARK_REGEX + "*", "");
                     StringBuilder stringBuilder = new StringBuilder();
                     stringBuilder.append(tempCol).append(",");
                     for (String str : mappedColumnsAndRelatedValues.get(tempCol)) {
@@ -141,13 +140,13 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                     temp.append("\\(").append(OPTIONAL_WHITE_SPACE);
                     Iterator<String> stringIterator = tempValuesRelatedToActualCol.iterator();
                     while (stringIterator.hasNext()) {
-                        temp.append(this.selectDeParserForRegEx.generateRegExForQuotationMarks()).append("?");
+                        temp.append(QUOTATION_MARK_REGEX).append("?");
                         temp.append(
                                 SpellingMistake.useOrDefault(
                                         this.tableNameSpellingMistake,
                                         stringIterator.next().split(",")[i + 1]
-                                ).replaceAll(this.selectDeParserForRegEx.generateRegExForQuotationMarks(), ""));
-                        temp.append(this.selectDeParserForRegEx.generateRegExForQuotationMarks()).append("?");
+                                ).replaceAll(QUOTATION_MARK_REGEX, ""));
+                        temp.append(QUOTATION_MARK_REGEX).append("?");
                         if (stringIterator.hasNext()) temp.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
                     }
                     temp.append(OPTIONAL_WHITE_SPACE).append("\\)");
@@ -393,20 +392,17 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         for (Expression expression : expressionList.getExpressions()) {
             String expressionFixed = expression.toString();
             boolean hasQuotationMarks = false;
-            for (String str : this.selectDeParserForRegEx.getQuotationMarkList()) {
-                if (expressionFixed.contains(str)) {
-                    hasQuotationMarks = true;
-                    break;
-                }
+            for (Character cha : QUOTATION_MARK_REGEX.replace("[", "").replace("]", "").toCharArray()) {
+                if (expressionFixed.contains((Character.toString(cha)))) {hasQuotationMarks = true; break; }
             }
             if (hasQuotationMarks) {
-                expressionFixed = this.selectDeParserForRegEx.generateRegExForQuotationMarks() + "?"
-                        + SpellingMistake.useOrDefault(this.columnNameSpellingMistake, expressionFixed.replaceAll(this.selectDeParserForRegEx.generateRegExForQuotationMarks(), ""))
-                        + this.selectDeParserForRegEx.generateRegExForQuotationMarks() + "?";
+                expressionFixed = QUOTATION_MARK_REGEX + "*"
+                        + SpellingMistake.useOrDefault(this.columnNameSpellingMistake, expressionFixed.replaceAll(QUOTATION_MARK_REGEX, ""))
+                        + QUOTATION_MARK_REGEX + "*";
             } else {
-                expressionFixed = this.selectDeParserForRegEx.generateRegExForQuotationMarks() + "?"
+                expressionFixed = QUOTATION_MARK_REGEX + "*"
                         + SpellingMistake.useOrDefault(this.columnNameSpellingMistake, expressionFixed)
-                        + this.selectDeParserForRegEx.generateRegExForQuotationMarks() + "?";
+                        + QUOTATION_MARK_REGEX + "*";
             }
             expressionListAsString.add(expressionFixed);
         }

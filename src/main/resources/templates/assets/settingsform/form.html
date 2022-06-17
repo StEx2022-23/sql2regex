@@ -186,7 +186,7 @@
 </form>
 <div th:fragment="settingsform-regex" class="mb-3">
     <label th:text="#{settingsform.regexOutput.heading}" for="regexoutput" class="form-label"></label>
-    <textarea th:text="${regex}" class="form-control inputHeight" readonly="readonly" id="regexoutput" rows="3" th:placeholder="#{settingsform.regexOutput}"></textarea>
+    <textarea th:text="${regex}" class="form-control inputHeight" onclick="this.select()" readonly="readonly" id="regexoutput" rows="3" th:placeholder="#{settingsform.regexOutput}"></textarea>
 </div>
 <div th:fragment="settingsform-output" class="text-end">
     <button onclick="window.location.href='/visualization?'+window.location.href.split('?')[1] +'&regex='+encodeURIComponent(document.getElementById('regexoutput').innerHTML)" id="visualization_button" class="btn btn-m btn-quart copy-button mt-2">
