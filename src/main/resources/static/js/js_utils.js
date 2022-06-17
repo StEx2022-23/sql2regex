@@ -500,16 +500,28 @@ function scrollToInValidInput(el) {
 
 function handleDateValue(el) {
     let dateValue = el.value;
-    let regex = /(?=\d\d\d\d-\d\d-\d\d$)(?<!{d')(\d\d\d\d-\d\d-\d\d)(?!')/gi;
-    if(dateValue.match(regex)) {
+    let regexDate = /(?=\d\d\d\d-\d\d-\d\d$)(?<!{d')(\d\d\d\d-\d\d-\d\d)(?!')/gi;
+    let regexDateTime = /(?=\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?)(?!')/gi
+    let regexTime = /(?=\d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d:\d\d(?::\d\d)?)(?!')/gi
+    if(dateValue.match(regexDate) || dateValue.match(regexDateTime) || dateValue.match(regexTime)) {
         document.getElementById("dateHint").classList.add("show");
     }
 }
 
 function performDateValueDeParsing(id) {
     let sqlInput = document.getElementById(id);
-    let regex = /(?=\d\d\d\d-\d\d-\d\d$)(?<!{d')(\d\d\d\d-\d\d-\d\d)(?!')/gi;
-    sqlInput.value = sqlInput.value.replace(regex, "{d'$&'}");
+    let regexDate = /(?=\d\d\d\d-\d\d-\d\d$)(?<!{d')(\d\d\d\d-\d\d-\d\d)(?!')/gi;
+    let regexDateTime = /(?=\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?)(?!')/gi;
+    let regexTime = /(?=\d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d:\d\d(?::\d\d)?)(?!')/gi;
+
+    if(sqlInput.value.match(regexDate)){
+        sqlInput.value = sqlInput.value.replace(regexDate, "{d'$&'}");
+    } else if (sqlInput.value.match(regexDateTime)) {
+        sqlInput.value = sqlInput.value.replace(regexDateTime, "{ts'$&'}");
+    } else if (sqlInput.value.match(regexTime)) {
+        sqlInput.value = sqlInput.value.replace(regexTime, "{t'$&'}");
+    }
+
     document.getElementById("dateHint").classList.remove("show");
 }
 
