@@ -506,7 +506,8 @@ function handleDateValue(el) {
     }
 }
 
-function performDateValueDeParsing(elChecked, sqlInput) {
+function performDateValueDeParsing(id) {
+    let sqlInput = document.getElementById(id);
     let regex = /(?=\d\d\d\d-\d\d-\d\d$)(?<!{d')(\d\d\d\d-\d\d-\d\d)(?!')/gi;
     sqlInput.value = sqlInput.value.replace(regex, "{d'$&'}");
     document.getElementById("dateHint").classList.remove("show");
