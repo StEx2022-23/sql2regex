@@ -39,7 +39,7 @@ public class SettingsForm {
     Set<String> aggregateFunctionLang;
     Set<String> datatypeSynonyms;
     Set<String> otherSynonyms;
-    @NotEmpty(message = "{settingsForm.sql.notEmpty}") String sql;
+    @NotEmpty(message = "{settingsform.sql.notEmpty}") String sql;
 
     /**
      * Constructor for the SettingsForm.
@@ -61,12 +61,12 @@ public class SettingsForm {
                         Set<String> aggregateFunctionLang,
                         Set<String> datatypeSynonyms,
                         Set<String> otherSynonyms,
-                        @NotEmpty(message = "{settingsForm.sql.NotEmpty}") String sql) {
+                        @NotEmpty(message = "{settingsform.sql.NotEmpty}") String sql) {
         this.spellings = spellings == null ? Collections.emptySet() : spellings;
         this.orders = orders == null ? Collections.emptySet() : orders;
-        this.dateFormats = dateFormats == null ? Collections.emptySet() : dateFormats;
-        this.timeFormats = timeFormats == null ? Collections.emptySet() : timeFormats;
-        this.dateTimeFormats = dateTimeFormats == null ? Collections.emptySet() : dateTimeFormats;
+        this.dateFormats = dateFormats == null ? Collections.emptySet() : setAllNonLenient(dateFormats);
+        this.timeFormats = timeFormats == null ? Collections.emptySet() : setAllNonLenient(timeFormats);
+        this.dateTimeFormats = dateTimeFormats == null ? Collections.emptySet() : setAllNonLenient(dateTimeFormats);
         this.aggregateFunctionLang = aggregateFunctionLang == null ? Collections.emptySet() : aggregateFunctionLang;
         this.datatypeSynonyms= datatypeSynonyms == null ? Collections.emptySet() : datatypeSynonyms;
         this.otherSynonyms = otherSynonyms == null ? Collections.emptySet() : otherSynonyms;
@@ -87,6 +87,10 @@ public class SettingsForm {
 
     public Set<SimpleDateFormat> getDateFormats() {
         return this.dateFormats;
+    }
+
+    public void setDateFormats(Set<SimpleDateFormat> dateFormats) {
+        dateFormats.forEach(format -> format.setLenient(false));
     }
 
     public Set<SimpleDateFormat> getDateTimeFormats() {
@@ -139,5 +143,15 @@ public class SettingsForm {
         }
 
         return this.sql.contains("CREATE") && this.sql.contains("DATABASE");
+    }
+
+    /**
+     * Sets the provided Set of SimpleDateFormats to lenient false
+     * @param formats
+     * @return
+     */
+    private Set<SimpleDateFormat> setAllNonLenient(Set<SimpleDateFormat> formats){
+        formats.forEach(format -> format.setLenient(false));
+        return formats;
     }
 }
