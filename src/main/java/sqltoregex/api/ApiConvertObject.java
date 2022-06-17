@@ -97,7 +97,7 @@ public class ApiConvertObject {
      */
     public List<String> getRegex() throws XPathExpressionException, ParserConfigurationException, IOException, URISyntaxException, SAXException, JSQLParserException {
         for(String str : this.sql){
-            this.regex.add(new ConverterManagement(new SettingsManager()).deparse(str, false, true, this.settingsType));
+            this.regex.add(new ConverterManagement(new SettingsManager()).deparse(str, false, this.settingsType));
         }
         return this.regex;
     }
