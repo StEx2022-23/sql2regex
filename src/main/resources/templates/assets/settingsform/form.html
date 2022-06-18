@@ -101,7 +101,6 @@
             <div id="collapseDateAndTime" class="collapse show" aria-labelledby="headingDateAndTime" data-parent="#accordion">
                 <div class="accordion-body">
                     <div class="row">
-                        <span th:text="${settingsForm.getDateFormats()}"></span>
                         <div class="col-sm"
                              th:each="setting, iter : ${dateFormats}">
                             <div class="form-check form-switch">
