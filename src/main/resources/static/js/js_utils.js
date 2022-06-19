@@ -408,7 +408,11 @@ function loadUserFormSettings(formElement){
     } else {
         let savings = JSON.parse(localStorage.getItem("savedUserSettings"));
         allCheckboxes.forEach(checkbox => {
-            checkbox.checked = savings[checkbox.id];
+            if(undefined === savings[checkbox.id]) {
+                checkbox.checked = true;
+            } else {
+                checkbox.checked = savings[checkbox.id];
+            }
             if (checkbox.id.includes("master")){
                 setCheckboxState(checkbox, slaveSelectionState(savings, checkbox.id.split("_")[0]))
             }
@@ -505,6 +509,8 @@ function handleDateValue(el) {
     let regexTime = /(?=\d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d:\d\d(?::\d\d)?)(?!')/gi
     if(dateValue.match(regexDate) || dateValue.match(regexDateTime) || dateValue.match(regexTime)) {
         document.getElementById("dateHint").classList.add("show");
+    } else {
+        document.getElementById("dateHint").classList.remove("show");
     }
 }
 
