@@ -31,7 +31,6 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
     private final OrderRotation indexColumnNameOrder;
     private final OrderRotation columnNameOrder;
     private final SpellingMistake keywordSpellingMistake;
-    private final SpellingMistake indexColumnNameSpelling;
     private final SpellingMistake tableNameSpellingMistake;
     private final SpellingMistake columnNameSpellingMistake;
     private final StringSynonymGenerator datatypeSynonymGenerator;
@@ -40,7 +39,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
     /**
      * Short constrcutor for CreateTableDeParserForRegEx.
      * @param buffer {@link StringBuilder}
-     * @param settingsContainer
+     * @param settingsContainer {@link SettingsContainer}
      */
     public CreateTableDeParserForRegEx(StringBuilder buffer, SettingsContainer settingsContainer) {
         this(new StatementDeParserForRegEx(buffer, settingsContainer), buffer, settingsContainer);
@@ -52,7 +51,6 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         this.statementDeParser = statementDeParser;
         this.settings = settingsContainer;
         this.keywordSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
-        this.indexColumnNameSpelling = settingsContainer.get(SpellingMistake.class).get(SettingsOption.INDEXCOLUMNNAMESPELLING);
         this.tableNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
         this.columnNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
         this.indexColumnNameOrder = settings.get(OrderRotation.class).get(SettingsOption.INDEXCOLUMNNAMEORDER);
