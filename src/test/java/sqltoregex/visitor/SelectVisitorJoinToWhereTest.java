@@ -1,4 +1,4 @@
-package sqltoregex;
+package sqltoregex.visitor;
 
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
