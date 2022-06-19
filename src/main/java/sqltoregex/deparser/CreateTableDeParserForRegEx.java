@@ -84,39 +84,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         }
 
         for (Index index : indexList){
-            StringBuilder tmpBuffer = new StringBuilder();
-            if (index.getType() != null && (index.getType().equals("PRIMARY KEY") || index.getType().equals("FOREIGN KEY"))){
-                tmpBuffer.append("(?:").append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "CONSTRAINT")).append(REQUIRED_WHITE_SPACE);
-                tmpBuffer.append(SpellingMistake.useOrDefault(this.indexColumnNameSpelling, index.getName())).append(REQUIRED_WHITE_SPACE);
-                tmpBuffer.append(SpellingMistake.useOrDefault(this.indexColumnNameSpelling, index.getType())).append(OPTIONAL_WHITE_SPACE);
-                tmpBuffer.append(concatIndexColumns(index));
-                tmpBuffer.append("|");
-            }
-
-            tmpBuffer.append(StringSynonymGenerator.useOrDefault(this.otherSynonymsGenerator, index.getType()));
-            tmpBuffer.append(!index.getName().isEmpty() ? REQUIRED_WHITE_SPACE + SpellingMistake.useOrDefault(this.indexColumnNameSpelling, index.getName()) : "");
-            tmpBuffer.append(REQUIRED_WHITE_SPACE);
-            tmpBuffer.append(concatIndexColumns(index));
-            if (index.getType() != null && (index.getType().equals("PRIMARY KEY") || index.getType().equals("FOREIGN KEY"))){
-                tmpBuffer.append(")");
-            }
-            if (index instanceof ForeignKeyIndex foreignKeyIndex){
-                tmpBuffer.append(OPTIONAL_WHITE_SPACE + "REFERENCES" + REQUIRED_WHITE_SPACE)
-                        .append(foreignKeyIndex.getTable().toString())
-                        .append(OPTIONAL_WHITE_SPACE)
-                        .append("\\(")
-                        .append(OPTIONAL_WHITE_SPACE)
-                        .append(OrderRotation.useOrDefault(this.indexColumnNameOrder, foreignKeyIndex.getReferencedColumnNames()))
-                        .append(OPTIONAL_WHITE_SPACE)
-                        .append("\\)");
-                //Generate the index String with the toString method since there is private access necessary.
-                //Built the public part and remove it to have maximum variety in the string
-                String s =  indexToString(index);
-                tmpBuffer.append(index.toString()
-                                         .replace(s, "")
-                                         .replace(" ", REQUIRED_WHITE_SPACE)); //Spaces between referential Actions
-            }
-            stringList.add(tmpBuffer.toString());
+            stringList.add(getIndexRegEx(index));
         }
         return stringList;
     }
@@ -283,13 +251,58 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
             String columnDefinitionString = stringBuilder.toString();
             Pattern pPrimary = Pattern.compile("(?<!UNIQUE.*)(PRIMARY)?\\s*KEY");
             Matcher mPrimary = pPrimary.matcher(columnDefinitionString);
-            columnDefinitionString = mPrimary.replaceFirst("(PRIMARY)?\sKEY");
+            columnDefinitionString = mPrimary.replaceFirst("(PRIMARY\\\\s+)?KEY");
 
-            Pattern pUnique = Pattern.compile("UNIQUE\\s*(KEY)?");
+            Pattern pUnique = Pattern.compile("UNIQUE(\\s*KEY)?");
             Matcher mUnique = pUnique.matcher(columnDefinitionString);
-            columnDefinitionString = mUnique.replaceFirst("UNIQUE\s(KEY)?");
+            columnDefinitionString = mUnique.replaceFirst("UNIQUE(\\\\s+KEY)?");
 
             buffer.append(columnDefinitionString);
         }
+    }
+
+    private String getIndexRegEx(Index index){
+        StringBuilder tmpBuffer = new StringBuilder();
+        if (index.getType() != null
+                && (index.getType().equals("PRIMARY KEY")
+                || index.getType().equals("FOREIGN KEY")
+                || index.getType().equals("UNIQUE KEY")
+        )
+        ){
+            tmpBuffer.append("(?:").append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "CONSTRAINT"));
+            tmpBuffer.append(OPTIONAL_WHITE_SPACE);
+            tmpBuffer.append(")?");
+            //constraint name optional
+            tmpBuffer.append("(?:").append(REQUIRED_WHITE_SPACE).append(".*?)");
+        }
+
+        List<String> typeSynonymList = StringSynonymGenerator.generateAsListOrDefault(this.otherSynonymsGenerator, index.getType());
+        List<String> typeSynonymsWithSpellingMistake = new LinkedList<>();
+        for(String typeSynonym : typeSynonymList){
+            typeSynonymsWithSpellingMistake.add(SpellingMistake.useOrDefault(this.keywordSpellingMistake, typeSynonym).replace(" ", REQUIRED_WHITE_SPACE));
+        }
+        tmpBuffer.append(RegExGenerator.joinListToRegEx(this.otherSynonymsGenerator, typeSynonymsWithSpellingMistake));
+        tmpBuffer.append(REQUIRED_WHITE_SPACE);
+        //indexname optional
+        tmpBuffer.append("(?:.*?").append(REQUIRED_WHITE_SPACE).append(")?");
+        tmpBuffer.append(concatIndexColumns(index));
+
+        if (index instanceof ForeignKeyIndex foreignKeyIndex){
+            tmpBuffer.append(OPTIONAL_WHITE_SPACE + "REFERENCES" + REQUIRED_WHITE_SPACE)
+                    .append(foreignKeyIndex.getTable().toString())
+                    .append(OPTIONAL_WHITE_SPACE)
+                    .append("\\(")
+                    .append(OPTIONAL_WHITE_SPACE)
+                    .append(OrderRotation.useOrDefault(this.indexColumnNameOrder, foreignKeyIndex.getReferencedColumnNames()))
+                    .append(OPTIONAL_WHITE_SPACE)
+                    .append("\\)");
+            //Generate the index String with the toString method since there is private access necessary.
+            //Built the public part and remove it to have maximum variety in the string
+            String s =  indexToString(index);
+            tmpBuffer.append(index.toString()
+                                     .replace(s, "")
+                                     .replace(" ", REQUIRED_WHITE_SPACE)); //Spaces between referential Actions
+        }
+        return tmpBuffer.toString();
     }
 }
