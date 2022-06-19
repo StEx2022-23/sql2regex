@@ -155,4 +155,8 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     public void visit(Statements stmts) {
         stmts.accept(this);
     }
+
+    public static String getQuotationMarkRegEx(){
+        return "[`´'\"]";
+    }
 }

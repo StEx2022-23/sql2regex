@@ -1,6 +1,7 @@
 package sqltoregex.settings.regexgenerator;
 
 import org.springframework.util.Assert;
+import sqltoregex.deparser.StatementDeParserForRegEx;
 import sqltoregex.settings.SettingsOption;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.List;
  * SELECT (?:table1\s*,\s*table2|table2\s*,\s*table1)
  */
 public class OrderRotation extends RegExGenerator<List<String>> {
-    private static final String QUOTATION_MARK_REGEX = "[`´'\"]";
+    private static final String QUOTATION_MARK_REGEX = StatementDeParserForRegEx.getQuotationMarkRegEx();
 
     /**
      * Constructor of OrderRotation. Init the super class.
