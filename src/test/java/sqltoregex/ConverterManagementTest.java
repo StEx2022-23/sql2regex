@@ -16,6 +16,8 @@ import java.net.URISyntaxException;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class ConverterManagementTest {
     ConverterManagement converterManagement = new ConverterManagement(new SettingsManager());
@@ -67,5 +69,18 @@ class ConverterManagementTest {
                 "^col1 + col2;?$",
                 converterManagement.deparse("col1+col2", true, SettingsType.ALL)
         );
+    }
+
+    @Test
+    void testMultipleConstraintPositions() throws JSQLParserException {
+        String sampleSolution = "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col1))";
+        String parsingSolution = converterManagement.deparse(sampleSolution, false, SettingsType.NONE);
+        Pattern pattern = Pattern.compile("CREATE");
+        Matcher matcher = pattern.matcher(parsingSolution);
+        int count = 0;
+        while(matcher.find()){
+            count++;
+        }
+        Assertions.assertEquals(2, count);
     }
 }

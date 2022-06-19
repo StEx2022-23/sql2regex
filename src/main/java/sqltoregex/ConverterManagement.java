@@ -16,6 +16,7 @@ import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsType;
 import sqltoregex.visitor.StatementVisitorJoinToWhere;
+import sqltoregex.visitor.StatementVisitorKeyPlacement;
 
 import java.util.*;
 
@@ -54,16 +55,24 @@ public class ConverterManagement {
         StringBuilder outputRegex = new StringBuilder();
         outputRegex.append("^");
 
-        if (regexList.size() == 1 || !isDistinctList(regexList)) {
-            outputRegex.append(regexList.get(0));
-        } else if (isDistinctList(regexList)) {
-            for (String str : regexList) {
-                outputRegex.append("(");
-                outputRegex.append(str);
-                outputRegex.append(";?)|");
-            }
-            outputRegex.replace(outputRegex.length() - 1, outputRegex.length(), "");
+        Set<String> sqlRegExSet = new HashSet<>(regexList);
+
+        if (sqlRegExSet.size() > 1){
+            outputRegex.append("(");
         }
+        Iterator<String> iterator = sqlRegExSet.iterator();
+        while (iterator.hasNext()){
+            String regEx = iterator.next();
+            outputRegex.append(regEx);
+            outputRegex.append(";?");
+            if (iterator.hasNext()){
+                outputRegex.append("|");
+            }
+        }
+        if (sqlRegExSet.size() > 1){
+            outputRegex.append(")");
+        }
+
         outputRegex.append("$");
         return outputRegex.toString();
     }
@@ -97,19 +106,28 @@ public class ConverterManagement {
 
         Statement statement;
         statement = this.parseStatement(sqlStatement);
+        List<String> regExList = new LinkedList<>();
 
         StatementDeParserForRegEx defaultStatementDeParser = new StatementDeParserForRegEx(buffer, SettingsContainer.builder().with(settingsManager, settingsType));
+
         statement.accept(defaultStatementDeParser);
-        String regExOne = defaultStatementDeParser.getBuffer().toString();
+        regExList.add(defaultStatementDeParser.getBuffer().toString());
 
         statement.accept(new StatementVisitorJoinToWhere());
 
-        StringBuilder bufferTwo = new StringBuilder();
-        defaultStatementDeParser.setBuffer(bufferTwo);
+        defaultStatementDeParser.setBuffer(new StringBuilder());
         statement.accept(defaultStatementDeParser);
+        regExList.add(defaultStatementDeParser.getBuffer().toString());
 
-        String regExTwo = defaultStatementDeParser.getBuffer().toString();
-        return this.buildOutputRegex(Arrays.asList(regExOne, regExTwo));
+        for (StatementVisitorKeyPlacement.KeyPlacementOption option
+                : StatementVisitorKeyPlacement.KeyPlacementOption.values()) {
+            statement.accept(new StatementVisitorKeyPlacement(option));
+            defaultStatementDeParser.setBuffer(new StringBuilder());
+            statement.accept(defaultStatementDeParser);
+            regExList.add(defaultStatementDeParser.getBuffer().toString());
+        }
+
+        return this.buildOutputRegex(regExList);
     }
 
     /**
@@ -149,17 +167,6 @@ public class ConverterManagement {
         } else {
             return this.deParseStatement(sqlStatement, buffer, settingsType);
         }
-    }
-
-    /**
-     * Compares list elements about unique elements.
-     * @param list List of String
-     * @return boolean
-     */
-    private boolean isDistinctList(List<String> list) {
-        if (list.isEmpty()) throw new IllegalArgumentException("List should not be empty. One element is required.");
-        Set<String> set = new HashSet<>(list);
-        return (set.size() == list.size());
     }
 
     /**

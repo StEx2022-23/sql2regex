@@ -211,12 +211,15 @@ class CreateTableTest {
 
     @Test
     void withConstraintPrimaryKey() {
+        final String sampleSolution = "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col1))" ;
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col1))"
+                "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col1))",
+                "CREATE TABLE table1 (col1 type1, CONSTRAINT PRIMARY KEY index_name (col1))",
+                "CREATE TABLE table1 (col1 type1, PRIMARY KEY (col1))"
         ));
 
-        TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col1))", matchingMap, true);
+        TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), sampleSolution, matchingMap, true);
     }
 
     @Test
@@ -225,8 +228,12 @@ class CreateTableTest {
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "CREATE TABLE table1 (col1 type1, UNIQUE KEY index_name (col1))"
         ));
+        matchingMap.put(SettingsOption.OTHERSYNONYMS, List.of(
+                "CREATE TABLE table1 (col1 type1, UNIQUE index_name (col1))"
+        ));
 
         TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), "CREATE TABLE table1 (col1 type1, UNIQUE KEY index_name (col1))", matchingMap, true);
+        TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().withStringSet(Set.of("UNIQUE", "UNIQUE KEY"), SettingsOption.OTHERSYNONYMS).build(), "CREATE TABLE table1 (col1 type1, UNIQUE KEY index_name (col1))", matchingMap, true);
     }
 
     @Test
@@ -304,6 +311,11 @@ class CreateTableTest {
         TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), "CREATE TABLE table1 (col1 type1, CONSTRAINT symbol FOREIGN KEY (col1) REFERENCES table2 (col1, col2) ON UPDATE SET DEFAULT)", matchingMapSetDefault, true);
     }
 
+    /**
+     * Check for acceptance of
+     *                 "CREATE TABLE table1 (col1 type1, CONSTRAINT PRIMARY KEY (col1))",
+     * with further JSQLParser versions.
+     */
     @Test
     void with2TableConstraint() {
         final String sampleSolution = "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col1, col2))";
@@ -329,6 +341,7 @@ class CreateTableTest {
                 "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col1), col2 type2)"
         ));
 
+        TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), "CREATE TABLE table1 (col1 type1, col2 type2, CONSTRAINT my_constraint PRIMARY KEY (col1))", matchingMap, true);
         TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().with(SettingsOption.COLUMNNAMEORDER).build(), "CREATE TABLE table1 (col1 type1, CONSTRAINT my_constraint PRIMARY KEY (col1), col2 type2)", matchingMap, true);
     }
 

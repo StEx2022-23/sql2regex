@@ -79,6 +79,8 @@
           <value>NOT;NICHT</value>
           <value>AND;&amp;&amp;</value>
           <value>KEY;INDEX</value>
+          <value>UNIQUE;UNIQUE INDEX</value>
+          <value>UNIQUE;UNIQUE KEY</value>
       </othersynonyms>
   </synonyms>
 </properties>

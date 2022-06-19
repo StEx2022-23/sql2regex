@@ -141,7 +141,6 @@ public class SettingsForm {
                 return true;
             }
         }
-
         return this.sql.contains("CREATE") && this.sql.contains("DATABASE");
     }
 
