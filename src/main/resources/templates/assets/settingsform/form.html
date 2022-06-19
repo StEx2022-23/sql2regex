@@ -2,9 +2,39 @@
     <div class="mb-3">
         <label for="sqlinput" class="form-label"><strong th:text="#{settingsform.sqlInput.heading}">SQL-Input</strong></label>
         <div class="textareainputinvalid">
-            <textarea th:field="*{sql}" class="form-control inputHeight" id="sqlinput" rows="3" th:placeholder="#{settingsform.sqlInput}"></textarea>
-            <div id="isInValid" th:if="${#fields.hasErrors('sql')}" th:uerrors="*{sql}" th:errorclass="'alert alert-warning mt-3 overlayinvalidhint'" >
+            <textarea th:field="*{sql}" class="form-control inputHeight" id="sqlinput" rows="3" oninput="handleDateValue(this);" th:placeholder="#{settingsform.sqlInput}"></textarea>
+            <div id="isInValid" th:if="${#fields.hasErrors('sql')}" th:uerrors="*{sql}" th:errorclass="'alert alert-warning overlayinvalidhint'" >
                 title error
+            </div>
+            <div id="dateHint"  class="alert alert-success overlayinvalidhint alert-dismissible fade hidden" role="alert">
+                <div class="row align-items-center">
+                    <div class="col-sm-1 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1.6rem" height="1.6rem" fill="currentColor" class="bi bi-calendar-week" viewBox="0 0 16 16">
+                            <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+                            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                        </svg>
+                    </div>
+                    <div class="col-sm-8 text-center" th:utext="#{conv.dateDetected}"></div>
+                    <div class="col-sm-3 text-center">
+                        <p class="fw-bolder" th:utext="#{conv.DateValueParsing}"></p>
+                        <div class="row align-items-center">
+                            <div class="col text-center">
+                                <button type="button" id="dateHintApprove" class="btn btn-primary" onclick="performDateValueDeParsing('sqlinput')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16">
+                                        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="col text-center">
+                                <button type="button" id="dateHintDismiss" class="btn btn-secondary" onclick="hideDateValueHint()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -72,9 +102,9 @@
                 <div class="accordion-body">
                     <div class="row">
                         <div class="col-sm"
-                             th:each="setting : ${dateFormats}">
+                             th:each="setting, iter : ${dateFormats}">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'dateAndTime_' + ${setting.toPattern()}" th:value="${setting.toPattern()}" th:name="dateFormats" th:checked="${settingsForm.getDateFormats().contains(setting)}">
+                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'dateAndTime_' + ${setting.toPattern()}" th:value="${setting.toPattern()}" th:name="dateFormats" th:checked="${#sets.contains(settingsForm.getDateFormats(), setting)}">
                                 <label class="form-check-label" th:for="'dateFormats_' + ${setting.toPattern()}" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
                             </div>
                         </div>

@@ -2,7 +2,10 @@ package sqltoregex.settings.validations;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * custom validator for validation by method
@@ -12,6 +15,7 @@ public class AssertMethodAsTrueValidator implements ConstraintValidator<AssertMe
     private String methodName;
     private String fieldName;
 
+    @Override
     public void initialize(AssertMethodAsTrue assertMethodAsTrue) {
         methodName = assertMethodAsTrue.value();
         fieldName = assertMethodAsTrue.field();
@@ -23,7 +27,7 @@ public class AssertMethodAsTrueValidator implements ConstraintValidator<AssertMe
         try {
             Class<?> clazz = object.getClass();
             Method validate = clazz.getMethod(methodName);
-            Boolean isValid = (Boolean) validate.invoke(object);
+            boolean isValid = (boolean) validate.invoke(object);
             if (!isValid) {
                 constraintValidatorContext.disableDefaultConstraintViolation();
                 constraintValidatorContext
@@ -32,8 +36,8 @@ public class AssertMethodAsTrueValidator implements ConstraintValidator<AssertMe
                         .addPropertyNode(fieldName).addConstraintViolation();
             }
             return isValid;
-        } catch (Throwable e) {
-            System.err.println(e);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).log(Level.WARNING, "Error while validating SQL statement", e);
         }
         return false;
     }

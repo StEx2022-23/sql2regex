@@ -498,6 +498,37 @@ function scrollToInValidInput(el) {
     }
 }
 
+function handleDateValue(el) {
+    let dateValue = el.value;
+    let regexDate = /(?=\d\d\d\d-\d\d-\d\d$)(?<!{d')(\d\d\d\d-\d\d-\d\d)(?!')/gi;
+    let regexDateTime = /(?=\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?)(?!')/gi
+    let regexTime = /(?=\d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d:\d\d(?::\d\d)?)(?!')/gi
+    if(dateValue.match(regexDate) || dateValue.match(regexDateTime) || dateValue.match(regexTime)) {
+        document.getElementById("dateHint").classList.add("show");
+    }
+}
+
+function performDateValueDeParsing(id) {
+    let sqlInput = document.getElementById(id);
+    let regexDate = /(?=\d\d\d\d-\d\d-\d\d$)(?<!{d')(\d\d\d\d-\d\d-\d\d)(?!')/gi;
+    let regexDateTime = /(?=\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?)(?!')/gi;
+    let regexTime = /(?=\d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d:\d\d(?::\d\d)?)(?!')/gi;
+
+    if(sqlInput.value.match(regexDate)){
+        sqlInput.value = sqlInput.value.replace(regexDate, "{d'$&'}");
+    } else if (sqlInput.value.match(regexDateTime)) {
+        sqlInput.value = sqlInput.value.replace(regexDateTime, "{ts'$&'}");
+    } else if (sqlInput.value.match(regexTime)) {
+        sqlInput.value = sqlInput.value.replace(regexTime, "{t'$&'}");
+    }
+
+    document.getElementById("dateHint").classList.remove("show");
+}
+
+function hideDateValueHint(){
+    document.getElementById("dateHint").classList.remove("show")
+}
+
 let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
 
 document.onreadystatechange = function () {
