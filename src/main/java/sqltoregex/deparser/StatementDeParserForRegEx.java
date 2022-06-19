@@ -17,6 +17,7 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
  */
 public class StatementDeParserForRegEx extends StatementDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
+    public static final String quotationMarkRegEx = "[`´'\"]";
     private final SpellingMistake keywordSpellingMistake;
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
@@ -157,6 +158,6 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     }
 
     public static String getQuotationMarkRegEx(){
-        return "[`´'\"]";
+        return quotationMarkRegEx;
     }
 }

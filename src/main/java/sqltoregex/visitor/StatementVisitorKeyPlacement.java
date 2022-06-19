@@ -4,7 +4,6 @@ import net.sf.jsqlparser.statement.StatementVisitorAdapter;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.create.table.Index;
-import net.sf.jsqlparser.util.deparser.StatementDeParser;
 import org.springframework.util.Assert;
 
 import java.util.*;
@@ -12,7 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
-    private KeyPlacementOption keyPlacementOption;
+    private final KeyPlacementOption keyPlacementOption;
 
     public StatementVisitorKeyPlacement(KeyPlacementOption keyPlacementOption){
         Assert.notNull(keyPlacementOption, "keyPlacementOption must not be null");
@@ -22,7 +21,9 @@ public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
     @Override
     public void visit(CreateTable createTable) {
         switch (this.keyPlacementOption){
-            case USER_INPUT -> {}
+            case USER_INPUT -> {
+                //no specific action
+            }
             case ONLY_COLUMN -> this.pushAllIndizesInColumns(createTable);
             case ONLY_CONSTRAINT -> this.pushAllIndizesInConstraints(createTable);
         }
@@ -40,38 +41,43 @@ public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
         }
     }
 
-    private void pushAllIndizesInColumns(CreateTable createTable){
-        if (createTable.getIndexes() == null){
-            return;
+    private void handlePrimaryKey(Index index, Map<String, ColumnDefinition> columnDefinitionMap){
+        if (index.getColumns().size() == 1){
+            String indexColumn = index.getColumns().get(0).getColumnName();
+            List<String> columnSpecs = columnDefinitionMap.get(indexColumn).getColumnSpecs();
+            if (columnSpecs == null){
+                columnSpecs = new LinkedList<>();
+                columnDefinitionMap.get(indexColumn).setColumnSpecs(columnSpecs);
+            }
+            columnSpecs.addAll(List.of("PRIMARY", "KEY"));
         }
+    }
+
+    private void handleForeignKey(Index index, Map<String, ColumnDefinition> columnDefinitionMap){
+        if (index.getColumns().size() == 1){
+            String indexColumn = index.getColumns().get(0).getColumnName();
+            columnDefinitionMap.get(indexColumn).getColumnSpecs()
+                    .addAll(List.of("UNIQUE", "KEY", indexColumn));
+        }
+    }
+
+    private void pushAllIndizesInColumns(CreateTable createTable){
+        if (createTable.getIndexes() == null) return;
 
         List<Index> indexList = new LinkedList<>();
         Map<String, ColumnDefinition> columnDefinitionMap = this.createColumnMap(createTable.getColumnDefinitions());
 
         for (Index index : createTable.getIndexes()){
             if (index.getType().equals("PRIMARY KEY")){
-                if (index.getColumns().size() == 1){
-                    String indexColumn = index.getColumns().get(0).getColumnName();
-                    List<String> columnSpecs = columnDefinitionMap.get(indexColumn).getColumnSpecs();
-                    if (columnSpecs == null){
-                        columnSpecs = new LinkedList<>();
-                        columnDefinitionMap.get(indexColumn).setColumnSpecs(columnSpecs);
-                    }
-                    columnSpecs.addAll(List.of("PRIMARY", "KEY"));
-                }
+                this.handlePrimaryKey(index, columnDefinitionMap);
                 continue;
             }
             if (index.getType().equals("UNIQUE KEY")){
-                if (index.getColumns().size() == 1){
-                    String indexColumn = index.getColumns().get(0).getColumnName();
-                    columnDefinitionMap.get(indexColumn).getColumnSpecs()
-                            .addAll(List.of("UNIQUE", "KEY", indexColumn));
-                }
+                this.handleForeignKey(index, columnDefinitionMap);
                 continue;
             }
             indexList.add(index);
         }
-
         createTable.setIndexes(indexList);
     }
 
