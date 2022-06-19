@@ -8,5 +8,6 @@ package sqltoregex.settings;
 public enum SettingsType {
     ALL,
     DEFAULT_SCHOOL,
-    USER
+    USER,
+    NONE
 }
