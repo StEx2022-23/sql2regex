@@ -35,18 +35,18 @@ class StatementVisitorKeyPlacementTest {
 
     @Test
     void keyPlacementAllInColumn() {
-        final String sqlInput = "CREATE TABLE table1 (col1 type1, col2 type2 UNIQUE, CONSTRAINT my_constraint PRIMARY KEY (col1))";
+        final String sqlInput = "CREATE TABLE table1 (col1 type1, col2 type2, CONSTRAINT my_constraint PRIMARY KEY (col1), CONSTRAINT my_constraint UNIQUE KEY (col2))";
         String regEx = parseWithKeyPlacementOption(sqlInput, StatementVisitorKeyPlacement.KeyPlacementOption.ONLY_COLUMN);
 
         Assertions.assertTrue(TestUtils.checkAgainstRegEx(
                 regEx,
-                "CREATE TABLE table1 (col1 type1 PRIMARY KEY, col2 type2 UNIQUE)"), "failed with regEx: " + regEx
+                "CREATE TABLE table1 (col1 type1 PRIMARY KEY, col2 type2 UNIQUE KEY)"), "failed with regEx: " + regEx
         );
     }
 
     @Test
     void keyPlacementAllInConstraints() {
-        final String sqlInput = "CREATE TABLE table1 (col1 type1, col2 type2 UNIQUE KEY, CONSTRAINT my_constraint PRIMARY KEY (col1))";
+        final String sqlInput = "CREATE TABLE table1 (col1 type1 PRIMARY KEY, col2 type2 UNIQUE KEY)";
         String regEx = parseWithKeyPlacementOption(sqlInput, StatementVisitorKeyPlacement.KeyPlacementOption.ONLY_CONSTRAINT);
 
         Assertions.assertTrue(TestUtils.checkAgainstRegEx(

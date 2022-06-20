@@ -58,9 +58,10 @@
       </datetimesynonyms>
       <aggregatefunctionlang>
           <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
-          <value>SUM;SUMME</value>
           <value>AVG;MITTELWERT</value>
           <value>AVG;Average</value>
+          <value>COUNT;Anzahl</value>
+          <value>SUM;SUMME</value>alue>
       </aggregatefunctionlang>
       <datatypesynonyms>
           <settingstype>ALL;DEFAULT_SCHOOL</settingstype>

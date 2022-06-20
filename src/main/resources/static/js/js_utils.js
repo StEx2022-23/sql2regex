@@ -398,17 +398,14 @@ function loadDefaultLanguageSettings(){
 
 function loadUserFormSettings(formElement){
     let allCheckboxes = formElement.querySelectorAll('input[type="checkbox"]');
-    if(localStorage.getItem("savedUserSettings") === null){
-        let settingsDict = {}
-        allCheckboxes.forEach(checkbox => {
-            settingsDict[checkbox.id] = true;
-            document.getElementById(checkbox.id).checked = true;
-        })
-        localStorage.setItem("savedUserSettings", JSON.stringify(settingsDict));
-    } else {
+    if(localStorage.getItem("savedUserSettings") !== null){
+        const settingsToast = new bootstrap.Toast(document.getElementById('toast-loaded-user-settings'))
+        settingsToast.show();
         let savings = JSON.parse(localStorage.getItem("savedUserSettings"));
         allCheckboxes.forEach(checkbox => {
-            checkbox.checked = savings[checkbox.id];
+            if(undefined !== savings[checkbox.id]) {
+                checkbox.checked = savings[checkbox.id];
+            }
             if (checkbox.id.includes("master")){
                 setCheckboxState(checkbox, slaveSelectionState(savings, checkbox.id.split("_")[0]))
             }
@@ -465,7 +462,10 @@ function slaveSelectionState(checkboxDict, groupName){
 
 function resetUserSettings(formElement){
     localStorage.removeItem("savedUserSettings");
-    loadUserFormSettings(formElement);
+    let allCheckboxes = formElement.querySelectorAll('input[type="checkbox"]');
+    allCheckboxes.forEach(checkbox => {
+        document.getElementById(checkbox.id).checked = true;
+    })
 }
 
 function setCookiesAccepted(){
@@ -504,7 +504,9 @@ function handleDateValue(el) {
     let regexDateTime = /(?=\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?)(?!')/gi
     let regexTime = /(?=\d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d:\d\d(?::\d\d)?)(?!')/gi
     if(dateValue.match(regexDate) || dateValue.match(regexDateTime) || dateValue.match(regexTime)) {
-        document.getElementById("dateHint").classList.add("show");
+        showDateValueHint()
+    } else {
+        hideDateValueHint()
     }
 }
 
@@ -522,11 +524,18 @@ function performDateValueDeParsing(id) {
         sqlInput.value = sqlInput.value.replace(regexTime, "{t'$&'}");
     }
 
-    document.getElementById("dateHint").classList.remove("show");
+    hideDateValueHint()
+}
+
+function showDateValueHint(){
+    const dateHint = document.getElementById("dateHint")
+    dateHint.classList.remove("d-none");
+    setTimeout(() => {    dateHint.classList.add("show");}, 1)
 }
 
 function hideDateValueHint(){
-    document.getElementById("dateHint").classList.remove("show")
+    const dateHint = document.getElementById("dateHint")
+    dateHint.classList.remove("show")
 }
 
 let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
@@ -561,6 +570,15 @@ document.onreadystatechange = function () {
             })
             SqlRegExHis.checkUpdatedConverting();
             loadUserFormSettings(document.getElementById("converterForm"));
+            const dateHint = document.getElementById("dateHint")
+            dateHint.addEventListener('transitionend', event => {
+                if (event.target.id === dateHint.id && !event.target.classList.contains("show")){
+                    event.target.classList.add("d-none");
+                    event.target.classList.remove("d-block")
+                }
+            })
+
+
         } else if(actualPath === "visualization"){
             insertVisualizationPage();
         }

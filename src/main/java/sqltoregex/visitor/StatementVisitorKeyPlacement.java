@@ -35,6 +35,11 @@ public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
         for (ColumnDefinition definition : columnDefinitionList) {
             Index index = this.generateIndex(definition);
             if (index != null){
+                List<Index> indexList = createTable.getIndexes();
+                if (indexList == null){
+                    indexList = new LinkedList<>();
+                    createTable.setIndexes(indexList);
+                }
                 createTable.getIndexes().add(index);
             }
             this.deleteAllColumnIndizes(definition);
@@ -53,11 +58,15 @@ public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
         }
     }
 
-    private void handleForeignKey(Index index, Map<String, ColumnDefinition> columnDefinitionMap){
+    private void handleUniqueKey(Index index, Map<String, ColumnDefinition> columnDefinitionMap){
         if (index.getColumns().size() == 1){
             String indexColumn = index.getColumns().get(0).getColumnName();
-            columnDefinitionMap.get(indexColumn).getColumnSpecs()
-                    .addAll(List.of("UNIQUE", "KEY", indexColumn));
+            List<String> columnSpecs = columnDefinitionMap.get(indexColumn).getColumnSpecs();
+            if (columnSpecs == null){
+                columnSpecs = new LinkedList<>();
+                columnDefinitionMap.get(indexColumn).setColumnSpecs(columnSpecs);
+            }
+            columnSpecs.addAll(List.of("UNIQUE", "KEY"));
         }
     }
 
@@ -73,7 +82,7 @@ public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
                 continue;
             }
             if (index.getType().equals("UNIQUE KEY")){
-                this.handleForeignKey(index, columnDefinitionMap);
+                this.handleUniqueKey(index, columnDefinitionMap);
                 continue;
             }
             indexList.add(index);
