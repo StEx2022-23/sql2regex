@@ -6,7 +6,7 @@
             <div id="isInValid" th:if="${#fields.hasErrors('sql')}" th:uerrors="*{sql}" th:errorclass="'alert alert-warning overlayinvalidhint'" >
                 title error
             </div>
-            <div id="dateHint"  class="alert alert-success overlayinvalidhint alert-dismissible fade hidden" role="alert">
+            <div id="dateHint"  class="alert alert-success overlayinvalidhint alert-dismissible fade d-none" role="alert">
                 <div class="row align-items-center">
                     <div class="col-sm-1 text-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="1.6rem" height="1.6rem" fill="currentColor" class="bi bi-calendar-week" viewBox="0 0 16 16">

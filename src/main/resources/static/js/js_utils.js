@@ -504,9 +504,9 @@ function handleDateValue(el) {
     let regexDateTime = /(?=\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?)(?!')/gi
     let regexTime = /(?=\d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d:\d\d(?::\d\d)?)(?!')/gi
     if(dateValue.match(regexDate) || dateValue.match(regexDateTime) || dateValue.match(regexTime)) {
-        document.getElementById("dateHint").classList.add("show");
+        showDateValueHint()
     } else {
-        document.getElementById("dateHint").classList.remove("show");
+        hideDateValueHint()
     }
 }
 
@@ -524,11 +524,18 @@ function performDateValueDeParsing(id) {
         sqlInput.value = sqlInput.value.replace(regexTime, "{t'$&'}");
     }
 
-    document.getElementById("dateHint").classList.remove("show");
+    hideDateValueHint()
+}
+
+function showDateValueHint(){
+    const dateHint = document.getElementById("dateHint")
+    dateHint.classList.remove("d-none");
+    setTimeout(() => {    dateHint.classList.add("show");}, 1)
 }
 
 function hideDateValueHint(){
-    document.getElementById("dateHint").classList.remove("show")
+    const dateHint = document.getElementById("dateHint")
+    dateHint.classList.remove("show")
 }
 
 let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
@@ -563,6 +570,15 @@ document.onreadystatechange = function () {
             })
             SqlRegExHis.checkUpdatedConverting();
             loadUserFormSettings(document.getElementById("converterForm"));
+            const dateHint = document.getElementById("dateHint")
+            dateHint.addEventListener('transitionend', event => {
+                if (event.target.id === dateHint.id && !event.target.classList.contains("show")){
+                    event.target.classList.add("d-none");
+                    event.target.classList.remove("d-block")
+                }
+            })
+
+
         } else if(actualPath === "visualization"){
             insertVisualizationPage();
         }
