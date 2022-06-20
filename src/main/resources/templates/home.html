@@ -12,7 +12,7 @@
             <div class="p-5 mb-4 bg-dark text-light rounded-3 jumbotronbackgroundimage" style="background-image: url('/img/bg.jpg');">
                 <div class="container-fluid py-5">
                     <h1 th:text="#{converterName}" class="display-5 fw-bold jumbotronshadow"></h1>
-                    <p th:text="#{tooldescription}" class="col-md-8 fs-4 jumbotronshadow"></p>
+                    <p th:text="#{tooldescription}" class="col-md-8 fs-4 jumbotronshadow d-none d-sm-block"></p>
                     <a class="btn btn-info btn-lg" th:href="#{gitHubLink}">GitHub</a>
                 </div>
             </div>
@@ -106,14 +106,14 @@
                     <div class="container" id="hanging-icons">
                         <h2 class="pb-2 border-bottom" th:text="#{faq.heading}">Questions</h2>
                         <div class="row g-4 py-3 row-cols-1 row-cols-lg-3">
-                            <div class="col d-flex align-items-start">
-                                <div class="flex-shrink-0 me-3">
+                            <div class="col d-flex align-items-start flex-column flex-sm-row">
+                                <div class="flex-shrink-0 me-3 align-self-center align-self-sm-baseline">
                                     <svg class="bi" width="3em" height="3em" viewBox="0 0 16 16">
                                         <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3Zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3Z"/>
                                         <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5v-1ZM10 8a1 1 0 1 1 2 0v5a1 1 0 1 1-2 0V8Zm-6 4a1 1 0 1 1 2 0v1a1 1 0 1 1-2 0v-1Zm4-3a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1Z"/>
                                     </svg>
                                 </div>
-                                <div>
+                                <div class="d-flex flex-column">
                                     <h2 th:text="#{faq.sql.heading}">What is SQL?</h2>
                                     <p th:utext="#{faq.sql.text}">
                                         SQL stands for <strong>S</strong>tructured <strong>Q</strong>uery <strong>L</strong>anguage.
@@ -121,18 +121,18 @@
                                         Data Manipulation Language (DML), Data Definition Language (DDL) and Data Control Language (DCL).
                                         SQL is the basis for interacting with databases over a database management system.
                                     </p>
-                                    <a href="https://docs.oracle.com/cd/E11882_01/server.112/e41085/sqlqr01001.htm" class="btn btn-primary" th:text="#{faq.sql.documentation}">
+                                    <a href="https://docs.oracle.com/cd/E11882_01/server.112/e41085/sqlqr01001.htm" class="btn btn-primary flex-grow-1" th:text="#{faq.sql.documentation}">
                                         Syntax for SQL Statements
                                     </a>
                                 </div>
                             </div>
-                            <div class="col d-flex align-items-start">
-                                <div class="flex-shrink-0 me-3">
+                            <div class="col d-flex align-items-start flex-column flex-sm-row">
+                                <div class="flex-shrink-0 me-3 align-self-center align-self-sm-baseline">
                                     <svg class="bi" width="3em" height="3em" viewBox="0 0 16 16">
                                         <path d="M1.114 8.063V7.9c1.005-.102 1.497-.615 1.497-1.6V4.503c0-1.094.39-1.538 1.354-1.538h.273V2h-.376C2.25 2 1.49 2.759 1.49 4.352v1.524c0 1.094-.376 1.456-1.49 1.456v1.299c1.114 0 1.49.362 1.49 1.456v1.524c0 1.593.759 2.352 2.372 2.352h.376v-.964h-.273c-.964 0-1.354-.444-1.354-1.538V9.663c0-.984-.492-1.497-1.497-1.6ZM14.886 7.9v.164c-1.005.103-1.497.616-1.497 1.6v1.798c0 1.094-.39 1.538-1.354 1.538h-.273v.964h.376c1.613 0 2.372-.759 2.372-2.352v-1.524c0-1.094.376-1.456 1.49-1.456v-1.3c-1.114 0-1.49-.362-1.49-1.456V4.352C14.51 2.759 13.75 2 12.138 2h-.376v.964h.273c.964 0 1.354.444 1.354 1.538V6.3c0 .984.492 1.497 1.497 1.6ZM7.5 11.5V9.207l-1.621 1.621-.707-.707L6.792 8.5H4.5v-1h2.293L5.172 5.879l.707-.707L7.5 6.792V4.5h1v2.293l1.621-1.621.707.707L9.208 7.5H11.5v1H9.207l1.621 1.621-.707.707L8.5 9.208V11.5h-1Z"/>
                                     </svg>
                                 </div>
-                                <div>
+                                <div class="d-flex flex-column">
                                     <h2 th:text="#{faq.regex.heading}">What is RegEx?</h2>
                                     <p th:utext="#{faq.regex.text}">
                                         RegEx stands for regular expressions.
@@ -140,18 +140,18 @@
                                         You use regular expressions frequently, even if unconsciously,
                                         for example in operations such as "search and replace".
                                     </p>
-                                    <a href="https://docs.microsoft.com/de-de/dotnet/standard/base-types/regular-expression-language-quick-reference" class="btn btn-primary" th:text="#{faq.regex.documentation}">
+                                    <a href="https://docs.microsoft.com/de-de/dotnet/standard/base-types/regular-expression-language-quick-reference" class="btn btn-primary flex-grow-1" th:text="#{faq.regex.documentation}">
                                         RegEx-Documentation
                                     </a>
                                 </div>
                             </div>
-                            <div class="col d-flex align-items-start">
-                                <div class="flex-shrink-0 me-3">
+                            <div class="col d-flex align-items-start flex-column flex-sm-row">
+                                <div class="flex-shrink-0 me-3 align-self-center align-self-sm-baseline">
                                     <svg class="bi" width="3em" height="3em" viewBox="0 0 16 16">
                                         <path d="M5.933.87a2.89 2.89 0 0 1 4.134 0l.622.638.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636zM7.002 11a1 1 0 1 0 2 0 1 1 0 0 0-2 0zm1.602-2.027c.04-.534.198-.815.846-1.26.674-.475 1.05-1.09 1.05-1.986 0-1.325-.92-2.227-2.262-2.227-1.02 0-1.792.492-2.1 1.29A1.71 1.71 0 0 0 6 5.48c0 .393.203.64.545.64.272 0 .455-.147.564-.51.158-.592.525-.915 1.074-.915.61 0 1.03.446 1.03 1.084 0 .563-.208.885-.822 1.325-.619.433-.926.914-.926 1.64v.111c0 .428.208.745.585.745.336 0 .504-.24.554-.627z"/>
                                     </svg>
                                 </div>
-                                <div>
+                                <div class="d-flex flex-column">
                                     <h2 th:text="#{faq.sqlAndRegex.heading}">SQL & RegEx?</h2>
                                     <p th:text="#{faq.sqlAndRegex.text}">
                                         Competency-based e-assessment and the associated digital tests make it necessary to check free-text
@@ -159,7 +159,7 @@
                                         technically correct. With the generated regular expressions, based on SQL grammar, a variety of variable
                                         answers can be covered.
                                     </p>
-                                    <a href="https://www.bps-system.de/help/display/ONYX/Regulaere+Ausdruecke" class="btn btn-primary" th:text="#{faq.sqlAndRegex.documention}">
+                                    <a href="https://www.bps-system.de/help/display/ONYX/Regulaere+Ausdruecke" class="btn btn-primary flex-grow-1" th:text="#{faq.sqlAndRegex.documention}">
                                         ONYX-Documentation
                                     </a>
                                 </div>
