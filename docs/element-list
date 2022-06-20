@@ -1,0 +1,10 @@
+sqltoregex
+sqltoregex.api
+sqltoregex.controller
+sqltoregex.deparser
+sqltoregex.equivalentStatements
+sqltoregex.settings
+sqltoregex.settings.regexgenerator
+sqltoregex.settings.regexgenerator.synonymgenerator
+sqltoregex.settings.validations
+sqltoregex.visitor
