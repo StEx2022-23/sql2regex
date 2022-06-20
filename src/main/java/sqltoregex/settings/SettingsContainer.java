@@ -71,8 +71,8 @@ public class SettingsContainer {
     }
 
     /**
-     * Get a new SettingsContainer-Builder
-     * @return Builder
+     * Get a new SettingsContainer-Builder.
+     * @return Builder for building SettingsContainer with method chaining
      */
     public static Builder builder(){
         return new Builder();
@@ -90,7 +90,7 @@ public class SettingsContainer {
         /**
          * Append an entry to the builder map, which holds {@link SettingsOption} and related setting objects. In this case, by passing an object instanceof {@link IRegExGenerator}.
          * @param regExGenerator object instanceof {@link IRegExGenerator}
-         * @return this {@link Builder}
+         * @return this {@link Builder} for method chaining
          */
         public Builder with(IRegExGenerator<?> regExGenerator){
             this.modifiableMap.put(regExGenerator.getSettingsOption(), regExGenerator);
@@ -100,7 +100,7 @@ public class SettingsContainer {
         /**
          * Append an or multiple entry to the builder map, which holds {@link SettingsOption} and related setting objects. In this case, by passing  {@link SettingsContainer}.
          * @param settingsContainer  {@link SettingsContainer}
-         * @return this {@link Builder}
+         * @return this {@link Builder} for method chaining
          */
         public Builder with(SettingsContainer settingsContainer) {
             modifiableMap.putAll(settingsContainer.getAllSettings());
@@ -111,7 +111,7 @@ public class SettingsContainer {
          * Append an or multiple entry to the builder map, which holds {@link SettingsOption} and related setting objects. In this case, by passing the {@link SettingsManager} and one of enum {@link SettingsType}.
          * @param settingsManager {@link SettingsManager}
          * @param settingsType one of enum {@link SettingsType}
-         * @return this {@link Builder}
+         * @return this {@link Builder} for method chaining
          */
         public SettingsContainer with(SettingsManager settingsManager, SettingsType settingsType){
             this.with(settingsManager.getSettingsContainer(settingsType));
@@ -122,7 +122,7 @@ public class SettingsContainer {
          * Append an entry to the builder map, which holds {@link SettingsOption} and related setting objects. In this case, by passing a {@link NodeList} and one of enum {@link SettingsOption}.
          * @param nodeList NodeList from the xml parsing process
          * @param settingsOption one of enum {@link SettingsOption}
-         * @return this {@link Builder}
+         * @return this {@link Builder} for method chaining
          */
         public Builder withNodeList(NodeList nodeList, SettingsOption settingsOption) {
             if (nodeList.item(0).getTextContent().equals("false")) {
@@ -161,6 +161,11 @@ public class SettingsContainer {
             return this;
         }
 
+        /**
+         * Creates a {@link IRegExGenerator} depending on the provided {@link SettingsOption}.
+         * @param settingsOption for creating related {@link sqltoregex.settings.regexgenerator.RegExGenerator}
+         * @return this {@link Builder} for method chaining
+         */
         public Builder with(SettingsOption settingsOption) {
             switch (settingsOption) {
                 case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING -> {
@@ -176,6 +181,12 @@ public class SettingsContainer {
             return this;
         }
 
+        /**
+         * Creates a {@link IRegExGenerator} depending on the provided Set of {@link SettingsOption}s.
+         * Therefore, hands calls over to {@link Builder#with(SettingsOption)}.
+         * @param settingsOptions Set of {@link SettingsOption}s
+         * @return this {@link Builder} for method chaining
+         */
         public Builder withSettingsOptionSet(Set<SettingsOption> settingsOptions) {
             Assert.notNull(settingsOptions, "Set of settings options must not be null");
             for (SettingsOption settingsOption : settingsOptions) {
@@ -184,6 +195,12 @@ public class SettingsContainer {
             return this;
         }
 
+        /**
+         * Creates a {@link IRegExGenerator} depending on the provided set of {@link SimpleDateFormat}s and {@link SettingsOption}.
+         * @param synonyms synonyms set as SimpleDateFormats which will be added to the {@link IRegExGenerator}
+         * @param settingsOption {@link SettingsOption} for determine which {@link IRegExGenerator} will be created
+         * @return this {@link Builder} for method chaining
+         */
         public Builder withSimpleDateFormatSet(Set<SimpleDateFormat> synonyms, SettingsOption settingsOption) {
             Assert.notNull(synonyms, "Set of simple date formats options must not be null");
             switch (settingsOption) {
@@ -202,11 +219,11 @@ public class SettingsContainer {
 
         /**
          * Creates a {@link IRegExGenerator} depending on the provided {@link SettingsOption} and synonym Set.
-         * If the synonymSet consists of delimited Strings they can split
+         * If the synonymSet consists of Strings delimited by {@link Builder#STRING_SYNONYM_DELIMITER} they are split
          * and added with {@link sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator#addSynonymFor(Object, Object)}
          * @param synonyms synonym set as set of string
          * @param settingsOption {@link SettingsOption}
-         * @return this {@link Builder}
+         * @return this {@link Builder} for method chaining
          */
         public Builder withStringSet(Set<String> synonyms, SettingsOption settingsOption) {
             switch (settingsOption) {
@@ -239,6 +256,9 @@ public class SettingsContainer {
             return this;
         }
 
+        /**
+         * {@return the finally constructed {@link SettingsContainer} with corresponding settings}.
+         */
         public SettingsContainer build(){
             this.unModifiableMap = Collections.unmodifiableMap(this.modifiableMap);
             return new SettingsContainer(this);

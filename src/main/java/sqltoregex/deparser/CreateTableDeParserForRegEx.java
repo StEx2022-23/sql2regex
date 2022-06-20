@@ -21,7 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Implements an own create table statement deparser to generate regular expressions.
+ * Implements an own {@link CreateTableDeParser} to generate regular expressions.
  */
 public class CreateTableDeParserForRegEx extends CreateTableDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
@@ -37,7 +37,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
     private final StringSynonymGenerator otherSynonymsGenerator;
 
     /**
-     * Short constrcutor for CreateTableDeParserForRegEx.
+     * Short constructor for CreateTableDeParserForRegEx.
      * @param buffer {@link StringBuilder}
      * @param settingsContainer {@link SettingsContainer}
      */
@@ -45,6 +45,12 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         this(new StatementDeParserForRegEx(buffer, settingsContainer), buffer, settingsContainer);
     }
 
+    /**
+     * Long constructor for CreateTableDeParserForRegEx.
+     * @param statementDeParser {@link StatementDeParser}
+     * @param buffer {@link StringBuilder}
+     * @param settingsContainer {@link SettingsContainer}
+     */
     public CreateTableDeParserForRegEx(StatementDeParser statementDeParser,
                                        StringBuilder buffer, SettingsContainer settingsContainer) {
         super(statementDeParser, buffer);
@@ -59,6 +65,10 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         this.otherSynonymsGenerator = settings.get(StringSynonymGenerator.class).get(SettingsOption.OTHERSYNONYMS);
     }
 
+    /**
+     * {@return list of {@literal String}s} concatenated from ColumnDefinition.
+     * @param columnDefinitions List of {@link ColumnDefinition}
+     */
     private List<String> columnDefinitionsListToStringList(List<ColumnDefinition> columnDefinitions){
         List<String> stringList = new LinkedList<>();
 
@@ -67,13 +77,15 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         }
 
         for (ColumnDefinition definition : columnDefinitions) {
-            StringBuilder tmpBuffer = new StringBuilder();
-            concatColumnDefinition(definition, tmpBuffer);
-            stringList.add(tmpBuffer.toString());
+            stringList.add(deParseColumnDefinition(definition));
         }
         return stringList;
     }
 
+    /**
+     * {@return {@link Index} list concatenated to strings} because of unusable toString method for RegEx generation.
+     * @param indexList List of
+     */
     private List<String> indexListToStringList(List<Index> indexList){
         List<String> stringList = new LinkedList<>();
 
@@ -82,20 +94,33 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         }
 
         for (Index index : indexList){
-            stringList.add(getIndexRegEx(index));
+            stringList.add(deParseIndex(index));
         }
         return stringList;
     }
-    
-    private String indexToString(Index index){
+
+    /**
+     * {@return {@link ForeignKeyIndex} as RegEx}.
+     * Mimicking toString method of index superclass and subtracts it from the ForeignKeyIndex toString string.
+     * With that its possible to deParse:
+     * "CONSTRAINT symbol FOREIGN KEY (col1) REFERENCES table2 (col1, col2) MATCH FULL"
+     * with maximum variance in whiteSpaces.
+     * @param index {@link ForeignKeyIndex}
+     */
+    private String deParseReferentialActions(ForeignKeyIndex index){
         String idxSpecText = PlainSelect.getStringList(index.getIndexSpec(), false, false);
-        return (index.getName() != null ? "CONSTRAINT " + index.getName() + " " : "")
+        String s =  (index.getName() != null ? "CONSTRAINT " + index.getName() + " " : "")
                 + index.getType() + " " + PlainSelect.getStringList(index.getColumnsNames(), true, true) + (!"".
-                equals(idxSpecText) ? " " + idxSpecText : "") + " REFERENCES "  + ((ForeignKeyIndex) index).getTable() +
-                PlainSelect.getStringList(((ForeignKeyIndex) index).getReferencedColumnNames(), true, true);
+                equals(idxSpecText) ? " " + idxSpecText : "") + " REFERENCES "  + (index).getTable() +
+                PlainSelect.getStringList((index).getReferencedColumnNames(), true, true);
+        return index.toString().replace(s, "").replace(" ", REQUIRED_WHITE_SPACE);
     }
 
-    private String getProcessedTableOptions(CreateTable createTable){
+    /**
+     * {@return table options as {@literal String}}.
+     * @param createTable {@link CreateTable}
+     */
+    private String deParseTableOptions(CreateTable createTable){
         StringBuilder tmpBuffer = new StringBuilder();
         if (createTable.getTableOptionsStrings() == null){
             return tmpBuffer.toString();
@@ -132,18 +157,31 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         return tmpBuffer.toString();
     }
 
-    private String concatIndexColumns(Index index){
+    /**
+     * {@return index columns as {@literal String}}.
+     * @param index {@link Index}
+     */
+    private String deParseIndexColumns(Index index){
         List<String> indexStringList = getStringList(index.getColumns());
         return "\\(" + OrderRotation.useOrDefault(this.indexColumnNameOrder, indexStringList)
                 + "\\)";
     }
 
+
+    /**
+     * {@return List of {@literal String}} generated out of any list type.
+     * @param list {@link List}
+     */
     private List<String> getStringList(List<?> list){
         List<String> stringList = new LinkedList<>();
         list.forEach(el -> stringList.add(el.toString()));
         return stringList;
     }
 
+    /**
+     * Overrides deParse method for RegEx generation.
+     * @param createTable {@link CreateTable}
+     */
     @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     public void deParse(CreateTable createTable) {
@@ -190,7 +228,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
             buffer.append("\\)");
         }
 
-        params = getProcessedTableOptions(createTable);
+        params = deParseTableOptions(createTable);
         if (!"".equals(params)) {
             buffer.append(REQUIRED_WHITE_SPACE).append(params);
         }
@@ -222,9 +260,14 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         }
     }
 
-    private void concatColumnDefinition(ColumnDefinition columnDefinition, StringBuilder buffer) {
-        buffer.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, columnDefinition.getColumnName()));
-        buffer.append(REQUIRED_WHITE_SPACE);
+    /**
+     * {@return {@link ColumnDefinition} as {@literal String}}.
+     * @param columnDefinition {@link ColumnDefinition}
+     */
+    private String deParseColumnDefinition(ColumnDefinition columnDefinition) {
+        StringBuilder tmpBuffer = new StringBuilder();
+        tmpBuffer.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, columnDefinition.getColumnName()));
+        tmpBuffer.append(REQUIRED_WHITE_SPACE);
         List<String> synsWithSpellingMistake = new LinkedList<>();
 
         for (String keywordSyn : StringSynonymGenerator.generateAsListOrDefault(this.datatypeSynonymGenerator, columnDefinition.getColDataType().toString())){
@@ -234,7 +277,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
             }
             synsWithSpellingMistake.add(SpellingMistake.useOrDefault(this.keywordSpellingMistake, keywordSyn));
         }
-        buffer.append(RegExGenerator.joinListToRegEx(this.datatypeSynonymGenerator, synsWithSpellingMistake));
+        tmpBuffer.append(RegExGenerator.joinListToRegEx(this.datatypeSynonymGenerator, synsWithSpellingMistake));
         if (columnDefinition.getColumnSpecs() != null) {
             StringBuilder stringBuilder = new StringBuilder();
             for (String s : columnDefinition.getColumnSpecs()) {
@@ -255,11 +298,16 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
             Matcher mUnique = pUnique.matcher(columnDefinitionString);
             columnDefinitionString = mUnique.replaceFirst("UNIQUE(\\\\s+KEY)?");
 
-            buffer.append(columnDefinitionString);
+            tmpBuffer.append(columnDefinitionString);
         }
+        return tmpBuffer.toString();
     }
 
-    private String getIndexRegEx(Index index){
+    /**
+     * {@return index as {@literal String}}.
+     * @param index {@link Index}
+     */
+    private String deParseIndex(Index index){
         StringBuilder tmpBuffer = new StringBuilder();
         if (index.getType() != null
                 && (index.getType().equals("PRIMARY KEY")
@@ -283,7 +331,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         tmpBuffer.append(REQUIRED_WHITE_SPACE);
         //indexname optional
         tmpBuffer.append("(?:.*?").append(REQUIRED_WHITE_SPACE).append(")?");
-        tmpBuffer.append(concatIndexColumns(index));
+        tmpBuffer.append(deParseIndexColumns(index));
 
         if (index instanceof ForeignKeyIndex foreignKeyIndex){
             tmpBuffer.append(OPTIONAL_WHITE_SPACE + "REFERENCES" + REQUIRED_WHITE_SPACE)
@@ -294,12 +342,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
                     .append(OrderRotation.useOrDefault(this.indexColumnNameOrder, foreignKeyIndex.getReferencedColumnNames()))
                     .append(OPTIONAL_WHITE_SPACE)
                     .append("\\)");
-            //Generate the index String with the toString method since there is private access necessary.
-            //Built the public part and remove it to have maximum variety in the string
-            String s =  indexToString(index);
-            tmpBuffer.append(index.toString()
-                                     .replace(s, "")
-                                     .replace(" ", REQUIRED_WHITE_SPACE)); //Spaces between referential Actions
+            tmpBuffer.append(deParseReferentialActions(foreignKeyIndex));
         }
         return tmpBuffer.toString();
     }

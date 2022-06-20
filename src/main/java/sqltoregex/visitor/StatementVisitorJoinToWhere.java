@@ -9,7 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Another StatementVisitor which allows to translate JOIN-ON → WHERE-Expressions.
+ * StatementVisitor which allows to translate JOIN-ON → WHERE-Expressions.
+ * @author Maximilian Förster
  */
 public class StatementVisitorJoinToWhere extends StatementVisitorAdapter {
     SelectVisitor selectVisitorJoinToWhere = new SelectVisitorJoinToWhere();

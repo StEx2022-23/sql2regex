@@ -26,7 +26,7 @@ public class GroupByDeParserForRegEx extends GroupByDeParser {
     private final SettingsContainer settings;
 
     /**
-     * Constructor for GroupByDeParserForRegEx
+     * Constructor for GroupByDeParserForRegEx.
      * @param expressionDeParser {@link ExpressionDeParserForRegEx}
      * @param buffer {@link StringBuilder}
      * @param settings {@link SettingsContainer}

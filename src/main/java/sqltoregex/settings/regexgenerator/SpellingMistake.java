@@ -59,7 +59,7 @@ public class SpellingMistake extends RegExGenerator<String> {
      * Otherwise, a list of string with only one entry is returned. The entry is the given string.
      * @param spellingMistake SpellingMistake object
      * @param str string to handle
-     * @return generated list of strings (with one ore more entries)
+     * @return generated list of strings (with one or more entries)
      */
     public static List<String> generateAsListOrDefault(SpellingMistake spellingMistake, String str){
         if (null != spellingMistake) return spellingMistake.generateAsList(str);
