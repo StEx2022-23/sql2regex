@@ -19,7 +19,7 @@ import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX
 public class OrderRotation extends RegExGenerator<List<String>> {
 
     /**
-     * Constructor of OrderRotation. Init the super class.
+     * Constructor of OrderRotation. Inits the super class.
      * @param settingsOption one of enum {@link SettingsOption}
      * @see RegExGenerator
      */
@@ -44,6 +44,7 @@ public class OrderRotation extends RegExGenerator<List<String>> {
      * Helper function for recursive table/column/value-name order concatenation.
      * @param amount amount of items to order rotate
      * @param valueList List of String with to order rotate items
+     * @return list of strings containing all possible rotations as {@literal String}s
      */
     private List<String> orderRotationRek(int amount, List<String> valueList) {
         StringBuilder singleValue = new StringBuilder();
@@ -51,7 +52,7 @@ public class OrderRotation extends RegExGenerator<List<String>> {
         if (amount == 1) {
             Iterator<String> iterator = valueList.iterator();
             while (iterator.hasNext()) {
-                singleValue.append(QUOTATION_MARK_REGEX + "*").append(iterator.next()).append(QUOTATION_MARK_REGEX + "*");
+                singleValue.append(QUOTATION_MARK_REGEX).append("*").append(iterator.next()).append(QUOTATION_MARK_REGEX).append("*");
                 if (iterator.hasNext()) {
                     singleValue.append("\\s*,\\s*");
                 }
@@ -89,7 +90,7 @@ public class OrderRotation extends RegExGenerator<List<String>> {
         StringBuilder stringBuilder = new StringBuilder();
         Iterator<String> stringIterator = valueList.iterator();
         while(stringIterator.hasNext()){
-            stringBuilder.append(QUOTATION_MARK_REGEX + "*").append(stringIterator.next()).append(QUOTATION_MARK_REGEX + "*");
+            stringBuilder.append(QUOTATION_MARK_REGEX).append("*").append(stringIterator.next()).append(QUOTATION_MARK_REGEX).append("*");
             if(stringIterator.hasNext()){
                 stringBuilder.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
             }

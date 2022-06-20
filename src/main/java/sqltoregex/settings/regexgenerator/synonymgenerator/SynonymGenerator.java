@@ -153,6 +153,9 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
                 && this.isNonCapturingGroup == that.isNonCapturingGroup;
     }
 
+    /**
+     * {@return <b>cloned</b> graph attribute}.
+     */
     public Graph<A, DefaultWeightedEdge> getGraph() {
         try {
             return (Graph<A, DefaultWeightedEdge>) this.synonymsGraph.clone();
@@ -178,25 +181,26 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     }
 
     /**
-     * Preprocessed input into a String that will be stored in the graph.
-     * @param syn
-     * @return
+     * Preprocesses the input class into the class which will be stored in the graph.
+     * @param syn synonym to prepare
+     * @return parameter as type for addition
      */
     protected abstract A prepareSynonymForAdd(A syn);
 
     /**
      * Preprocesses input for search. Changing the search class into the vertex class.
-     * @param wordToFindSynonyms
-     * @return
+     * @param wordToFindSynonyms synonym for converting
+     * @return parameter as vertex class
      */
     protected abstract A prepareSynonymForSearch(S wordToFindSynonyms);
 
     /**
-     * Makes it possible to manipulate the way a synonym class is converted into a {@literal String} for RegEx usage
-     * without changing {@link Object#toString}. Especially useful when A and S generics are different.
-     * @param syn
-     * @param wordToFindSynonyms
-     * @return
+     * Makes it possible to manipulate the way a vertex class is converted into a {@literal String} for RegEx usage
+     * without changing {@link Object#toString}. Especially useful when A and S generics are different
+     * and toString() can't be used, because only returning object reference.
+     * @param syn vertex of graph
+     * @param wordToFindSynonyms word, which is used for querying the graph. Especially useful if saved vertices class doesn't equal the search class.
+     * @return String representation of vertex useable for RegEx
      */
     protected abstract String prepareVertexForRegEx(A syn, S wordToFindSynonyms);
 

@@ -85,9 +85,10 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
 
     /**
      * Prepares vertex by passing a {@link SimpleDateFormat} and a {@link Expression} with the item to find synonyms for.
+     * If the provided Expression is parsable by any format in the graph it is further formatted by the provided SimpleDateFormat.
      * @param syn the specified {@link SimpleDateFormat}
-     * @param wordToFindSynonyms  the item to find synonyms for as {@link Expression}
-     * @return parsed string
+     * @param wordToFindSynonyms the item to find synonyms for as {@link Expression}
+     * @return Expression formated by provided SimpleDateFormat
      * @throws NoSuchElementException if there are no synonym formats
      */
     @Override

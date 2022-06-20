@@ -10,9 +10,17 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * StatementVisitor which allows to determine where to place single column indices.
+ * @author Maximilian Förster
+ */
 public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
     private final KeyPlacementOption keyPlacementOption;
 
+    /**
+     * Constructor for StatementVisitorKeyPlacement.
+     * @param keyPlacementOption where to place the index
+     */
     public StatementVisitorKeyPlacement(KeyPlacementOption keyPlacementOption){
         Assert.notNull(keyPlacementOption, "keyPlacementOption must not be null");
         this.keyPlacementOption = keyPlacementOption;
@@ -29,6 +37,10 @@ public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
         }
     }
 
+    /**
+     * Translates column indices into constraints.
+     * @param createTable Create Table to extract indices from
+     */
     private void pushAllIndizesInConstraints(CreateTable createTable){
         List<ColumnDefinition> columnDefinitionList = createTable.getColumnDefinitions();
 
@@ -46,6 +58,11 @@ public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
         }
     }
 
+    /**
+     * Translates a PRIMARY KEY into {@link ColumnDefinition}s.
+     * @param index Index to add to ColumnDefinition
+     * @param columnDefinitionMap Create Table to extract indices from
+     */
     private void handlePrimaryKey(Index index, Map<String, ColumnDefinition> columnDefinitionMap){
         if (index.getColumns().size() == 1){
             String indexColumn = index.getColumns().get(0).getColumnName();
@@ -57,7 +74,12 @@ public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
             columnSpecs.addAll(List.of("PRIMARY", "KEY"));
         }
     }
-
+    
+    /**
+     * Translates a FOREIGN KEY into {@link ColumnDefinition}s.
+     * @param index Index to add to ColumnDefinition
+     * @param columnDefinitionMap Create Table to extract indices from
+     */
     private void handleUniqueKey(Index index, Map<String, ColumnDefinition> columnDefinitionMap){
         if (index.getColumns().size() == 1){
             String indexColumn = index.getColumns().get(0).getColumnName();
@@ -70,6 +92,10 @@ public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
         }
     }
 
+    /**
+     * Helper method for translating constraints into column indices.
+     * @param createTable Create Table to extract indices from
+     */
     private void pushAllIndizesInColumns(CreateTable createTable){
         if (createTable.getIndexes() == null) return;
 
@@ -90,6 +116,10 @@ public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
         createTable.setIndexes(indexList);
     }
 
+    /**
+     * {@return a map keyed by column name and value of corresponding columnDefinition}.
+     * @param columnDefinitionList List to create Map from
+     */
     private Map<String, ColumnDefinition> createColumnMap(List<ColumnDefinition> columnDefinitionList){
         Map<String, ColumnDefinition> columnDefinitionMap = new HashMap<>();
 
@@ -100,6 +130,11 @@ public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
         return columnDefinitionMap;
     }
 
+    /**
+     * Helper function for translating a {@link ColumnDefinition} into an {@link Index}.
+     * @param columnDefinition {@link ColumnDefinition} to translate
+     * @return translated {@link Index}
+     */
     private Index generateIndex(ColumnDefinition columnDefinition){
         String columnDefString = "";
         List<String> columnSpecs = columnDefinition.getColumnSpecs();
@@ -117,6 +152,10 @@ public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
         return null;
     }
 
+    /**
+     * Helper method for deleting all indices out of the provided {@link ColumnDefinition}.
+     * @param columnDefinition where to delete indices from
+     */
     private void deleteAllColumnIndizes(ColumnDefinition columnDefinition){
         List<String> columnSpecsList = new LinkedList<>();
 
@@ -143,7 +182,7 @@ public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
     }
 
     /**
-     * Holds all possible placement options for (primary) keys
+     * Holds all possible placement options for (primary) keys.
      */
     public enum KeyPlacementOption{
         USER_INPUT,

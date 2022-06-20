@@ -23,7 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Missing overrides: AnalyticExpression
+ * Implements an own {@link ExpressionDeParser} for generating RegEx.
+ * Therefore, overwriting every visit method with RegEx String generation
  */
 public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     public static final String NOT = "NOT";
@@ -41,15 +42,32 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     private final OrderByDeParserForRegEx orderByDeParser;
     private Map<String, String> tableNameAliasMap;
 
+    /**
+     * Short constructor.
+     * @param settingsContainer containing all deparse Settings
+     */
     public ExpressionDeParserForRegEx(SettingsContainer settingsContainer) {
         this(new SelectDeParserForRegEx(settingsContainer), new StringBuilder(), settingsContainer);
     }
 
+    /**
+     * Extended constructor.
+     * @param selectVisitor visitor used for deparsing sub selects
+     * @param buffer used for string building
+     * @param settingsContainer containing all deparse Settings
+     */
     public ExpressionDeParserForRegEx(SelectVisitor selectVisitor, StringBuilder buffer,
                                       SettingsContainer settingsContainer) {
         this(selectVisitor, buffer, new OrderByDeParserForRegEx(settingsContainer), settingsContainer);
     }
 
+    /**
+     * Detailed constructor.
+     * @param selectVisitor visitor used for deparsing sub selects
+     * @param buffer used for string building
+     * @param orderByDeParser visitor for deparsing order by statements
+     * @param settings containing all deparse Settings
+     */
     ExpressionDeParserForRegEx(SelectVisitor selectVisitor, StringBuilder buffer,
                                OrderByDeParserForRegEx orderByDeParser, SettingsContainer settings) {
         super(selectVisitor, buffer);
@@ -1046,6 +1064,11 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
+    /**
+     * Adds RegEx for both equivalent evaluated {@link BinaryExpression} representations.
+     * @param binaryExpression to deparse
+     * @param operator between the the expressions of the binary
+     */
     protected void visitCommutativeBinaryExpression(BinaryExpression binaryExpression, String operator) {
         buffer.append("(?:");
         buffer.append(OPTIONAL_WHITE_SPACE);
@@ -1078,6 +1101,10 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
+    /**
+     * Adds the provided table name or alias to the class attribute for further processing.
+     * @param tableNameOrAlias {@literal String} to add
+     */
     public void addTableNameAlias(String tableNameOrAlias){
         if(tableNameOrAlias.contains(" ")){
             this.tableNameAliasMap.put(tableNameOrAlias.split(" ")[0], tableNameOrAlias.split(" ")[1]);
@@ -1087,14 +1114,26 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         }
     }
 
+    /**
+     * {@return the table name alias map attribute containing one entry K:table name V:alias and one entry K:alias V:table name.}
+     */
     public Map<String, String> getTableNameAliasMap() {
         return this.tableNameAliasMap;
     }
 
+    /**
+     * Provided map must fulfill schema: one entry K:table name V:alias and one entry K:alias V:table name.
+     * @param tableNameAliasMap Map to set
+     */
     public void setTableNameAliasMap(Map<String, String> tableNameAliasMap) {
         this.tableNameAliasMap = tableNameAliasMap;
     }
 
+    /**
+     * Returns an alias for provided tablename and vice versa.
+     * @param input Table name or table name alias
+     * @return Counterpart for provided input or null if none found
+     */
     public String getRelatedTableNameOrAlias(String input){
         if(this.tableNameAliasMap.get(input) != null){
             return this.tableNameAliasMap.get(input);

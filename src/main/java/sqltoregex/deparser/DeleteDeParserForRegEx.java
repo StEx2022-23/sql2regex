@@ -209,7 +209,7 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
     }
 
     /**
-     * Set {@link ExpressionDeParserForRegEx}
+     * Set {@link ExpressionDeParserForRegEx}.
      * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
      */
     public void setExpressionDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx) {

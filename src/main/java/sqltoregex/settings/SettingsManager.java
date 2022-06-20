@@ -22,7 +22,7 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * Realize a spring boot service which handles all settings operations (parsing and specific getters)
+ * Realize a spring boot service which handles all settings operations (parsing and specific getters).
  * @author Patrick Binkert
  * @author Maximilian Förster
  */
