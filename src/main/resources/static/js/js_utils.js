@@ -398,19 +398,12 @@ function loadDefaultLanguageSettings(){
 
 function loadUserFormSettings(formElement){
     let allCheckboxes = formElement.querySelectorAll('input[type="checkbox"]');
-    if(localStorage.getItem("savedUserSettings") === null){
-        let settingsDict = {}
-        allCheckboxes.forEach(checkbox => {
-            settingsDict[checkbox.id] = true;
-            document.getElementById(checkbox.id).checked = true;
-        })
-        localStorage.setItem("savedUserSettings", JSON.stringify(settingsDict));
-    } else {
+    if(localStorage.getItem("savedUserSettings") !== null){
+        const settingsToast = new bootstrap.Toast(document.getElementById('toast-loaded-user-settings'))
+        settingsToast.show();
         let savings = JSON.parse(localStorage.getItem("savedUserSettings"));
         allCheckboxes.forEach(checkbox => {
-            if(undefined === savings[checkbox.id]) {
-                checkbox.checked = true;
-            } else {
+            if(undefined !== savings[checkbox.id]) {
                 checkbox.checked = savings[checkbox.id];
             }
             if (checkbox.id.includes("master")){
@@ -469,7 +462,10 @@ function slaveSelectionState(checkboxDict, groupName){
 
 function resetUserSettings(formElement){
     localStorage.removeItem("savedUserSettings");
-    loadUserFormSettings(formElement);
+    let allCheckboxes = formElement.querySelectorAll('input[type="checkbox"]');
+    allCheckboxes.forEach(checkbox => {
+        document.getElementById(checkbox.id).checked = true;
+    })
 }
 
 function setCookiesAccepted(){
