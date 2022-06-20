@@ -32,8 +32,5 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### javaDoc ###
-docs
-
 ### VS Code ###
 .vscode/
