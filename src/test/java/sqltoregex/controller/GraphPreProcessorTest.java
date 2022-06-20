@@ -35,6 +35,7 @@ class GraphPreProcessorTest {
                                                                                        DefaultWeightedEdge.class)));
         Assertions.assertTrue(map.containsKey("AVG"));
         Assertions.assertTrue(map.containsKey("SUM"));
-        Assertions.assertEquals(2, map.size());
+        Assertions.assertTrue(map.containsKey("COUNT"));
+        Assertions.assertEquals(3, map.size());
     }
 }
