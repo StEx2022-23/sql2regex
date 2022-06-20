@@ -53,7 +53,7 @@ public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
         }
     }
 
-    private void handleForeignKey(Index index, Map<String, ColumnDefinition> columnDefinitionMap){
+    private void handleUniqueKey(Index index, Map<String, ColumnDefinition> columnDefinitionMap){
         if (index.getColumns().size() == 1){
             String indexColumn = index.getColumns().get(0).getColumnName();
             columnDefinitionMap.get(indexColumn).getColumnSpecs()
@@ -73,7 +73,7 @@ public class StatementVisitorKeyPlacement extends StatementVisitorAdapter {
                 continue;
             }
             if (index.getType().equals("UNIQUE KEY")){
-                this.handleForeignKey(index, columnDefinitionMap);
+                this.handleUniqueKey(index, columnDefinitionMap);
                 continue;
             }
             indexList.add(index);
