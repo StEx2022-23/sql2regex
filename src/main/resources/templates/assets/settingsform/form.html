@@ -6,41 +6,17 @@
             <div id="isInValid" th:if="${#fields.hasErrors('sql')}" th:uerrors="*{sql}" th:errorclass="'alert alert-warning overlayinvalidhint'" >
                 title error
             </div>
-            <div id="dateHint"  class="alert alert-success overlayinvalidhint alert-dismissible fade d-none" role="alert">
-                <div class="row align-items-center">
-                    <div class="col-sm-1 text-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1.6rem" height="1.6rem" fill="currentColor" class="bi bi-calendar-week" viewBox="0 0 16 16">
-                            <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
-                            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
-                        </svg>
-                    </div>
-                    <div class="col-sm-8 text-center" th:utext="#{conv.dateDetected}"></div>
-                    <div class="col-sm-3 text-center">
-                        <p class="fw-bolder" th:utext="#{conv.DateValueParsing}"></p>
-                        <div class="row align-items-center">
-                            <div class="col text-center">
-                                <button type="button" id="dateHintApprove" class="btn btn-primary" onclick="performDateValueDeParsing('sqlinput')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16">
-                                        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="col text-center">
-                                <button type="button" id="dateHintDismiss" class="btn btn-secondary" onclick="hideDateValueHint()">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-                                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <div class="d-flex justify-content-end">
-        <button type="button" onclick="resetUserSettings(document.getElementById('converterForm'))" id="reset_user_settings" class="btn btn-m btn-success copy-button mb-2 flex-grow-1 flex-lg-grow-0">
+    <div class="d-flex justify-content-end flex-wrap flex-sm-row flex-column">
+        <button class="btn btn-primary me-0 me-sm-2 flex-grow-1 flex-lg-grow-0 mb-2 " type="button" data-bs-toggle="offcanvas" data-bs-target="#convertingHints" aria-controls="convertingHints">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-info" viewBox="0 0 16 16">
+                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+            </svg>
+            <span th:text="#{settingsform.convertingHints}"></span>
+        </button>
+        <button type="button" onclick="resetUserSettings(document.getElementById('converterForm'))" id="reset_user_settings" class="btn btn-m btn-success copy-button flex-grow-1 flex-lg-grow-0 mb-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-filetype-json" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
                 <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
@@ -51,7 +27,7 @@
     <div class="accordion" id="accordion">
         <div class="accordion-item">
             <div class="accordion-header" id="headingSpelling">
-                <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseSpellings" aria-controls="collapseSpellings">
+                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseSpellings" aria-controls="collapseSpellings">
                     <input class="form-check-input me-2 master_toggle" type="checkbox" id="spellingMistake_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'spellings'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.spellings.size() > 0}">
                     <span th:text="#{settingsform.spellings.heading}"></span>
                 </button>
@@ -72,7 +48,7 @@
         </div>
         <div class="accordion-item">
             <div class="accordion-header" id="headingOrders">
-                <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseOrders" aria-controls="collapseOrders">
+                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseOrders" aria-controls="collapseOrders">
                     <input class="form-check-input me-2 master_toggle" type="checkbox" id="orderRotation_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'orders'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.orders.size() > 0}">
                     <span th:text="#{settingsform.orders.heading}"></span>
                 </button>
@@ -93,7 +69,7 @@
         </div>
         <div class="accordion-item">
             <div class="accordion-header" id="headingDateAndTime">
-                <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseDateAndTime" aria-controls="collapseDateAndTime">
+                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseDateAndTime" aria-controls="collapseDateAndTime">
                     <input class="form-check-input me-2 master_toggle" type="checkbox" id="dateAndTime_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'dateFormats'); toggleSlaveCheckboxes(this, 'timeFormats'); toggleSlaveCheckboxes(this, 'dateTimeFormats'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.dateFormats.size() > 0 || settingsForm.timeFormats.size() > 0 || settingsForm.dateTimeFormats.size() > 0}">
                     <span th:text="#{settingsform.dateAndTime.heading}"></span>
                 </button>
@@ -132,7 +108,7 @@
         </div>
         <div class="accordion-item">
             <div class="accordion-header" id="headingAggregateFunctionLang">
-                <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseAggregateFunctionLang" aria-controls="collapseAggregateFunctionLang">
+                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseAggregateFunctionLang" aria-controls="collapseAggregateFunctionLang">
                     <input class="form-check-input me-2 master_toggle" type="checkbox" id="aggregateFunctionLang_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'aggregateFunctionLang'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.aggregateFunctionLang.size() > 0}">
                     <span th:text="#{settingsform.aggregateFunctionLang.heading}"></span>
                 </button>
@@ -159,7 +135,7 @@
         </div>
         <div class="accordion-item">
             <div class="accordion-header" id="headingDatatypeSynonyms">
-                <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseDatatypeSynonyms" aria-controls="collapseDatatypeSynonyms">
+                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseDatatypeSynonyms" aria-controls="collapseDatatypeSynonyms">
                     <input class="form-check-input me-2 master_toggle" type="checkbox" id="datatypeSynonyms_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'datatypeSynonyms'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.datatypeSynonyms.size() > 0}">
                     <span th:text="#{settingsform.datatype.heading}"></span>
                 </button>
@@ -186,7 +162,7 @@
         </div>
         <div class="accordion-item">
             <div class="accordion-header" id="headingOtherSynonyms">
-                <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseOtherSynonyms" aria-controls="collapseOtherSynonyms">
+                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseOtherSynonyms" aria-controls="collapseOtherSynonyms">
                     <input class="form-check-input me-2 master_toggle" type="checkbox" id="otherSynonyms_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'otherSynonyms'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.otherSynonyms.size() > 0}">
                     <span th:text="#{settingsform.otherSynonyms.heading}"></span>
                 </button>
