@@ -504,23 +504,35 @@ String.prototype.replaceAt = function(index, toReplace, replacement) {
 
 function handleDateValue(sqlInputEl) {
     let dateValue = sqlInputEl.value;
-    let regexDate = new RegExp(/\d\d\d\d-\d\d-\d\d/g);
-    let regexDateTime = /(?=\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?)(?!')/gi
-    let regexTime = /(?=\d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d:\d\d(?::\d\d)?)(?!')/gi
-
     const matches = [];
     let match
+
+    let regexDate = new RegExp(/\d\d\d\d-\d\d-\d\d/g);
     while ((match = regexDate.exec(dateValue)) != null){
         if (!(dateValue?.[match.index - 1] === "'" || dateValue?.[match.index - 2] === "d" || dateValue?.[match.index - 3] === "{")){
             matches.push({start: match.index, end: regexDate.lastIndex, value: match[0]})
         }
     }
 
+    let regexDateTime = new RegExp(/\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?/g);
+    while ((match = regexDateTime.exec(dateValue)) != null){
+        if (!(dateValue?.[match.index - 1] === "'" || dateValue?.[match.index - 2] === "s" || dateValue?.[match.index - 3] === "t" || dateValue?.[match.index - 4] === "{")){
+            matches.push({start: match.index, end: regexDateTime.lastIndex, value: match[0]})
+        }
+    }
+
+    let regexTime = new RegExp(/\d\d:\d\d(?::\d\d)?/g);
+    while ((match = regexTime.exec(dateValue)) != null){
+        if (!(dateValue?.[match.index - 1] === "'" || dateValue?.[match.index - 2] === "t" || dateValue?.[match.index - 3] === "{")){
+            matches.push({start: match.index, end: regexTime.lastIndex, value: match[0]})
+        }
+    }
+
     const selectEl = document.getElementById("dateAndTimeSelect")
     selectEl.innerHTML ="";
 
-    matches.forEach(match => {
-        selectEl.appendChild(renderOption(match))
+    matches.forEach(singleMatch => {
+        selectEl.appendChild(renderOption(singleMatch))
     })
 
     if(matches.length !== 0) {
@@ -567,8 +579,10 @@ function dateOrTimeStringToLiteral(dateString) {
 }
 
 function showDateValueHint(){
-    const dateAndTimeValueToast = new bootstrap.Toast(document.getElementById('toast-date-and-time-value'))
-    dateAndTimeValueToast.show()
+    if(!document.getElementById('toast-date-and-time-value').classList.contains("show")){
+        const dateAndTimeValueToast = new bootstrap.Toast(document.getElementById('toast-date-and-time-value'))
+        dateAndTimeValueToast.show();
+    }
 }
 
 let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
