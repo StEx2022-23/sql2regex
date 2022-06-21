@@ -498,44 +498,77 @@ function scrollToInValidInput(el) {
     }
 }
 
-function handleDateValue(el) {
-    let dateValue = el.value;
-    let regexDate = /(?=\d\d\d\d-\d\d-\d\d$)(?<!{d')(\d\d\d\d-\d\d-\d\d)(?!')/gi;
+String.prototype.replaceAt = function(index, toReplace, replacement) {
+    return this.substring(0, index) + replacement + this.substring(index + toReplace.length);
+}
+
+function handleDateValue(sqlInputEl) {
+    let dateValue = sqlInputEl.value;
+    let regexDate = new RegExp(/\d\d\d\d-\d\d-\d\d/g);
     let regexDateTime = /(?=\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?)(?!')/gi
     let regexTime = /(?=\d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d:\d\d(?::\d\d)?)(?!')/gi
-    if(dateValue.match(regexDate) || dateValue.match(regexDateTime) || dateValue.match(regexTime)) {
+
+    const matches = [];
+    let match
+    while ((match = regexDate.exec(dateValue)) != null){
+        if (!(dateValue?.[match.index - 1] === "'" || dateValue?.[match.index - 2] === "d" || dateValue?.[match.index - 3] === "{")){
+            matches.push({start: match.index, end: regexDate.lastIndex, value: match[0]})
+        }
+    }
+
+    const selectEl = document.getElementById("dateAndTimeSelect")
+    selectEl.innerHTML ="";
+
+    matches.forEach(match => {
+        selectEl.appendChild(renderOption(match))
+    })
+
+    if(matches.length !== 0) {
+        selectEl.setAttribute("size", matches.length)
         showDateValueHint()
-    } else {
-        hideDateValueHint()
     }
 }
 
-function performDateValueDeParsing(id) {
-    let sqlInput = document.getElementById(id);
-    let regexDate = /(?=\d\d\d\d-\d\d-\d\d$)(?<!{d')(\d\d\d\d-\d\d-\d\d)(?!')/gi;
-    let regexDateTime = /(?=\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?)(?!')/gi;
-    let regexTime = /(?=\d\d:\d\d(?::\d\d)?$)(?<!{d')(\d\d:\d\d(?::\d\d)?)(?!')/gi;
+function renderOption(information){
+    let element = document.createElement('option')
+    element.setAttribute('value', information.start)
+    element.innerHTML = information.value
 
-    if(sqlInput.value.match(regexDate)){
-        sqlInput.value = sqlInput.value.replace(regexDate, "{d'$&'}");
-    } else if (sqlInput.value.match(regexDateTime)) {
-        sqlInput.value = sqlInput.value.replace(regexDateTime, "{ts'$&'}");
-    } else if (sqlInput.value.match(regexTime)) {
-        sqlInput.value = sqlInput.value.replace(regexTime, "{t'$&'}");
+    return element
+}
+
+function performDateAndTimeConversion(sqlInputEl, selectEl){
+    const options = selectEl && selectEl.options
+    let opt;
+    for (let i = 0, iLen = options.length; i < iLen; i++) {
+        opt = options[i];
+
+        if (!opt.selected) {
+            sqlInputEl.value = sqlInputEl.value.replaceAt(opt.value, opt.text, dateOrTimeStringToLiteral(sqlInputEl.value.substring(opt.value, opt.value + opt.text.length)))
+        }
+        opt.parentElement.removeChild(opt)
     }
 
-    hideDateValueHint()
+    selectEl.setAttribute("size", 1)
+}
+
+function dateOrTimeStringToLiteral(dateString) {
+    let regexDate = new RegExp(/(?=\d\d\d\d-\d\d-\d\d)/gi);
+    let regexDateTime = new RegExp(/(?=\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?)/gi);
+    let regexTime = new RegExp(/(?=\d\d:\d\d(?::\d\d)?)/gi);
+
+    if(dateString.match(regexDate).length >= 1){
+        return dateString.replace(dateString, "{d'$&'}");
+    } else if (dateString.match(regexDateTime)) {
+        return dateString.replace(dateString, "{ts'$&'}");
+    } else if (dateString.match(regexTime)) {
+        return dateString.replace(dateString, "{t'$&'}");
+    }
 }
 
 function showDateValueHint(){
-    const dateHint = document.getElementById("dateHint")
-    dateHint.classList.remove("d-none");
-    setTimeout(() => {    dateHint.classList.add("show");}, 1)
-}
-
-function hideDateValueHint(){
-    const dateHint = document.getElementById("dateHint")
-    dateHint.classList.remove("show")
+    const dateAndTimeValueToast = new bootstrap.Toast(document.getElementById('toast-date-and-time-value'))
+    dateAndTimeValueToast.show()
 }
 
 let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
@@ -548,6 +581,9 @@ document.onreadystatechange = function () {
 
         if(actualPath === ""){
             document.addEventListener('submit',  (e) => {
+                const sqlInputEl = document.getElementById("sqlinput")
+                const selectEl = document.getElementById("dateAndTimeSelect")
+                performDateAndTimeConversion(sqlInputEl, selectEl)
                 const form = e.target;
                 form.parentNode.parentNode.style.minHeight = form.clientHeight
                 fetch(form.action, {
@@ -564,21 +600,13 @@ document.onreadystatechange = function () {
                     })
                     .then( () => SqlRegExHis.checkUpdatedConverting())
                     .then( () => copy2clipbord('regexoutput', null))
-                    .then( () => scrollToInValidInput(document.getElementById("isInValid")));
+                    .then( () => scrollToInValidInput(document.getElementById("isInValid")))
+                    .then( () => handleDateValue(sqlInputEl));
                 e.preventDefault();
                 form.parentNode.parentNode.style.removeProperty("minHeight");
             })
             SqlRegExHis.checkUpdatedConverting();
             loadUserFormSettings(document.getElementById("converterForm"));
-            const dateHint = document.getElementById("dateHint")
-            dateHint.addEventListener('transitionend', event => {
-                if (event.target.id === dateHint.id && !event.target.classList.contains("show")){
-                    event.target.classList.add("d-none");
-                    event.target.classList.remove("d-block")
-                }
-            })
-
-
         } else if(actualPath === "visualization"){
             insertVisualizationPage();
         }
