@@ -51,7 +51,7 @@
     <div class="accordion" id="accordion">
         <div class="accordion-item">
             <div class="accordion-header" id="headingSpelling">
-                <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseSpellings" aria-controls="collapseSpellings">
+                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseSpellings" aria-controls="collapseSpellings">
                     <input class="form-check-input me-2 master_toggle" type="checkbox" id="spellingMistake_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'spellings'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.spellings.size() > 0}">
                     <span th:text="#{settingsform.spellings.heading}"></span>
                 </button>
@@ -72,7 +72,7 @@
         </div>
         <div class="accordion-item">
             <div class="accordion-header" id="headingOrders">
-                <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseOrders" aria-controls="collapseOrders">
+                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseOrders" aria-controls="collapseOrders">
                     <input class="form-check-input me-2 master_toggle" type="checkbox" id="orderRotation_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'orders'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.orders.size() > 0}">
                     <span th:text="#{settingsform.orders.heading}"></span>
                 </button>
@@ -93,7 +93,7 @@
         </div>
         <div class="accordion-item">
             <div class="accordion-header" id="headingDateAndTime">
-                <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseDateAndTime" aria-controls="collapseDateAndTime">
+                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseDateAndTime" aria-controls="collapseDateAndTime">
                     <input class="form-check-input me-2 master_toggle" type="checkbox" id="dateAndTime_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'dateFormats'); toggleSlaveCheckboxes(this, 'timeFormats'); toggleSlaveCheckboxes(this, 'dateTimeFormats'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.dateFormats.size() > 0 || settingsForm.timeFormats.size() > 0 || settingsForm.dateTimeFormats.size() > 0}">
                     <span th:text="#{settingsform.dateAndTime.heading}"></span>
                 </button>
@@ -132,7 +132,7 @@
         </div>
         <div class="accordion-item">
             <div class="accordion-header" id="headingAggregateFunctionLang">
-                <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseAggregateFunctionLang" aria-controls="collapseAggregateFunctionLang">
+                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseAggregateFunctionLang" aria-controls="collapseAggregateFunctionLang">
                     <input class="form-check-input me-2 master_toggle" type="checkbox" id="aggregateFunctionLang_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'aggregateFunctionLang'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.aggregateFunctionLang.size() > 0}">
                     <span th:text="#{settingsform.aggregateFunctionLang.heading}"></span>
                 </button>
@@ -159,7 +159,7 @@
         </div>
         <div class="accordion-item">
             <div class="accordion-header" id="headingDatatypeSynonyms">
-                <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseDatatypeSynonyms" aria-controls="collapseDatatypeSynonyms">
+                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseDatatypeSynonyms" aria-controls="collapseDatatypeSynonyms">
                     <input class="form-check-input me-2 master_toggle" type="checkbox" id="datatypeSynonyms_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'datatypeSynonyms'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.datatypeSynonyms.size() > 0}">
                     <span th:text="#{settingsform.datatype.heading}"></span>
                 </button>
@@ -186,7 +186,7 @@
         </div>
         <div class="accordion-item">
             <div class="accordion-header" id="headingOtherSynonyms">
-                <button type="button" class="accordion-button" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseOtherSynonyms" aria-controls="collapseOtherSynonyms">
+                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseOtherSynonyms" aria-controls="collapseOtherSynonyms">
                     <input class="form-check-input me-2 master_toggle" type="checkbox" id="otherSynonyms_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'otherSynonyms'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.otherSynonyms.size() > 0}">
                     <span th:text="#{settingsform.otherSynonyms.heading}"></span>
                 </button>
