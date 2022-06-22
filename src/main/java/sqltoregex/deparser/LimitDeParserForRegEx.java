@@ -8,6 +8,7 @@ import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
+import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
 /**
  * Implements own {@link LimitDeparser} to generate regex.
  */
@@ -48,7 +49,7 @@ public class LimitDeParserForRegEx extends LimitDeparser {
         if (limit.getRowCount() instanceof NullValue) {
             buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "NULL"));
         } else {
-            buffer.append(limit.getRowCount());
+            buffer.append(StatementDeParserForRegEx.addQuotationMarks(limit.getRowCount().toString().replaceAll(QUOTATION_MARK_REGEX, "")));
             if (limit.getRowCount() instanceof AllValue) {
                 buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "ALL"));
             } else {
@@ -57,22 +58,22 @@ public class LimitDeParserForRegEx extends LimitDeparser {
                     buffer.append(REQUIRED_WHITE_SPACE);
                     buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "OFFSET"));
                     buffer.append(REQUIRED_WHITE_SPACE);
-                    buffer.append(limit.getOffset());
+                    buffer.append(StatementDeParserForRegEx.addQuotationMarks(limit.getOffset().toString().replaceAll(QUOTATION_MARK_REGEX, "")));
                     buffer.append(OPTIONAL_WHITE_SPACE);
                     buffer.append("|");
                     buffer.append(OPTIONAL_WHITE_SPACE);
-                    buffer.append(limit.getOffset());
+                    buffer.append(StatementDeParserForRegEx.addQuotationMarks(limit.getOffset().toString().replaceAll(QUOTATION_MARK_REGEX, "")));
                     buffer.append(OPTIONAL_WHITE_SPACE);
                     buffer.append(",");
                     buffer.append(OPTIONAL_WHITE_SPACE);
-                    buffer.append(limit.getRowCount());
+                    buffer.append(StatementDeParserForRegEx.addQuotationMarks(limit.getRowCount().toString().replaceAll(QUOTATION_MARK_REGEX, "")));
                     buffer.append(")");
                 }
 
                 if (null != limit.getOffset() && null == limit.getRowCount()) {
                     buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "LIMIT"));
                     buffer.append(REQUIRED_WHITE_SPACE);
-                    buffer.append(limit.getOffset());
+                    buffer.append(StatementDeParserForRegEx.addQuotationMarks(limit.getOffset().toString().replaceAll(QUOTATION_MARK_REGEX, "")));
                 }
             }
         }

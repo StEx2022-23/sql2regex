@@ -12,12 +12,29 @@ import java.util.Map;
 class SelectDeParserForRegExTest{
     StringSynonymGenerator stringSynonymGenerator = new StringSynonymGenerator(SettingsOption.AGGREGATEFUNCTIONLANG);
     @Test
+    void testInsertStatementsWithQuotationMarks(){
+        final String sampleSolution = "SELECT `col1`, `col2` FROM `table1`";
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT 'col1', \"col2\" FROM `table1´"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+    }
+
+
+    @Test
     void testSelectFromWithTwoColumns()  {
-        final String sampleSolution = "SELECT col1, col2 FROM table1";
+        final String sampleSolution = "SELECT `col1`, `col2` FROM `table1`";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         Map<SettingsOption, List<String>> nonMatchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1, col2 FROM table1",
+                "SELECT \"col1\", 'col2' FROM 'table1'",
                 "SELECT   col1  , col2  FROM  table1"
         ));
         nonMatchingMap.put(SettingsOption.DEFAULT, List.of(
@@ -98,12 +115,13 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testSimpleInnerJoin()  {
-        final String sampleSolution = "SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2";
+        final String sampleSolution = "SELECT `col1` FROM `table1` INNER JOIN `table2` ON `col1` = `col2`";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 FROM table1 INNER JOIN table2 ON col1 = col2",
                 "SELECT col1 FROM table1 INNER  JOIN  table2  ON  col1 = col2",
-                "SELECT col1 FROM table1 INNER  JOIN  table2  ON  col2 = col1"
+                "SELECT col1 FROM table1 INNER  JOIN  table2  ON  col2 = col1",
+                "SELECT 'col1' FROM 'table1' INNER  JOIN  'table2'  ON  col2 = col1"
         ));
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
@@ -115,13 +133,14 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testFrom()  {
-        final String sampleSolution = "SELECT col1 FROM table1, table2";
+        final String sampleSolution = "SELECT `col1` FROM `table1`, `table2`";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         Map<SettingsOption, List<String>> nonMatchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1 FROM table1, table2",
                 "SELECT col1 FROM  table1   ,  table2",
-                "SELECT col1 FROM  table1,table2"
+                "SELECT col1 FROM  table1,table2",
+                "SELECT 'col1' FROM 'table1', 'table2'"
         ));
         matchingMap.put(SettingsOption.TABLENAMEORDER, List.of(
                 "SELECT col1 FROM table1, table2",
@@ -171,13 +190,14 @@ class SelectDeParserForRegExTest{
      */
     @Test
     void testAliasAndAggregateFunction() {
-        final String sampleSolution = "SELECT AVG(col1) AS c1 FROM table1";
+        final String sampleSolution = "SELECT AVG(`col1`) AS `c1` FROM `table1`";
         stringSynonymGenerator.addSynonymFor("AVG", "MITTELWERT");
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT AVG(col1) AS c1 FROM table1",
                 "SELECT AVG ( col1 ) ALIAS c1 FROM table1",
-                "SELECT AVG(col1) AS c1 FROM table1"
+                "SELECT AVG(col1) AS c1 FROM table1",
+                "SELECT AVG('col1') AS 'c1' FROM 'table1'"
         ));
         matchingMap.put(SettingsOption.AGGREGATEFUNCTIONLANG, List.of(
                 "SELECT MITTELWERT(col1) AS c1 FROM table1"
@@ -198,14 +218,15 @@ class SelectDeParserForRegExTest{
 
     @Test
     void testTableAlias() {
-        final String sampleSolution = "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key";
+        final String sampleSolution = "SELECT `col1`, `col2` FROM `table1` `t1` INNER JOIN `table2` `t2` ON `t1`.`key` = `t2`.`key`";
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key",
                 "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t2.key = t1.key",
                 "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON table2.key = table1.key",
                 "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON table2.key = t1.key",
-                "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t2.key = t1.key"
+                "SELECT col1, col2 FROM table1 t1 INNER JOIN table2 t2 ON t2.key = t1.key",
+                "SELECT 'col1', 'col2' FROM 'table1' 't1' INNER JOIN 'table2' 't2' ON 't2'.'key' = 't1'.'key'"
         ));
         matchingMap.put(SettingsOption.COLUMNNAMEORDER, List.of(
                 "SELECT col2, col1 FROM table1 t1 INNER JOIN table2 t2 ON t1.key = t2.key"
@@ -495,6 +516,7 @@ class SelectDeParserForRegExTest{
                 true
         );
     }
+
 
     @Test
     void testHavingWithAlias()  {

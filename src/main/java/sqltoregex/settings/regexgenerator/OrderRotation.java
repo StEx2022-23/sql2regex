@@ -3,12 +3,7 @@ package sqltoregex.settings.regexgenerator;
 import org.springframework.util.Assert;
 import sqltoregex.settings.SettingsOption;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
+import java.util.*;
 
 /**
  * The OrderRotation class allows creating a RegEx expression that takes into all possible order possibilities.
@@ -52,7 +47,7 @@ public class OrderRotation extends RegExGenerator<List<String>> {
         if (amount == 1) {
             Iterator<String> iterator = valueList.iterator();
             while (iterator.hasNext()) {
-                singleValue.append(QUOTATION_MARK_REGEX).append("*").append(iterator.next()).append(QUOTATION_MARK_REGEX).append("*");
+                singleValue.append(iterator.next());
                 if (iterator.hasNext()) {
                     singleValue.append("\\s*,\\s*");
                 }
@@ -82,7 +77,7 @@ public class OrderRotation extends RegExGenerator<List<String>> {
      * Generates a regex with all possible orders, if the param orderRotation isn't null.
      * Otherwise, only the joined string list returned.
      * @param orderRotation {@link OrderRotation} object
-     * @param valueList list of strings to order rotate
+     * @param valueList collection of strings to order rotate
      * @return generated regex or str
      */
     public static String useOrDefault(OrderRotation orderRotation, List<String> valueList){
@@ -90,7 +85,7 @@ public class OrderRotation extends RegExGenerator<List<String>> {
         StringBuilder stringBuilder = new StringBuilder();
         Iterator<String> stringIterator = valueList.iterator();
         while(stringIterator.hasNext()){
-            stringBuilder.append(QUOTATION_MARK_REGEX).append("*").append(stringIterator.next()).append(QUOTATION_MARK_REGEX).append("*");
+            stringBuilder.append(stringIterator.next());
             if(stringIterator.hasNext()){
                 stringBuilder.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
             }
@@ -110,7 +105,7 @@ public class OrderRotation extends RegExGenerator<List<String>> {
         Iterator<String> stringIterator = valueList.iterator();
         List<String> stringList = new LinkedList<>();
         while(stringIterator.hasNext()){
-            stringList.add(QUOTATION_MARK_REGEX + "*" + stringIterator.next() + QUOTATION_MARK_REGEX + "*");
+            stringList.add(stringIterator.next());
         }
         return stringList;
     }

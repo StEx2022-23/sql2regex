@@ -108,4 +108,21 @@ class LimitDeParserForRegExTest{
                 true
         );
     }
+
+    @Test
+    void testLimitQuotationMark() {
+        final String sampleSolution = "SELECT col1 LIMIT `3`";
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT col1 LIMIT 3",
+                "SELECT col1   LIMIT   3",
+                "SELECT col1   LIMIT   \"3\""
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+    }
 }

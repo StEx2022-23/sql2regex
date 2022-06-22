@@ -266,7 +266,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
      */
     private String deParseColumnDefinition(ColumnDefinition columnDefinition) {
         StringBuilder tmpBuffer = new StringBuilder();
-        tmpBuffer.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, columnDefinition.getColumnName()));
+        tmpBuffer.append(StatementDeParserForRegEx.addQuotationMarks(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, columnDefinition.getColumnName())));
         tmpBuffer.append(REQUIRED_WHITE_SPACE);
         List<String> synsWithSpellingMistake = new LinkedList<>();
 

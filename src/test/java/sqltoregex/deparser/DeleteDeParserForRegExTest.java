@@ -136,6 +136,41 @@ class DeleteDeParserForRegExTest {
         );
     }
 
+    @Test
+    void testQuotationMarks(){
+        final String sampleSolution = "DELETE FROM `tab1` INNER JOIN `tab2` ON `tab1`.`col1` = `tab2`.`col2`";
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "DELETE FROM tab1 INNER JOIN tab2 ON tab1.col1 = tab2.col2",
+                "DELETE FROM tab1 INNER JOIN tab2 ON tab2.col2 = tab1.col1",
+                "DELETE FROM \"tab1\" INNER JOIN \"tab2\" ON \"tab1\".\"col1\" = \"tab2\".\"col2\"",
+                "DELETE FROM \"tab1\" INNER JOIN \"tab2\" ON \"tab2\".\"col2\" = \"tab1\".\"col1\""
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+    }
+
+    @Test
+    void testQuotationMarksWithAlias(){
+        final String sampleSolution = "DELETE FROM `tab1` `t1` WHERE `t1`.`col1`=2";
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "DELETE FROM tab1 t1 WHERE t1.col1=2",
+                "DELETE FROM `tab1` `t1` WHERE `t1`.`col1`=2",
+                "DELETE FROM \"tab1\" \"t1\" WHERE \"t1\".\"col1\"=2"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+    }
+
 
 
 

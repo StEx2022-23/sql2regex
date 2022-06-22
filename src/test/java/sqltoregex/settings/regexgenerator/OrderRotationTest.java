@@ -28,7 +28,7 @@ class OrderRotationTest {
     void testOrderRotationWithCapturingGroup() {
         orderRotation.setNonCapturingGroup(true);
         Assertions.assertEquals(
-                "(?:[`´'\"]*table1[`´'\"]*\\s*,\\s*[`´'\"]*table2[`´'\"]*|[`´'\"]*table2[`´'\"]*\\s*,\\s*[`´'\"]*table1[`´'\"]*)",
+                "(?:table1\\s*,\\s*table2|table2\\s*,\\s*table1)",
                 orderRotation.generateRegExFor(testListOne)
         );
     }
@@ -37,7 +37,7 @@ class OrderRotationTest {
     void testOrderRotationWithoutCapturingGroup() {
         orderRotation.setNonCapturingGroup(false);
         Assertions.assertEquals(
-                "([`´'\"]*table1[`´'\"]*\\s*,\\s*[`´'\"]*table2[`´'\"]*|[`´'\"]*table2[`´'\"]*\\s*,\\s*[`´'\"]*table1[`´'\"]*)",
+                "(table1\\s*,\\s*table2|table2\\s*,\\s*table1)",
                 orderRotation.generateRegExFor(testListOne)
         );
     }
@@ -46,7 +46,7 @@ class OrderRotationTest {
     void testOrderRotationWithOneElement() {
         orderRotation.setNonCapturingGroup(false);
         Assertions.assertEquals(
-                "([`´'\"]*table1[`´'\"]*)",
+                "(table1)",
                 orderRotation.generateRegExFor(testListTwo)
         );
     }
@@ -55,7 +55,7 @@ class OrderRotationTest {
     void testOrderRotationWithOneElementWithCapturingGroup() {
         orderRotation.setNonCapturingGroup(true);
         Assertions.assertEquals(
-                "(?:[`´'\"]*table1[`´'\"]*)",
+                "(?:table1)",
                 orderRotation.generateRegExFor(testListTwo)
         );
     }
@@ -64,11 +64,7 @@ class OrderRotationTest {
     void testGenerateAsList(){
         final List<String> testList = new LinkedList<>(List.of("1", "2", "3"));
 
-        List<String> tempTestList = new LinkedList<>();
-        for(String str : testList){
-            tempTestList.add("[`´'\"]*" + str + "[`´'\"]*");
-        }
-        Assertions.assertEquals(tempTestList, OrderRotation.generateAsListOrDefault(null, testList));
+        Assertions.assertEquals(testList, OrderRotation.generateAsListOrDefault(null, testList));
 
         List<String> rotations = List.of("1,2,3",
                                          "1,3,2",
@@ -97,7 +93,7 @@ class OrderRotationTest {
         List<String> stringList = new LinkedList<>();
         stringList.add("1");
         stringList.add("2");
-        String orderRotatedExpections = "(?:[`´'\"]*1[`´'\"]*\\s*,\\s*[`´'\"]*2[`´'\"]*|[`´'\"]*2[`´'\"]*\\s*,\\s*[`´'\"]*1[`´'\"]*)";
+        String orderRotatedExpections = "(?:1\\s*,\\s*2|2\\s*,\\s*1)";
         String orderRotatedList = OrderRotation.useOrDefault(new OrderRotation(SettingsOption.TABLENAMEORDER),
                                                              stringList);
         Assertions.assertEquals(orderRotatedExpections, orderRotatedList);
@@ -105,7 +101,7 @@ class OrderRotationTest {
         List<String> nonRotatedList = new LinkedList<>();
         nonRotatedList.add("1");
         nonRotatedList.add("2");
-        String nonOrderRotatedExpectation = "[`´'\"]*1[`´'\"]*\\s*,\\s*[`´'\"]*2[`´'\"]*";
+        String nonOrderRotatedExpectation = "1\\s*,\\s*2";
         String regex = OrderRotation.useOrDefault(null, nonRotatedList);
         Assertions.assertEquals(nonOrderRotatedExpectation, regex);
     }

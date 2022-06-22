@@ -12,12 +12,20 @@ import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Implements an own statement deparser to generate regular expressions.
  */
 public class StatementDeParserForRegEx extends StatementDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     public static final String QUOTATION_MARK_REGEX = "[`´'\"]";
+    public static final String QUOTATION_MARK_REGEX_ZERO_ONE = QUOTATION_MARK_REGEX + "?";
+    public static final String QUOTATION_MARK_REGEX_ZERO_INFINITE = QUOTATION_MARK_REGEX + "*";
+    public static final String QUOTATION_MARK_REGEX_ONE_INFINITE = QUOTATION_MARK_REGEX + "+";
     private final SpellingMistake keywordSpellingMistake;
     ExpressionDeParserForRegEx expressionDeParserForRegEx;
     SelectDeParserForRegEx selectDeParserForRegEx;
@@ -155,5 +163,29 @@ public class StatementDeParserForRegEx extends StatementDeParser {
     @Override
     public void visit(Statements stmts) {
         stmts.accept(this);
+    }
+
+    /**
+     * {@return {@literal String} with all possible quotation mars and suiting quantifier}
+     * @param el if containing whitespace quotation marks are mandatory
+     */
+    public static String addQuotationMarks(String el){
+        el = el.replaceAll(QUOTATION_MARK_REGEX, "");
+
+        String quotationMarkRegEx = el.contains(" ") ? QUOTATION_MARK_REGEX + "{1}" : QUOTATION_MARK_REGEX + "?";
+        return quotationMarkRegEx + el + quotationMarkRegEx;
+    }
+
+    /**
+     * {@return List of {@literal String}s with all possible quotation mars and suiting quantifier}
+     * @param stringList if elements containing whitespace quotation marks are mandatory for this element
+     */
+    public static List<String> addQuotationMarks(Collection<String> stringList){
+        Iterator<String> iterator = stringList.iterator();
+        List<String> manipulateStringList = new LinkedList<>();
+        while (iterator.hasNext()){
+            manipulateStringList.add(addQuotationMarks(iterator.next()));
+        }
+        return manipulateStringList;
     }
 }

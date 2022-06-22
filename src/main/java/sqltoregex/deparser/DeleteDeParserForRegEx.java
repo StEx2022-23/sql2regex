@@ -12,10 +12,12 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import java.util.*;
 
+import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
 /**
  * Implements an own delete statement deparser to generate regular expressions.
  */
 public class DeleteDeParserForRegEx extends DeleteDeParser {
+    public static final String ALIAS_AS = "(?:ALIAS|AS)";
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private ExpressionDeParserForRegEx expressionDeParserForRegEx;
     private final SelectDeParserForRegEx selectDeParserForRegEx;
@@ -94,18 +96,23 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
             for(Table table : unEditedTableList){
                 StringBuilder temp = new StringBuilder();
                 if(table.getFullyQualifiedName().contains(".")){
-                    temp.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, table.getFullyQualifiedName().split("\\.")[0]));
+                    temp.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, StatementDeParserForRegEx.addQuotationMarks(table.getFullyQualifiedName().split("\\.")[0].replaceAll(QUOTATION_MARK_REGEX, ""))));
                     temp.append("\\.");
-                    temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, table.getFullyQualifiedName().split("\\.")[1]));
+                    temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, StatementDeParserForRegEx.addQuotationMarks(table.getFullyQualifiedName().split("\\.")[1].replaceAll(QUOTATION_MARK_REGEX, ""))));
                 } else {
-                    temp.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, table.getFullyQualifiedName()));
+                    temp.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, StatementDeParserForRegEx.addQuotationMarks(table.getFullyQualifiedName().replaceAll(QUOTATION_MARK_REGEX, ""))));
                     temp.append("(\\.\\*)?");
                 }
-
+                
                 if(null != table.getAlias()){
-                    temp.append(REQUIRED_WHITE_SPACE).append("(").append("(?:ALIAS|AS)").append(REQUIRED_WHITE_SPACE).append(")?").append(table.getAlias().toString().replace("AS", "").replace(" ", ""));
+                    temp.append(REQUIRED_WHITE_SPACE).append("(").append(ALIAS_AS).append(REQUIRED_WHITE_SPACE).append(")?");
+                    temp.append(
+                            StatementDeParserForRegEx.addQuotationMarks(table.getAlias().toString().replace("AS", "")
+                                                                                .replace(" ", "")
+                                                                                .replaceAll(QUOTATION_MARK_REGEX, "")))
+                    ;
                 } else {
-                    temp.append("(").append(REQUIRED_WHITE_SPACE).append("(?:ALIAS|AS)").append(".*").append(")?");
+                    temp.append("(").append(REQUIRED_WHITE_SPACE).append(ALIAS_AS).append(".*").append(")?");
                 }
                 tableList.add(temp.toString());
             }
@@ -142,12 +149,12 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
             StringBuilder tmpbuffer = new StringBuilder();
             if (o.toString().contains(" ")){
                 this.expressionDeParserForRegEx.addTableNameAlias(o.toString());
-                tmpbuffer.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, o.toString().split(" ")[0]));
-                tmpbuffer.append("(").append(REQUIRED_WHITE_SPACE).append("(?:ALIAS|AS)").append(")?").append(REQUIRED_WHITE_SPACE);
-                tmpbuffer.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, o.toString().split(" ")[1]));
+                tmpbuffer.append(StatementDeParserForRegEx.addQuotationMarks(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, o.toString().split(" ")[0])));
+                tmpbuffer.append("(").append(REQUIRED_WHITE_SPACE).append(ALIAS_AS).append(")?").append(REQUIRED_WHITE_SPACE);
+                tmpbuffer.append(StatementDeParserForRegEx.addQuotationMarks(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, o.toString().split(" ")[1])));
             } else {
-                tmpbuffer.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, o.toString()));
-                tmpbuffer.append("(").append(REQUIRED_WHITE_SPACE).append("(?:ALIAS|AS)").append(".*").append(")?");
+                tmpbuffer.append(StatementDeParserForRegEx.addQuotationMarks(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, o.toString())));
+                tmpbuffer.append("(").append(REQUIRED_WHITE_SPACE).append(ALIAS_AS).append(".*").append(")?");
             }
             toRotateTables.add(tmpbuffer.toString());
         }
@@ -158,7 +165,7 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
             buffer.append(REQUIRED_WHITE_SPACE).append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "USING")).append(REQUIRED_WHITE_SPACE);
             List<String> tableNameListAsStrings = new LinkedList<>();
             for(Table table : delete.getUsingList()){
-                tableNameListAsStrings.add(table.toString());
+                tableNameListAsStrings.add(StatementDeParserForRegEx.addQuotationMarks(table.toString().replaceAll(QUOTATION_MARK_REGEX, "")));
             }
             buffer.append(OrderRotation.useOrDefault(this.tableNameOrderRotation, tableNameListAsStrings));
         }

@@ -17,6 +17,8 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
+import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +33,6 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     public static final String OLD_ORACLE_JOIN = "\\(\\+\\)";
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
-    private static final String QUOTATION_MARK_REGEX = "[`´'\"]";
     private final SpellingMistake columnNameSpellingMistake;
     private final SpellingMistake tableNameSpellingMistake;
     private final DateAndTimeFormatSynonymGenerator dateSynonyms;
@@ -425,7 +426,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             buffer.append(stringValue.getPrefix());
         }
         buffer.append(OPTIONAL_WHITE_SPACE)
-                .append(QUOTATION_MARK_REGEX).append("+").append(stringValue.getValue()).append(QUOTATION_MARK_REGEX).append("+")
+                .append(StatementDeParserForRegEx.addQuotationMarks(stringValue.getValue()))
                 .append(OPTIONAL_WHITE_SPACE);
     }
 
@@ -469,30 +470,35 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     public void visit(Column tableColumn) {
         buffer.append(OPTIONAL_WHITE_SPACE);
         final Table table = tableColumn.getTable();
-        StringBuilder tableName = new StringBuilder();
-        buffer.append(QUOTATION_MARK_REGEX).append("*");
-        if (table != null && !table.getFullyQualifiedName().isEmpty()) {
-            tableName.append(table.getFullyQualifiedName());
+        String tableName = null;
+        if (table != null) {
             if (table.getAlias() != null) {
-                tableName.append(table.getAlias().toString());
+                tableName = table.getAlias().toString().replaceAll(QUOTATION_MARK_REGEX, "");
+            }else{
+                tableName = table.getFullyQualifiedName().replaceAll(QUOTATION_MARK_REGEX, "");
             }
 
             StringBuilder tableNameWithAlias = new StringBuilder();
-            if(this.getRelatedTableNameOrAlias(tableName.toString()) == null){
-                tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName.toString()));
-            } else {
-                tableNameWithAlias.append("(?:");
-                tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName.toString()));
-                tableNameWithAlias.append("|");
-                tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, this.getRelatedTableNameOrAlias(tableName.toString())));
-                tableNameWithAlias.append(")");
+            deparseTableName(tableName, tableNameWithAlias);
+            if (!tableName.isEmpty()) {
+                buffer.append(StatementDeParserForRegEx.addQuotationMarks(tableNameWithAlias.toString())).append('.');
             }
-            buffer.append(tableNameWithAlias).append('.');
         }
 
-        buffer.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, tableColumn.getColumnName()));
-        buffer.append(QUOTATION_MARK_REGEX).append("*");
+        buffer.append(StatementDeParserForRegEx.addQuotationMarks(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, tableColumn.getColumnName().replaceAll(QUOTATION_MARK_REGEX, ""))));
         buffer.append(OPTIONAL_WHITE_SPACE);
+    }
+
+    private void deparseTableName(String tableName, StringBuilder tableNameWithAlias) {
+        if(this.getRelatedTableNameOrAlias(tableName) == null){
+            tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName));
+        } else {
+            tableNameWithAlias.append("(?:");
+            tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName ));
+            tableNameWithAlias.append("|");
+            tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, this.getRelatedTableNameOrAlias(tableName)));
+            tableNameWithAlias.append(")");
+        }
     }
 
     @Override
@@ -525,16 +531,10 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                     StringBuilder tableNameWithAlias = new StringBuilder();
                     if(singleExpression.contains(".")){
                         String tableName = singleExpression.split("\\.")[0];
-                        if(this.getRelatedTableNameOrAlias(tableName) == null){
-                            tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName));
-                        } else {
-                            tableNameWithAlias.append("(?:");
-                            tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName));
-                            tableNameWithAlias.append("|");
-                            tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, this.getRelatedTableNameOrAlias(tableName)));
-                            tableNameWithAlias.append(")");
+                        deparseTableName(tableName, tableNameWithAlias);
+                        if (!tableName.isEmpty()) {
+                            tableNameWithAlias.append(".");
                         }
-                        tableNameWithAlias.append(".");
                     }
                     String[] columnName = singleExpression.split("\\.");
                     buffer.append(tableNameWithAlias).append(columnName[columnName.length - 1]);
@@ -1106,11 +1106,12 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
      * @param tableNameOrAlias {@literal String} to add
      */
     public void addTableNameAlias(String tableNameOrAlias){
+        String tableNameOrAliasWithOutQuotationMarks = tableNameOrAlias.replaceAll(QUOTATION_MARK_REGEX, "");
         if(tableNameOrAlias.contains(" ")){
-            this.tableNameAliasMap.put(tableNameOrAlias.split(" ")[0], tableNameOrAlias.split(" ")[1]);
-            this.tableNameAliasMap.put(tableNameOrAlias.split(" ")[1], tableNameOrAlias.split(" ")[0]);
+            this.tableNameAliasMap.put(tableNameOrAliasWithOutQuotationMarks.split(" ")[0], tableNameOrAliasWithOutQuotationMarks.split(" ")[1]);
+            this.tableNameAliasMap.put(tableNameOrAliasWithOutQuotationMarks.split(" ")[1], tableNameOrAliasWithOutQuotationMarks.split(" ")[0]);
         } else {
-            this.tableNameAliasMap.put(tableNameOrAlias, tableNameOrAlias);
+            this.tableNameAliasMap.put(tableNameOrAliasWithOutQuotationMarks, tableNameOrAliasWithOutQuotationMarks);
         }
     }
 
@@ -1135,7 +1136,8 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
      * @return Counterpart for provided input or null if none found
      */
     public String getRelatedTableNameOrAlias(String input){
-        if(this.tableNameAliasMap.get(input) != null){
+        String inputWithOutQuotionMarks = input.replaceAll(QUOTATION_MARK_REGEX, "");
+        if(this.tableNameAliasMap.get(inputWithOutQuotionMarks) != null){
             return this.tableNameAliasMap.get(input);
         }
         return null;
