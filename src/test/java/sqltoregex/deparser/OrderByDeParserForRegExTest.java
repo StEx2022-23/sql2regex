@@ -303,4 +303,19 @@ class OrderByDeParserForRegExTest{
                 true
         );
     }
+
+    @Test
+    void testComplexerOrderByWithTableNameAliasQuotationMark() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT `col1` FROM `table1` `t1` ORDER BY `t1`.`col1`, `t1.col2`",
+                "SELECT \"col1\" FROM \"table1\" \"t1\" ORDER BY \"t1\".\"col1\", \"t1.col2\""
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "SELECT `col1` FROM `table1` `t1` ORDER BY `t1`.`col1`, `t1.col2`",
+                matchingMap,
+                true
+        );
+    }
 }

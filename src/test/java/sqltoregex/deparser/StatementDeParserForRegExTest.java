@@ -5,16 +5,16 @@ import org.junit.jupiter.api.Test;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-class StatementDeParserForRegExTest{
+class StatementDeParserForRegExTest {
 
     @Test
     void testConstructorOne() {
         StringBuilder buffer = new StringBuilder();
-        StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(buffer, SettingsContainer.builder().build());
+        StatementDeParserForRegEx statementDeParserForRegEx = new StatementDeParserForRegEx(buffer,
+                                                                                            SettingsContainer.builder()
+                                                                                                    .build());
         Assertions.assertNotNull(statementDeParserForRegEx);
     }
 
@@ -47,10 +47,45 @@ class StatementDeParserForRegExTest{
                 "WITH temporaryTable(averageValue)); as (SELECT AVG(col2) from table2) SELECT col1 FROM table1"
         ));
         TestUtils.validateStatementAgainstRegEx(
-                SettingsContainer.builder().build(), 
+                SettingsContainer.builder().build(),
                 "WITH temporaryTable(averageValue) as (SELECT AVG(col2) from table2) SELECT col1 FROM table1",
                 matchingMap,
                 false
         );
     }
+
+    @Test
+    void testaddQuotationMarks() {
+        Map<SettingsOption, List<String>> matchingMapNormal = new EnumMap<>(SettingsOption.class);
+        matchingMapNormal.put(SettingsOption.DEFAULT, List.of(
+            "string",
+            "'string'",
+            "´string´",
+            "`string`",
+            "\"string\""
+            ));
+        for (String val : matchingMapNormal.get(SettingsOption.DEFAULT)){
+            TestUtils.checkAgainstRegEx(StatementDeParserForRegEx.addQuotationMarks("string"), val);
+        }
+
+        Map<SettingsOption, List<String>> matchingMapWhitespace = new EnumMap<>(SettingsOption.class);
+        matchingMapWhitespace.put(SettingsOption.DEFAULT, List.of(
+            "'str ing'",
+            "´str ing´",
+            "`str ing`",
+            "\"str ing\""
+            ));
+        for (String val : matchingMapWhitespace.get(SettingsOption.DEFAULT)){
+            TestUtils.checkAgainstRegEx(StatementDeParserForRegEx.addQuotationMarks("str ing"), val);
+        }
+
+        Map<SettingsOption, List<String>> notMatchingMapWhitespace = new EnumMap<>(SettingsOption.class);
+        notMatchingMapWhitespace.put(SettingsOption.DEFAULT, List.of(
+            "str ing"
+            ));
+        for (String val : notMatchingMapWhitespace.get(SettingsOption.DEFAULT)){
+            TestUtils.checkAgainstRegEx(StatementDeParserForRegEx.addQuotationMarks("str ing"), val);
+        }
+
+      }
 }

@@ -7,6 +7,7 @@ import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
+import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
 /**
  * Implements an own create drop statement deparser to generate regular expressions.
  */
@@ -55,7 +56,7 @@ public class DropDeParserForRegEx extends DropDeParser {
             buffer.append(REQUIRED_WHITE_SPACE);
         }
 
-        buffer.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, drop.getName().toString()));
+        buffer.append(StatementDeParserForRegEx.addQuotationMarks(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, drop.getName().toString().replaceAll(QUOTATION_MARK_REGEX, ""))));
 
         if (drop.getParameters() != null && !drop.getParameters().isEmpty()) {
             buffer.append(REQUIRED_WHITE_SPACE);

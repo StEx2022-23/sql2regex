@@ -22,11 +22,12 @@ import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerato
 
 import java.util.*;
 
+import static sqltoregex.deparser.StatementDeParserForRegEx.*;
+
 /**
  * Implements own {@link SelectDeParser} to generate regex.
  */
 public class SelectDeParserForRegEx extends SelectDeParser {
-    private static final String QUOTATION_MARK_REGEX = "[`´'\"]";
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SpellingMistake keywordSpellingMistake;
@@ -120,7 +121,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         fromItem.accept(this);
         if (join.isWindowJoin()) {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "WITHIN", true);
-            buffer.append(join.getJoinWindow().toString());
+            buffer.append(QUOTATION_MARK_REGEX_ZERO_ONE).append(join.getJoinWindow().toString()).append(QUOTATION_MARK_REGEX_ZERO_ONE);
         }
         for (Expression onExpression : join.getOnExpressions()) {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "ON", true);
@@ -132,7 +133,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             buffer.append(OPTIONAL_WHITE_SPACE);
             for (Iterator<Column> iterator = join.getUsingColumns().iterator(); iterator.hasNext(); ) {
                 Column column = iterator.next();
-                buffer.append(column.toString());
+                buffer.append(QUOTATION_MARK_REGEX_ZERO_ONE).append(column.toString().replaceAll(QUOTATION_MARK_REGEX, "")).append(QUOTATION_MARK_REGEX_ZERO_ONE);
                 if (iterator.hasNext()) {
                     buffer.append(",");
                     buffer.append(OPTIONAL_WHITE_SPACE);
@@ -199,26 +200,36 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         StringBuilder temp = new StringBuilder();
         if (o.toString().contains("(") && o.toString().contains(")")) {
             temp.append(StringSynonymGenerator.useOrDefault(this.aggregateFunctionLang,
-                                                                 o.toString().replaceAll("\\(.*", "")));
+                                                                 o.toString().replaceAll(QUOTATION_MARK_REGEX, "").replaceAll("\\(.*", "")));
             temp.append(OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE);
-            temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake,
-                                                          o.toString().split("\\(")[1].split("\\)")[0]));
+            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
+            temp.append(SpellingMistake.useOrDefault(
+                    this.columnNameSpellingMistake,
+                    o.toString().replaceAll(QUOTATION_MARK_REGEX, "").split("\\(")[1].split("\\)")[0])
+            );
+            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
             temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
         }
 
         if (!o.toString().contains("AS") && !o.toString().contains("(") && !o.toString().contains(")")) {
-            temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, o.toString()));
+            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
+            temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, o.toString().replaceAll(QUOTATION_MARK_REGEX, "")));
+            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
         }
 
         if (o.toString().contains("AS") && o.toString().contains("(") && o.toString().contains(")")) {
             temp.append(this.addOptionalAliasKeywords(false));
-            temp.append(o.toString().split("AS")[1].replace(" ", ""));
+            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
+            temp.append(o.toString().replaceAll(QUOTATION_MARK_REGEX, "").split("AS")[1].replace(" ", ""));
+            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
         }
 
         if (o.toString().contains("AS") && !o.toString().contains("(") && !o.toString().contains(")")) {
-            temp.append(o.toString().split("AS")[0].replace(" ", ""));
+            temp.append(o.toString().replaceAll(QUOTATION_MARK_REGEX, "").split("AS")[0].replace(" ", ""));
             temp.append(this.addOptionalAliasKeywords(false));
-            temp.append(o.toString().split("AS")[1].replace(" ", ""));
+            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
+            temp.append(o.toString().replaceAll(QUOTATION_MARK_REGEX, "").split("AS")[1].replace(" ", ""));
+            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
         }
 
         if (!o.toString().contains("AS")) {
@@ -436,14 +447,17 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             for (SelectItem selectItem : plainSelect.getSelectItems()) {
                 selectedColumnNamesAsStrings.add(this.handleAliasAndAggregateFunction(selectItem));
             }
-            buffer.append(OrderRotation.useOrDefault(this.columnNameOrder, selectedColumnNamesAsStrings));
+            buffer.append(OrderRotation.useOrDefault(
+                    this.columnNameOrder,
+                    selectedColumnNamesAsStrings)
+            );
         }
         if (plainSelect.getIntoTables() != null) {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "FROM", true);
 
             List<String> selectedTableNamesAsStrings = new ArrayList<>();
             for (Table table : plainSelect.getIntoTables()) {
-                String temp = SpellingMistake.useOrDefault(this.tableNameSpellingMistake, table.getFullyQualifiedName());
+                String temp = QUOTATION_MARK_REGEX_ZERO_ONE + SpellingMistake.useOrDefault(this.tableNameSpellingMistake, table.getFullyQualifiedName()) + QUOTATION_MARK_REGEX_ZERO_ONE;
                 temp = temp + (table.getAlias() != null ? REQUIRED_WHITE_SPACE + SpellingMistake.useOrDefault(this.tableNameSpellingMistake, table.getAlias().toString()) : "");
                 selectedTableNamesAsStrings.add(temp);
             }
@@ -453,15 +467,21 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         if (plainSelect.getFromItem() != null && plainSelect.getJoins() != null) {
             List<String> simpleJoinElements = new ArrayList<>();
             StringBuilder fromItemWithAlias = new StringBuilder();
-            this.expressionDeParserForRegEx.addTableNameAlias(plainSelect.getFromItem().toString());
+            this.expressionDeParserForRegEx.addTableNameAlias(plainSelect.getFromItem().toString().replaceAll(QUOTATION_MARK_REGEX, ""));
             if(plainSelect.getFromItem().toString().split(" ").length >= 2){
-                fromItemWithAlias.append(plainSelect.getFromItem().toString().split(" ")[0]);
+                fromItemWithAlias.append(QUOTATION_MARK_REGEX_ZERO_ONE).append(plainSelect.getFromItem().toString().replaceAll(QUOTATION_MARK_REGEX, "").split(" ")[0]).append(QUOTATION_MARK_REGEX_ZERO_ONE);
                 fromItemWithAlias.append("(").append("(?:ALIAS|AS)"+REQUIRED_WHITE_SPACE).append(")?");
                 String[] getFromItem = plainSelect.getFromItem().toString().split(" ");
-                if(getFromItem.length > 1) fromItemWithAlias.append(REQUIRED_WHITE_SPACE).append(getFromItem[getFromItem.length - 1]);
-
+                if(getFromItem.length > 1) {
+                    fromItemWithAlias.append(REQUIRED_WHITE_SPACE);
+                    fromItemWithAlias.append(QUOTATION_MARK_REGEX_ZERO_ONE);
+                    fromItemWithAlias.append(getFromItem[getFromItem.length - 1].replaceAll(QUOTATION_MARK_REGEX, ""));
+                    fromItemWithAlias.append(QUOTATION_MARK_REGEX_ZERO_ONE);
+                }
             } else {
-                fromItemWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, plainSelect.getFromItem().toString()));
+                fromItemWithAlias.append(QUOTATION_MARK_REGEX_ZERO_ONE)
+                        .append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, plainSelect.getFromItem().toString().replaceAll(QUOTATION_MARK_REGEX, "")))
+                        .append(QUOTATION_MARK_REGEX_ZERO_ONE);
             }
             simpleJoinElements.add(fromItemWithAlias.toString());
 
@@ -469,7 +489,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             for (Join join : plainSelect.getJoins()) {
                 if (join.isSimple()){
                     this.expressionDeParserForRegEx.addTableNameAlias(join.toString());
-                    simpleJoinElements.add(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, join.toString()));
+                    simpleJoinElements.add(QUOTATION_MARK_REGEX_ZERO_ONE + SpellingMistake.useOrDefault(this.tableNameSpellingMistake, join.toString().replaceAll(QUOTATION_MARK_REGEX, "")) + QUOTATION_MARK_REGEX_ZERO_ONE);
                 }
             }
 
@@ -614,8 +634,10 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         Alias alias = subSelect.getAlias();
         if (alias != null) {
             buffer.append(addOptionalAliasKeywords(true));
+            buffer.append(QUOTATION_MARK_REGEX_ZERO_ONE);
             buffer.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake,
                                                             alias.toString().replace(" ", "")));
+            buffer.append(QUOTATION_MARK_REGEX_ZERO_ONE);
         } else {
             buffer.append("(");
             buffer.append(addOptionalAliasKeywords(true));
@@ -640,20 +662,23 @@ public class SelectDeParserForRegEx extends SelectDeParser {
      */
     @Override
     public void visit(Table tableName) {
-        buffer.append(QUOTATION_MARK_REGEX + "*");
+        buffer.append(QUOTATION_MARK_REGEX_ZERO_INFINITE);
         buffer.append(
-                SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName.getFullyQualifiedName()));
+                SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName.getFullyQualifiedName().replaceAll(QUOTATION_MARK_REGEX, "")));
+        buffer.append(QUOTATION_MARK_REGEX_ZERO_INFINITE);
         Alias alias = tableName.getAlias();
         if (alias != null) {
             buffer.append(addOptionalAliasKeywords(true));
+            buffer.append(QUOTATION_MARK_REGEX_ZERO_INFINITE);
             buffer.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake,
-                                                            alias.toString().replace(" ", "")));
+                                                            alias.toString().replaceAll(QUOTATION_MARK_REGEX, "").replace(" ", "")));
+            buffer.append(QUOTATION_MARK_REGEX_ZERO_INFINITE);
         } else {
             buffer.append("(");
             buffer.append(addOptionalAliasKeywords(true));
             buffer.append(".*)?");
         }
-        buffer.append(QUOTATION_MARK_REGEX + "*");
+
         Pivot pivot = tableName.getPivot();
         if (pivot != null) {
             pivot.accept(this);

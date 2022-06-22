@@ -148,4 +148,22 @@ class InsertDeParserForRegExTest{
                 true
         );
     }
+
+    @Test
+    void insertWithSetQuotationMark() {
+        final String sampleSolution = "INSERT INTO `table` SET name = 'Kim', isBFF = true";
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "INSERT INTO `table` SET name = 'Kim', isBFF = true",
+                "INSERT INTO \"table\" SET name = 'Kim', isBFF = true",
+                "INSERT INTO \"table\" SET name = \"Kim\", isBFF = true"
+        ));
+
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+    }
 }

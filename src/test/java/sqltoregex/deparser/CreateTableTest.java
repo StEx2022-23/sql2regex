@@ -20,6 +20,17 @@ class CreateTableTest {
     }
 
     @Test
+    void createTable1colWithWhitespaceInCol() {
+        final String sampleSolution = "CREATE TABLE table1 (`col umn1` datatype1)";
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "CREATE TABLE table1 ('col umn1' datatype1)"
+        ));
+
+        TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), sampleSolution, matchingMap, true);
+    }
+
+    @Test
     void createTable1colAndDataTypeAndDefinition() {
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(

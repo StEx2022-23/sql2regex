@@ -134,6 +134,21 @@ class GroupByDeParserForRegExTest{
     }
 
     @Test
+    void testAliasSupportWithQuotationMark() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT `col1` FROM `table1` `t1` GROUP BY `t1`.`col1`, `table1`.`col2`",
+                "SELECT \"col1\" FROM \"table1\" \"t1\" GROUP BY \"t1\".\"col1\", \"table1\".\"col2\""
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "SELECT `col1` FROM `table1` `t1` GROUP BY `t1`.`col1`, `t1`.`col2`",
+                matchingMap,
+                true
+        );
+    }
+
+    @Test
     void testExpressionToStringListConvert(){
         List<Expression> expressionList = new ArrayList<>();
         expressionList.add(new Column("col1"));
@@ -142,7 +157,7 @@ class GroupByDeParserForRegExTest{
         SettingsContainer settingsContainer = SettingsContainer.builder().build();
         GroupByDeParserForRegEx groupByDeParserForRegEx = new GroupByDeParserForRegEx(new ExpressionDeParserForRegEx(settingsContainer), new StringBuilder(), settingsContainer);
         for(String str : groupByDeParserForRegEx.expressionListToStringList(expressionList)){
-            Assertions.assertTrue(str.equals("\\s*[`´'\"]*col1[`´'\"]*\\s*") || str.equals("\\s*[`´'\"]*col2[`´'\"]*\\s*"), str);
+            Assertions.assertTrue(str.equals("\\s*[`´'\"]?col1[`´'\"]?\\s*") || str.equals("\\s*[`´'\"]?col2[`´'\"]?\\s*"), str);
         }
     }
 }

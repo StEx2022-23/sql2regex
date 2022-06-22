@@ -98,4 +98,20 @@ class DropDeParserForRegExTest {
                 true
         );
     }
+
+    @Test
+    void testDropStatementWithQuotationMarks(){
+        final String sampleSolution = "DROP TABLE `tab1`";
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "DROP TABLE tab1",
+                "DROP   TABLE   \"tab1\""
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+    }
 }

@@ -11,6 +11,8 @@ import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
+import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -196,13 +198,13 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
      */
     private String handleTableNameAlias(FromItem fromItem, String col) {
         StringBuilder temp = new StringBuilder();
-        String columnName = col.split("\\.")[1];
+        String columnName = col.split("\\.")[1].replaceAll(QUOTATION_MARK_REGEX, "");
         temp.append("(?:");
-        temp.append(fromItem.toString().split(" ")[0]);
+        temp.append(StatementDeParserForRegEx.addQuotationMarks(fromItem.toString().split(" ")[0].replaceAll(QUOTATION_MARK_REGEX, "")));
         temp.append("|");
-        temp.append(fromItem.getAlias().toString().replace(" ", ""));
+        temp.append(StatementDeParserForRegEx.addQuotationMarks(fromItem.getAlias().toString().replace(" ", "").replaceAll(QUOTATION_MARK_REGEX, "")));
         temp.append(")?\\.?");
-        temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, columnName));
+        temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, StatementDeParserForRegEx.addQuotationMarks(columnName)));
         return temp.toString();
     }
 }

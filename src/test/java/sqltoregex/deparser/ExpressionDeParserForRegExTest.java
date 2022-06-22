@@ -497,6 +497,54 @@ class ExpressionDeParserForRegExTest {
     }
 
     @Test
+    void testQuotationMarksStringWithoutWhitespace(){
+        final String sampleSolution = "col1='string'";
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "col1=string",
+                "col1='string'",
+                "'col1'='string'",
+                "\"col1\"=\"string\"",
+                "`col1`=`string`",
+                "´col1´=´string´",
+                "col1='string",
+                "col1=string'"
+        ));
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        notMatchingMap.put(SettingsOption.DEFAULT, List.of(
+                "col1=''string''"
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true);
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false);
+    }
+
+    @Test
+    void testQuotationMarksStringWithWhitespace(){
+        final String sampleSolution = "col1='stri ng'";
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "col1='stri ng'",
+                "'col1'='stri ng'",
+                "\"col1\"=\"stri ng\"",
+                "`col1`=`stri ng`",
+                "´col1´=´stri ng´"
+        ));
+        Map<SettingsOption, List<String>> notMatchingMap = new EnumMap<>(SettingsOption.class);
+        notMatchingMap.put(SettingsOption.DEFAULT, List.of(
+                "col1=stri ng",
+                "col1='stri ng",
+                "col1=stri ng'",
+                "col1=''stri ng''"
+        ));
+
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true);
+        TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, notMatchingMap, false);
+    }
+
+    @Test
     void testFullConstructor() {
         StringBuilder buffer = new StringBuilder();
         SettingsContainer settings = SettingsContainer.builder().build();
