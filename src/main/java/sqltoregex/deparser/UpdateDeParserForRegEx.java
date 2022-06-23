@@ -15,6 +15,7 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import java.util.*;
 
+import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
 /**
  * Implements an own {@link UpdateDeParser} to generate regex.
  */
@@ -94,7 +95,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             }
         }
 
-        buffer.append(OrderRotation.useOrDefault(this.tableNameOrderRotation, tableList));
+        buffer.append(OrderRotation.useOrDefault(this.tableNameOrderRotation, StatementDeParserForRegEx.addQuotationMarks(tableList)));
 
         if (update.getStartJoins() != null) {
             for (Join join : update.getStartJoins()) {
@@ -122,8 +123,16 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
 
             singleSet.append(OPTIONAL_WHITE_SPACE + "\\(?" + OPTIONAL_WHITE_SPACE);
             Iterator<Expression> expressionIterator = updateSet.getExpressions().iterator();
+            StringBuilder tempExpressionDeParserStringBuilder = new StringBuilder();
+            ExpressionDeParserForRegEx tempExpressionDeParserForRegEx = new ExpressionDeParserForRegEx(
+                    this.selectDeParserForRegEx,
+                    tempExpressionDeParserStringBuilder,
+                    this.settingsContainer
+            );
             while(expressionIterator.hasNext()){
-                singleSet.append(expressionIterator.next().toString());
+                tempExpressionDeParserStringBuilder.replace(0, tempExpressionDeParserStringBuilder.length(), "");
+                expressionIterator.next().accept(tempExpressionDeParserForRegEx);
+                singleSet.append(tempExpressionDeParserStringBuilder);
                 if(expressionIterator.hasNext()) singleSet.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
             }
             singleSet.append(OPTIONAL_WHITE_SPACE + "\\)?" + OPTIONAL_WHITE_SPACE);
@@ -271,16 +280,16 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     private String checkOfExistingTableNameAndAlias(String column){
         StringBuilder temp = new StringBuilder();
         if(column.contains(".")){
-            String tab = column.split("\\.")[0];
-            String col = column.split("\\.")[1];
+            String tab = column.split("\\.")[0].replaceAll(QUOTATION_MARK_REGEX, "");
+            String col = column.split("\\.")[1].replaceAll(QUOTATION_MARK_REGEX, "");
             temp.append("(?:")
-                    .append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tab))
+                    .append(StatementDeParserForRegEx.addQuotationMarks(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tab)))
                     .append("|")
-                    .append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, this.tableNameAliasCombinations.getOrDefault(tab, tab)))
+                    .append(StatementDeParserForRegEx.addQuotationMarks(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, this.tableNameAliasCombinations.getOrDefault(tab, tab))))
                     .append(")\\.");
-            temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, col));
+            temp.append(StatementDeParserForRegEx.addQuotationMarks(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, col)));
         } else{
-            temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, column));
+            temp.append(StatementDeParserForRegEx.addQuotationMarks(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, column)));
         }
         return temp.toString();
     }
