@@ -85,7 +85,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(Addition addition) {
-        visitCommutativeBinaryExpression(addition, OPTIONAL_WHITE_SPACE + "+" + OPTIONAL_WHITE_SPACE);
+        visitCommutativeBinaryExpression(addition, OPTIONAL_WHITE_SPACE + "\\+" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
