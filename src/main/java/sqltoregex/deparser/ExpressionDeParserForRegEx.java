@@ -482,7 +482,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             buffer.append("(");
             deparseTableName(tableName, tableNameWithAlias);
             if (!tableName.isEmpty()) {
-                buffer.append(StatementDeParserForRegEx.addQuotationMarks(tableNameWithAlias.toString())).append('.');
+                buffer.append(StatementDeParserForRegEx.addQuotationMarks(tableNameWithAlias.toString())).append("\\.");
             }
             buffer.append(")?");
         }
@@ -493,12 +493,33 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     private void deparseTableName(String tableName, StringBuilder tableNameWithAlias) {
         if(this.getRelatedTableNameOrAlias(tableName) == null){
-            tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName));
+            tableNameWithAlias.append(
+                    StatementDeParserForRegEx.addQuotationMarks(
+                            SpellingMistake.useOrDefault(
+                                    this.tableNameSpellingMistake,
+                                    tableName.replaceAll(QUOTATION_MARK_REGEX, "")
+                            )
+                    )
+            );
         } else {
             tableNameWithAlias.append("(?:");
-            tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName ));
+            tableNameWithAlias.append(
+                    StatementDeParserForRegEx.addQuotationMarks(
+                            SpellingMistake.useOrDefault(
+                                    this.tableNameSpellingMistake,
+                                    tableName.replaceAll(QUOTATION_MARK_REGEX, "")
+                            )
+                    )
+            );
             tableNameWithAlias.append("|");
-            tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, this.getRelatedTableNameOrAlias(tableName)));
+            tableNameWithAlias.append(
+                    StatementDeParserForRegEx.addQuotationMarks(
+                            SpellingMistake.useOrDefault(
+                                    this.tableNameSpellingMistake,
+                                    this.getRelatedTableNameOrAlias(tableName)
+                            )
+                    )
+            );
             tableNameWithAlias.append("|");
             tableNameWithAlias.append("\\w*?");
             tableNameWithAlias.append(")");
@@ -534,7 +555,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                     String singleExpression = expressionIterator.next().toString();
                     StringBuilder tableNameWithAlias = new StringBuilder();
                     if(singleExpression.contains(".")){
-                        String tableName = singleExpression.split("\\.")[0];
+                        String tableName = singleExpression.split("\\.")[0].replaceAll("\\s", "");
 
                         tableNameWithAlias.append("(");
                         deparseTableName(tableName, tableNameWithAlias);
@@ -544,7 +565,15 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                         tableNameWithAlias.append(")?");
                     }
                     String[] columnName = singleExpression.split("\\.");
-                    buffer.append(tableNameWithAlias).append(columnName[columnName.length - 1]);
+                    buffer.append(tableNameWithAlias);
+                    buffer.append(
+                            StatementDeParserForRegEx.addQuotationMarks(
+                                    SpellingMistake.useOrDefault(
+                                            columnNameSpellingMistake,
+                                            columnName[columnName.length - 1].replaceAll("\\s", "").replaceAll(QUOTATION_MARK_REGEX, "")
+                                    )
+                            )
+                    );
 
                     if(expressionIterator.hasNext()){
                         buffer.append(OPTIONAL_WHITE_SPACE).append(",").append(OPTIONAL_WHITE_SPACE);
