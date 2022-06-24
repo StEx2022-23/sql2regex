@@ -271,9 +271,33 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         List<String> synsWithSpellingMistake = new LinkedList<>();
 
         for (String keywordSyn : StringSynonymGenerator.generateAsListOrDefault(this.datatypeSynonymGenerator, columnDefinition.getColDataType().toString())){
+            StringBuilder tempColumnDefinition = new StringBuilder();
             if (keywordSyn.matches(".*\\([\\w,\\s]+\\)")){
-                keywordSyn = keywordSyn.replace("(", "\\(");
-                keywordSyn = keywordSyn.replace(")", "\\)");
+                String[] splittedColumnDefinition = keywordSyn.split(" ");
+                Iterator<String> stringIterator = Arrays.stream(splittedColumnDefinition).iterator();
+                while(stringIterator.hasNext()){
+                    String splitElement = stringIterator.next();
+
+                    if(splitElement.contains("(") && splitElement.contains(")")){
+                        tempColumnDefinition.append("\\(");
+                        tempColumnDefinition.append(
+                                SpellingMistake.useOrDefault(
+                                        this.keywordSpellingMistake,
+                                        splitElement.replace("(", "").replace(")","")
+                                )
+                        );
+                        tempColumnDefinition.append("\\)");
+                    } else {
+                        tempColumnDefinition.append(
+                                SpellingMistake.useOrDefault(
+                                        this.keywordSpellingMistake,
+                                        splitElement
+                                )
+                        );
+                    }
+                    if(stringIterator.hasNext()) tempColumnDefinition.append(OPTIONAL_WHITE_SPACE);
+                }
+                synsWithSpellingMistake.add(tempColumnDefinition.toString());
             }
             synsWithSpellingMistake.add(SpellingMistake.useOrDefault(this.keywordSpellingMistake, keywordSyn));
         }
