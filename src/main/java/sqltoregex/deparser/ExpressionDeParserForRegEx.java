@@ -482,12 +482,19 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             buffer.append("(");
             deparseTableName(tableName, tableNameWithAlias);
             if (!tableName.isEmpty()) {
-                buffer.append(StatementDeParserForRegEx.addQuotationMarks(tableNameWithAlias.toString())).append("\\.");
+                buffer.append(tableNameWithAlias).append("\\.");
             }
             buffer.append(")?");
         }
 
-        buffer.append(StatementDeParserForRegEx.addQuotationMarks(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, tableColumn.getColumnName().replaceAll(QUOTATION_MARK_REGEX, ""))));
+        buffer.append(
+                StatementDeParserForRegEx.addQuotationMarks(
+                    SpellingMistake.useOrDefault(
+                            this.columnNameSpellingMistake,
+                            tableColumn.getColumnName().replaceAll(QUOTATION_MARK_REGEX, "")
+                    )
+                )
+        );
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
@@ -555,7 +562,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                     String singleExpression = expressionIterator.next().toString();
                     StringBuilder tableNameWithAlias = new StringBuilder();
                     if(singleExpression.contains(".")){
-                        String tableName = singleExpression.split("\\.")[0].replaceAll("\\s", "");
+                        String tableName = singleExpression.split("\\.")[0];
 
                         tableNameWithAlias.append("(");
                         deparseTableName(tableName, tableNameWithAlias);
@@ -570,7 +577,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                             StatementDeParserForRegEx.addQuotationMarks(
                                     SpellingMistake.useOrDefault(
                                             columnNameSpellingMistake,
-                                            columnName[columnName.length - 1].replaceAll("\\s", "").replaceAll(QUOTATION_MARK_REGEX, "")
+                                            columnName[columnName.length - 1].replaceAll(QUOTATION_MARK_REGEX, "")
                                     )
                             )
                     );
