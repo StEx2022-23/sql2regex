@@ -556,7 +556,21 @@ function performDateAndTimeConversion(sqlInputEl, selectEl){
         opt = options[i];
 
         if (!opt.selected) {
-            sqlInputEl.value = sqlInputEl.value.replaceAt(opt.value, opt.text, dateOrTimeStringToLiteral(sqlInputEl.value.substring(opt.value, opt.value + opt.text.length)))
+            let endSubstring = parseInt(opt.value) + parseInt(opt.text.length);
+            let afterDateTime = sqlInputEl.value.substring(endSubstring);
+
+            sqlInputEl.value = sqlInputEl.value.replaceAt(
+                opt.value,
+                opt.text,
+                dateOrTimeStringToLiteral(
+                    sqlInputEl.value.substring(
+                        opt.value,
+                        endSubstring
+                    )
+                )
+            )
+
+            sqlInputEl.value = sqlInputEl.value + afterDateTime;
         }
         opt.parentElement.removeChild(opt)
     }
@@ -565,15 +579,15 @@ function performDateAndTimeConversion(sqlInputEl, selectEl){
 }
 
 function dateOrTimeStringToLiteral(dateString) {
-    let regexDate = new RegExp(/(?=\d\d\d\d-\d\d-\d\d)/gi);
+    let regexDate = new RegExp(/\d\d\d\d-\d\d-\d\d/gi);
     let regexDateTime = new RegExp(/(?=\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?)/gi);
     let regexTime = new RegExp(/(?=\d\d:\d\d(?::\d\d)?)/gi);
 
     if(dateString.match(regexDate).length >= 1){
         return dateString.replace(dateString, "{d'$&'}");
-    } else if (dateString.match(regexDateTime)) {
+    } else if (dateString.match(regexDateTime).length >= 1) {
         return dateString.replace(dateString, "{ts'$&'}");
-    } else if (dateString.match(regexTime)) {
+    } else if (dateString.match(regexTime).length >= 1) {
         return dateString.replace(dateString, "{t'$&'}");
     }
 }
