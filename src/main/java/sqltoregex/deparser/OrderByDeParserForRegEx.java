@@ -1,19 +1,14 @@
 package sqltoregex.deparser;
 
 import net.sf.jsqlparser.expression.ExpressionVisitor;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.OrderByElement;
-import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
 import net.sf.jsqlparser.util.deparser.OrderByDeParser;
-import org.jaxen.expr.Expr;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
-
-import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
 
 import java.util.LinkedList;
 import java.util.List;
