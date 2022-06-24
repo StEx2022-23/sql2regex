@@ -203,10 +203,19 @@ public class SelectDeParserForRegEx extends SelectDeParser {
                                                                  o.toString().replaceAll(QUOTATION_MARK_REGEX, "").replaceAll("\\(.*", "")));
             temp.append(OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE);
             temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
-            temp.append(SpellingMistake.useOrDefault(
-                    this.columnNameSpellingMistake,
-                    o.toString().replaceAll(QUOTATION_MARK_REGEX, "").split("\\(")[1].split("\\)")[0])
-            );
+
+            String aggregateFunctionInput = o.toString()
+                                            .replaceAll(QUOTATION_MARK_REGEX, "")
+                                            .split("\\(")[1]
+                                            .split("\\)")[0];
+            if (aggregateFunctionInput.equals("*")){
+                temp.append("(?:\\*|.*)");
+            } else {
+                temp.append(SpellingMistake.useOrDefault(
+                        this.columnNameSpellingMistake,
+                        o.toString().replaceAll(QUOTATION_MARK_REGEX, "").split("\\(")[1].split("\\)")[0])
+                );
+            }
             temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
             temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
         }
