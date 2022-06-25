@@ -98,11 +98,11 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     /**
-     * Sets a {@link ExpressionVisitor}.
-     * @param expressionVisitor {@link ExpressionVisitor}
+     * Sets a {@link ExpressionDeParserForRegEx}.
+     * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
      */
-    public void setExpressionVisitor(ExpressionVisitor expressionVisitor) {
-        this.expressionDeParserForRegEx = (ExpressionDeParserForRegEx) expressionVisitor;
+    public void setExpressionVisitor(ExpressionDeParserForRegEx expressionDeParserForRegEx) {
+        this.expressionDeParserForRegEx = expressionDeParserForRegEx;
     }
 
     /**

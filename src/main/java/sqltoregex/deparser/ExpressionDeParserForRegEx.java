@@ -492,7 +492,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                     SpellingMistake.useOrDefault(
                             this.columnNameSpellingMistake,
                             tableColumn.getColumnName().replaceAll(QUOTATION_MARK_REGEX, "")
-                    )
+                     )
                 )
         );
         buffer.append(OPTIONAL_WHITE_SPACE);
@@ -527,8 +527,6 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                             )
                     )
             );
-            tableNameWithAlias.append("|");
-            tableNameWithAlias.append("\\w*?");
             tableNameWithAlias.append(")");
         }
     }

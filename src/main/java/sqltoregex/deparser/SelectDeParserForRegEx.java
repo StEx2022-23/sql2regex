@@ -240,7 +240,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
                                             .split("\\(")[1]
                                             .split("\\)")[0];
             if (aggregateFunctionInput.equals("*")){
-                temp.append("(?:\\*|.*)");
+                temp.append("\\*");
             } else {
                 temp.append(
                         StatementDeParserForRegEx.addQuotationMarks(
