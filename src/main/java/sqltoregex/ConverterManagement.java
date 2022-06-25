@@ -58,7 +58,7 @@ public class ConverterManagement {
         Set<String> sqlRegExSet = new HashSet<>(regexList);
 
         if (sqlRegExSet.size() > 1){
-            outputRegex.append("(");
+            outputRegex.append("(?:");
         }
         Iterator<String> iterator = sqlRegExSet.iterator();
         while (iterator.hasNext()){

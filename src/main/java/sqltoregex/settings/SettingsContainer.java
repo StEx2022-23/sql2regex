@@ -130,7 +130,7 @@ public class SettingsContainer {
             }
 
             switch (settingsOption) {
-                case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, GROUPBYELEMENTORDER, INDEXCOLUMNNAMEORDER, INSERTINTOVALUESORDER -> this.with(
+                case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING, STRINGVALUESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, GROUPBYELEMENTORDER, INDEXCOLUMNNAMEORDER, INSERTINTOVALUESORDER -> this.with(
                         settingsOption);
                 case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
                     Set<String> valueList = new HashSet<>();
@@ -168,7 +168,7 @@ public class SettingsContainer {
          */
         public Builder with(SettingsOption settingsOption) {
             switch (settingsOption) {
-                case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING -> {
+                case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING, STRINGVALUESPELLING -> {
                     SpellingMistake spellingMistake = new SpellingMistake(settingsOption);
                     this.modifiableMap.put(settingsOption, spellingMistake);
                 }

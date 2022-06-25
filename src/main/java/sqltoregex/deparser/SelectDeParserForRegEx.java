@@ -191,6 +191,37 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         this.expressionDeParserForRegEx = (ExpressionDeParserForRegEx) visitor;
     }
 
+    private String checkIfTableNameIsGivenAndHandleIt(String str, StringBuilder temp){
+        if(str.contains(".")){
+            String extractedTable = str.split("\\.")[0];
+            temp.append("(");
+            if(this.expressionDeParserForRegEx.getRelatedTableNameOrAlias(extractedTable) == null){
+                temp.append(
+                        StatementDeParserForRegEx.addQuotationMarks(
+                            SpellingMistake.useOrDefault(
+                                    this.tableNameSpellingMistake,
+                                    extractedTable.replaceAll(QUOTATION_MARK_REGEX, "")
+                            )
+                        )
+                );
+            } else {
+                temp.append(
+                        StatementDeParserForRegEx.addQuotationMarks(
+                            SpellingMistake.useOrDefault(
+                                    this.tableNameSpellingMistake,
+                                    this.expressionDeParserForRegEx.getRelatedTableNameOrAlias(extractedTable)
+                            )
+                        )
+                );
+            }
+
+            temp.append("\\.");
+            temp.append(")?");
+            return str.split("\\.")[1].replace("*", "\\*");
+        }
+        return str;
+    }
+
     /**
      * Generates regex for alias and aggregate functions.
      * @param o Object instanceof {@link net.sf.jsqlparser.statement.Statement}
@@ -198,20 +229,33 @@ public class SelectDeParserForRegEx extends SelectDeParser {
      */
     private String handleAliasAndAggregateFunction(Object o) {
         StringBuilder temp = new StringBuilder();
+
         if (o.toString().contains("(") && o.toString().contains(")")) {
             temp.append(StringSynonymGenerator.useOrDefault(this.aggregateFunctionLang,
                                                                  o.toString().replaceAll(QUOTATION_MARK_REGEX, "").replaceAll("\\(.*", "")));
             temp.append(OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE);
-            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
-            temp.append(SpellingMistake.useOrDefault(
-                    this.columnNameSpellingMistake,
-                    o.toString().replaceAll(QUOTATION_MARK_REGEX, "").split("\\(")[1].split("\\)")[0])
-            );
-            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
+
+            String aggregateFunctionInput = o.toString()
+                                            .replaceAll(QUOTATION_MARK_REGEX, "")
+                                            .split("\\(")[1]
+                                            .split("\\)")[0];
+            if (aggregateFunctionInput.equals("*")){
+                temp.append("\\*");
+            } else {
+                temp.append(
+                        StatementDeParserForRegEx.addQuotationMarks(
+                                SpellingMistake.useOrDefault(
+                                        this.columnNameSpellingMistake,
+                                        checkIfTableNameIsGivenAndHandleIt(aggregateFunctionInput, temp)
+                                )
+                        )
+                );
+            }
             temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
         }
 
         if (!o.toString().contains("AS") && !o.toString().contains("(") && !o.toString().contains(")")) {
+            o = checkIfTableNameIsGivenAndHandleIt(o.toString(), temp);
             temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
             temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, o.toString().replaceAll(QUOTATION_MARK_REGEX, "")));
             temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
@@ -375,6 +419,8 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.ExcessiveMethodLength", "PMD.NPathComplexity"})
     public void visit(PlainSelect plainSelect) {
+        if(plainSelect.getFromItem() != null) this.expressionDeParserForRegEx.addTableNameAlias(plainSelect.getFromItem().toString().replaceAll(QUOTATION_MARK_REGEX, ""));
+
         if (plainSelect.isUseBrackets()) {
             buffer.append("\\(" + OPTIONAL_WHITE_SPACE);
         }
@@ -529,7 +575,6 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             buffer.append(REQUIRED_WHITE_SPACE);
             GroupByDeParserForRegEx groupByDeParserForRegEx = new GroupByDeParserForRegEx(this.expressionDeParserForRegEx, buffer, settingsContainer);
             if(plainSelect.getFromItem() != null){
-                this.expressionDeParserForRegEx.addTableNameAlias(plainSelect.getFromItem().toString());
                 groupByDeParserForRegEx.setTableNameAliasMap(this.expressionDeParserForRegEx.getTableNameAliasMap());
             }
             groupByDeParserForRegEx.deParse(plainSelect.getGroupBy());

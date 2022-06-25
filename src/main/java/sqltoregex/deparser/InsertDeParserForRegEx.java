@@ -100,13 +100,8 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 buffer.append("\\(");
                 buffer.append(OPTIONAL_WHITE_SPACE);
                 while (extractedColumnsIterator.hasNext()) {
-                    buffer.append(
-                            StatementDeParserForRegEx.addQuotationMarks(
-                                SpellingMistake.useOrDefault(
-                                        this.tableNameSpellingMistake,
-                                        mappedColumnsAndRelatedValues.get(extractedColumnsIterator.next().replace(QUOTATION_MARK_REGEX, ""))
-                                )
-                            )
+                    buffer.append(mappedColumnsAndRelatedValues.get(extractedColumnsIterator.next())
+
                     );
                     if (extractedColumnsIterator.hasNext()) {
                         buffer.append(OPTIONAL_WHITE_SPACE);
@@ -128,7 +123,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 List<String> tempValuesRelatedToActualCol = new ArrayList<>();
                 int valueDepth = 0;
                 while (extractedColumnsIterator.hasNext()) {
-                    String tempCol = extractedColumnsIterator.next().replace(QUOTATION_MARK_REGEX + "*", "");
+                    String tempCol = extractedColumnsIterator.next().replace(QUOTATION_MARK_REGEX + "?", "");
                     StringBuilder stringBuilder = new StringBuilder();
                     stringBuilder.append(tempCol).append(",");
                     for (String str : mappedColumnsAndRelatedValues.get(tempCol)) {
@@ -145,13 +140,14 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                     temp.append("\\(").append(OPTIONAL_WHITE_SPACE);
                     Iterator<String> stringIterator = tempValuesRelatedToActualCol.iterator();
                     while (stringIterator.hasNext()) {
-                        temp.append(QUOTATION_MARK_REGEX).append("?");
                         temp.append(
-                                SpellingMistake.useOrDefault(
-                                        this.tableNameSpellingMistake,
-                                        stringIterator.next().split(",")[i + 1]
-                                ).replaceAll(QUOTATION_MARK_REGEX, ""));
-                        temp.append(QUOTATION_MARK_REGEX).append("?");
+                                StatementDeParserForRegEx.addQuotationMarks(
+                                        SpellingMistake.useOrDefault(
+                                                this.tableNameSpellingMistake,
+                                                stringIterator.next().split(",")[i + 1]
+                                        )
+                                )
+                        );
                         if (stringIterator.hasNext()) temp.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
                     }
                     temp.append(OPTIONAL_WHITE_SPACE).append("\\)");
@@ -348,10 +344,15 @@ public class InsertDeParserForRegEx extends InsertDeParser {
      * @return column list
      */
     private String[] generateListOfColumnsOrderOption(Map<String, String> mappedColumnsAndRelatedValues, Insert insert) {
+        ExpressionDeParserForRegEx tempExpressionDeParserForRegEx = new ExpressionDeParserForRegEx(this.settings);
+        StringBuilder tempStringBuilder = new StringBuilder();
+        tempExpressionDeParserForRegEx.setBuffer(tempStringBuilder);
         for (int i = 0; i < insert.getColumns().size(); i++) {
+            tempStringBuilder.replace(0, tempStringBuilder.length(), "");
+            insert.getItemsList(ExpressionList.class).getExpressions().get(i).accept(tempExpressionDeParserForRegEx);
             mappedColumnsAndRelatedValues.put(
                     insert.getColumns().get(i).toString().replaceAll(QUOTATION_MARK_REGEX, ""),
-                    insert.getItemsList(ExpressionList.class).getExpressions().get(i).toString().replaceAll(QUOTATION_MARK_REGEX, "")
+                    tempStringBuilder.toString()
             );
         }
         return this.generateColumnsRotatedArray(mappedColumnsAndRelatedValues.keySet());
