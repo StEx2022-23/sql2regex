@@ -425,9 +425,16 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         if (stringValue.getPrefix() != null) {
             buffer.append(stringValue.getPrefix());
         }
-        buffer.append(OPTIONAL_WHITE_SPACE)
-                .append(StatementDeParserForRegEx.addQuotationMarks(stringValue.getValue()))
-                .append(OPTIONAL_WHITE_SPACE);
+        String keywordSpellingString = "";
+        if(this.columnNameSpellingMistake != null || this.tableNameSpellingMistake != null) {
+            keywordSpellingString = SpellingMistake.useOrDefault(new SpellingMistake(SettingsOption.DEFAULT), stringValue.getValue());
+        } else {
+            keywordSpellingString = stringValue.getValue();
+        }
+
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer.append(StatementDeParserForRegEx.addQuotationMarks(keywordSpellingString));
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
