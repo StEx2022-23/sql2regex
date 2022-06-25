@@ -425,14 +425,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     @Override
     public void visit(StringValue stringValue) {
         if (stringValue.getPrefix() != null) {
-            buffer.append(
-                    StatementDeParserForRegEx.addQuotationMarks(
-                            SpellingMistake.useOrDefault(
-                                    this.stringValueSpellingMistake,
-                                    stringValue.getPrefix()
-                            )
-                    )
-            );
+            buffer.append(stringValue.getPrefix());
         }
 
         buffer.append(OPTIONAL_WHITE_SPACE);
