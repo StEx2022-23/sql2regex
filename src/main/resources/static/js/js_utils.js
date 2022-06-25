@@ -65,19 +65,19 @@ function insertVisualizationPage() {
     container.appendChild(iframe);
 }
 
-function handleVisualizationButton(regexoutput){
+function moveToVisualizationPage(regexoutput){
     window.location.href='/visualization?'+window.location.href.split('?')[1] +'&regex='+encodeURIComponent(document.getElementById(regexoutput).innerHTML)
 }
 
-function checkIfVisualizationIsAllowed(buttonID, regexoutput) {
-    let button = document.getElementById(buttonID);
+function handleVisualization(regexoutput) {
     let MAX_URL_LENGTH = 2048;
     let parsedUrl = '/visualization?' + window.location.href.split('?')[1] + '&regex=' + encodeURIComponent(document.getElementById(regexoutput).innerHTML);
-    if(parsedUrl.length <= MAX_URL_LENGTH && button.classList.contains("disabled")) {
-        button.classList.remove("disabled");
-    } else {
-        button.classList.add("disabled");
+    const urlTooLongToast = new bootstrap.Toast(document.getElementById('toast-too-long-url-for-visualization'))
+    if(parsedUrl.length > MAX_URL_LENGTH) {
+        urlTooLongToast.show();
+        return;
     }
+    moveToVisualizationPage(regexoutput);
 }
 
 function formattedCurrentTimestamp() {
@@ -644,8 +644,7 @@ document.onreadystatechange = function () {
                     .then( () => SqlRegExHis.checkUpdatedConverting())
                     .then( () => copy2clipbord('regexoutput', null))
                     .then( () => scrollToInValidInput(document.getElementById("isInValid")))
-                    .then( () => handleDateValue(sqlInputEl))
-                    .then( () => checkIfVisualizationIsAllowed("visualization_button", "regexoutput"));
+                    .then( () => handleDateValue(sqlInputEl));
                 e.preventDefault();
                 form.parentNode.parentNode.style.removeProperty("minHeight");
             })
