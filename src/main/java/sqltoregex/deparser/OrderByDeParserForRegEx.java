@@ -1,7 +1,5 @@
 package sqltoregex.deparser;
 
-import net.sf.jsqlparser.expression.ExpressionVisitor;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.util.deparser.OrderByDeParser;
@@ -10,8 +8,6 @@ import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
-
-import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -109,22 +105,6 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         temp.append(this.handleAscDesc(orderByElement));
         temp.append(this.handleNullFirstLast(orderByElement));
         return temp.toString();
-    }
-
-    /**
-     * Gets the set {@link ExpressionVisitor}.
-     * @return {@link ExpressionVisitor}
-     */
-    public ExpressionVisitor getExpressionVisitor() {
-        return this.expressionDeParserForRegEx;
-    }
-
-    /**
-     * Sets a {@link ExpressionVisitor}.
-     * @param expressionVisitor {@link ExpressionVisitor}
-     */
-    public void setExpressionVisitor(ExpressionVisitor expressionVisitor) {
-        this.expressionDeParserForRegEx = expressionVisitor;
     }
 
     /**

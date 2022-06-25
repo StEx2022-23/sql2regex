@@ -36,6 +36,8 @@ class GraphPreProcessorTest {
         Assertions.assertTrue(map.containsKey("AVG"));
         Assertions.assertTrue(map.containsKey("SUM"));
         Assertions.assertTrue(map.containsKey("COUNT"));
-        Assertions.assertEquals(3, map.size());
+        Assertions.assertTrue(map.containsKey("MIN"));
+        Assertions.assertTrue(map.containsKey("MAX"));
+        Assertions.assertEquals(5, map.size());
     }
 }

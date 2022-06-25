@@ -175,4 +175,35 @@ class UpdateDeParserForRegExTest{
                 true
         );
     }
+
+    @Test
+    void testExpressionBehaviour() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "UPDATE table SET preis = preis * 1.1",
+                "UPDATE table SET preis = 1.1 * preis",
+                "UPDATE table SET preis = 1,1 * preis"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "UPDATE table SET preis = preis * 1.1",
+                matchingMap,
+                true
+        );
+    }
+
+    @Test
+    void testInsertedQuotationMarks() {
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "UPDATE `table` SET `preis` = `preis` * 1.1",
+                "UPDATE table SET preis = preis * 1.1"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                "UPDATE `table` SET `preis` = `preis` * 1.1",
+                matchingMap,
+                true
+        );
+    }
 }

@@ -201,6 +201,12 @@ public class SqlToRegexController {
         settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING, SpellingMistake.class,
                         settingsType)
                 .ifPresent(tableNameSpelling -> spellings.add(tableNameSpelling.getSettingsOption()));
+        settingsManager.getSettingBySettingsOption(SettingsOption.INDEXCOLUMNNAMESPELLING, SpellingMistake.class,
+                        settingsType)
+                .ifPresent(tableNameSpelling -> spellings.add(tableNameSpelling.getSettingsOption()));
+        settingsManager.getSettingBySettingsOption(SettingsOption.STRINGVALUESPELLING, SpellingMistake.class,
+                        settingsType)
+                .ifPresent(tableNameSpelling -> spellings.add(tableNameSpelling.getSettingsOption()));
         return spellings;
     }
 

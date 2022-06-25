@@ -65,6 +65,21 @@ function insertVisualizationPage() {
     container.appendChild(iframe);
 }
 
+function handleVisualizationButton(regexoutput){
+    window.location.href='/visualization?'+window.location.href.split('?')[1] +'&regex='+encodeURIComponent(document.getElementById(regexoutput).innerHTML)
+}
+
+function checkIfVisualizationIsAllowed(buttonID, regexoutput) {
+    let button = document.getElementById(buttonID);
+    let MAX_URL_LENGTH = 2048;
+    let parsedUrl = '/visualization?' + window.location.href.split('?')[1] + '&regex=' + encodeURIComponent(document.getElementById(regexoutput).innerHTML);
+    if(parsedUrl.length <= MAX_URL_LENGTH && button.classList.contains("disabled")) {
+        button.classList.remove("disabled");
+    } else {
+        button.classList.add("disabled");
+    }
+}
+
 function formattedCurrentTimestamp() {
     let currentdate = new Date();
     return ((currentdate.getDate().toString().length === 1) ? "0".concat(currentdate.getDate()) : (currentdate.getDate())) + "/" + (((currentdate.getMonth() + 1).toString().length === 1) ? "0".concat(currentdate.getMonth() + 1) : (currentdate.getMonth() + 1)) + "/" + ((currentdate.getFullYear().toString().length === 1) ? "0".concat(currentdate.getFullYear()) : (currentdate.getFullYear())) + " @ " + ((currentdate.getHours().toString().length === 1) ? "0".concat(currentdate.getHours()) : (currentdate.getHours())) + ":" + ((currentdate.getMinutes().toString().length === 1) ? "0".concat(currentdate.getMinutes()) : (currentdate.getMinutes())) + ":" + ((currentdate.getSeconds().toString().length === 1) ? "0".concat(currentdate.getSeconds()) : (currentdate.getSeconds()));
@@ -556,7 +571,21 @@ function performDateAndTimeConversion(sqlInputEl, selectEl){
         opt = options[i];
 
         if (!opt.selected) {
-            sqlInputEl.value = sqlInputEl.value.replaceAt(opt.value, opt.text, dateOrTimeStringToLiteral(sqlInputEl.value.substring(opt.value, opt.value + opt.text.length)))
+            let endSubstring = parseInt(opt.value) + parseInt(opt.text.length);
+            let afterDateTime = sqlInputEl.value.substring(endSubstring);
+
+            sqlInputEl.value = sqlInputEl.value.replaceAt(
+                opt.value,
+                opt.text,
+                dateOrTimeStringToLiteral(
+                    sqlInputEl.value.substring(
+                        opt.value,
+                        endSubstring
+                    )
+                )
+            )
+
+            sqlInputEl.value = sqlInputEl.value + afterDateTime;
         }
         opt.parentElement.removeChild(opt)
     }
@@ -565,15 +594,15 @@ function performDateAndTimeConversion(sqlInputEl, selectEl){
 }
 
 function dateOrTimeStringToLiteral(dateString) {
-    let regexDate = new RegExp(/(?=\d\d\d\d-\d\d-\d\d)/gi);
+    let regexDate = new RegExp(/\d\d\d\d-\d\d-\d\d/gi);
     let regexDateTime = new RegExp(/(?=\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?)/gi);
     let regexTime = new RegExp(/(?=\d\d:\d\d(?::\d\d)?)/gi);
 
     if(dateString.match(regexDate).length >= 1){
         return dateString.replace(dateString, "{d'$&'}");
-    } else if (dateString.match(regexDateTime)) {
+    } else if (dateString.match(regexDateTime).length >= 1) {
         return dateString.replace(dateString, "{ts'$&'}");
-    } else if (dateString.match(regexTime)) {
+    } else if (dateString.match(regexTime).length >= 1) {
         return dateString.replace(dateString, "{t'$&'}");
     }
 }
@@ -615,7 +644,8 @@ document.onreadystatechange = function () {
                     .then( () => SqlRegExHis.checkUpdatedConverting())
                     .then( () => copy2clipbord('regexoutput', null))
                     .then( () => scrollToInValidInput(document.getElementById("isInValid")))
-                    .then( () => handleDateValue(sqlInputEl));
+                    .then( () => handleDateValue(sqlInputEl))
+                    .then( () => checkIfVisualizationIsAllowed("visualization_button", "regexoutput"));
                 e.preventDefault();
                 form.parentNode.parentNode.style.removeProperty("minHeight");
             })

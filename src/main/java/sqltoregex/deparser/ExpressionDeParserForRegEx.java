@@ -35,6 +35,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SpellingMistake columnNameSpellingMistake;
     private final SpellingMistake tableNameSpellingMistake;
+    private final SpellingMistake stringValueSpellingMistake;
     private final DateAndTimeFormatSynonymGenerator dateSynonyms;
     private final DateAndTimeFormatSynonymGenerator timeStampSynonyms;
     private final DateAndTimeFormatSynonymGenerator timeSynonyms;
@@ -75,6 +76,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         this.orderByDeParser = orderByDeParser;
         this.columnNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
         this.tableNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
+        this.stringValueSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.STRINGVALUESPELLING);
         this.dateSynonyms = settings.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.DATESYNONYMS);
         this.timeSynonyms = settings.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.TIMESYNONYMS);
         this.timeStampSynonyms = settings.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.DATETIMESYNONYMS);
@@ -85,7 +87,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(Addition addition) {
-        visitCommutativeBinaryExpression(addition, OPTIONAL_WHITE_SPACE + "+" + OPTIONAL_WHITE_SPACE);
+        visitCommutativeBinaryExpression(addition, OPTIONAL_WHITE_SPACE + "\\+" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
@@ -145,7 +147,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     @Override
     public void visit(DoubleValue doubleValue) {
         buffer.append(OPTIONAL_WHITE_SPACE);
-        buffer.append(doubleValue.toString());
+        buffer.append(doubleValue.toString().replace(".", "(?:\\.|,)"));
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
@@ -425,9 +427,17 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         if (stringValue.getPrefix() != null) {
             buffer.append(stringValue.getPrefix());
         }
-        buffer.append(OPTIONAL_WHITE_SPACE)
-                .append(StatementDeParserForRegEx.addQuotationMarks(stringValue.getValue()))
-                .append(OPTIONAL_WHITE_SPACE);
+
+        buffer.append(OPTIONAL_WHITE_SPACE);
+        buffer.append(
+                StatementDeParserForRegEx.addQuotationMarks(
+                        SpellingMistake.useOrDefault(
+                                this.stringValueSpellingMistake,
+                                stringValue.getValue()
+                        )
+                )
+        );
+        buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     @Override
@@ -481,22 +491,50 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             StringBuilder tableNameWithAlias = new StringBuilder();
             deparseTableName(tableName, tableNameWithAlias);
             if (!tableName.isEmpty()) {
-                buffer.append(StatementDeParserForRegEx.addQuotationMarks(tableNameWithAlias.toString())).append('.');
+                buffer.append(tableNameWithAlias).append("\\.");
             }
         }
 
-        buffer.append(StatementDeParserForRegEx.addQuotationMarks(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, tableColumn.getColumnName().replaceAll(QUOTATION_MARK_REGEX, ""))));
+        buffer.append(
+                StatementDeParserForRegEx.addQuotationMarks(
+                    SpellingMistake.useOrDefault(
+                            this.columnNameSpellingMistake,
+                            tableColumn.getColumnName().replaceAll(QUOTATION_MARK_REGEX, "")
+                     )
+                )
+        );
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
     private void deparseTableName(String tableName, StringBuilder tableNameWithAlias) {
         if(this.getRelatedTableNameOrAlias(tableName) == null){
-            tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName));
+            tableNameWithAlias.append(
+                    StatementDeParserForRegEx.addQuotationMarks(
+                            SpellingMistake.useOrDefault(
+                                    this.tableNameSpellingMistake,
+                                    tableName.replaceAll(QUOTATION_MARK_REGEX, "")
+                            )
+                    )
+            );
         } else {
             tableNameWithAlias.append("(?:");
-            tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName ));
+            tableNameWithAlias.append(
+                    StatementDeParserForRegEx.addQuotationMarks(
+                            SpellingMistake.useOrDefault(
+                                    this.tableNameSpellingMistake,
+                                    tableName.replaceAll(QUOTATION_MARK_REGEX, "")
+                            )
+                    )
+            );
             tableNameWithAlias.append("|");
-            tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, this.getRelatedTableNameOrAlias(tableName)));
+            tableNameWithAlias.append(
+                    StatementDeParserForRegEx.addQuotationMarks(
+                            SpellingMistake.useOrDefault(
+                                    this.tableNameSpellingMistake,
+                                    this.getRelatedTableNameOrAlias(tableName)
+                            )
+                    )
+            );
             tableNameWithAlias.append(")");
         }
     }
@@ -537,7 +575,15 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                         }
                     }
                     String[] columnName = singleExpression.split("\\.");
-                    buffer.append(tableNameWithAlias).append(columnName[columnName.length - 1]);
+                    buffer.append(tableNameWithAlias);
+                    buffer.append(
+                            StatementDeParserForRegEx.addQuotationMarks(
+                                    SpellingMistake.useOrDefault(
+                                            columnNameSpellingMistake,
+                                            columnName[columnName.length - 1].replaceAll(QUOTATION_MARK_REGEX, "")
+                                    )
+                            )
+                    );
 
                     if(expressionIterator.hasNext()){
                         buffer.append(OPTIONAL_WHITE_SPACE).append(",").append(OPTIONAL_WHITE_SPACE);
@@ -547,7 +593,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             if (function.getOrderByElements() != null) {
                 buffer.append(REQUIRED_WHITE_SPACE).append("ORDER").append(REQUIRED_WHITE_SPACE).append("BY").append(REQUIRED_WHITE_SPACE);
                 boolean comma = false;
-                orderByDeParser.setExpressionVisitor(this);
+                orderByDeParser.setExpressionDeParserForRegEx(this);
                 orderByDeParser.setBuffer(buffer);
                 for (OrderByElement orderByElement : function.getOrderByElements()) {
                     if (comma) {

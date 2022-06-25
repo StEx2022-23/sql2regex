@@ -122,8 +122,8 @@ class OrderByDeParserForRegExTest{
         ExpressionDeParserForRegEx expressionDeParserForRegExTwo = new ExpressionDeParserForRegEx(settings);
         OrderByDeParserForRegEx orderByDeParserForRegEx = new OrderByDeParserForRegEx(expressionDeParserForRegExOne,
                                                                                       buffer, settings);
-        orderByDeParserForRegEx.setExpressionVisitor(expressionDeParserForRegExTwo);
-        Assertions.assertEquals(expressionDeParserForRegExTwo, orderByDeParserForRegEx.getExpressionVisitor());
+        orderByDeParserForRegEx.setExpressionDeParserForRegEx(expressionDeParserForRegExTwo);
+        Assertions.assertEquals(expressionDeParserForRegExTwo, orderByDeParserForRegEx.getExpressionDeParserForRegEx());
     }
 
     @Test
