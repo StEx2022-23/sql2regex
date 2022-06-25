@@ -35,6 +35,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SpellingMistake columnNameSpellingMistake;
     private final SpellingMistake tableNameSpellingMistake;
+    private final SpellingMistake stringValueSpellingMistake;
     private final DateAndTimeFormatSynonymGenerator dateSynonyms;
     private final DateAndTimeFormatSynonymGenerator timeStampSynonyms;
     private final DateAndTimeFormatSynonymGenerator timeSynonyms;
@@ -75,6 +76,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
         this.orderByDeParser = orderByDeParser;
         this.columnNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
         this.tableNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
+        this.stringValueSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.STRINGVALUESPELLING);
         this.dateSynonyms = settings.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.DATESYNONYMS);
         this.timeSynonyms = settings.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.TIMESYNONYMS);
         this.timeStampSynonyms = settings.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.DATETIMESYNONYMS);
@@ -423,17 +425,25 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     @Override
     public void visit(StringValue stringValue) {
         if (stringValue.getPrefix() != null) {
-            buffer.append(stringValue.getPrefix());
-        }
-        String keywordSpellingString = "";
-        if(this.columnNameSpellingMistake != null || this.tableNameSpellingMistake != null) {
-            keywordSpellingString = SpellingMistake.useOrDefault(new SpellingMistake(SettingsOption.DEFAULT), stringValue.getValue());
-        } else {
-            keywordSpellingString = stringValue.getValue();
+            buffer.append(
+                    StatementDeParserForRegEx.addQuotationMarks(
+                            SpellingMistake.useOrDefault(
+                                    this.stringValueSpellingMistake,
+                                    stringValue.getPrefix()
+                            )
+                    )
+            );
         }
 
         buffer.append(OPTIONAL_WHITE_SPACE);
-        buffer.append(StatementDeParserForRegEx.addQuotationMarks(keywordSpellingString));
+        buffer.append(
+                StatementDeParserForRegEx.addQuotationMarks(
+                        SpellingMistake.useOrDefault(
+                                this.stringValueSpellingMistake,
+                                stringValue.getValue()
+                        )
+                )
+        );
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
