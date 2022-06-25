@@ -147,7 +147,12 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     @Override
     public void visit(DoubleValue doubleValue) {
         buffer.append(OPTIONAL_WHITE_SPACE);
-        buffer.append(doubleValue.toString().replace(".", "(?:\\.|,)"));
+        buffer.append(
+                doubleValue.toString().replace(
+                        ".",
+                        StringSynonymGenerator.useOrDefault(this.otherSynonyms, ".")
+                )
+        );
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
