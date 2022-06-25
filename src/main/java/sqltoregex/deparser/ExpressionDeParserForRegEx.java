@@ -588,7 +588,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             if (function.getOrderByElements() != null) {
                 buffer.append(REQUIRED_WHITE_SPACE).append("ORDER").append(REQUIRED_WHITE_SPACE).append("BY").append(REQUIRED_WHITE_SPACE);
                 boolean comma = false;
-                orderByDeParser.setExpressionVisitor(this);
+                orderByDeParser.setExpressionDeParserForRegEx(this);
                 orderByDeParser.setBuffer(buffer);
                 for (OrderByElement orderByElement : function.getOrderByElements()) {
                     if (comma) {

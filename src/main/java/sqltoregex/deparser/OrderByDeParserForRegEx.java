@@ -90,22 +90,6 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     }
 
     /**
-     * Gets the set {@link ExpressionVisitor}.
-     * @return {@link ExpressionVisitor}
-     */
-    public ExpressionVisitor getExpressionVisitor() {
-        return this.expressionDeParserForRegEx;
-    }
-
-    /**
-     * Sets a {@link ExpressionDeParserForRegEx}.
-     * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
-     */
-    public void setExpressionVisitor(ExpressionDeParserForRegEx expressionDeParserForRegEx) {
-        this.expressionDeParserForRegEx = expressionDeParserForRegEx;
-    }
-
-    /**
      * Gets the set {@link ExpressionDeParserForRegEx}.
      * @return {@link ExpressionDeParserForRegEx}
      */
