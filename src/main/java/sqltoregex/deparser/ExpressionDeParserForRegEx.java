@@ -59,7 +59,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
      */
     public ExpressionDeParserForRegEx(SelectVisitor selectVisitor, StringBuilder buffer,
                                       SettingsContainer settingsContainer) {
-        this(selectVisitor, buffer, null, settingsContainer);
+        this(selectVisitor, buffer, new OrderByDeParserForRegEx(settingsContainer), settingsContainer);
     }
 
     /**
@@ -479,12 +479,10 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             }
 
             StringBuilder tableNameWithAlias = new StringBuilder();
-            buffer.append("(");
             deparseTableName(tableName, tableNameWithAlias);
             if (!tableName.isEmpty()) {
                 buffer.append(StatementDeParserForRegEx.addQuotationMarks(tableNameWithAlias.toString())).append('.');
             }
-            buffer.append(")?");
         }
 
         buffer.append(StatementDeParserForRegEx.addQuotationMarks(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, tableColumn.getColumnName().replaceAll(QUOTATION_MARK_REGEX, ""))));
@@ -499,8 +497,6 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, tableName ));
             tableNameWithAlias.append("|");
             tableNameWithAlias.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, this.getRelatedTableNameOrAlias(tableName)));
-            tableNameWithAlias.append("|");
-            tableNameWithAlias.append("\\w*?");
             tableNameWithAlias.append(")");
         }
     }
@@ -535,13 +531,10 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                     StringBuilder tableNameWithAlias = new StringBuilder();
                     if(singleExpression.contains(".")){
                         String tableName = singleExpression.split("\\.")[0];
-
-                        tableNameWithAlias.append("(");
                         deparseTableName(tableName, tableNameWithAlias);
                         if (!tableName.isEmpty()) {
                             tableNameWithAlias.append(".");
                         }
-                        tableNameWithAlias.append(")?");
                     }
                     String[] columnName = singleExpression.split("\\.");
                     buffer.append(tableNameWithAlias).append(columnName[columnName.length - 1]);

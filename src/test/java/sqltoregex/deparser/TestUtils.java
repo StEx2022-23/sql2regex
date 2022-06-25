@@ -41,7 +41,6 @@ public class TestUtils{
                     statement.accept(statementDeParserForRegEx);
                 }
             }
-            System.out.println(buffer);
             return buffer.toString();
         }catch(JSQLParserException e){
             e.printStackTrace();
