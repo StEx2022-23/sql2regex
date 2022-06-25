@@ -276,26 +276,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
                 String[] splittedColumnDefinition = keywordSyn.split(" ");
                 Iterator<String> stringIterator = Arrays.stream(splittedColumnDefinition).iterator();
                 while(stringIterator.hasNext()){
-                    String splitElement = stringIterator.next();
-
-                    if(splitElement.contains("(") && splitElement.contains(")")){
-                        tempColumnDefinition.append("\\(");
-                        tempColumnDefinition.append(
-                                SpellingMistake.useOrDefault(
-                                        this.keywordSpellingMistake,
-                                        splitElement.replace("(", "").replace(")","")
-                                )
-                        );
-                        tempColumnDefinition.append("\\)");
-                    } else {
-                        tempColumnDefinition.append(
-                                SpellingMistake.useOrDefault(
-                                        this.keywordSpellingMistake,
-                                        splitElement
-                                )
-                        );
-                    }
-                    if(stringIterator.hasNext()) tempColumnDefinition.append(OPTIONAL_WHITE_SPACE);
+                    handleColumnDefinitionWithClipsAndWhitespaces(tempColumnDefinition, stringIterator);
                 }
                 synsWithSpellingMistake.add(tempColumnDefinition.toString());
             }
@@ -325,6 +306,28 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
             tmpBuffer.append(columnDefinitionString);
         }
         return tmpBuffer.toString();
+    }
+
+    private void handleColumnDefinitionWithClipsAndWhitespaces(StringBuilder tempColumnDefinition, Iterator<String> stringIterator) {
+        String splitElement = stringIterator.next();
+        if(splitElement.contains("(") && splitElement.contains(")")){
+            tempColumnDefinition.append("\\(");
+            tempColumnDefinition.append(
+                    SpellingMistake.useOrDefault(
+                            this.keywordSpellingMistake,
+                            splitElement.replace("(", "").replace(")","")
+                    )
+            );
+            tempColumnDefinition.append("\\)");
+        } else {
+            tempColumnDefinition.append(
+                    SpellingMistake.useOrDefault(
+                            this.keywordSpellingMistake,
+                            splitElement
+                    )
+            );
+        }
+        if(stringIterator.hasNext()) tempColumnDefinition.append(OPTIONAL_WHITE_SPACE);
     }
 
     /**
