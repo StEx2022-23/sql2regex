@@ -65,7 +65,9 @@
           <value>AVG;MITTELWERT</value>
           <value>AVG;Average</value>
           <value>COUNT;Anzahl</value>
-          <value>SUM;SUMME</value>alue>
+          <value>SUM;SUMME</value>
+          <value>MIN;MINIMUM</value>
+          <value>MAX;MAXIMUM</value>
       </aggregatefunctionlang>
       <datatypesynonyms>
           <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
@@ -86,6 +88,7 @@
           <value>KEY;INDEX</value>
           <value>UNIQUE;UNIQUE INDEX</value>
           <value>UNIQUE;UNIQUE KEY</value>
+          <value>.;,</value>
       </othersynonyms>
   </synonyms>
 </properties>
