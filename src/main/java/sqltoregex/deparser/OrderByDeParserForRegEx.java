@@ -12,6 +12,8 @@ import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerato
 import java.util.LinkedList;
 import java.util.List;
 
+import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
+
 /**
  * Implements own {@link OrderByDeParser} to generate regex.
  */
@@ -23,14 +25,14 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
     private final SpellingMistake columnNameSpellingMistake;
     private final SpellingMistake keywordSpellingMistake;
     private final StringSynonymGenerator specialSynonyms;
-    private ExpressionVisitor expressionDeParserForRegEx;
+    private ExpressionDeParserForRegEx expressionDeParserForRegEx;
 
     /**
      * Short constructor for OrderByDeParserForRegEx. Inits the expanded constructor.
      * @param settings {@link SettingsContainer}
      */
     public OrderByDeParserForRegEx(SettingsContainer settings) {
-        this(new ExpressionVisitorAdapter(), new StringBuilder(), settings);
+        this(null, new StringBuilder(), settings);
     }
 
     /**
@@ -39,7 +41,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
      * @param buffer {@link StringBuilder}
      * @param settings {@link SettingsContainer}
      */
-    public OrderByDeParserForRegEx(ExpressionVisitor expressionDeParserForRegEx, StringBuilder buffer,
+    public OrderByDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx, StringBuilder buffer,
                                    SettingsContainer settings) {
         super(expressionDeParserForRegEx, buffer);
         this.expressionDeParserForRegEx = expressionDeParserForRegEx;
@@ -112,7 +114,7 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
      * @return {@link ExpressionDeParserForRegEx}
      */
     public ExpressionDeParserForRegEx getExpressionDeParserForRegEx() {
-        return (ExpressionDeParserForRegEx) this.expressionDeParserForRegEx;
+        return this.expressionDeParserForRegEx;
     }
 
     /**
