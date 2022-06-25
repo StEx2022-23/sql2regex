@@ -87,7 +87,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     @Override
     public void visit(Addition addition) {
-        visitCommutativeBinaryExpression(addition, OPTIONAL_WHITE_SPACE + "+" + OPTIONAL_WHITE_SPACE);
+        visitCommutativeBinaryExpression(addition, OPTIONAL_WHITE_SPACE + "\\+" + OPTIONAL_WHITE_SPACE);
     }
 
     @Override
@@ -147,7 +147,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     @Override
     public void visit(DoubleValue doubleValue) {
         buffer.append(OPTIONAL_WHITE_SPACE);
-        buffer.append(doubleValue.toString());
+        buffer.append(doubleValue.toString().replace(".", "(?:\\.|,)"));
         buffer.append(OPTIONAL_WHITE_SPACE);
     }
 
