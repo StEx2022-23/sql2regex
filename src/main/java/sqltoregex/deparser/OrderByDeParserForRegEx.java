@@ -1,6 +1,5 @@
 package sqltoregex.deparser;
 
-import net.sf.jsqlparser.expression.ExpressionVisitor;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.util.deparser.OrderByDeParser;
