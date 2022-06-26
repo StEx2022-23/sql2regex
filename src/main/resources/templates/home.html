@@ -4,34 +4,8 @@
         <title>sqltoregex</title>
     </head>
 
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="convertingHints" aria-labelledby="convertingHintsLabel">
-        <div class="offcanvas-header">
-            <h4 class="offcanvas-title fw-bold" id="convertingHintsLabel">Hinweise</h4>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-            <h4 th:text="#{canvas.dateAndTimeHeading}">Hinweis 3: Zeit und Datumsformat</h4>
-            <div class="mb-2">
-                <p th:utext="#{canvas.dateAndTimeText1}"></p>
-                <p th:utext="#{canvas.dateAndTimeText2}"></p>
-                <select id="dateAndTimeSelect" class="form-select" size="1" multiple aria-label="multiple select example">
-                    <option value="" th:text="#{select.noItemYet}">2022-05-06</option>
-                </select>
-            </div>
-            <h4 th:text="#{canvas.fullQualifiedNamesHeading}">Hinweis</h4>
-            <div class="mb-2">
-                <p th:utext="#{canvas.fullQualifiedNameText}"></p>
-            </div>
-            <h4 th:text="#{canvas.joinToWhereHeading}">Hinweis</h4>
-            <div class="mb-2">
-                <p th:utext="#{canvas.joinToWhereText}"></p>
-            </div>
-            <h4 th:text="#{canvas.indexNamesHeading}">Hinweis</h4>
-            <div class="mb-2">
-                <p th:utext="#{canvas.indexNamesText}"></p>
-            </div>
-        </div>
-    </div>
+    <div lang="en" th:replace="assets/offcanvasElement :: offcanvasElement"></div>
+
     <body class="bg-dark">
         <button lang="en" th:replace="assets/scrolltotop :: scrolltotop"></button>
         <nav lang="en" th:replace="assets/navbar :: navbar"></nav>
@@ -47,27 +21,8 @@
             </div>
         </div>
 
-        <div id="toast-loaded-user-settings" role="status" aria-live="polite" aria-atomic="true" class="position-fixed toast m-3 top-0 end-0" data-bs-autohide="true" data-bs-delay="2000" style="z-index:10">
-            <div class="toast-header">
-                <svg class="bd-placeholder-img rounded me-2 bg-success" width="20" height="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#a3be8c"></rect></svg>
-                <strong class="me-auto" th:text="#{toast.information}">sql2RegEx</strong>
-                <small th:text="#{toast.localStorage}">localStorage</small>
-            </div>
-            <div class="toast-body" th:text="#{toast.userSettingsLoaded}">
-                This is a toast message.
-            </div>
-        </div>
-
-        <div id="toast-date-and-time-value" role="status" aria-live="polite" aria-atomic="true" class="position-fixed toast m-3 top-0 end-0" data-bs-autohide="true" data-bs-delay="10000" style="z-index:10">
-            <div class="toast-header">
-                <svg class="bd-placeholder-img rounded me-2 bg-success" width="20" height="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#a3be8c"></rect></svg>
-                <strong class="me-auto" th:text="#{toast.information}">sql2RegEx</strong>
-                <small th:text="#{toast.processing}">localStorage</small>
-            </div>
-            <div class="toast-body" th:utext="#{toast.dateAndTimeValue(#{settingsform.convertingHints}, 'convertingHints')}">
-                This is a toast message.
-            </div>
-        </div>
+        <div lang="en" th:replace="assets/userSettingsToast :: userSettingsToast"></div>
+        <div lang="en" th:replace="assets/dateTimeValueToast :: dateTimeValueToast"></div>
 
         <div id="toast-too-long-url-for-visualization" role="status" aria-live="polite" aria-atomic="true" class="position-fixed toast m-3 top-0 end-0" data-bs-autohide="false" style="z-index:10">
             <div class="toast-header">

@@ -1,0 +1,28 @@
+<div th:fragment="offcanvasElement" class="offcanvas offcanvas-start" tabindex="-1" id="convertingHints" aria-labelledby="convertingHintsLabel">
+    <div class="offcanvas-header">
+        <h4 class="offcanvas-title fw-bold" id="convertingHintsLabel">Hinweise</h4>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <h4 th:text="#{canvas.dateAndTimeHeading}">Hinweis 3: Zeit und Datumsformat</h4>
+        <div class="mb-2">
+            <p th:utext="#{canvas.dateAndTimeText1}"></p>
+            <p th:utext="#{canvas.dateAndTimeText2}"></p>
+            <select id="dateAndTimeSelect" class="form-select" size="1" multiple aria-label="multiple select example">
+                <option value="" th:text="#{select.noItemYet}">2022-05-06</option>
+            </select>
+        </div>
+        <h4 th:text="#{canvas.fullQualifiedNamesHeading}">Hinweis</h4>
+        <div class="mb-2">
+            <p th:utext="#{canvas.fullQualifiedNameText}"></p>
+        </div>
+        <h4 th:text="#{canvas.joinToWhereHeading}">Hinweis</h4>
+        <div class="mb-2">
+            <p th:utext="#{canvas.joinToWhereText}"></p>
+        </div>
+        <h4 th:text="#{canvas.indexNamesHeading}">Hinweis</h4>
+        <div class="mb-2">
+            <p th:utext="#{canvas.indexNamesText}"></p>
+        </div>
+    </div>
+</div>
