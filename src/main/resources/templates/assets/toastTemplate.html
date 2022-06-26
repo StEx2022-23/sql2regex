@@ -1,0 +1,11 @@
+<div th:fragment="toastTemplate (id, title, subTitle, text, color, isPermanent, delay)" th:id="${id}" role="status" aria-live="polite" aria-atomic="true" class="position-fixed toast m-3 top-0 end-0" th:data-bs-autohide="${!isPermanent}" th:data-bs-delay="${delay}" style="z-index:10">
+    <div class="toast-header">
+        <svg class="bd-placeholder-img rounded me-2 bg-success" width="20" height="20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" th:fill="${color}"></rect></svg>
+        <strong class="me-auto" th:text="${title}">title</strong>
+        <small th:text="${subTitle}">subtilte</small>
+        <button th:hidden="${!isPermanent}" type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body" th:utext="${text}">
+        Toast message!
+    </div>
+</div>

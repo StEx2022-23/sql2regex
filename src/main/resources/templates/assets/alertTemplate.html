@@ -1,0 +1,4 @@
+<div th:fragment="alertTemplate (id, boldText, lightText, type)" th:id="${id}" class="alert mt-3 collapse" role="alert" th:classappend="'alert-' + ${type}">
+    <strong th:text="${boldText}"></strong>
+    <span th:text="${lightText}"></span>
+</div>

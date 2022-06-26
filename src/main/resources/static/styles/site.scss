@@ -1,4 +1,3 @@
-
 .jumbotronbackgroundimage{
     background-repeat: no-repeat;
     background-position: bottom;
@@ -44,11 +43,6 @@
     cursor: pointer;
     z-index: 99;
 }
-
-#copyFeedack, #copyFeedackFailed, #jsonFeedback, #jsonFeedbackFailed, #jsonFeedbackHistory, #jsonFeedbackHistoryFailed{
-    display: none;
-}
-
 .examplesfeedback{
     display: none;
 }
