@@ -545,6 +545,33 @@ class ExpressionDeParserForRegExTest {
     }
 
     @Test
+    void dotEqualsCommaInDoubleValue() {
+        final String sampleSolution = "col = 1.2";
+        SettingsContainer settingsContainer = SettingsContainer.builder().build();
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "col = 1.2"
+        ));
+        matchingMap.put(SettingsOption.OTHERSYNONYMS, List.of(
+                "col = 1.2",
+                "col = 1,2"
+        ));
+
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(settingsContainer, sampleSolution, matchingMap, true)
+        );
+        assertIsNonCapturingGroup(
+                TestUtils.validateExpressionAgainstRegEx(
+                        SettingsContainer.builder().withStringSet(new HashSet<>(List.of(".",",")),
+                        SettingsOption.OTHERSYNONYMS).build(),
+                        sampleSolution,
+                        matchingMap,
+                        true
+                )
+        );
+    }
+
+    @Test
     void testFullConstructor() {
         StringBuilder buffer = new StringBuilder();
         SettingsContainer settings = SettingsContainer.builder().build();
