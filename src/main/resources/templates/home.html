@@ -22,7 +22,13 @@
         </div>
 
         <div lang="en" th:replace="assets/userSettingsToast :: userSettingsToast"></div>
-        <div lang="en" th:replace="assets/dateTimeValueToast :: dateTimeValueToast"></div>
+        <div lang="en" th:replace="assets/dateTimeValueToast :: dateTimeValueToast (
+            info=#{toast.information},
+            processing=${processing},
+            text=#{toast.dateAndTimeValue(#{settingsform.convertingHints}, 'convertingHints')},
+            color='#a3be8c',
+            isPermanent=false
+        )"></div>
 
         <div id="toast-too-long-url-for-visualization" role="status" aria-live="polite" aria-atomic="true" class="position-fixed toast m-3 top-0 end-0" data-bs-autohide="false" style="z-index:10">
             <div class="toast-header">
