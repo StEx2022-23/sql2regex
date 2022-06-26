@@ -60,7 +60,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
      */
     public ExpressionDeParserForRegEx(SelectVisitor selectVisitor, StringBuilder buffer,
                                       SettingsContainer settingsContainer) {
-        this(selectVisitor, buffer, null, settingsContainer);
+        this(selectVisitor, buffer, new OrderByDeParserForRegEx(settingsContainer), settingsContainer);
     }
 
     /**
@@ -489,12 +489,10 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             }
 
             StringBuilder tableNameWithAlias = new StringBuilder();
-            buffer.append("(");
             deparseTableName(tableName, tableNameWithAlias);
             if (!tableName.isEmpty()) {
                 buffer.append(tableNameWithAlias).append("\\.");
             }
-            buffer.append(")?");
         }
 
         buffer.append(
@@ -571,13 +569,10 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                     StringBuilder tableNameWithAlias = new StringBuilder();
                     if(singleExpression.contains(".")){
                         String tableName = singleExpression.split("\\.")[0];
-
-                        tableNameWithAlias.append("(");
                         deparseTableName(tableName, tableNameWithAlias);
                         if (!tableName.isEmpty()) {
                             tableNameWithAlias.append(".");
                         }
-                        tableNameWithAlias.append(")?");
                     }
                     String[] columnName = singleExpression.split("\\.");
                     buffer.append(tableNameWithAlias);
