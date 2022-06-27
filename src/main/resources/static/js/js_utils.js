@@ -17,26 +17,29 @@ function topFunction() {
     document.documentElement.scrollTop = 0;
 }
 
-function copy2clipbord(id, idFeedback) {
+function handleAlerts(id){
+    if(document.getElementById(id) !== null && !document.getElementById(id).classList.contains("show")){
+        new bootstrap.Collapse(document.getElementById(id));
+        setTimeout(function(){
+            new bootstrap.Collapse(document.getElementById(id));
+        }, 5000);
+    }
+}
+
+function copy2clipbord(id) {
     let copyText = document.getElementById(id);
 
     navigator.clipboard.writeText(copyText.value).then(function() {
-        if(idFeedback !== null){
-            let copyFeedbackAlert = document.getElementById(idFeedback);
-            copyFeedbackAlert.style.display = "block";
-        }
+        handleAlerts("alert-success-copy");
     }, function() {
-        if(idFeedback !== null){
-            let copyFeedbackAlertFailed = document.getElementById(idFeedback+"Failed");
-            copyFeedbackAlertFailed.style.display = "block";
-        }
+        handleAlerts("alert-warning-copy");
     }).catch(function () {
-        let copyElement = document.createElement('input');
-        copyElement.setAttribute('value', copyText.value);
+        let copyElement = document.createElement("input");
+        copyElement.setAttribute("value", copyText.value);
         document.body.appendChild(copyElement);
         copyElement.focus();
         copyElement.select();
-        document.execCommand('copy');
+        document.execCommand("copy");
         document.body.removeChild(copyElement);
     });
 }
@@ -66,13 +69,13 @@ function insertVisualizationPage() {
 }
 
 function moveToVisualizationPage(regexoutput){
-    window.location.href='/visualization?'+window.location.href.split('?')[1] +'&regex='+encodeURIComponent(document.getElementById(regexoutput).innerHTML)
+    window.location.href="/visualization?"+window.location.href.split('?')[1] +"&regex="+encodeURIComponent(document.getElementById(regexoutput).innerHTML)
 }
 
 function handleVisualization(regexoutput) {
     let MAX_URL_LENGTH = 2048;
-    let parsedUrl = '/visualization?' + window.location.href.split('?')[1] + '&regex=' + encodeURIComponent(document.getElementById(regexoutput).innerHTML);
-    const urlTooLongToast = new bootstrap.Toast(document.getElementById('toast-too-long-url-for-visualization'))
+    let parsedUrl = "/visualization?" + window.location.href.split("?")[1] + "&regex=" + encodeURIComponent(document.getElementById(regexoutput).innerHTML);
+    const urlTooLongToast = new bootstrap.Toast(document.getElementById("toast-too-long-url-for-visualization"))
     if(parsedUrl.length > MAX_URL_LENGTH) {
         urlTooLongToast.show();
         return;
@@ -85,7 +88,7 @@ function formattedCurrentTimestamp() {
     return ((currentdate.getDate().toString().length === 1) ? "0".concat(currentdate.getDate()) : (currentdate.getDate())) + "/" + (((currentdate.getMonth() + 1).toString().length === 1) ? "0".concat(currentdate.getMonth() + 1) : (currentdate.getMonth() + 1)) + "/" + ((currentdate.getFullYear().toString().length === 1) ? "0".concat(currentdate.getFullYear()) : (currentdate.getFullYear())) + " @ " + ((currentdate.getHours().toString().length === 1) ? "0".concat(currentdate.getHours()) : (currentdate.getHours())) + ":" + ((currentdate.getMinutes().toString().length === 1) ? "0".concat(currentdate.getMinutes()) : (currentdate.getMinutes())) + ":" + ((currentdate.getSeconds().toString().length === 1) ? "0".concat(currentdate.getSeconds()) : (currentdate.getSeconds()));
 }
 
-function generateJsonFormatFile(id_sql, id_regex, id_jsonFeedback) {
+function generateJsonFormatFile(id_sql, id_regex) {
     let element = document.createElement('a');
     let sql = document.getElementById(id_sql).value;
     let regex = document.getElementById(id_regex).value;
@@ -94,26 +97,24 @@ function generateJsonFormatFile(id_sql, id_regex, id_jsonFeedback) {
     let filename = "sql2regex_" + formattedCurrentTimestamp().replaceAll(" @ ", "").replaceAll("/", "").replaceAll(":", "") + ".json";
 
     try{
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonformat));
-        element.setAttribute('download', filename);
-        element.style.display = 'none';
+        element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(jsonformat));
+        element.setAttribute("download", filename);
+        element.style.display = "none";
         document.body.appendChild(element);
         element.click();
         document.body.removeChild(element);
     } catch (e) {
         console.log(e);
-        let jsonFeedbackAlertFailed = document.getElementById(id_jsonFeedback+"Failed");
-        jsonFeedbackAlertFailed.style.display = "block";
+        handleAlerts("json-warning-export");
         return;
     }
-    let jsonFeedbackAlert = document.getElementById(id_jsonFeedback);
-    jsonFeedbackAlert.style.display = "block";
+    handleAlerts("json-success-export");
 }
 
 const animateRegExCheck = [
-    { transform: 'scale(0.98)' },
-    { transform: 'scale(1.02)' },
-    { transform: 'scale(1.0)' }
+    {transform: 'scale(0.98)'},
+    {transform: 'scale(1.02)'},
+    {transform: 'scale(1.0)'}
 ];
 
 const animateRegExCheckTiming = {
@@ -192,13 +193,13 @@ class SqlRegExHistory {
     }
 
     readSqlRegExFromLocalStorage() {
-        return [this.readSqlFromLocalStorage(), this.readRegExFromLocalStorage()]
+        return [this.readSqlFromLocalStorage(), this.readRegExFromLocalStorage()];
     }
 
     addToLocalStorage(sqlNew, regexNew) {
-        this.sql.push(sqlNew)
-        this.regex.push(regexNew)
-        this.writeToLocalStorage()
+        this.sql.push(sqlNew);
+        this.regex.push(regexNew);
+        this.writeToLocalStorage();
     }
 
     checkUpdatedConverting() {
@@ -211,10 +212,6 @@ class SqlRegExHistory {
     }
 
     showConvertingHistory() {
-        document.getElementById("jsonFeedbackHistory").style.display = "none";
-        document.getElementById("jsonFeedbackHistoryFailed").style.display = "none";
-        document.getElementById("clearLocalStorage").style.display = "none";
-
         let arrayOfSqlAndArrayOfRegex = this.readSqlRegExFromLocalStorage();
         let body = document.getElementById("table-container");
 
@@ -333,19 +330,19 @@ class SqlRegExHistory {
         return copyIcon;
     }
 
-    clearLocalStorage(clearStorageFeedbackId) {
+    clearLocalStorage() {
         try{
             this.sql = [];
             this.regex = [];
             this.writeToLocalStorage(this);
         } catch (e) {
             console.log(e);
-            document.getElementById(clearStorageFeedbackId).style.display = "block";
+            handleAlerts("clear-local-storage-warning");
         }
-        new bootstrap.Collapse(document.getElementById("convertbodycontainer"))
+        new bootstrap.Collapse(document.getElementById("convertbodycontainer"));
     }
 
-    downloadJsonOfHistory(JsonHistoryFeedbackId) {
+    downloadJsonOfHistory() {
         try{
             let converts = {}
             let ConvertingHistory = {}
@@ -361,16 +358,16 @@ class SqlRegExHistory {
 
             let filename = "sql2regex_convertinghistory_" + formattedCurrentTimestamp().replaceAll(" @ ", "").replaceAll("/", "").replaceAll(":", "") + ".json";
             let element = document.createElement('a');
-            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(ConvertingHistory, null, "\t")));
-            element.setAttribute('download', filename);
-            element.style.display = 'none';
+            element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(ConvertingHistory, null, "\t")));
+            element.setAttribute("download", filename);
+            element.style.display = "none";
             document.body.appendChild(element);
             element.click();
             document.body.removeChild(element);
-            document.getElementById(JsonHistoryFeedbackId).style.display = "block";
+            handleAlerts("json-history-success-export");
         } catch (e) {
             console.log(e);
-            document.getElementById(JsonHistoryFeedbackId+"Failed").style.display = "block";
+            handleAlerts("json-history-warning-export");
         }
 
     }
@@ -378,13 +375,11 @@ class SqlRegExHistory {
 
 function toggleSlaveCheckboxes(master, slaveName){
     const slaveArray = document.getElementsByName(slaveName);
-
     slaveArray.forEach((el) => {
         document.getElementById(el.id).checked = master.checked;
         updateSingleUserSetting(el);
     })
 }
-
 
 function languageChange(){
     let langOption = window.location.href.split("?")[1];
@@ -412,9 +407,9 @@ function loadDefaultLanguageSettings(){
 }
 
 function loadUserFormSettings(formElement){
-    let allCheckboxes = formElement.querySelectorAll('input[type="checkbox"]');
+    let allCheckboxes = formElement.querySelectorAll("input[type='checkbox']");
     if(localStorage.getItem("savedUserSettings") !== null){
-        const settingsToast = new bootstrap.Toast(document.getElementById('toast-loaded-user-settings'))
+        const settingsToast = new bootstrap.Toast(document.getElementById("toast-loaded-user-settings"))
         settingsToast.show();
         let savings = JSON.parse(localStorage.getItem("savedUserSettings"));
         allCheckboxes.forEach(checkbox => {
@@ -520,31 +515,43 @@ String.prototype.replaceAt = function(index, toReplace, replacement) {
 function handleDateValue(sqlInputEl) {
     let dateValue = sqlInputEl.value;
     const matches = [];
-    let match
+    let match = null;
 
     let regexDate = new RegExp(/\d\d\d\d-\d\d-\d\d/g);
     while ((match = regexDate.exec(dateValue)) != null){
         if (!(dateValue?.[match.index - 1] === "'" || dateValue?.[match.index - 2] === "d" || dateValue?.[match.index - 3] === "{")){
-            matches.push({start: match.index, end: regexDate.lastIndex, value: match[0]})
+            matches.push({
+                start: match.index,
+                end: regexDate.lastIndex,
+                value: match[0]
+            })
         }
     }
 
     let regexDateTime = new RegExp(/\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?/g);
     while ((match = regexDateTime.exec(dateValue)) != null){
         if (!(dateValue?.[match.index - 1] === "'" || dateValue?.[match.index - 2] === "s" || dateValue?.[match.index - 3] === "t" || dateValue?.[match.index - 4] === "{")){
-            matches.push({start: match.index, end: regexDateTime.lastIndex, value: match[0]})
+            matches.push({
+                start: match.index,
+                end: regexDateTime.lastIndex,
+                value: match[0]
+            })
         }
     }
 
     let regexTime = new RegExp(/\d\d:\d\d(?::\d\d)?/g);
     while ((match = regexTime.exec(dateValue)) != null){
         if (!(dateValue?.[match.index - 1] === "'" || dateValue?.[match.index - 2] === "t" || dateValue?.[match.index - 3] === "{")){
-            matches.push({start: match.index, end: regexTime.lastIndex, value: match[0]})
+            matches.push({
+                start: match.index,
+                end: regexTime.lastIndex,
+                value: match[0]
+            })
         }
     }
 
     const selectEl = document.getElementById("dateAndTimeSelect")
-    selectEl.innerHTML ="";
+    selectEl.innerHTML = "";
 
     matches.forEach(singleMatch => {
         selectEl.appendChild(renderOption(singleMatch))
@@ -557,8 +564,8 @@ function handleDateValue(sqlInputEl) {
 }
 
 function renderOption(information){
-    let element = document.createElement('option')
-    element.setAttribute('value', information.start)
+    let element = document.createElement("option")
+    element.setAttribute("value", information.start)
     element.innerHTML = information.value
 
     return element
@@ -608,8 +615,8 @@ function dateOrTimeStringToLiteral(dateString) {
 }
 
 function showDateValueHint(){
-    if(!document.getElementById('toast-date-and-time-value').classList.contains("show")){
-        const dateAndTimeValueToast = new bootstrap.Toast(document.getElementById('toast-date-and-time-value'))
+    if(!document.getElementById("toast-date-and-time-value").classList.contains("show")){
+        const dateAndTimeValueToast = new bootstrap.Toast(document.getElementById("toast-date-and-time-value"))
         dateAndTimeValueToast.show();
     }
 }
@@ -619,11 +626,12 @@ let SqlRegExHis = new SqlRegExHistory("SqlRegExHistory");
 document.onreadystatechange = function () {
     if (document.readyState === "interactive") {
         handleCookieBanner();
+        handleAlerts();
         let currentDomain = window.location.href.split("/");
         let actualPath = currentDomain[currentDomain.length - 1].split("?")[0];
 
         if(actualPath === ""){
-            document.addEventListener('submit',  (e) => {
+            document.addEventListener("submit",  (e) => {
                 const sqlInputEl = document.getElementById("sqlinput")
                 const selectEl = document.getElementById("dateAndTimeSelect")
                 performDateAndTimeConversion(sqlInputEl, selectEl)
@@ -634,15 +642,15 @@ document.onreadystatechange = function () {
                     body: new FormData(form),
                 })
                     .then((res) => res.text())
-                    .then((text) => new DOMParser().parseFromString(text, 'text/html'))
+                    .then((text) => new DOMParser().parseFromString(text, "text/html"))
                     .then((doc) => {
-                        const result = document.createElement('div');
+                        const result = document.createElement("div");
                         result.innerHTML = doc.body.innerHTML;
                         form.parentNode.parentNode.replaceChild(result, form.parentNode);
                         result.focus();
                     })
                     .then( () => SqlRegExHis.checkUpdatedConverting())
-                    .then( () => copy2clipbord('regexoutput', null))
+                    .then( () => copy2clipbord("regexoutput"))
                     .then( () => scrollToInValidInput(document.getElementById("isInValid")))
                     .then( () => handleDateValue(sqlInputEl));
                 e.preventDefault();

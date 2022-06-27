@@ -1,0 +1,14 @@
+<div th:fragment="timelineItemTemplate (location, date, headerTimelineElement, description)" class="item">
+    <div class="location">
+        <span class="badge rounded-pill bg-secondary" th:id="${headerTimelineElement}" th:text="${location}">
+        </span>
+    </div>
+    <div class="dateholder">
+        <div class="date" th:text="${date}"></div>
+    </div>
+    <div class="bubble"></div>
+    <div>
+        <h3 class="timeline-item-title fw-bolder" th:text="${headerTimelineElement}">Projekt-Start</h3>
+        <div th:utext="${description}"> </div>
+    </div>
+</div>
