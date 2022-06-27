@@ -11,7 +11,7 @@
         <div class="container mt-3">
             <div class="card">
                 <div class="card-body">
-                    <h2 class="pb-2 border-bottom">Project-Initiators</h2>
+                    <h2 class="pb-2 border-bottom" th:utext="#{aboutUs.projectInitiators}"></h2>
                     <div class="container">
                         <div class="row">
                             <div class="col-sm-4">
@@ -93,23 +93,14 @@
             </div>
             <div class="card mt-3">
                 <div class="card-body">
-                    <h2 class="pb-2 border-bottom" th:text="#{aboutUs.roadmapHeader}"></h2>
+                    <h2 class="pb-2 border-bottom" th:utext="#{aboutUs.roadmapHeader}"></h2>
                     <div class="container">
                         <div class="timeline">
-                            <div class="item">
-                                <div class="location">
-                                    <span class="badge rounded-pill bg-secondary">Dresden
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 20 20">
-                                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
-                                        </svg>
-                                    </span>
-                                </div>
-                                <div class="dateholder">
-                                    <div class="date">01.04.2022</div>
-                                </div>
-                                <div class="bubble"></div>
-                                <div>
-                                    <h3 class="timeline-item-title fw-bolder">Projekt-Start</h3>
+                            <div lang="en" th:replace="assets/timelineItemTemplate :: timelineItemTemplate (
+                                location='Dresden',
+                                date='01.04.2022',
+                                headerTimelineElement='Projekt-Start',
+                                description='
                                     <ul>
                                         <li>
                                             Lorem ipsum dolor sit amet, consetetur sadipscing elitr, ut labore et dolore magna aliquyam.
@@ -120,36 +111,16 @@
                                         <li>
                                             Lorem ipsum dolor sit amet, consetetur sadipscing elitr, ut labore et dolore magna aliquyam.
                                         </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="item">
-                                <div class="location">
-                                    <span class="badge rounded-pill bg-secondary">Dresden
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 20 20">
-                                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
-                                        </svg>
-                                    </span>
-                                </div>
-                                <div class="dateholder">
-                                    <div class="date">01.04.2022</div>
-                                </div>
-                                <div class="bubble"></div>
-                                <div>
-                                    <h3 class="timeline-item-title fw-bolder">Projekt-Start</h3>
-                                    <ul>
-                                        <li>
-                                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, ut labore et dolore magna aliquyam.
-                                        </li>
-                                        <li>
-                                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, ut labore et dolore magna aliquyam.
-                                        </li>
-                                        <li>
-                                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, ut labore et dolore magna aliquyam.
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
+                                    </ul>'
+                            )"></div>
+
+                            <div lang="en" th:replace="assets/timelineItemTemplate :: timelineItemTemplate (
+                                location='Dresden',
+                                date='01.04.2022',
+                                headerTimelineElement='Projekt-Start',
+                                description='Lorem ipsum dolor sit amet, consetetur sadipscing elitr, ut labore et dolore magna aliquyam.'
+                            )"></div>
+
                         </div>
                     </div>
                 </div>
