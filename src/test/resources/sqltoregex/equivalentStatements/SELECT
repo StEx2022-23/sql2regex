@@ -25,3 +25,8 @@ SELECT COUNT(*), playlist.name, playlist.erstelltvon FROM playlist GROUP BY play
 SELECT COUNT(*), name, erstelltvon FROM playlist GROUP BY erstelltvon HAVING COUNT(*) > 10;
 SELECT erstelltvon, COUNT(*), name FROM playlist GROUP BY erstelltvon HAVING 10 < COUNT(*);
 SELECT erstelltvon, COUNT(*), name FROM playlist GROUP BY erstelltvon HAVING 10 < Anzahl(*);
+#####
+SELECT COUNT(playlist.playlistid), playlist.name, playlist.erstelltvon FROM playlist GROUP BY playlist.erstelltvon HAVING COUNT(playlist.playlistid) > 10;
+SELECT COUNT(playlistid), name, erstelltvon FROM playlist GROUP BY erstelltvon HAVING COUNT(playlistid) > 10;
+SELECT COUNT(playlistid), name, erstelltvon FROM playlist GROUP BY erstelltvon HAVING 10 < COUNT(playlistid);
+SELECT COUNT(playlistid), erstelltvon, name FROM playlist GROUP BY erstelltvon HAVING COUNT(playlistid) > 10;
