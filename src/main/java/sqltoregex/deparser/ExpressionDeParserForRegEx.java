@@ -496,7 +496,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             StringBuilder tableNameWithAlias = new StringBuilder();
             deparseTableName(tableName, tableNameWithAlias);
             if (!tableName.isEmpty()) {
-                buffer.append(tableNameWithAlias).append("\\.");
+                buffer.append(tableNameWithAlias).append("\\.?");
             }
         }
 
@@ -513,6 +513,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     private void deparseTableName(String tableName, StringBuilder tableNameWithAlias) {
         if(this.getRelatedTableNameOrAlias(tableName) == null){
+            tableNameWithAlias.append("(");
             tableNameWithAlias.append(
                     StatementDeParserForRegEx.addQuotationMarks(
                             SpellingMistake.useOrDefault(
@@ -521,6 +522,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                             )
                     )
             );
+            tableNameWithAlias.append(")?");
         } else {
             tableNameWithAlias.append("(?:");
             tableNameWithAlias.append(
@@ -540,7 +542,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                             )
                     )
             );
-            tableNameWithAlias.append(")");
+            tableNameWithAlias.append(")?");
         }
     }
 
@@ -586,7 +588,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                                     SpellingMistake.useOrDefault(
                                             columnNameSpellingMistake,
                                             columnName[columnName.length - 1].replaceAll(QUOTATION_MARK_REGEX, "")
-                                    )
+                                    ).replace("*", "\\*")
                             )
                     );
 
