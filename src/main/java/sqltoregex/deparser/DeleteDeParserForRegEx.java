@@ -84,7 +84,7 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
             buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "IGNORE"));
         }
 
-        if (delete.getTables().size() == 0) {
+        if (delete.getTables().isEmpty()) {
             buffer.append("(");
             buffer.append(REQUIRED_WHITE_SPACE).append("\\*");
             buffer.append(")?");
@@ -185,7 +185,7 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
                     tempStringBuilder.replace(0, tempStringBuilder.length(), "");
                 }
             }
-            if(joinListAsStringsToRotate.size()>0) buffer.append(OrderRotation.useOrDefault(this.tableNameOrderRotation, joinListAsStringsToRotate));
+            if(joinListAsStringsToRotate.isEmpty()) buffer.append(OrderRotation.useOrDefault(this.tableNameOrderRotation, joinListAsStringsToRotate));
         }
 
         if (delete.getWhere() != null) {

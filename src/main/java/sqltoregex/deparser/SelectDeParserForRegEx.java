@@ -30,7 +30,6 @@ import static sqltoregex.deparser.StatementDeParserForRegEx.*;
 public class SelectDeParserForRegEx extends SelectDeParser {
     private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
-    private Map<String, String> savedTableNameAliasMap;
     private final SpellingMistake keywordSpellingMistake;
     private final SpellingMistake columnNameSpellingMistake;
     private final SpellingMistake tableNameSpellingMistake;
@@ -558,16 +557,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
                     tempStringBuilder.replace(0, tempStringBuilder.length(), "");
                 }
 
-                List<String> orderRotated = OrderRotation.generateAsListOrDefault(this.tableNameOrder, joinListAsStringsToRotate);
-                Iterator<String> stringIterator = orderRotated.iterator();
-                buffer.append("(?:");
-                while(stringIterator.hasNext()) {
-                    buffer.append(stringIterator.next().replace(",", ""));
-                    if (stringIterator.hasNext()) {
-                        buffer.append("|");
-                    }
-                }
-                buffer.append(")");
+                concatJoinOptions(joinListAsStringsToRotate);
             } else {
                 buffer.append(OrderRotation.useOrDefault(this.tableNameOrder, simpleJoinElements));
             }
@@ -661,6 +651,19 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             buffer.append(OPTIONAL_WHITE_SPACE + "\\)");
         }
 
+    }
+
+    private void concatJoinOptions(List<String> joinListAsStringsToRotate) {
+        List<String> orderRotated = OrderRotation.generateAsListOrDefault(this.tableNameOrder, joinListAsStringsToRotate);
+        Iterator<String> stringIterator = orderRotated.iterator();
+        buffer.append("(?:");
+        while(stringIterator.hasNext()) {
+            buffer.append(stringIterator.next().replace(",", ""));
+            if (stringIterator.hasNext()) {
+                buffer.append("|");
+            }
+        }
+        buffer.append(")");
     }
 
     /**
@@ -944,16 +947,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             tempStringBuilder.replace(0, tempStringBuilder.length(), "");
         }
 
-        List<String> orderRotated = OrderRotation.generateAsListOrDefault(this.tableNameOrder, joinListAsStringsToRotate);
-        Iterator<String> stringIterator = orderRotated.iterator();
-        buffer.append("(?:");
-        while(stringIterator.hasNext()) {
-            buffer.append(stringIterator.next().replace(",", ""));
-            if (stringIterator.hasNext()) {
-                buffer.append("|");
-            }
-        }
-        buffer.append(")");
+        concatJoinOptions(joinListAsStringsToRotate);
 
         buffer.append("\\)");
 
