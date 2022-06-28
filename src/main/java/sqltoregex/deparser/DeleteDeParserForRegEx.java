@@ -84,8 +84,10 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
             buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "IGNORE"));
         }
 
-        if (null == delete.getTables()) {
-            buffer.append(REQUIRED_WHITE_SPACE).append("\\*").append(REQUIRED_WHITE_SPACE);
+        if (delete.getTables().size() == 0) {
+            buffer.append("(");
+            buffer.append(REQUIRED_WHITE_SPACE).append("\\*");
+            buffer.append(")?");
         }
 
         List<String> tableList = new LinkedList<>();

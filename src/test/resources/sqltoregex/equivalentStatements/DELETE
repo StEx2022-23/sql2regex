@@ -1,0 +1,6 @@
+<!-- first line == sample solution, follow line == equivalent solutions, five # as delimiter between statements --!>
+
+DELETE FROM Song WHERE genreID = 6;
+DELETE FROM Song WHERE genreID = 6;
+DELETE * FROM Song WHERE genreID = 6;
+DELETE FROM Song WHERE 6 = genreID;
