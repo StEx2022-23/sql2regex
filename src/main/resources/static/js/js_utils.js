@@ -26,13 +26,13 @@ function handleAlerts(id){
     }
 }
 
-function copy2clipbord(id) {
+function copy2clipbord(id, dontShowAlert) {
     let copyText = document.getElementById(id);
 
     navigator.clipboard.writeText(copyText.value).then(function() {
-        handleAlerts("alert-success-copy");
+        if(dontShowAlert === false) handleAlerts("alert-success-copy");
     }, function() {
-        handleAlerts("alert-warning-copy");
+        if(dontShowAlert === false) handleAlerts("alert-success-copy");
     }).catch(function () {
         let copyElement = document.createElement("input");
         copyElement.setAttribute("value", copyText.value);
@@ -650,7 +650,7 @@ document.onreadystatechange = function () {
                         result.focus();
                     })
                     .then( () => SqlRegExHis.checkUpdatedConverting())
-                    .then( () => copy2clipbord("regexoutput"))
+                    .then( () => copy2clipbord("regexoutput", true))
                     .then( () => scrollToInValidInput(document.getElementById("isInValid")))
                     .then( () => handleDateValue(sqlInputEl));
                 e.preventDefault();
