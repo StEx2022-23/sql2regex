@@ -1,0 +1,15 @@
+<!-- first line == sample solution, follow line == equivalent solutions, five # as delimiter between statements --!>
+
+INSERT INTO genre (bezeichnung, beschreibung) VALUES ("Rock", "Rockige Musik.");
+INSERT INTO genre (bezeichnung, beschreibung) VALUE ("Rock", "Rockige Musik.");
+INSERT INTO genre (beschreibung, bezeichnung) VALUES ("Rockige Musik.", "Rock");
+INSERT INTO genre ("beschreibung", "bezeichnung") VALUES ("Rockige Musik.", "Rock");
+INSERT INTO genre(beschreibung,bezeichnung) VALUES ("Rockige Musik.","Rock");
+INSERT INTO genre(beschreibun,bezeichnun) VALUES ("Rockige Musik","Roc");
+#####
+INSERT INTO playlist (name, erstelltam, erstelltvon) VALUES ("krassePlaylist", {d'2020-12-12'}, "SpotifyUser");
+INSERT INTO playlist (name, erstelltam, erstelltvon) VALUES ("krassePlaylist", 20-12-12, "SpotifyUser");
+INSERT INTO playlist (name, erstelltam, erstelltvon) VALUES ("krassePlaylist", 20201212, "SpotifyUser");
+INSERT INTO playlist ("name", "erstelltam", "erstelltvon") VALUES ("krassePlaylist", 2020-12-12, "SpotifyUser");
+INSERT INTO playlist ("name", "erstelltvon", "erstelltam") VALUES ("krassePlaylist", "SpotifyUser", 2020-12-12);
+INSERT INTO playlist ("name", "erstelltvon", "erstelltam") VALUES ("krassePlaylist", "SpotifyUser", #2020-12-12#);
