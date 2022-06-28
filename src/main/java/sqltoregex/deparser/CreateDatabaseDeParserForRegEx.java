@@ -40,7 +40,7 @@ public class CreateDatabaseDeParserForRegEx {
      * @return generated regex
      */
     public String deParse(String createDatabase){
-        Pattern pattern = Pattern.compile("CREATE DATABASE (\\w*)( .*)*");
+        Pattern pattern = Pattern.compile("CREATE DATABASE [`´'\"]?(\\w*)[`´'\"]?( .*)*");
         Matcher matcher = pattern.matcher(createDatabase);
         StringBuilder databasename = new StringBuilder();
         StringBuilder statementAfterDatabaseName = new StringBuilder();
@@ -66,7 +66,14 @@ public class CreateDatabaseDeParserForRegEx {
                     .append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "EXISTS"))
                     .append(REQUIRED_WHITE_SPACE);
             buffer.append(")?");
-        buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, databasename.toString()));
+        buffer.append(
+                StatementDeParserForRegEx.addQuotationMarks(
+                        SpellingMistake.useOrDefault(
+                                this.keywordSpellingMistake,
+                                databasename.toString()
+                        )
+                )
+        );
         if(!statementAfterDatabaseName.toString().equals("null")){
             buffer.append(statementAfterDatabaseName.toString().replace(" ", REQUIRED_WHITE_SPACE));
         }
