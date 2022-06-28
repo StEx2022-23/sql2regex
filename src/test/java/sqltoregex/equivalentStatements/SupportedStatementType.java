@@ -4,5 +4,6 @@ public enum SupportedStatementType {
     SELECT,
     DELETE,
     INSERTINTO,
-    UPDATE
+    UPDATE,
+    CREATE
 }

@@ -64,6 +64,11 @@ class EquivalentStatementTest extends UserSettingsPreparer {
         this.specificTest(SupportedStatementType.UPDATE);
     }
 
+    @Test
+    void testCreateStatements() throws JSQLParserException, IOException {
+        this.specificTest(SupportedStatementType.CREATE);
+    }
+
     void specificTest(SupportedStatementType supportedStatementType) throws JSQLParserException, IOException {
         this.parseTextFile(supportedStatementType);
         for (String key : this.equivalentStatements.keySet()) {
