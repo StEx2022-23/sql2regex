@@ -1,7 +1,27 @@
 <!-- first line == sample solution, follow line == equivalent solutions, five # as delimiter between statements --!>
 
-SELECT col1, col2 FROM table;
-SELECT col1, col2 FROM table;
+SELECT song.name, song.erscheinungsdatum FROM song ORDER BY song.erscheinungsdatum DESC;
+SELECT song.erscheinungsdatum, song.name FROM song ORDER BY song.erscheinungsdatum DESC;
+SELECT name, erscheinungsdatum FROM song ORDER BY erscheinungsdatum DESC;
+SELECT erscheinungsdatum, name FROM song ORDER BY erscheinungsdatum DESC;
+SELECT name, erscheinungsdatum FROM song ORDER BY erscheinungsdatum absteigend;
 #####
-SELECT col1, col2 FROM table;
-SELECT col1, col2 FROM table;
+SELECT COUNT(*) FROM playlist;
+SELECT ANZAHL(*) FROM playlist;
+SELECT COUNT(*) AS "Anzahl" FROM playlist;
+#####
+SELECT genre.bezeichung, genre.beschreibung, SUM(song.laenge) AS Spieldauer FROM song INNER JOIN genre ON song.genreid = genre.genreid GROUP BY genre.bezeichnung, genre.beschreibung;
+SELECT bezeichung, beschreibung, SUM(laenge) AS Spieldauer FROM song INNER JOIN genre ON song.genreid = genre.genreid GROUP BY bezeichnung, beschreibung;
+SELECT bezeichung, beschreibung, SUMME(laenge) AS Spieldauer FROM song INNER JOIN genre ON song.genreid = genre.genreid GROUP BY bezeichnung, beschreibung;
+SELECT beschreibung, bezeichung, SUM(laenge) AS Spieldauer FROM song INNER JOIN genre ON song.genreid = genre.genreid GROUP BY beschreibung, bezeichnung;
+#####
+SELECT song.name, musiker.kuenstlername FROM song  INNER JOIN interpretvon ON musiker.musikerid = song.musikerid  INNER JOIN kuenstler ON musiker.musikerid = song.musikerid WHERE musiker.kuenstlername = "01099";
+SELECT name, kuenstlername FROM song  INNER JOIN interpretvon ON musiker.musikerid = song.musikerid  INNER JOIN kuenstler ON musiker.musikerid = song.musikerid WHERE kuenstlername = "01099";
+SELECT name, kuenstlername FROM song  INNER JOIN kuenstler ON musiker.musikerid = song.musikerid INNER JOIN interpretvon ON musiker.musikerid = song.musikerid WHERE "01099" = kuenstlername;
+SELECT kuenstlername, name FROM song  INNER JOIN kuenstler ON musiker.musikerid = song.musikerid INNER JOIN interpretvon ON musiker.musikerid = song.musikerid WHERE "01099" = kuenstlername;
+SELECT kuenstlername, name FROM song  INNER JOIN kuenstler ON song.musikerid = musiker.musikerid INNER JOIN interpretvon ON song.musikerid = musiker.musikerid WHERE "01099" = kuenstlername;
+#####
+SELECT COUNT(*), playlist.name, playlist.erstelltvon FROM playlist GROUP BY playlist.erstelltvon HAVING COUNT(*) > 10;
+SELECT COUNT(*), name, erstelltvon FROM playlist GROUP BY erstelltvon HAVING COUNT(*) > 10;
+SELECT erstelltvon, COUNT(*), name FROM playlist GROUP BY erstelltvon HAVING 10 < COUNT(*);
+SELECT erstelltvon, COUNT(*), name FROM playlist GROUP BY erstelltvon HAVING 10 < Anzahl(*);

@@ -180,13 +180,40 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
      */
     private String handleTableNameAlias(FromItem fromItem, String col) {
         StringBuilder temp = new StringBuilder();
-        String columnName = col.split("\\.")[1].replaceAll(QUOTATION_MARK_REGEX, "");
+
+        String table = fromItem.toString().split(" ")[0].replaceAll(QUOTATION_MARK_REGEX, "");
+        String tableAlias = this.expressionDeParserForRegEx.getRelatedTableNameOrAlias(table);
+
         temp.append("(?:");
-        temp.append(StatementDeParserForRegEx.addQuotationMarks(fromItem.toString().split(" ")[0].replaceAll(QUOTATION_MARK_REGEX, "")));
+        temp.append(
+                StatementDeParserForRegEx.addQuotationMarks(
+                    SpellingMistake.useOrDefault(
+                            this.columnNameSpellingMistake,
+                            table
+                    )
+                )
+        );
         temp.append("|");
-        temp.append(StatementDeParserForRegEx.addQuotationMarks(fromItem.getAlias().toString().replace(" ", "").replaceAll(QUOTATION_MARK_REGEX, "")));
+        temp.append(
+                StatementDeParserForRegEx.addQuotationMarks(
+                        SpellingMistake.useOrDefault(
+                                this.columnNameSpellingMistake,
+                                tableAlias
+                        )
+                )
+        );
         temp.append(")?\\.?");
-        temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, StatementDeParserForRegEx.addQuotationMarks(columnName)));
+
+        String columnName = col.split("\\.")[1].replaceAll(QUOTATION_MARK_REGEX, "");
+
+        temp.append(
+                StatementDeParserForRegEx.addQuotationMarks(
+                        SpellingMistake.useOrDefault(
+                                this.columnNameSpellingMistake,
+                                columnName.replaceAll(QUOTATION_MARK_REGEX, "")
+                        )
+                )
+        );
         return temp.toString();
     }
 }

@@ -42,7 +42,7 @@ class ConverterManagementTest {
     @Test
     void testExpressionDeparsing() throws JSQLParserException {
         Assertions.assertEquals(
-                "^col1 + col2;?$",
+                "^\\s*col1 + col2\\s*;?\\s*$",
                 converterManagement.deparse("col1+col2", true, SettingsType.ALL)
         );
         Assertions.assertThrows(JSQLParserException.class, () ->
@@ -66,7 +66,7 @@ class ConverterManagementTest {
         Assertions.assertTrue(parsingSolution.endsWith("$"));
 
         Assertions.assertEquals(
-                "^col1 + col2;?$",
+                "^\\s*col1 + col2\\s*;?\\s*$",
                 converterManagement.deparse("col1+col2", true, SettingsType.ALL)
         );
     }

@@ -171,14 +171,19 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
         }
 
         if (delete.getJoins() != null) {
+            List<String> joinListAsStringsToRotate = new LinkedList<>();
+            StringBuilder tempStringBuilder = new StringBuilder();
             for (Join join : delete.getJoins()) {
                 if (!join.isSimple()) {
                     SelectDeParserForRegEx joinSelectDeParserForRegEx = new SelectDeParserForRegEx(settingsContainer);
                     joinSelectDeParserForRegEx.setBuffer(buffer);
                     joinSelectDeParserForRegEx.setExpressionVisitor(this.expressionDeParserForRegEx);
-                    joinSelectDeParserForRegEx.deparseJoin(join);
+                    joinSelectDeParserForRegEx.deparseJoin(tempStringBuilder, join);
+                    joinListAsStringsToRotate.add(tempStringBuilder.toString());
+                    tempStringBuilder.replace(0, tempStringBuilder.length(), "");
                 }
             }
+            if(joinListAsStringsToRotate.size()>0) buffer.append(OrderRotation.useOrDefault(this.tableNameOrderRotation, joinListAsStringsToRotate));
         }
 
         if (delete.getWhere() != null) {

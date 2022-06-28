@@ -49,9 +49,13 @@ class EquivalentStatementTest extends UserSettingsPreparer {
     void testSelectStatements() throws IOException, JSQLParserException {
         this.parseTextFile(SupportedStatementType.SELECT);
         for (String key : this.equivalentStatements.keySet()) {
-            Pattern pattern = Pattern.compile(this.converterManagement.deparse(key, false, SettingsType.ALL));
+            Pattern pattern = Pattern.compile(this.converterManagement.deparse(key, false, SettingsType.ALL), Pattern.CASE_INSENSITIVE);
             for (String toValidateStatements : this.equivalentStatements.get(key)) {
                 Matcher matcher = pattern.matcher(toValidateStatements);
+                if(!matcher.matches()) {
+                    System.out.println(pattern);
+                    System.out.println(toValidateStatements);
+                }
                 Assertions.assertTrue(matcher.matches());
             }
         }
