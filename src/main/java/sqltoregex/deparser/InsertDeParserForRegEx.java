@@ -89,7 +89,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         buffer.append(
                 StatementDeParserForRegEx.addQuotationMarks(
                     SpellingMistake.useOrDefault(this.tableNameSpellingMistake, insert.getTable().toString().replaceAll(QUOTATION_MARK_REGEX, "")))
-        ).append(REQUIRED_WHITE_SPACE);
+        ).append(OPTIONAL_WHITE_SPACE);
 
         if (insert.getColumns() != null && !(insert.getItemsList(ExpressionList.class).getExpressions().get(0) instanceof RowConstructor)) {
             Map<String, String> mappedColumnsAndRelatedValues = new LinkedHashMap<>();
@@ -100,9 +100,7 @@ public class InsertDeParserForRegEx extends InsertDeParser {
                 buffer.append("\\(");
                 buffer.append(OPTIONAL_WHITE_SPACE);
                 while (extractedColumnsIterator.hasNext()) {
-                    buffer.append(mappedColumnsAndRelatedValues.get(extractedColumnsIterator.next())
-
-                    );
+                    buffer.append(mappedColumnsAndRelatedValues.get(extractedColumnsIterator.next()));
                     if (extractedColumnsIterator.hasNext()) {
                         buffer.append(OPTIONAL_WHITE_SPACE);
                         buffer.append(",");
@@ -382,7 +380,11 @@ public class InsertDeParserForRegEx extends InsertDeParser {
         String[] splittedSingleColumnOrderOption = singleColumnOrderOption.replace(" ", "").split(",");
         Iterator<String> stringIterator = Arrays.stream(splittedSingleColumnOrderOption).iterator();
         while (stringIterator.hasNext()) {
-            buffer.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, stringIterator.next().replaceAll(QUOTATION_MARK_REGEX, "")));
+            buffer.append(
+                    StatementDeParserForRegEx.addQuotationMarks(
+                            SpellingMistake.useOrDefault(this.columnNameSpellingMistake, stringIterator.next().replaceAll(QUOTATION_MARK_REGEX, ""))
+                    )
+            );
             if (stringIterator.hasNext()) buffer.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
         }
         buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);

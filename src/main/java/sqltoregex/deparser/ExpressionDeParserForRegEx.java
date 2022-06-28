@@ -669,7 +669,9 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 .append("\\{d").append(OPTIONAL_WHITE_SPACE).append("'").append(dateValue.getValue().toString())
                 .append("'").append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')
+                .append("#?")
                 .append(DateAndTimeFormatSynonymGenerator.useOrDefault(this.dateSynonyms, dateValue))
+                .append("#?")
                 .append(")");
     }
 
@@ -679,7 +681,9 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 .append("\\{ts").append(OPTIONAL_WHITE_SPACE).append("'").append(timestampValue.getValue().toString())
                 .append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')
+                .append("#?")
                 .append(DateAndTimeFormatSynonymGenerator.useOrDefault(this.timeStampSynonyms, timestampValue))
+                .append("#?")
                 .append(")");
     }
 
@@ -689,7 +693,9 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 .append("\\{t").append(OPTIONAL_WHITE_SPACE).append("'").append(timeValue.getValue().toString())
                 .append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')
+                .append("#?")
                 .append(DateAndTimeFormatSynonymGenerator.useOrDefault(this.timeSynonyms, timeValue))
+                .append("#?")
                 .append(")");
     }
 
