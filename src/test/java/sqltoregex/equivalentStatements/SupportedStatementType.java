@@ -1,5 +1,6 @@
 package sqltoregex.equivalentStatements;
 
 public enum SupportedStatementType {
-    SELECT
+    SELECT,
+    DELETE
 }

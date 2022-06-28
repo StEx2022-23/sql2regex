@@ -171,9 +171,19 @@ class DeleteDeParserForRegExTest {
         );
     }
 
-
-
-
-
-
+    @Test
+    void testDeleteAllNotation(){
+        final String sampleSolution = "DELETE FROM table";
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "DELETE FROM table",
+                "DELETE * FROM table"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+    }
 }
