@@ -185,7 +185,7 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
                     tempStringBuilder.replace(0, tempStringBuilder.length(), "");
                 }
             }
-            if(joinListAsStringsToRotate.isEmpty()) buffer.append(OrderRotation.useOrDefault(this.tableNameOrderRotation, joinListAsStringsToRotate));
+            if(!joinListAsStringsToRotate.isEmpty()) buffer.append(OrderRotation.useOrDefault(this.tableNameOrderRotation, joinListAsStringsToRotate));
         }
 
         if (delete.getWhere() != null) {
