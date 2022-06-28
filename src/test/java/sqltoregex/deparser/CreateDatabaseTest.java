@@ -76,4 +76,35 @@ class CreateDatabaseTest {
                 true
         );
     }
+
+    @Test
+    void testQuotationMarkBehaviour(){
+        final String sampleSolution = "CREATE DATABASE `database` something else";
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "CREATE DATABASE `database` something else",
+                "CREATE DATABASE database something else",
+                "CREATE DATABASE \"database\" something else"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+
+        final String sampleSolutionTwo = "CREATE DATABASE database something else";
+        Map<SettingsOption, List<String>> matchingMapTwo = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "CREATE DATABASE `database` something else",
+                "CREATE DATABASE 'database' something else",
+                "CREATE DATABASE \"database\" something else"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                sampleSolutionTwo,
+                matchingMapTwo,
+                true
+        );
+    }
 }
