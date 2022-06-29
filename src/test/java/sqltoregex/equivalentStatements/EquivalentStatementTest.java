@@ -56,7 +56,7 @@ class EquivalentStatementTest extends UserSettingsPreparer {
 
     @Test
     void testInsertIntoStatements() throws JSQLParserException, IOException {
-        this.specificTest(SupportedStatementType.INSERTINTO);
+        this.specificTest(SupportedStatementType.INSERT);
     }
 
     @Test
@@ -67,6 +67,11 @@ class EquivalentStatementTest extends UserSettingsPreparer {
     @Test
     void testCreateStatements() throws JSQLParserException, IOException {
         this.specificTest(SupportedStatementType.CREATE);
+    }
+
+    @Test
+    void testDropStatements() throws JSQLParserException, IOException {
+        this.specificTest(SupportedStatementType.DROP);
     }
 
     void specificTest(SupportedStatementType supportedStatementType) throws JSQLParserException, IOException {
