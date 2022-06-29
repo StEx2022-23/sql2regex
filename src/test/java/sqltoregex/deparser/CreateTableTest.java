@@ -164,7 +164,8 @@ class CreateTableTest {
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "CREATE TABLE table1 (col1 type1, INDEX index_name (col1))",
-                "CREATE  TABLE  table1  (col1  type1 ,  INDEX  index_name  ( col1 ))"
+                "CREATE  TABLE  table1  (col1  type1 ,  INDEX  index_name  ( col1 ))",
+                "CREATE TABLE table1 (col1 type1, INDEX index_name (`col1`))"
         ));
         matchingMap.put(SettingsOption.OTHERSYNONYMS, List.of(
                 "CREATE TABLE table1 (col1 type1, KEY index_name (col1))"
@@ -172,6 +173,19 @@ class CreateTableTest {
 
         TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), "CREATE TABLE table1 (col1 type1, INDEX index_name (col1))", matchingMap, true);
         TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().withStringSet(Set.of("INDEX", "KEY"), SettingsOption.OTHERSYNONYMS).build(), "CREATE TABLE table1 (col1 type1, INDEX index_name (col1))", matchingMap, true);
+    }
+
+    @Test
+    void withMultipleColumnIndex() {
+        final String sampleSolution = "CREATE TABLE table1 (col1 type1, col2 type2, INDEX index_name (col1, col2))";
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "CREATE TABLE table1 (col1 type1, col2 type2, INDEX index_name (col1, col2))",
+                "CREATE TABLE table1 (col1 type1, col2 type2, INDEX index_name (`col1`, `col2`))",
+                "CREATE TABLE table1 (col1 type1, col2 type2, INDEX index_name (col1, col2))"
+        ));
+
+        TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), sampleSolution, matchingMap, true);
     }
 
     @Test
@@ -253,7 +267,9 @@ class CreateTableTest {
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
                 "CREATE TABLE table1 (col1 type1, CONSTRAINT symbol FOREIGN KEY (col1) REFERENCES table2 (col1, col2))",
-                "CREATE TABLE table1 (col1 type1, CONSTRAINT symbol FOREIGN KEY (col1) REFERENCES table2 ( col1 ,col2 ))"
+                "CREATE TABLE table1 (col1 type1, CONSTRAINT symbol FOREIGN KEY (col1) REFERENCES table2 ( col1 ,col2 ))",
+                "CREATE TABLE table1 (col1 type1, CONSTRAINT symbol FOREIGN KEY (col1) REFERENCES `table2` ( col1 ,col2 ))",
+                "CREATE TABLE table1 (col1 type1, CONSTRAINT symbol FOREIGN KEY (col1) REFERENCES table2 (`col1`,`col2`))"
         ));
 
         TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), "CREATE TABLE table1 (col1 type1, CONSTRAINT symbol FOREIGN KEY (col1) REFERENCES table2 (col1, col2))", matchingMap, true);

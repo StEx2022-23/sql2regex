@@ -2,8 +2,6 @@ package sqltoregex;
 
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.ExpressionVisitor;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
@@ -22,8 +20,6 @@ import sqltoregex.visitor.StatementVisitorKeyPlacement;
 import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
 
 import java.util.*;
-
-import static java.lang.Math.abs;
 
 /**
  * Realizes a spring service for handling the converting process.
@@ -89,33 +85,31 @@ public class ConverterManagement {
      * @return generated regex
      * @throws JSQLParserException if parsing goes wrong
      */
-    private String deParseExpression(String sqlstatement, StringBuilder buffer, SettingsType settingsType) throws JSQLParserException {
+    private String deParseExpression(String sqlstatement, SettingsType settingsType) throws JSQLParserException {
         Expression expression;
         expression = this.parseExpression(sqlstatement);
         SettingsContainer settings = SettingsContainer.builder().with(settingsManager, settingsType);
         ExpressionDeParser expressionDeParser = new ExpressionDeParserForRegEx(new SelectDeParserForRegEx(
-                settings), buffer, settings);
+                settings), new StringBuilder(), settings);
         expression.accept(expressionDeParser);
-        return expressionDeParser.getBuffer().toString();
+        return this.buildOutputRegex(expressionDeParser.getBuffer().toString());
     }
 
     /**
      * Deparses statements.
      * @param sqlStatement current sql statement
-     * @param buffer StringBuilder {@link StringBuilder}
      * @param settingsType {@link sqltoregex.settings.UserSettings} or presets
      * @return  generated regex
      * @throws JSQLParserException if parsing goes wrong
      */
-    private String deParseStatement(String sqlStatement, StringBuilder buffer, SettingsType settingsType) throws JSQLParserException {
+    private String deParseStatement(String sqlStatement, SettingsType settingsType) throws JSQLParserException {
         if(checkIfStatementTypeOfCreateDatabase(sqlStatement)) return new CreateDatabaseDeParserForRegEx(SettingsContainer.builder().with(settingsManager, settingsType)).deParse(sqlStatement);
 
         Statement statement;
         statement = this.parseStatement(sqlStatement);
         List<String> regExList = new LinkedList<>();
 
-        StatementDeParserForRegEx defaultStatementDeParser = new StatementDeParserForRegEx(buffer, SettingsContainer.builder().with(settingsManager, settingsType));
-
+        StatementDeParserForRegEx defaultStatementDeParser = new StatementDeParserForRegEx(new StringBuilder(), SettingsContainer.builder().with(settingsManager, settingsType));
         statement.accept(defaultStatementDeParser);
         regExList.add(defaultStatementDeParser.getBuffer().toString());
 
@@ -143,8 +137,7 @@ public class ConverterManagement {
      * @throws JSQLParserException if parsing goes wrong
      */
     public String deparse(String sqlStatement) throws JSQLParserException {
-        StringBuilder buffer = new StringBuilder();
-        return this.deParseStatement(sqlStatement, buffer, SettingsType.USER);
+        return this.deParseStatement(sqlStatement, SettingsType.USER);
     }
 
     /**
@@ -155,7 +148,7 @@ public class ConverterManagement {
      * @throws JSQLParserException if parsing goes wrong
      */
     public String deparse(String sqlStatement, boolean isOnlyExpression) throws JSQLParserException {
-        return deparse(sqlStatement, isOnlyExpression, SettingsType.USER);
+        return this.deparse(sqlStatement, isOnlyExpression, SettingsType.USER);
     }
 
     /**
@@ -167,20 +160,20 @@ public class ConverterManagement {
      * @throws JSQLParserException if parsing goes wrong
      */
     public String deparse(String sqlStatement, boolean isOnlyExpression, SettingsType settingsType) throws JSQLParserException {
-        Set<String> statementSet = new HashSet<String>(extractStatements(sqlStatement));
+        Set<String> statementSet = new HashSet<>(extractStatements(sqlStatement));
         StringBuilder buffer = new StringBuilder();
         Iterator<String> iterator = statementSet.iterator();
         while (iterator.hasNext()){
             if (isOnlyExpression) {
-                this.deParseExpression(iterator.next(), buffer, settingsType);
+                buffer.append(this.deParseExpression(iterator.next(), settingsType));
             } else {
-                this.deParseStatement(iterator.next(), buffer, settingsType);
+                buffer.append(this.deParseStatement(iterator.next(), settingsType));
             }
             if (iterator.hasNext()){
                 buffer.append('|');
             }
         }
-        return buildOutputRegex(buffer.toString());
+        return buffer.toString();
     }
 
     /**
@@ -208,6 +201,10 @@ public class ConverterManagement {
 
             firstPos = ++secondPos;
             stmtList.add(subBetweenSemis);
+        }
+
+        if (!multStmtString.endsWith(";")){
+            stmtList.add(multStmtString.substring(firstPos));
         }
         return stmtList;
     }

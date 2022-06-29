@@ -15,6 +15,7 @@ import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
+import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX_ZERO_ONE;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -163,7 +164,8 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
      */
     private String deParseIndexColumns(Index index){
         List<String> indexStringList = getStringList(index.getColumns());
-        return "\\(" + OPTIONAL_WHITE_SPACE + OrderRotation.useOrDefault(this.indexColumnNameOrder, indexStringList)
+        return "\\(" + OPTIONAL_WHITE_SPACE
+                + OrderRotation.useOrDefault(this.indexColumnNameOrder, StatementDeParserForRegEx.addQuotationMarks(indexStringList))
                 + OPTIONAL_WHITE_SPACE + "\\)";
     }
 
@@ -362,11 +364,11 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
 
         if (index instanceof ForeignKeyIndex foreignKeyIndex){
             tmpBuffer.append(OPTIONAL_WHITE_SPACE + "REFERENCES" + REQUIRED_WHITE_SPACE)
-                    .append(foreignKeyIndex.getTable().toString())
+                    .append(StatementDeParserForRegEx.addQuotationMarks(foreignKeyIndex.getTable().toString()))
                     .append(OPTIONAL_WHITE_SPACE)
                     .append("\\(")
                     .append(OPTIONAL_WHITE_SPACE)
-                    .append(OrderRotation.useOrDefault(this.indexColumnNameOrder, foreignKeyIndex.getReferencedColumnNames()))
+                    .append(OrderRotation.useOrDefault(this.indexColumnNameOrder, StatementDeParserForRegEx.addQuotationMarks(foreignKeyIndex.getReferencedColumnNames())))
                     .append(OPTIONAL_WHITE_SPACE)
                     .append("\\)");
             tmpBuffer.append(deParseReferentialActions(foreignKeyIndex));
