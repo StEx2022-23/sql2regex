@@ -163,8 +163,8 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
      */
     private String deParseIndexColumns(Index index){
         List<String> indexStringList = getStringList(index.getColumns());
-        return "\\(" + OrderRotation.useOrDefault(this.indexColumnNameOrder, indexStringList)
-                + "\\)";
+        return "\\(" + OPTIONAL_WHITE_SPACE + OrderRotation.useOrDefault(this.indexColumnNameOrder, indexStringList)
+                + OPTIONAL_WHITE_SPACE + "\\)";
     }
 
 

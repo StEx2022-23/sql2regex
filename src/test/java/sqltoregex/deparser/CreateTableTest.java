@@ -163,7 +163,8 @@ class CreateTableTest {
     void withSingleColumnAndSimpleIndex() {
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "CREATE TABLE table1 (col1 type1, INDEX index_name (col1))"
+                "CREATE TABLE table1 (col1 type1, INDEX index_name (col1))",
+                "CREATE  TABLE  table1  (col1  type1 ,  INDEX  index_name  ( col1 ))"
         ));
         matchingMap.put(SettingsOption.OTHERSYNONYMS, List.of(
                 "CREATE TABLE table1 (col1 type1, KEY index_name (col1))"
