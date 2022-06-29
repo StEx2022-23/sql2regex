@@ -3,7 +3,8 @@ package sqltoregex.equivalentStatements;
 public enum SupportedStatementType {
     SELECT,
     DELETE,
-    INSERTINTO,
+    INSERT,
     UPDATE,
-    CREATE
+    CREATE,
+    DROP
 }
