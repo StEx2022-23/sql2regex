@@ -69,7 +69,51 @@
                                 altSql5='DELETE * FROM tab WHERE col1 = 1 AND col2 = 2',
                                 altSql6=''
                     )"></div>
-                    
+
+                    <hr class="my-3"/>
+
+                    <h2 class="pb-2 border-bottom" th:text="#{examples.example} + ' #5'"></h2>
+                    <div lang="en" th:replace="assets/examplesTemplate :: examplesTemplate (
+                                id='5',
+                                sql='CREATE DATABASE test',
+                                regex='(?:CREATE|REATE|CEATE|CRATE|CRETE|CREAE|CREAT)\s+(?:DATABASE|ATABASE|DTABASE|DAABASE|DATBASE|DATAASE|DATABSE|DATABAE|DATABAS)\s+((?:OR|R|O)\s+(?:REPLACE|EPLACE|RPLACE|RELACE|REPACE|REPLCE|REPLAE|REPLAC)\s+|(?:IF|F|I)\s+(?:NOT|OT|NT|NO)\s+(?:EXISTS|XISTS|EISTS|EXSTS|EXITS|EXISS|EXIST)\s+)?[`´\'&quot;]?(?:test|est|tst|tet|tes)[`´\'&quot;]?',
+                                altSql1='CREATE DATABASE test',
+                                altSql2='CREATE DATABASE \'test\'',
+                                altSql3='CREATE    DATABASE   \'test\'',
+                                altSql4='CREATE DATABAS test',
+                                altSql5='',
+                                altSql6=''
+                    )"></div>
+
+                    <hr class="my-3"/>
+
+                    <h2 class="pb-2 border-bottom" th:text="#{examples.example} + ' #6'"></h2>
+                    <div lang="en" th:replace="assets/examplesTemplate :: examplesTemplate (
+                                id='6',
+                                sql='DROP TABLE test',
+                                regex='^\s*(?:DROP|ROP|DOP|DRP|DRO)\s+(?:TABLE|ABLE|TBLE|TALE|TABE|TABL)\s+[`´\'&quot;]?(?:test|est|tst|tet|tes)[`´\'&quot;]?\s*;?\s*$',
+                                altSql1='DROP TABLE test',
+                                altSql2='DROP   TABLE    test',
+                                altSql3='DROP TABLE \'test\'',
+                                altSql4='DROP TABLE &quot;test&quot;',
+                                altSql5='',
+                                altSql6=''
+                    )"></div>
+
+                    <hr class="my-3"/>
+
+                    <h2 class="pb-2 border-bottom" th:text="#{examples.example} + ' #7'"></h2>
+                    <div lang="en" th:replace="assets/examplesTemplate :: examplesTemplate (
+                                id='7',
+                                sql='CREATE TABLE test(id integer PRIMARY KEY, context varchar(255))',
+                                regex='^\s*(?:(?:CREATE|REATE|CEATE|CRATE|CRETE|CREAE|CREAT)\s+(?:TABLE|ABLE|TBLE|TALE|TABE|TABL)\s+(?:test|est|tst|tet|tes)\s*\((?:[`´\'&quot;]?(?:id|d|i)[`´\'&quot;]?\s+(?:(?:INTEGER|INT))\s+(?:PRIMARY|RIMARY|PIMARY|PRMARY|PRIARY|PRIMRY|PRIMAY|PRIMAR)\s+(?:(PRIMARY\s+)?KEY|EY|KY|KE)\s*,\s*[`´\'&quot;]?(?:context|ontext|cntext|cotext|conext|contxt|contet|contex)[`´\'&quot;]?\s+(?:(?:VARCHAR)\s*\(\s*(?:255|55|25|25)\s*\))|[`´\'&quot;]?(?:context|ontext|cntext|cotext|conext|contxt|contet|contex)[`´\'&quot;]?\s+(?:(?:VARCHAR)\s*\(\s*(?:255|55|25|25)\s*\))\s*,\s*[`´\'&quot;]?(?:id|d|i)[`´\'&quot;]?\s+(?:(?:INTEGER|INT))\s+(?:PRIMARY|RIMARY|PIMARY|PRMARY|PRIARY|PRIMRY|PRIMAY|PRIMAR)\s+(?:(PRIMARY\s+)?KEY|EY|KY|KE))\)\s*;?|(?:CREATE|REATE|CEATE|CRATE|CRETE|CREAE|CREAT)\s+(?:TABLE|ABLE|TBLE|TALE|TABE|TABL)\s+(?:test|est|tst|tet|tes)\s*\((?:[`´\'&quot;]?(?:id|d|i)[`´\'&quot;]?\s+(?:(?:INTEGER|INT))\s*,\s*[`´\'&quot;]?(?:context|ontext|cntext|cotext|conext|contxt|contet|contex)[`´\'&quot;]?\s+(?:(?:VARCHAR)\s*\(\s*(?:255|55|25|25)\s*\))\s*,\s*(?:(?:CONSTRAINT|ONSTRAINT|CNSTRAINT|COSTRAINT|CONTRAINT|CONSRAINT|CONSTAINT|CONSTRINT|CONSTRANT|CONSTRAIT|CONSTRAIN)\s*)?(?:\s+.*?)(?:(?:PRIMARY\s+KEY|RIMARY\s+KEY|PIMARY\s+KEY|PRMARY\s+KEY|PRIARY\s+KEY|PRIMRY\s+KEY|PRIMAY\s+KEY|PRIMAR\s+KEY|PRIMARYKEY|PRIMARY\s+EY|PRIMARY\s+KY|PRIMARY\s+KE))\s+(?:.*?\s+)?\(id\)|[`´\'&quot;]?(?:context|ontext|cntext|cotext|conext|contxt|contet|contex)[`´\'&quot;]?\s+(?:(?:VARCHAR)\s*\(\s*(?:255|55|25|25)\s*\))\s*,\s*[`´\'&quot;]?(?:id|d|i)[`´\'&quot;]?\s+(?:(?:INTEGER|INT))\s*,\s*(?:(?:CONSTRAINT|ONSTRAINT|CNSTRAINT|COSTRAINT|CONTRAINT|CONSRAINT|CONSTAINT|CONSTRINT|CONSTRANT|CONSTRAIT|CONSTRAIN)\s*)?(?:\s+.*?)(?:(?:PRIMARY\s+KEY|RIMARY\s+KEY|PIMARY\s+KEY|PRMARY\s+KEY|PRIARY\s+KEY|PRIMRY\s+KEY|PRIMAY\s+KEY|PRIMAR\s+KEY|PRIMARYKEY|PRIMARY\s+EY|PRIMARY\s+KY|PRIMARY\s+KE))\s+(?:.*?\s+)?\(id\)|(?:(?:CONSTRAINT|ONSTRAINT|CNSTRAINT|COSTRAINT|CONTRAINT|CONSRAINT|CONSTAINT|CONSTRINT|CONSTRANT|CONSTRAIT|CONSTRAIN)\s*)?(?:\s+.*?)(?:(?:PRIMARY\s+KEY|RIMARY\s+KEY|PIMARY\s+KEY|PRMARY\s+KEY|PRIARY\s+KEY|PRIMRY\s+KEY|PRIMAY\s+KEY|PRIMAR\s+KEY|PRIMARYKEY|PRIMARY\s+EY|PRIMARY\s+KY|PRIMARY\s+KE))\s+(?:.*?\s+)?\(id\)\s*,\s*[`´\'&quot;]?(?:id|d|i)[`´\'&quot;]?\s+(?:(?:INTEGER|INT))\s*,\s*[`´\'&quot;]?(?:context|ontext|cntext|cotext|conext|contxt|contet|contex)[`´\'&quot;]?\s+(?:(?:VARCHAR)\s*\(\s*(?:255|55|25|25)\s*\))|[`´\'&quot;]?(?:id|d|i)[`´\'&quot;]?\s+(?:(?:INTEGER|INT))\s*,\s*(?:(?:CONSTRAINT|ONSTRAINT|CNSTRAINT|COSTRAINT|CONTRAINT|CONSRAINT|CONSTAINT|CONSTRINT|CONSTRANT|CONSTRAIT|CONSTRAIN)\s*)?(?:\s+.*?)(?:(?:PRIMARY\s+KEY|RIMARY\s+KEY|PIMARY\s+KEY|PRMARY\s+KEY|PRIARY\s+KEY|PRIMRY\s+KEY|PRIMAY\s+KEY|PRIMAR\s+KEY|PRIMARYKEY|PRIMARY\s+EY|PRIMARY\s+KY|PRIMARY\s+KE))\s+(?:.*?\s+)?\(id\)\s*,\s*[`´\'&quot;]?(?:context|ontext|cntext|cotext|conext|contxt|contet|contex)[`´\'&quot;]?\s+(?:(?:VARCHAR)\s*\(\s*(?:255|55|25|25)\s*\))|[`´\'&quot;]?(?:context|ontext|cntext|cotext|conext|contxt|contet|contex)[`´\'&quot;]?\s+(?:(?:VARCHAR)\s*\(\s*(?:255|55|25|25)\s*\))\s*,\s*(?:(?:CONSTRAINT|ONSTRAINT|CNSTRAINT|COSTRAINT|CONTRAINT|CONSRAINT|CONSTAINT|CONSTRINT|CONSTRANT|CONSTRAIT|CONSTRAIN)\s*)?(?:\s+.*?)(?:(?:PRIMARY\s+KEY|RIMARY\s+KEY|PIMARY\s+KEY|PRMARY\s+KEY|PRIARY\s+KEY|PRIMRY\s+KEY|PRIMAY\s+KEY|PRIMAR\s+KEY|PRIMARYKEY|PRIMARY\s+EY|PRIMARY\s+KY|PRIMARY\s+KE))\s+(?:.*?\s+)?\(id\)\s*,\s*[`´\'&quot;]?(?:id|d|i)[`´\'&quot;]?\s+(?:(?:INTEGER|INT))|(?:(?:CONSTRAINT|ONSTRAINT|CNSTRAINT|COSTRAINT|CONTRAINT|CONSRAINT|CONSTAINT|CONSTRINT|CONSTRANT|CONSTRAIT|CONSTRAIN)\s*)?(?:\s+.*?)(?:(?:PRIMARY\s+KEY|RIMARY\s+KEY|PIMARY\s+KEY|PRMARY\s+KEY|PRIARY\s+KEY|PRIMRY\s+KEY|PRIMAY\s+KEY|PRIMAR\s+KEY|PRIMARYKEY|PRIMARY\s+EY|PRIMARY\s+KY|PRIMARY\s+KE))\s+(?:.*?\s+)?\(id\)\s*,\s*[`´\'&quot;]?(?:context|ontext|cntext|cotext|conext|contxt|contet|contex)[`´\'&quot;]?\s+(?:(?:VARCHAR)\s*\(\s*(?:255|55|25|25)\s*\))\s*,\s*[`´\'&quot;]?(?:id|d|i)[`´\'&quot;]?\s+(?:(?:INTEGER|INT)))\)\s*;?)\s*$',
+                                altSql1='CREATE TABLE test(id integer PRIMARY KEY, context varchar(255))',
+                                altSql2='CREATE TABLE test(context varchar(255),id integer PRIMARY KEY)',
+                                altSql3='CREATE TABLE test(id int PRIMARY KEY, context varchar(255))',
+                                altSql4='',
+                                altSql5='',
+                                altSql6=''
+                    )"></div>
                 </div>
             </div>
         </div>
