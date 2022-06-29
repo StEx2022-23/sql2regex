@@ -11,14 +11,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import sqltoregex.deparser.CreateDatabaseDeParserForRegEx;
+import sqltoregex.deparser.ExpressionDeParserForRegEx;
+import sqltoregex.deparser.SelectDeParserForRegEx;
 import sqltoregex.deparser.StatementDeParserForRegEx;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsType;
 import sqltoregex.visitor.StatementVisitorJoinToWhere;
 import sqltoregex.visitor.StatementVisitorKeyPlacement;
+import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
 
 import java.util.*;
+
+import static java.lang.Math.abs;
 
 /**
  * Realizes a spring service for handling the converting process.
@@ -26,6 +31,7 @@ import java.util.*;
 @Service
 public class ConverterManagement {
     private final SettingsManager settingsManager;
+    private static final String NOT_QUOTATION_MARK_REGEX = "[^" + QUOTATION_MARK_REGEX.substring(1);
 
     /**
      * Constructor of converter management.
@@ -83,14 +89,14 @@ public class ConverterManagement {
      * @return generated regex
      * @throws JSQLParserException if parsing goes wrong
      */
-    private String deParseExpression(String sqlstatement) throws JSQLParserException {
+    private String deParseExpression(String sqlstatement, StringBuilder buffer, SettingsType settingsType) throws JSQLParserException {
         Expression expression;
         expression = this.parseExpression(sqlstatement);
-        ExpressionVisitor expressionVisitor = new ExpressionVisitorAdapter();
-        expression.accept(expressionVisitor);
-        ExpressionDeParser expressionDeParser = new ExpressionDeParser();
+        SettingsContainer settings = SettingsContainer.builder().with(settingsManager, settingsType);
+        ExpressionDeParser expressionDeParser = new ExpressionDeParserForRegEx(new SelectDeParserForRegEx(
+                settings), buffer, settings);
         expression.accept(expressionDeParser);
-        return this.buildOutputRegex(expressionDeParser.getBuffer().toString());
+        return expressionDeParser.getBuffer().toString();
     }
 
     /**
@@ -161,12 +167,49 @@ public class ConverterManagement {
      * @throws JSQLParserException if parsing goes wrong
      */
     public String deparse(String sqlStatement, boolean isOnlyExpression, SettingsType settingsType) throws JSQLParserException {
+        Set<String> statementSet = new HashSet<String>(extractStatements(sqlStatement));
         StringBuilder buffer = new StringBuilder();
-        if (isOnlyExpression) {
-            return this.deParseExpression(sqlStatement);
-        } else {
-            return this.deParseStatement(sqlStatement, buffer, settingsType);
+        Iterator<String> iterator = statementSet.iterator();
+        while (iterator.hasNext()){
+            if (isOnlyExpression) {
+                this.deParseExpression(iterator.next(), buffer, settingsType);
+            } else {
+                this.deParseStatement(iterator.next(), buffer, settingsType);
+            }
+            if (iterator.hasNext()){
+                buffer.append('|');
+            }
         }
+        return buildOutputRegex(buffer.toString());
+    }
+
+    /**
+     * Searches for ";" in the provided String and splits the Statements on ";" which are not enclosed in QuotationMarks
+     * @param multStmtString
+     * @see StatementDeParserForRegEx#QUOTATION_MARK_REGEX
+     * @return
+     */
+    public Collection<String> extractStatements(String multStmtString){
+        Collection<String> stmtList = new LinkedList<>();
+        int firstPos = 0;
+        int secondPos = 0;
+        String subBetweenSemis = "";
+
+        while ((secondPos = multStmtString.indexOf(';', secondPos)) != -1) {
+            subBetweenSemis = multStmtString.substring(firstPos, secondPos);
+            //RegEx searches for even (incl. 0) number of QuotationMarks "(([^']*'[^']*'[^']*)|[^'])*"
+            if (!subBetweenSemis.matches("((" + NOT_QUOTATION_MARK_REGEX +"*"
+                                                 + QUOTATION_MARK_REGEX + NOT_QUOTATION_MARK_REGEX +"*"
+                                                 + QUOTATION_MARK_REGEX + NOT_QUOTATION_MARK_REGEX +"*)|"
+                                                 + NOT_QUOTATION_MARK_REGEX +")*")){
+                secondPos++;
+                continue;
+            }
+
+            firstPos = ++secondPos;
+            stmtList.add(subBetweenSemis);
+        }
+        return stmtList;
     }
 
     /**

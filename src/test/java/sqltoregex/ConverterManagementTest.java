@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 import sqltoregex.deparser.TestUtils;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.SettingsType;
@@ -82,5 +83,16 @@ class ConverterManagementTest {
             count++;
         }
         Assertions.assertEquals(2, count);
+    }
+
+    @Test
+    void multipleStatements() throws JSQLParserException {
+        final String sampleSolution = "DELETE FROM Song WHERE genreID = (SELECT genreID FROM Genre WHERE 'be;zeichnung' " +
+                "= \"Klassik\");DELETE FROM Song WHERE genreID = 6;";
+        String regEx = converterManagement.deparse(sampleSolution, false, SettingsType.NONE);
+
+        Assertions.assertFalse(TestUtils.checkAgainstRegEx(regEx, "DELETE FROM Song WHERE genreID = (SELECT genreID FROM Genre WHERE 'bezeichnung` = \"Klassik\")"));
+        Assertions.assertTrue(TestUtils.checkAgainstRegEx(regEx, "DELETE FROM Song WHERE genreID = (SELECT genreID FROM Genre WHERE 'be;zeichnung` = \"Klassik\")"));
+        Assertions.assertTrue(TestUtils.checkAgainstRegEx(regEx, "DELETE FROM Song WHERE genreID = 6"));
     }
 }
