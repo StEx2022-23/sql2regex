@@ -2,6 +2,7 @@ package sqltoregex.visitor;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.StatementVisitorAdapter;
 import net.sf.jsqlparser.statement.select.*;
 
@@ -32,21 +33,27 @@ public class StatementVisitorJoinToWhere extends StatementVisitorAdapter {
         @Override
         public void visit(PlainSelect plainSelect) {
             List<Join> joinList = plainSelect.getJoins();
-
+            List<Join> newJoinList = new LinkedList<>();
             if (joinList == null) {
                 return;
             }
             for (Join join : joinList) {
-                for (Expression expression : join.getOnExpressions()){
-                    if (plainSelect.getWhere() == null) {
-                        plainSelect.setWhere(expression);
-                    }else{
-                        plainSelect.setWhere(new AndExpression().withLeftExpression(plainSelect.getWhere())
-                                                     .withRightExpression(expression));
+                if (join.isInner()){
+                    for (Expression expression : join.getOnExpressions()){
+                        if (plainSelect.getWhere() == null) {
+                            plainSelect.setWhere(expression);
+                        }else{
+                            plainSelect.setWhere(new AndExpression().withLeftExpression(plainSelect.getWhere())
+                                                         .withRightExpression(expression));
+                        }
                     }
+                    newJoinList.add(new Join().withSimple(true).withRightItem(join.getRightItem()));
+                }else{
+                    newJoinList.add(join);
                 }
-                join.setOnExpressions(new LinkedList<>());
             }
+
+            plainSelect.setJoins(newJoinList);
         }
     }
 }
