@@ -1,0 +1,76 @@
+<div th:fragment="examplesTemplate (id, sql, regex, altSql1, altSql2, altSql3, altSql4, altSql5, altSql6)" class="accordion" th:id="'example#' + ${id}">
+    <div class="accordion-item">
+        <h2 class="accordion-header" th:id="'panelsStayOpen-headingSqlExample#' + ${id}">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" th:data-bs-target="'#panelsStayOpen-example-' + ${id} + '-sql'" aria-expanded="true" th:aria-controls="'panelsStayOpen-example-' + ${id} + '-sql'" th:text="#{examples.sqlStatemenmt}">
+                SQL-Statement
+            </button>
+        </h2>
+        <div th:id="'panelsStayOpen-example-' + ${id} + '-sql'" class="accordion-collapse collapse show" th:aria-labelledby="'panelsStayOpen-headingSqlExample#' + ${id}">
+            <div class="accordion-body">
+                <code th:text="${sql}"></code>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header" th:id="'panelsStayOpen-headingRegExExample#' + ${id}">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" th:data-bs-target="'#panelsStayOpen-example-'+ ${id} +'-regex'" aria-expanded="false" th:aria-controls="'panelsStayOpen-example-'+ ${id} + '-regex'" th:text="#{examples.regEx}">
+                RegEx
+            </button>
+        </h2>
+        <div th:id="'panelsStayOpen-example-' + ${id} + '-regex'" class="accordion-collapse collapse" th:aria-labelledby="'panelsStayOpen-headingRegExExample#'+ ${id}">
+            <div class="accordion-body" >
+                <code th:id="'RegEx#'+ ${id}" th:text="${regex}"></code>
+                <br/> <br/>
+                <strong>Flags:</strong> <code>/gmi</code> (global, multi line, case insensitive)
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header" th:id="'panelsStayOpen-headingTryItExample#' + ${id}">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" th:data-bs-target="'#panelsStayOpen-example-' +  ${id} + '-tryit'" aria-expanded="false" th:aria-controls="'panelsStayOpen-example-' +  ${id} + '-tryit'" th:text="#{examples.tryIt}">
+                Try it!
+            </button>
+        </h2>
+        <div th:id="'panelsStayOpen-example-' + ${id} + '-tryit'" class="accordion-collapse collapse" th:aria-labelledby="'panelsStayOpen-headingTryItExample#' +  ${id}">
+            <div class="accordion-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <label th:for="'TestSQL#' +  ${id}" class="form-label" th:text="#{examples.checkAgainstAlternative}">Check against your alternative SQL-Statement:</label>
+                            <br>
+                            <input type="text" th:id="'TestSQL#' +  ${id}" class="form-control"/>
+                        </div>
+                        <div class="col-sm-4">
+                            <label th:for="'RadioExampleTestSQL#' +  ${id}" class="form-label" th:text="#{examples.preset}">Select preset:</label>
+                            <br>
+                            <select class="form-select" th:id="'RadioExampleTestSQL#' +  ${id}" th:attr="onchange=|onChangePresetSelect('TestSQL#${id}', 'RadioExampleTestSQL#${id}')|">
+                                <option value="" selected th:text="#{examples.noPreset}">none preset selected</option>
+                                <option th:if="${!altSql1.isEmpty()}" th:text="${altSql1}"></option>
+                                <option th:if="${!altSql2.isEmpty()}" th:text="${altSql2}"></option>
+                                <option th:if="${!altSql3.isEmpty()}" th:text="${altSql3}"></option>
+                                <option th:if="${!altSql4.isEmpty()}" th:text="${altSql4}"></option>
+                                <option th:if="${!altSql5.isEmpty()}" th:text="${altSql5}"></option>
+                                <option th:if="${!altSql6.isEmpty()}" th:text="${altSql6}"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div th:id="'RegEx#' +  ${id} + 'pos'" class="alert alert-success mt-3 examplesfeedback" role="alert">
+                    <strong th:text="#{examples.perfect}">Perfect! </strong><span th:text="#{examples.matches}"></span>
+                </div>
+
+                <div th:id="'RegEx#' +  ${id} + 'neg'" class="alert alert-danger mt-3 examplesfeedback" role="alert">
+                    <strong th:text="#{examples.oops}">Oooooops! </strong><span th:text="#{examples.doesntMatch}"></span>
+                </div>
+
+                <div th:id="'RegEx#' +  ${id} + 'hint'" class="alert alert-light mt-3 examplesfeedback" role="alert">
+                    <strong th:text="#{examples.oops}">Oooooops! </strong> <span th:text="#{examples.insertAStatement}"></span>
+                </div>
+
+                <div class="d-grid gap-2 col-6 mx-auto mt-3">
+                    <button type="submit" class="btn btn-primary" th:attr="onclick=|checkRegExExample('TestSQL#${id}', 'RegEx#${id}')|" th:text="#{examples.checkAgainstRegex}">Check against RegEx</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
