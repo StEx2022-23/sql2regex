@@ -9,6 +9,7 @@ import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -135,19 +136,33 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
 
         if (orderByElement.isAscDescPresent()) {
             if (orderByElement.isAsc()) {
-                temp.append(REQUIRED_WHITE_SPACE);
-                temp.append("(?:").append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "ASC"))
-                        .append("|").append(StringSynonymGenerator.useOrDefault(this.specialSynonyms, "ASC"))
-                        .append(")");
+                List<String> ascSynonyms = StringSynonymGenerator.generateAsListOrDefault(this.specialSynonyms, "ASC");
+                handleAscDescSynonyms(temp, ascSynonyms);
             } else {
-                temp.append(REQUIRED_WHITE_SPACE);
-                temp.append("(?:").append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "DESC"))
-                        .append("|").append(StringSynonymGenerator.useOrDefault(this.specialSynonyms, "DESC"))
-                        .append(")");
+                List<String> descSynonyms = StringSynonymGenerator.generateAsListOrDefault(this.specialSynonyms, "DESC");
+                handleAscDescSynonyms(temp, descSynonyms);
             }
         }
 
         return temp.toString();
+    }
+
+    private void handleAscDescSynonyms(StringBuilder temp, List<String> ascSynonyms) {
+        temp.append(REQUIRED_WHITE_SPACE);
+        Iterator<String> stringIterator = ascSynonyms.iterator();
+        temp.append("(?:");
+        while(stringIterator.hasNext()){
+            temp.append(
+                    StatementDeParserForRegEx.addQuotationMarks(
+                            SpellingMistake.useOrDefault(
+                                    this.keywordSpellingMistake,
+                                    stringIterator.next()
+                            )
+                    )
+            );
+            if(stringIterator.hasNext()) temp.append("|");
+        }
+        temp.append(")");
     }
 
     /**
