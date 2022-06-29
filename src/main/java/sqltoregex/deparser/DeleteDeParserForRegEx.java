@@ -85,7 +85,7 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
         }
 
         if (delete.getTables().isEmpty()) {
-            buffer.append("(");
+            buffer.append("(?:");
             buffer.append(REQUIRED_WHITE_SPACE).append("\\*");
             buffer.append(")?");
         }

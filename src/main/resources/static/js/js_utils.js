@@ -26,13 +26,13 @@ function handleAlerts(id){
     }
 }
 
-function copy2clipbord(id, dontShowAlert) {
+function copy2clipbord(id, showAlert) {
     let copyText = document.getElementById(id);
 
     navigator.clipboard.writeText(copyText.value).then(function() {
-        if(dontShowAlert === false) handleAlerts("alert-success-copy");
+        if(showAlert === true) handleAlerts("alert-success-copy");
     }, function() {
-        if(dontShowAlert === false) handleAlerts("alert-success-copy");
+        if(showAlert === true) handleAlerts("alert-success-copy");
     }).catch(function () {
         let copyElement = document.createElement("input");
         copyElement.setAttribute("value", copyText.value);
@@ -654,10 +654,10 @@ document.onreadystatechange = function () {
                         form.parentNode.parentNode.replaceChild(result, form.parentNode);
                         result.focus();
                     })
-                    .then( () => SqlRegExHis.checkUpdatedConverting())
-                    .then( () => copy2clipbord("regexoutput", true))
-                    .then( () => scrollToInValidInput(document.getElementById("isInValid")))
-                    .then( () => handleDateValue(sqlInputEl));
+                    .then(() => SqlRegExHis.checkUpdatedConverting())
+                    .then(() => copy2clipbord("regexoutput", false))
+                    .then(() => scrollToInValidInput(document.getElementById("isInValid")))
+                    .then(() => handleDateValue(sqlInputEl));
                 e.preventDefault();
                 form.parentNode.parentNode.style.removeProperty("minHeight");
             })

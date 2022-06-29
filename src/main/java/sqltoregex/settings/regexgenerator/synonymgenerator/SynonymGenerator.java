@@ -91,7 +91,7 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     public boolean addSynonym(A syn, Long weight) {
         if (synonymsGraph.addVertex(this.prepareSynonymForAdd(syn))) {
             for (A next : this.synonymsGraph.vertexSet()) {
-                if (next != syn) {
+                if (!next.equals(this.prepareSynonymForAdd(syn))) {
                     DefaultWeightedEdge e1 = synonymsGraph.addEdge(this.prepareSynonymForAdd(syn), next);
                     synonymsGraph.setEdgeWeight(e1, weight);
                 }

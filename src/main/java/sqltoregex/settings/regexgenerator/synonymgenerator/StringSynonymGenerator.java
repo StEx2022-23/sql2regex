@@ -31,7 +31,7 @@ public class StringSynonymGenerator extends SynonymGenerator<String, String> {
     @Override
     protected String prepareSynonymForAdd(String syn) {
         Assert.notNull(syn, "Added string must not be null");
-        return syn;
+        return syn.toUpperCase();
     }
 
     /**
@@ -42,7 +42,7 @@ public class StringSynonymGenerator extends SynonymGenerator<String, String> {
     @Override
     protected String prepareSynonymForSearch(String wordToFindSynonyms) {
         Assert.notNull(wordToFindSynonyms, "Query string must be not null");
-        return wordToFindSynonyms;
+        return wordToFindSynonyms.toUpperCase();
     }
 
     /**
@@ -55,7 +55,7 @@ public class StringSynonymGenerator extends SynonymGenerator<String, String> {
     protected String prepareVertexForRegEx(String syn, String wordToFindSynonyms) {
         Assert.notNull(syn, "Vertex string must be not null");
         Assert.notNull(wordToFindSynonyms, "Query string must be not null");
-        return syn;
+        return syn.toUpperCase();
     }
 
     /**
@@ -66,7 +66,7 @@ public class StringSynonymGenerator extends SynonymGenerator<String, String> {
      * @return generated regex or str
      */
     public static String useOrDefault(StringSynonymGenerator synonymGenerator, String str){
-        if (null != synonymGenerator) return synonymGenerator.generateRegExFor(str);
+        if (null != synonymGenerator) return synonymGenerator.generateRegExFor(str.toUpperCase());
         else return str;
     }
 
@@ -77,7 +77,7 @@ public class StringSynonymGenerator extends SynonymGenerator<String, String> {
      * @return generated list of synonyms as string or given string as one entry in the string list
      */
     public static List<String> generateAsListOrDefault(StringSynonymGenerator synonymGenerator, String str){
-        if (null != synonymGenerator) return synonymGenerator.generateAsList(str);
+        if (null != synonymGenerator) return synonymGenerator.generateAsList(str.toUpperCase());
         return new LinkedList<>(List.of(str));
     }
 }

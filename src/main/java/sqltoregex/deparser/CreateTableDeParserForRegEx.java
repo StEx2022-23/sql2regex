@@ -322,7 +322,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
             );
             tempColumnDefinition.append(OPTIONAL_WHITE_SPACE).append("\\)");
         } else {
-            tempColumnDefinition.append(StringSynonymGenerator.useOrDefault(this.datatypeSynonymGenerator, splitElement.toUpperCase(Locale.ROOT)));
+            tempColumnDefinition.append(StringSynonymGenerator.useOrDefault(this.datatypeSynonymGenerator, splitElement));
         }
         if(stringIterator.hasNext()) tempColumnDefinition.append(OPTIONAL_WHITE_SPACE);
     }
