@@ -15,7 +15,6 @@ import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
-import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX_ZERO_ONE;
 
 import java.util.*;
 import java.util.regex.Matcher;

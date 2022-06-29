@@ -43,8 +43,8 @@ class ConverterManagementTest {
     @Test
     void testExpressionDeparsing() throws JSQLParserException {
         Assertions.assertEquals(
-                "^(?:\\s*\\s*[`´'\"]?col1[`´'\"]?\\s*\\s*\\+\\s*\\s*[`´'\"]?col2[`´'\"]?\\s*|\\s*[`´'\"]?col2" +
-                        "[`´'\"]?\\s*\\s*\\+\\s*\\s*[`´'\"]?col1[`´'\"]?\\s*\\s*);?$",
+                "^\\s*(?:\\s*\\s*[`´'\"]?col1[`´'\"]?\\s*\\s*\\+\\s*\\s*[`´'\"]?col2[`´'\"]?\\s*|\\s*[`´'\"]?col2" +
+                        "[`´'\"]?\\s*\\s*\\+\\s*\\s*[`´'\"]?col1[`´'\"]?\\s*\\s*)\\s*;?\\s*$",
                 converterManagement.deparse("col1+col2", true, SettingsType.NONE)
         );
         Assertions.assertThrows(JSQLParserException.class, () ->
@@ -68,8 +68,8 @@ class ConverterManagementTest {
         Assertions.assertTrue(parsingSolution.endsWith("$"));
 
         Assertions.assertEquals(
-                "^(?:\\s*\\s*[`´'\"]?col1[`´'\"]?\\s*\\s*\\+\\s*\\s*[`´'\"]?col2[`´'\"]?\\s*|\\s*[`´'\"]?col2" +
-                        "[`´'\"]?\\s*\\s*\\+\\s*\\s*[`´'\"]?col1[`´'\"]?\\s*\\s*);?$",
+                "^\\s*(?:\\s*\\s*[`´'\"]?col1[`´'\"]?\\s*\\s*\\+\\s*\\s*[`´'\"]?col2[`´'\"]?\\s*|\\s*[`´'\"]?col2" +
+                        "[`´'\"]?\\s*\\s*\\+\\s*\\s*[`´'\"]?col1[`´'\"]?\\s*\\s*)\\s*;?\\s*$",
                 converterManagement.deparse("col1+col2", true, SettingsType.NONE)
         );
     }

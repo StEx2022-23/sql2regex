@@ -59,7 +59,7 @@ class ApiConvertObjectTest {
         for(String str : regexList){
             Assertions.assertEquals(
                     "^\\s*(?:.?SELECT|.?ELECT|S.?LECT|SE.?ECT|SEL.?CT|SELE.?T|SELEC.?|SELECT.?)\\s+(?:(?:.?ALL|.?LL|A" +
-                            ".?L|AL.?|ALL.?)|\\*);?\\s*$",
+                            ".?L|AL.?|ALL.?)|\\*)\\s*;?\\s*$",
                     str
             );
         }
