@@ -31,17 +31,17 @@ class SelectVisitorJoinToWhereTest {
 
     @Test
     void emptyWhere() {
-        visitAndCheckAgainst("SELECT col1 FROM table1 INNER JOIN table2 ON (col1=col2) AND col3 = col4","SELECT col1 FROM table1 INNER JOIN table2 WHERE (col1 = col2) AND col3 = col4");
+        visitAndCheckAgainst("SELECT col1 FROM table1 INNER JOIN table2 ON (col1=col2) AND col3 = col4","SELECT col1 FROM table1, table2 WHERE (col1 = col2) AND col3 = col4");
     }
 
     @Test
     void emptyJoinAndWhere() {
-        visitAndCheckAgainst("SELECT col1 FROM table1 INNER JOIN table2","SELECT col1 FROM table1 INNER JOIN table2");
+        visitAndCheckAgainst("SELECT col1 FROM table1 INNER JOIN table2","SELECT col1 FROM table1, table2");
     }
 
     @Test
     void populatedWhere() {
-        visitAndCheckAgainst("SELECT col1 FROM table1 INNER JOIN table2 ON (col1=col2) AND col3 = col4 WHERE col1=5","SELECT col1 FROM table1 INNER JOIN table2 WHERE col1 = 5 AND (col1 = col2) AND col3 = col4");
+        visitAndCheckAgainst("SELECT col1 FROM table1 INNER JOIN table2 ON (col1=col2) AND col3 = col4 WHERE col1=5","SELECT col1 FROM table1, table2 WHERE col1 = 5 AND (col1 = col2) AND col3 = col4");
     }
 
     /**
@@ -49,7 +49,22 @@ class SelectVisitorJoinToWhereTest {
      */
     @Test
     void multipleOnExpressions() {
-        visitAndCheckAgainst("SELECT col1 FROM table1 INNER JOIN table2 INNER JOIN table3 ON col1=col2 ON col3=col4","SELECT col1 FROM table1 INNER JOIN table2 INNER JOIN table3 WHERE col1 = col2 AND col3 = col4");
+        visitAndCheckAgainst("SELECT col1 FROM table1 INNER JOIN table2 INNER JOIN table3 ON col1=col2 ON col3=col4","SELECT col1 FROM table1, table2, table3 WHERE col1 = col2 AND col3 = col4");
+    }
+
+    @Test
+    void multipleTables() {
+        visitAndCheckAgainst("SELECT col1 FROM table1 INNER JOIN table2 INNER JOIN table3 ON col1=col2 ON col3=col4","SELECT col1 FROM table1, table2, table3 WHERE col1 = col2 AND col3 = col4");
+    }
+
+    @Test
+    void noInnerJoin(){
+        visitAndCheckAgainst("SELECT col1 FROM table1 LEFT JOIN table2 ON col1 = col2","SELECT col1 FROM table1 LEFT JOIN table2 ON col1 = col2");
+    }
+
+    @Test
+    void mixedInnerAndNonInner(){
+        visitAndCheckAgainst("SELECT col1 FROM table1 LEFT JOIN table2 ON col1=col2 INNER JOIN table3 ON col3=col4","SELECT col1 FROM table1 LEFT JOIN table2 ON col1 = col2, table3 WHERE col3 = col4");
     }
 
 }

@@ -30,14 +30,9 @@ class ConverterManagementTest {
     @Test
     void rightConcatOfJoinStatements() throws JSQLParserException {
         final String sampleSolution = "SELECT col1 FROM table1 INNER JOIN table2 ON (col1=col2) AND col3 = col4";
-        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
-        matchingMap.put(SettingsOption.DEFAULT, List.of(
-                "SELECT col1 FROM table1 INNER JOIN table2 ON (col1=col2) AND col3 = col4",
-                "SELECT col1 FROM table1 INNER JOIN table2 WHERE (col1=col2) AND col3 = col4"
-        ));
 
         Assertions.assertTrue(TestUtils.checkAgainstRegEx(converterManagement.deparse(sampleSolution, false,  SettingsType.NONE), "SELECT col1 FROM table1 INNER JOIN table2 ON (col1=col2) AND col3 = col4"));
-        Assertions.assertTrue(TestUtils.checkAgainstRegEx(converterManagement.deparse(sampleSolution, false, SettingsType.NONE), "SELECT col1 FROM table1 INNER JOIN table2 WHERE (col1=col2) AND col3 = col4"));
+        Assertions.assertTrue(TestUtils.checkAgainstRegEx(converterManagement.deparse(sampleSolution, false, SettingsType.NONE), "SELECT col1 FROM table1, table2 WHERE (col1=col2) AND col3 = col4"));
     }
 
     @Test
