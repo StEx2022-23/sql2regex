@@ -99,27 +99,37 @@
                             <div lang="en" th:replace="assets/timelineItemTemplate :: timelineItemTemplate (
                                 location='Dresden',
                                 date='01.04.2022',
-                                headerTimelineElement='Projekt-Start',
-                                description='
-                                    <ul>
-                                        <li>
-                                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, ut labore et dolore magna aliquyam.
-                                        </li>
-                                        <li>
-                                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, ut labore et dolore magna aliquyam.
-                                        </li>
-                                        <li>
-                                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, ut labore et dolore magna aliquyam.
-                                        </li>
-                                    </ul>'
+                                headerTimelineElement=#{about.timeline.entryOne},
+                                description=#{about.timeline.entryOneText}
                             )"></div>
 
                             <div lang="en" th:replace="assets/timelineItemTemplate :: timelineItemTemplate (
                                 location='Dresden',
-                                date='01.04.2022',
-                                headerTimelineElement='Projekt-Start',
-                                description='Lorem ipsum dolor sit amet, consetetur sadipscing elitr, ut labore et dolore magna aliquyam.'
+                                date='11.04.2022',
+                                headerTimelineElement=#{about.timeline.entryTwo},
+                                description=#{about.timeline.entryTwoText}
                             )"></div>
+
+                            <div lang="en" th:replace="assets/timelineItemTemplate :: timelineItemTemplate (
+                                location='Dresden',
+                                date='18.04.2022',
+                                headerTimelineElement=#{about.timeline.entryThree},
+                                description=#{about.timeline.entryThreeText}
+                            )"></div>
+
+                            <div lang="en" th:replace="assets/timelineItemTemplate :: timelineItemTemplate (
+                                location='Dresden',
+                                date='20.06.2022',
+                                headerTimelineElement=#{about.timeline.entryFour},
+                                description=#{about.timeline.entryFourText}
+                            )"></div>
+
+                            <div lang="en" th:replace="assets/timelineItemTemplate :: timelineItemTemplate (
+                                location='Dresden',
+                                date='05.07.2022',
+                                headerTimelineElement=#{about.timeline.entryFive},
+                                description=#{about.timeline.entryFiveText}
+                                )"></div>
 
                         </div>
                     </div>
