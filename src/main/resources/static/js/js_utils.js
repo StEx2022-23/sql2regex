@@ -398,6 +398,11 @@ function languageChange(){
 
 function loadDefaultLanguageSettings(){
     let defaultSettings = localStorage.getItem("defaultLanguage");
+    let navItems = document.querySelectorAll("#navbarlinks > a.nav-item.nav-link.fw-bolder");
+    navItems.forEach((el) => {
+       el.href = el.href + '?lang=' + defaultSettings
+    });
+
     if(window.location.href.includes("lang")) return;
     if(defaultSettings !== null){
         window.location.replace(window.location.href.split("?")[0] + '?lang=' + defaultSettings);
