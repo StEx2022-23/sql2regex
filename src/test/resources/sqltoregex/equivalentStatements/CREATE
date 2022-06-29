@@ -1,0 +1,7 @@
+<!-- first line == sample solution, follow line == equivalent solutions, five # as delimiter between statements --!>
+
+CREATE DATABASE Wetterdaten;
+CREATE DATABASE "Wetterdaten";
+CREAT DATABAS Wetterdatn
+#####
+CREATE TABLE wetterstation (id integer NOT NULL, name varchar(255), ortid integer NOT NULL, PRIMARY KEY (id), FOREIGN KEY (ortid) REFERENCES ort(ortid));

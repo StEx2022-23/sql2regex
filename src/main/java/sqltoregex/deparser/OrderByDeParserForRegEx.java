@@ -9,6 +9,7 @@ import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -135,19 +136,38 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
 
         if (orderByElement.isAscDescPresent()) {
             if (orderByElement.isAsc()) {
-                temp.append(REQUIRED_WHITE_SPACE);
-                temp.append("(?:").append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "ASC"))
-                        .append("|").append(StringSynonymGenerator.useOrDefault(this.specialSynonyms, "ASC"))
-                        .append(")");
+                List<String> ascSynonyms = StringSynonymGenerator.generateAsListOrDefault(this.specialSynonyms, "ASC");
+                handleAscDescSynonyms(temp, ascSynonyms);
             } else {
-                temp.append(REQUIRED_WHITE_SPACE);
-                temp.append("(?:").append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "DESC"))
-                        .append("|").append(StringSynonymGenerator.useOrDefault(this.specialSynonyms, "DESC"))
-                        .append(")");
+                List<String> descSynonyms = StringSynonymGenerator.generateAsListOrDefault(this.specialSynonyms, "DESC");
+                handleAscDescSynonyms(temp, descSynonyms);
             }
         }
 
         return temp.toString();
+    }
+
+    /**
+     * Checks if synonyms for asc or desc are given. Generates a regex.
+     * @param temp {@link StringBuilder}
+     * @param synonyms list with synonyms
+     */
+    private void handleAscDescSynonyms(StringBuilder temp, List<String> synonyms) {
+        temp.append(REQUIRED_WHITE_SPACE);
+        Iterator<String> stringIterator = synonyms.iterator();
+        temp.append("(?:");
+        while(stringIterator.hasNext()){
+            temp.append(
+                    StatementDeParserForRegEx.addQuotationMarks(
+                            SpellingMistake.useOrDefault(
+                                    this.keywordSpellingMistake,
+                                    stringIterator.next()
+                            )
+                    )
+            );
+            if(stringIterator.hasNext()) temp.append("|");
+        }
+        temp.append(")");
     }
 
     /**
@@ -180,13 +200,40 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
      */
     private String handleTableNameAlias(FromItem fromItem, String col) {
         StringBuilder temp = new StringBuilder();
-        String columnName = col.split("\\.")[1].replaceAll(QUOTATION_MARK_REGEX, "");
+
+        String table = fromItem.toString().split(" ")[0].replaceAll(QUOTATION_MARK_REGEX, "");
+        String tableAlias = this.expressionDeParserForRegEx.getRelatedTableNameOrAlias(table);
+
         temp.append("(?:");
-        temp.append(StatementDeParserForRegEx.addQuotationMarks(fromItem.toString().split(" ")[0].replaceAll(QUOTATION_MARK_REGEX, "")));
+        temp.append(
+                StatementDeParserForRegEx.addQuotationMarks(
+                    SpellingMistake.useOrDefault(
+                            this.columnNameSpellingMistake,
+                            table
+                    )
+                )
+        );
         temp.append("|");
-        temp.append(StatementDeParserForRegEx.addQuotationMarks(fromItem.getAlias().toString().replace(" ", "").replaceAll(QUOTATION_MARK_REGEX, "")));
+        temp.append(
+                StatementDeParserForRegEx.addQuotationMarks(
+                        SpellingMistake.useOrDefault(
+                                this.columnNameSpellingMistake,
+                                tableAlias
+                        )
+                )
+        );
         temp.append(")?\\.?");
-        temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, StatementDeParserForRegEx.addQuotationMarks(columnName)));
+
+        String columnName = col.split("\\.")[1].replaceAll(QUOTATION_MARK_REGEX, "");
+
+        temp.append(
+                StatementDeParserForRegEx.addQuotationMarks(
+                        SpellingMistake.useOrDefault(
+                                this.columnNameSpellingMistake,
+                                columnName.replaceAll(QUOTATION_MARK_REGEX, "")
+                        )
+                )
+        );
         return temp.toString();
     }
 }

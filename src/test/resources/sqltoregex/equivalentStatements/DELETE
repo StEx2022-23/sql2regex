@@ -1,0 +1,25 @@
+<!-- first line == sample solution, follow line == equivalent solutions, five # as delimiter between statements --!>
+
+DELETE FROM Song WHERE genreID = 6;
+DELETE FROM Song WHERE genreID = 6;
+DELETE * FROM Song WHERE genreID = 6;
+DELETE FROM Song WHERE 6 = genreID;
+#####
+DELETE FROM Song WHERE genreID = (SELECT genreID FROM Genre WHERE bezeichnung = "Klassik");
+DELETE FROM Song WHERE (SELECT genreID FROM Genre WHERE bezeichnung = "Klassik") = genreID;
+DELETE FROM Song WHERE (SELECT genreID FROM Genre WHERE "Klassik" = bezeichnung) = genreID;
+DELETE * FROM Song WHERE (SELECT genreID FROM Genre WHERE "Klassik" = bezeichnung) = genreID;
+#####
+DELETE FROM Genre WHERE bezeichnung = "Klassik";
+DELETE FROM Genre WHERE "Klassik" = bezeichnung;
+DELETE FROM Genre WHERE "bezeichnung" = "Klassik";
+DELETE FROM "Genre" WHERE "bezeichnung" = "Klassik";
+DELETE * FROM "Genre" WHERE "bezeichnung" = "Klassik";
+#####
+DELETE FROM Genre WHERE id = 6 AND bezeichnung = "Klassik";
+DELETE FROM Genre WHERE bezeichnung = "Klassik" AND id = 6;
+DELETE FROM Genre WHERE bezeichnung = "Klassik" && id = 6;
+#####
+DELETE FROM zugeordnetzu;
+DELETE FROM zugeordnezu;
+DELETE FROM "zugeordnetzu";

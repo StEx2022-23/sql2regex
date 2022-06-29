@@ -1,6 +1,6 @@
 <div th:fragment="timelineItemTemplate (location, date, headerTimelineElement, description)" class="item">
     <div class="location">
-        <span class="badge rounded-pill bg-secondary" th:id="${headerTimelineElement}" th:text="${location}">
+        <span class="badge rounded-pill bg-secondary" th:id="${headerTimelineElement}" th:utext="${location} + #{locationSVG}">
         </span>
     </div>
     <div class="dateholder">

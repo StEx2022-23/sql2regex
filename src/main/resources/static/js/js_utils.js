@@ -26,13 +26,13 @@ function handleAlerts(id){
     }
 }
 
-function copy2clipbord(id) {
+function copy2clipbord(id, showAlert) {
     let copyText = document.getElementById(id);
 
     navigator.clipboard.writeText(copyText.value).then(function() {
-        handleAlerts("alert-success-copy");
+        if(showAlert === true) handleAlerts("alert-success-copy");
     }, function() {
-        handleAlerts("alert-warning-copy");
+        if(showAlert === true) handleAlerts("alert-success-copy");
     }).catch(function () {
         let copyElement = document.createElement("input");
         copyElement.setAttribute("value", copyText.value);
@@ -398,6 +398,11 @@ function languageChange(){
 
 function loadDefaultLanguageSettings(){
     let defaultSettings = localStorage.getItem("defaultLanguage");
+    let navItems = document.querySelectorAll("#navbarlinks > a.nav-item.nav-link.fw-bolder");
+    navItems.forEach((el) => {
+       el.href = el.href + '?lang=' + defaultSettings
+    });
+
     if(window.location.href.includes("lang")) return;
     if(defaultSettings !== null){
         window.location.replace(window.location.href.split("?")[0] + '?lang=' + defaultSettings);
@@ -652,10 +657,10 @@ document.onreadystatechange = function () {
                         form.parentNode.parentNode.replaceChild(result, form.parentNode);
                         result.focus();
                     })
-                    .then( () => SqlRegExHis.checkUpdatedConverting())
-                    .then( () => copy2clipbord("regexoutput"))
-                    .then( () => scrollToInValidInput(document.getElementById("isInValid")))
-                    .then( () => handleDateValue(sqlInputEl));
+                    .then(() => SqlRegExHis.checkUpdatedConverting())
+                    .then(() => copy2clipbord("regexoutput", false))
+                    .then(() => scrollToInValidInput(document.getElementById("isInValid")))
+                    .then(() => handleDateValue(sqlInputEl));
                 e.preventDefault();
                 form.parentNode.parentNode.style.removeProperty("minHeight");
             })

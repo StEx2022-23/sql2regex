@@ -26,6 +26,7 @@ import java.util.*;
  */
 @Service
 public class ConverterManagement {
+    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SettingsManager settingsManager;
     private static final String NOT_QUOTATION_MARK_REGEX = "[^" + QUOTATION_MARK_REGEX.substring(1);
 
@@ -45,7 +46,7 @@ public class ConverterManagement {
      * @return builded regex
      */
     private String buildOutputRegex(String regex) {
-        return "^" + regex + ";?$";
+        return "^" + OPTIONAL_WHITE_SPACE + regex + OPTIONAL_WHITE_SPACE + ";?" + OPTIONAL_WHITE_SPACE + "$";
     }
 
     /**
@@ -55,7 +56,7 @@ public class ConverterManagement {
      */
     private String buildOutputRegex(List<String> regexList) {
         StringBuilder outputRegex = new StringBuilder();
-        outputRegex.append("^");
+        outputRegex.append("^").append(OPTIONAL_WHITE_SPACE);
 
         Set<String> sqlRegExSet = new HashSet<>(regexList);
 
@@ -66,7 +67,7 @@ public class ConverterManagement {
         while (iterator.hasNext()){
             String regEx = iterator.next();
             outputRegex.append(regEx);
-            outputRegex.append(";?");
+            outputRegex.append(OPTIONAL_WHITE_SPACE).append(";?");
             if (iterator.hasNext()){
                 outputRegex.append("|");
             }
@@ -75,7 +76,7 @@ public class ConverterManagement {
             outputRegex.append(")");
         }
 
-        outputRegex.append("$");
+        outputRegex.append(OPTIONAL_WHITE_SPACE).append("$");
         return outputRegex.toString();
     }
 

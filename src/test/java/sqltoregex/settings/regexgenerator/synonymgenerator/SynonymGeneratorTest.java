@@ -115,7 +115,7 @@ class SynonymGeneratorTest {
         stringSynonymGenerator.addSynonym("Mittelwert");
         stringSynonymGenerator.addSynonym("AVG");
         stringSynonymGenerator.addSynonym("Average");
-        Set<String> stringSet = new HashSet<>(List.of("Mittelwert", "AVG", "Average"));
+        Set<String> stringSet = new HashSet<>(List.of("MITTELWERT", "AVG", "AVERAGE"));
         Assertions.assertEquals(stringSet, stringSynonymGenerator.getGraph().vertexSet());
     }
 
@@ -161,7 +161,7 @@ class SynonymGeneratorTest {
         stringSynonymGenerator.addSynonym("Average");
         stringSynonymGenerator.setPrefix("%");
         stringSynonymGenerator.setSuffix("#");
-        Assertions.assertEquals("(?:%Mittelwert#|%Average#|%AVG#)",
+        Assertions.assertEquals("(?:%MITTELWERT#|%AVERAGE#|%AVG#)",
                                 stringSynonymGenerator.generateRegExFor("Mittelwert"));
     }
 
@@ -170,7 +170,7 @@ class SynonymGeneratorTest {
         stringSynonymGenerator.addSynonym("Mittelwert");
         stringSynonymGenerator.addSynonym("AVG");
         stringSynonymGenerator.addSynonym("Average");
-        Assertions.assertEquals("(?:Mittelwert|Average|AVG)", stringSynonymGenerator.generateRegExFor("Mittelwert"));
+        Assertions.assertEquals("(?:MITTELWERT|AVERAGE|AVG)", stringSynonymGenerator.generateRegExFor("Mittelwert"));
     }
 
     @Test

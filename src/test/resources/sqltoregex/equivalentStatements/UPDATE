@@ -1,0 +1,12 @@
+<!-- first line == sample solution, follow line == equivalent solutions, five # as delimiter between statements --!>
+
+UPDATE Song SET laenge = laenge + 10;
+UPDATE Song SET laenge = 10 + laenge;
+UPDATE "Song" SET "laenge" = 10 + "laenge";
+#####
+UPDATE Playlist SET name = "Roadtrip-Vibes", erstelltAm = {d'2022-06-23'} WHERE name = "Roadtrip";
+UPDATE Playlist SET erstelltAm = 2022-06-23, name = "Roadtrip-Vibes" WHERE name = "Roadtrip";
+UPDATE Playlist SET erstelltAm = 2022-06-23, name = "Roadtrip-Vibes" WHERE "Roadtrip" = name;
+UPDATE Playlist SET erstelltAm = #2022-06-23#, name = "Roadtrip-Vibes" WHERE "Roadtrip" = name;
+UPDATE Playlist SET erstelltAm = 22-06-23, name = "Roadtrip-Vibes" WHERE "Roadtrip" = name;
+UPDATE Playlist SET erstelltAm = 20220623, name = "Roadtrip-Vibes" WHERE "Roadtrip" = name;

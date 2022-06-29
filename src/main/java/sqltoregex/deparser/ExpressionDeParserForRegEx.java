@@ -495,9 +495,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
             StringBuilder tableNameWithAlias = new StringBuilder();
             deparseTableName(tableName, tableNameWithAlias);
-            if (!tableName.isEmpty()) {
-                buffer.append(tableNameWithAlias).append("\\.");
-            }
+            buffer.append(tableNameWithAlias);
         }
 
         buffer.append(
@@ -513,6 +511,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     private void deparseTableName(String tableName, StringBuilder tableNameWithAlias) {
         if(this.getRelatedTableNameOrAlias(tableName) == null){
+            tableNameWithAlias.append("(");
             tableNameWithAlias.append(
                     StatementDeParserForRegEx.addQuotationMarks(
                             SpellingMistake.useOrDefault(
@@ -521,6 +520,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                             )
                     )
             );
+            tableNameWithAlias.append(")?");
         } else {
             tableNameWithAlias.append("(?:");
             tableNameWithAlias.append(
@@ -540,7 +540,10 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                             )
                     )
             );
-            tableNameWithAlias.append(")");
+            tableNameWithAlias.append(")?");
+        }
+        if (!tableName.isEmpty()) {
+            tableNameWithAlias.append("\\.?");
         }
     }
 
@@ -575,9 +578,8 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                     if(singleExpression.contains(".")){
                         String tableName = singleExpression.split("\\.")[0];
                         deparseTableName(tableName, tableNameWithAlias);
-                        if (!tableName.isEmpty()) {
-                            tableNameWithAlias.append(".");
-                        }
+                        buffer.append(tableNameWithAlias);
+
                     }
                     String[] columnName = singleExpression.split("\\.");
                     buffer.append(tableNameWithAlias);
@@ -586,7 +588,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                                     SpellingMistake.useOrDefault(
                                             columnNameSpellingMistake,
                                             columnName[columnName.length - 1].replaceAll(QUOTATION_MARK_REGEX, "")
-                                    )
+                                    ).replace("*", "\\*")
                             )
                     );
 
@@ -667,7 +669,9 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 .append("\\{d").append(OPTIONAL_WHITE_SPACE).append("'").append(dateValue.getValue().toString())
                 .append("'").append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')
+                .append("#?")
                 .append(DateAndTimeFormatSynonymGenerator.useOrDefault(this.dateSynonyms, dateValue))
+                .append("#?")
                 .append(")");
     }
 
@@ -677,7 +681,9 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 .append("\\{ts").append(OPTIONAL_WHITE_SPACE).append("'").append(timestampValue.getValue().toString())
                 .append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')
+                .append("#?")
                 .append(DateAndTimeFormatSynonymGenerator.useOrDefault(this.timeStampSynonyms, timestampValue))
+                .append("#?")
                 .append(")");
     }
 
@@ -687,7 +693,9 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                 .append("\\{t").append(OPTIONAL_WHITE_SPACE).append("'").append(timeValue.getValue().toString())
                 .append(OPTIONAL_WHITE_SPACE).append("\\}")
                 .append('|')
+                .append("#?")
                 .append(DateAndTimeFormatSynonymGenerator.useOrDefault(this.timeSynonyms, timeValue))
+                .append("#?")
                 .append(")");
     }
 

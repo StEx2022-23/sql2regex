@@ -77,70 +77,76 @@ public class SelectDeParserForRegEx extends SelectDeParser {
      * Performs join deparsing.
      * @param join {@link Join}
      */
-    @Override
     @SuppressWarnings({"PMD.CyclomaticComplexity"})
-    public void deparseJoin(Join join) {
+    public void deparseJoin(StringBuilder stringBuilder, Join join) {
         this.expressionDeParserForRegEx.addTableNameAlias(join.getRightItem().toString());
         if (join.isSimple() && join.isOuter()) {
-            buffer.append(",");
-            this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "OUTER", true);
+            stringBuilder.append(",");
+            this.setKeywordSpellingMistakeWithRequiredWhitespaces(stringBuilder,true, "OUTER", true);
         } else if (join.isSimple()) {
-            buffer.append(",");
-            buffer.append(OPTIONAL_WHITE_SPACE);
+            stringBuilder.append(",");
+            stringBuilder.append(OPTIONAL_WHITE_SPACE);
         } else {
             if (join.isRight()) {
-                this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "RIGHT", false);
+                this.setKeywordSpellingMistakeWithRequiredWhitespaces(stringBuilder,true, "RIGHT", false);
             } else if (join.isNatural()) {
-                this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "NATURAL", false);
+                this.setKeywordSpellingMistakeWithRequiredWhitespaces(stringBuilder,true, "NATURAL", false);
             } else if (join.isFull()) {
-                this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "FULL", false);
+                this.setKeywordSpellingMistakeWithRequiredWhitespaces(stringBuilder,true, "FULL", false);
             } else if (join.isLeft()) {
-                this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "LEFT", false);
+                this.setKeywordSpellingMistakeWithRequiredWhitespaces(stringBuilder,true, "LEFT", false);
             } else if (join.isCross()) {
-                this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "CROSS", false);
+                this.setKeywordSpellingMistakeWithRequiredWhitespaces(stringBuilder,true, "CROSS", false);
             }
 
             if (join.isOuter()) {
-                this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "OUTER", false);
+                this.setKeywordSpellingMistakeWithRequiredWhitespaces(stringBuilder,true, "OUTER", false);
             } else if (join.isInner()) {
-                this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "INNER", false);
+                this.setKeywordSpellingMistakeWithRequiredWhitespaces(stringBuilder,true, "INNER", false);
             } else if (join.isSemi()) {
-                this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "SEMI", false);
+                this.setKeywordSpellingMistakeWithRequiredWhitespaces(stringBuilder,true, "SEMI", false);
             }
 
             if (join.isStraight()) {
-                this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "STRAIGHT_JOIN", true);
+                this.setKeywordSpellingMistakeWithRequiredWhitespaces(stringBuilder,true, "STRAIGHT_JOIN", true);
             } else if (join.isApply()) {
-                this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "APPLY", true);
+                this.setKeywordSpellingMistakeWithRequiredWhitespaces(stringBuilder,true, "APPLY", true);
             } else {
-                this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "JOIN", true);
+                this.setKeywordSpellingMistakeWithRequiredWhitespaces(stringBuilder,true, "JOIN", true);
             }
         }
 
+        ExpressionDeParserForRegEx tempExpressionDeParserForRegEx = new ExpressionDeParserForRegEx(this.settingsContainer);
+        tempExpressionDeParserForRegEx.setBuffer(stringBuilder);
+        tempExpressionDeParserForRegEx.setTableNameAliasMap(this.expressionDeParserForRegEx.getTableNameAliasMap());
+
+        SelectDeParserForRegEx tempSelectDeParserForRegEx = new SelectDeParserForRegEx(this.settingsContainer);
+        tempSelectDeParserForRegEx.setBuffer(stringBuilder);
+
         FromItem fromItem = join.getRightItem();
-        fromItem.accept(this);
+        fromItem.accept(tempSelectDeParserForRegEx);
         if (join.isWindowJoin()) {
-            this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "WITHIN", true);
-            buffer.append(QUOTATION_MARK_REGEX_ZERO_ONE).append(join.getJoinWindow().toString()).append(QUOTATION_MARK_REGEX_ZERO_ONE);
+            this.setKeywordSpellingMistakeWithRequiredWhitespaces(stringBuilder,true, "WITHIN", true);
+            stringBuilder.append(QUOTATION_MARK_REGEX_ZERO_ONE).append(join.getJoinWindow().toString()).append(QUOTATION_MARK_REGEX_ZERO_ONE);
         }
         for (Expression onExpression : join.getOnExpressions()) {
-            this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "ON", true);
-            onExpression.accept(expressionDeParserForRegEx);
+            this.setKeywordSpellingMistakeWithRequiredWhitespaces(stringBuilder,true, "ON", true);
+            onExpression.accept(tempExpressionDeParserForRegEx);
         }
         if (!join.getUsingColumns().isEmpty()) {
             this.setKeywordSpellingMistakeWithRequiredWhitespaces(true, "USING", true);
-            buffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
-            buffer.append(OPTIONAL_WHITE_SPACE);
+            stringBuilder.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
+            stringBuilder.append(OPTIONAL_WHITE_SPACE);
             for (Iterator<Column> iterator = join.getUsingColumns().iterator(); iterator.hasNext(); ) {
                 Column column = iterator.next();
-                buffer.append(QUOTATION_MARK_REGEX_ZERO_ONE).append(column.toString().replaceAll(QUOTATION_MARK_REGEX, "")).append(QUOTATION_MARK_REGEX_ZERO_ONE);
+                stringBuilder.append(QUOTATION_MARK_REGEX_ZERO_ONE).append(column.toString().replaceAll(QUOTATION_MARK_REGEX, "")).append(QUOTATION_MARK_REGEX_ZERO_ONE);
                 if (iterator.hasNext()) {
-                    buffer.append(",");
-                    buffer.append(OPTIONAL_WHITE_SPACE);
+                    stringBuilder.append(",");
+                    stringBuilder.append(OPTIONAL_WHITE_SPACE);
                 }
             }
-            buffer.append(OPTIONAL_WHITE_SPACE);
-            buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
+            stringBuilder.append(OPTIONAL_WHITE_SPACE);
+            stringBuilder.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
         }
     }
 
@@ -543,9 +549,15 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
             if (simpleJoinElements.size() == 1) {
                 buffer.append(OrderRotation.useOrDefault(this.tableNameOrder, simpleJoinElements));
+                List<String> joinListAsStringsToRotate = new LinkedList<>();
+                StringBuilder tempStringBuilder = new StringBuilder();
                 for (Join join : plainSelect.getJoins()) {
-                    deparseJoin(join);
+                    this.deparseJoin(tempStringBuilder, join);
+                    joinListAsStringsToRotate.add(tempStringBuilder.toString());
+                    tempStringBuilder.replace(0, tempStringBuilder.length(), "");
                 }
+
+                concatJoinOptions(joinListAsStringsToRotate);
             } else {
                 buffer.append(OrderRotation.useOrDefault(this.tableNameOrder, simpleJoinElements));
             }
@@ -639,6 +651,19 @@ public class SelectDeParserForRegEx extends SelectDeParser {
             buffer.append(OPTIONAL_WHITE_SPACE + "\\)");
         }
 
+    }
+
+    private void concatJoinOptions(List<String> joinListAsStringsToRotate) {
+        List<String> orderRotated = OrderRotation.generateAsListOrDefault(this.tableNameOrder, joinListAsStringsToRotate);
+        Iterator<String> stringIterator = orderRotated.iterator();
+        buffer.append("(?:");
+        while(stringIterator.hasNext()) {
+            buffer.append(stringIterator.next().replace(",", ""));
+            if (stringIterator.hasNext()) {
+                buffer.append("|");
+            }
+        }
+        buffer.append(")");
     }
 
     /**
@@ -914,9 +939,16 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     public void visit(SubJoin subjoin) {
         buffer.append("\\(");
         subjoin.getLeft().accept(this);
+        List<String> joinListAsStringsToRotate = new LinkedList<>();
+        StringBuilder tempStringBuilder = new StringBuilder();
         for (Join join : subjoin.getJoinList()) {
-            this.deparseJoin(join);
+            this.deparseJoin(tempStringBuilder, join);
+            joinListAsStringsToRotate.add(tempStringBuilder.toString());
+            tempStringBuilder.replace(0, tempStringBuilder.length(), "");
         }
+
+        concatJoinOptions(joinListAsStringsToRotate);
+
         buffer.append("\\)");
 
         if (subjoin.getPivot() != null) {
@@ -1101,5 +1133,18 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         buffer.append(whiteSpaceBefore ? REQUIRED_WHITE_SPACE : "");
         buffer.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, keyword));
         buffer.append(whiteSpaceAfter ? REQUIRED_WHITE_SPACE : "");
+    }
+
+    /**
+     * Performs keyword spelling mistakes with required whitespaces as suffix and prefix.
+     * @param stringBuilder other stringbuilder then default
+     * @param whiteSpaceBefore boolean for whitespace before
+     * @param keyword keyword to handle by keyword spelling mistake {@link SpellingMistake}
+     * @param whiteSpaceAfter boolean for whitespace after
+     */
+    private void setKeywordSpellingMistakeWithRequiredWhitespaces(StringBuilder stringBuilder,boolean whiteSpaceBefore, String keyword, boolean whiteSpaceAfter){
+        stringBuilder.append(whiteSpaceBefore ? REQUIRED_WHITE_SPACE : "");
+        stringBuilder.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, keyword));
+        stringBuilder.append(whiteSpaceAfter ? REQUIRED_WHITE_SPACE : "");
     }
 }

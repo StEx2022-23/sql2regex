@@ -281,9 +281,11 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
                     handleColumnDefinitionWithClipsAndWhitespaces(tempColumnDefinition, stringIterator);
                 }
                 synsWithSpellingMistake.add(tempColumnDefinition.toString());
+            } else {
+                synsWithSpellingMistake.add(StringSynonymGenerator.useOrDefault(this.datatypeSynonymGenerator, keywordSyn.toUpperCase(Locale.ROOT)));
             }
-            synsWithSpellingMistake.add(SpellingMistake.useOrDefault(this.keywordSpellingMistake, keywordSyn));
         }
+
         tmpBuffer.append(RegExGenerator.joinListToRegEx(this.datatypeSynonymGenerator, synsWithSpellingMistake));
         if (columnDefinition.getColumnSpecs() != null) {
             StringBuilder stringBuilder = new StringBuilder();
@@ -313,21 +315,16 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
     private void handleColumnDefinitionWithClipsAndWhitespaces(StringBuilder tempColumnDefinition, Iterator<String> stringIterator) {
         String splitElement = stringIterator.next();
         if(splitElement.contains("(") && splitElement.contains(")")){
-            tempColumnDefinition.append("\\(");
+            tempColumnDefinition.append("\\(").append(OPTIONAL_WHITE_SPACE);
             tempColumnDefinition.append(
                     SpellingMistake.useOrDefault(
                             this.keywordSpellingMistake,
                             splitElement.replace("(", "").replace(")","")
                     )
             );
-            tempColumnDefinition.append("\\)");
+            tempColumnDefinition.append(OPTIONAL_WHITE_SPACE).append("\\)");
         } else {
-            tempColumnDefinition.append(
-                    SpellingMistake.useOrDefault(
-                            this.keywordSpellingMistake,
-                            splitElement
-                    )
-            );
+            tempColumnDefinition.append(StringSynonymGenerator.useOrDefault(this.datatypeSynonymGenerator, splitElement));
         }
         if(stringIterator.hasNext()) tempColumnDefinition.append(OPTIONAL_WHITE_SPACE);
     }

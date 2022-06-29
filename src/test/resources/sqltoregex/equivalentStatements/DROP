@@ -1,0 +1,6 @@
+<!-- first line == sample solution, follow line == equivalent solutions, five # as delimiter between statements --!>
+
+DROP TABLE wetterstation_archiv;
+DROP TABLE "wetterstation_archiv";
+DROP  TABLE  wetterstation_archiv;
+DROP TABLE wetterstationarchiv;

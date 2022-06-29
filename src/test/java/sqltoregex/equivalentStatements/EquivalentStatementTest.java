@@ -39,19 +39,51 @@ class EquivalentStatementTest extends UserSettingsPreparer {
         String[] splitByEquivalents = data.split(DELIMITER_FOR_EQUIVALENTS);
         for (String str : splitByEquivalents) {
             String[] splitBySingleStatements = str.split(DELIMITER_FOR_SINGLE_STATEMENTS);
-            List<String> equivalents = new ArrayList<>(
-                    Arrays.asList(splitBySingleStatements).subList(1, splitBySingleStatements.length));
+            List<String> equivalents = Arrays.asList(splitBySingleStatements);
             this.equivalentStatements.put(splitBySingleStatements[0], equivalents);
         }
     }
 
     @Test
     void testSelectStatements() throws IOException, JSQLParserException {
-        this.parseTextFile(SupportedStatementType.SELECT);
+        this.specificTest(SupportedStatementType.SELECT);
+    }
+
+    @Test
+    void testDeleteStatements() throws IOException, JSQLParserException {
+        this.specificTest(SupportedStatementType.DELETE);
+    }
+
+    @Test
+    void testInsertIntoStatements() throws JSQLParserException, IOException {
+        this.specificTest(SupportedStatementType.INSERT);
+    }
+
+    @Test
+    void testUpdateStatements() throws JSQLParserException, IOException {
+        this.specificTest(SupportedStatementType.UPDATE);
+    }
+
+    @Test
+    void testCreateStatements() throws JSQLParserException, IOException {
+        this.specificTest(SupportedStatementType.CREATE);
+    }
+
+    @Test
+    void testDropStatements() throws JSQLParserException, IOException {
+        this.specificTest(SupportedStatementType.DROP);
+    }
+
+    void specificTest(SupportedStatementType supportedStatementType) throws JSQLParserException, IOException {
+        this.parseTextFile(supportedStatementType);
         for (String key : this.equivalentStatements.keySet()) {
-            Pattern pattern = Pattern.compile(this.converterManagement.deparse(key, false, SettingsType.ALL));
+            Pattern pattern = Pattern.compile(this.converterManagement.deparse(key, false, SettingsType.ALL), Pattern.CASE_INSENSITIVE);
             for (String toValidateStatements : this.equivalentStatements.get(key)) {
                 Matcher matcher = pattern.matcher(toValidateStatements);
+                if(!matcher.matches()) {
+                    System.out.println(pattern);
+                    System.out.println(toValidateStatements);
+                }
                 Assertions.assertTrue(matcher.matches());
             }
         }

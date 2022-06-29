@@ -23,9 +23,9 @@ class StringSynonymGeneratorTest {
 
     @Test
     void queryExistingSynonym() {
-        Assertions.assertEquals("(witzig|ulkig|komisch)", defaultSynonymManager.generateRegExFor("witzig"));
-        Assertions.assertEquals("(ulkig|komisch|witzig)", defaultSynonymManager.generateRegExFor("ulkig"));
-        Assertions.assertEquals("(komisch|ulkig|witzig)", defaultSynonymManager.generateRegExFor("komisch"));
+        Assertions.assertEquals("(WITZIG|ULKIG|KOMISCH)", defaultSynonymManager.generateRegExFor("witzig"));
+        Assertions.assertEquals("(ULKIG|KOMISCH|WITZIG)", defaultSynonymManager.generateRegExFor("ulkig"));
+        Assertions.assertEquals("(KOMISCH|ULKIG|WITZIG)", defaultSynonymManager.generateRegExFor("komisch"));
     }
 
     @Test
@@ -43,9 +43,9 @@ class StringSynonymGeneratorTest {
         generator.addSynonym("syn2");
         generator.addSynonym("syn3");
 
-        List<String> synonyms = List.of("syn1",
-                                        "syn2",
-                                        "syn3");
+        List<String> synonyms = List.of("SYN1",
+                                        "SYN2",
+                                        "SYN3");
 
         List<String> generatedSynonyms = StringSynonymGenerator.generateAsListOrDefault(generator, testString);
         Assertions.assertEquals(synonyms.size(), generatedSynonyms.size());
@@ -61,8 +61,8 @@ class StringSynonymGeneratorTest {
         stringSynonymGenerator.addSynonym("Coke");
         String regex = StringSynonymGenerator.useOrDefault(stringSynonymGenerator, "Cola");
 
-        Assertions.assertTrue(regex.contains("Cola"));
-        Assertions.assertTrue(regex.contains("Coke"));
+        Assertions.assertTrue(regex.contains("COLA"));
+        Assertions.assertTrue(regex.contains("COKE"));
 
         Assertions.assertEquals("Cola", StringSynonymGenerator.useOrDefault(null, "Cola"));
     }
