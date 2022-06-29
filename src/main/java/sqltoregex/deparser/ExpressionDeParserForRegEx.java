@@ -495,9 +495,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
             StringBuilder tableNameWithAlias = new StringBuilder();
             deparseTableName(tableName, tableNameWithAlias);
-            if (!tableName.isEmpty()) {
-                buffer.append(tableNameWithAlias).append("\\.?");
-            }
+            buffer.append(tableNameWithAlias);
         }
 
         buffer.append(
@@ -544,6 +542,9 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
             );
             tableNameWithAlias.append(")?");
         }
+        if (!tableName.isEmpty()) {
+            tableNameWithAlias.append("\\.?");
+        }
     }
 
     @Override
@@ -577,9 +578,8 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
                     if(singleExpression.contains(".")){
                         String tableName = singleExpression.split("\\.")[0];
                         deparseTableName(tableName, tableNameWithAlias);
-                        if (!tableName.isEmpty()) {
-                            tableNameWithAlias.append(".");
-                        }
+                        buffer.append(tableNameWithAlias);
+
                     }
                     String[] columnName = singleExpression.split("\\.");
                     buffer.append(tableNameWithAlias);
