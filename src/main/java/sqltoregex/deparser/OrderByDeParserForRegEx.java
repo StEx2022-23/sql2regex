@@ -147,6 +147,11 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
         return temp.toString();
     }
 
+    /**
+     * Checks if synonyms for asc or desc are given. Generates a regex.
+     * @param temp {@link StringBuilder}
+     * @param ascSynonyms list with synonyms
+     */
     private void handleAscDescSynonyms(StringBuilder temp, List<String> ascSynonyms) {
         temp.append(REQUIRED_WHITE_SPACE);
         Iterator<String> stringIterator = ascSynonyms.iterator();
