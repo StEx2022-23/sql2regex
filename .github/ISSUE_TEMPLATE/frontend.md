@@ -1,24 +1,17 @@
 ---
-name: report a bug
-about: Create a report to help us improve
+name: report a frontend bug
+about: Any issues relating display behavior.
 title: "[BUG] "
 labels: bug
 assignees: ''
 
 ---
 
+**Link to page:** <br>
+[URL of the related page]
+
 **Describe the bug:** <br>
 A clear and concise description of what the bug is.
-
-**Your inserted SQL-Statement:** <br>
-```sql
-SELECT *  
-```
-
-**The generated RegEx:** <br>
-```regex
-(?:regularExpression|RegEx)
-```
 
 **Steps to reproduce:** <br>
 Steps to reproduce the behavior.
@@ -41,4 +34,4 @@ If applicable, add screenshots to help explain your problem.
  - Version: [e.g. 22]
 
 **Additional context:**
-Add any other context about the problem here.
+Add any further context about the problem here.

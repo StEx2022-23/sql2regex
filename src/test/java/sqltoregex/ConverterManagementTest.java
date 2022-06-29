@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 import sqltoregex.deparser.TestUtils;
+import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.SettingsType;
@@ -35,18 +36,19 @@ class ConverterManagementTest {
                 "SELECT col1 FROM table1 INNER JOIN table2 WHERE (col1=col2) AND col3 = col4"
         ));
 
-        Assertions.assertTrue(TestUtils.checkAgainstRegEx(converterManagement.deparse(sampleSolution, false,  SettingsType.ALL), "SELECT col1 FROM table1 INNER JOIN table2 ON (col1=col2) AND col3 = col4"));
-        Assertions.assertTrue(TestUtils.checkAgainstRegEx(converterManagement.deparse(sampleSolution, false, SettingsType.ALL), "SELECT col1 FROM table1 INNER JOIN table2 WHERE (col1=col2) AND col3 = col4"));
+        Assertions.assertTrue(TestUtils.checkAgainstRegEx(converterManagement.deparse(sampleSolution, false,  SettingsType.NONE), "SELECT col1 FROM table1 INNER JOIN table2 ON (col1=col2) AND col3 = col4"));
+        Assertions.assertTrue(TestUtils.checkAgainstRegEx(converterManagement.deparse(sampleSolution, false, SettingsType.NONE), "SELECT col1 FROM table1 INNER JOIN table2 WHERE (col1=col2) AND col3 = col4"));
     }
 
     @Test
     void testExpressionDeparsing() throws JSQLParserException {
         Assertions.assertEquals(
-                "^\\s*col1 + col2\\s*;?\\s*$",
-                converterManagement.deparse("col1+col2", true, SettingsType.ALL)
+                "^\\s*(?:\\s*\\s*[`´'\"]?col1[`´'\"]?\\s*\\s*\\+\\s*\\s*[`´'\"]?col2[`´'\"]?\\s*|\\s*[`´'\"]?col2" +
+                        "[`´'\"]?\\s*\\s*\\+\\s*\\s*[`´'\"]?col1[`´'\"]?\\s*\\s*)\\s*;?\\s*$",
+                converterManagement.deparse("col1+col2", true, SettingsType.NONE)
         );
         Assertions.assertThrows(JSQLParserException.class, () ->
-                converterManagement.deparse("SELECT col1, col2 FROM table", true, SettingsType.ALL)
+                converterManagement.deparse("SELECT col1, col2 FROM table", true, SettingsType.NONE)
         );
     }
 
@@ -61,13 +63,14 @@ class ConverterManagementTest {
     @Test
     void testStatementDeparsingWithoutValidation() throws JSQLParserException {
         String sampleSolution = "SELECT col1, col2 FROM table";
-        String parsingSolution = converterManagement.deparse(sampleSolution, false, SettingsType.ALL);
+        String parsingSolution = converterManagement.deparse(sampleSolution, false, SettingsType.NONE);
         Assertions.assertTrue(parsingSolution.startsWith("^"));
         Assertions.assertTrue(parsingSolution.endsWith("$"));
 
         Assertions.assertEquals(
-                "^\\s*col1 + col2\\s*;?\\s*$",
-                converterManagement.deparse("col1+col2", true, SettingsType.ALL)
+                "^\\s*(?:\\s*\\s*[`´'\"]?col1[`´'\"]?\\s*\\s*\\+\\s*\\s*[`´'\"]?col2[`´'\"]?\\s*|\\s*[`´'\"]?col2" +
+                        "[`´'\"]?\\s*\\s*\\+\\s*\\s*[`´'\"]?col1[`´'\"]?\\s*\\s*)\\s*;?\\s*$",
+                converterManagement.deparse("col1+col2", true, SettingsType.NONE)
         );
     }
 
@@ -82,5 +85,16 @@ class ConverterManagementTest {
             count++;
         }
         Assertions.assertEquals(2, count);
+    }
+
+    @Test
+    void multipleStatements() throws JSQLParserException {
+        final String sampleSolution = "DELETE FROM Song WHERE genreID = (SELECT genreID FROM Genre WHERE 'be;zeichnung' " +
+                "= \"Klassik\");DELETE FROM Song WHERE genreID = 6";
+        String regEx = converterManagement.deparse(sampleSolution, false, SettingsType.NONE);
+
+        Assertions.assertFalse(TestUtils.checkAgainstRegEx(regEx, "DELETE FROM Song WHERE genreID = (SELECT genreID FROM Genre WHERE 'bezeichnung` = \"Klassik\")"));
+        Assertions.assertTrue(TestUtils.checkAgainstRegEx(regEx, "DELETE FROM Song WHERE genreID = (SELECT genreID FROM Genre WHERE 'be;zeichnung` = \"Klassik\")"));
+        Assertions.assertTrue(TestUtils.checkAgainstRegEx(regEx, "DELETE FROM Song WHERE genreID = 6"));
     }
 }

@@ -32,13 +32,14 @@ public class SpellingMistake extends RegExGenerator<String> {
             throw new IllegalArgumentException("String str should not be empty!");
         }
         List<String> stringList = new LinkedList<>();
-        stringList.add(str);
+        stringList.add(".?" + str);
         for(int i = 0; i<str.length(); i++){
             String first = str.substring(0, i);
             String second = str.substring(i + 1);
-            String concat = first.concat(second);
+            String concat = first.concat(".?").concat(second);
             stringList.add(concat);
         }
+        stringList.add(str + ".?");
         return stringList;
     }
 

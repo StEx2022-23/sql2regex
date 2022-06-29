@@ -2,8 +2,6 @@ package sqltoregex;
 
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.ExpressionVisitor;
-import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.util.deparser.ExpressionDeParser;
@@ -11,12 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import sqltoregex.deparser.CreateDatabaseDeParserForRegEx;
+import sqltoregex.deparser.ExpressionDeParserForRegEx;
+import sqltoregex.deparser.SelectDeParserForRegEx;
 import sqltoregex.deparser.StatementDeParserForRegEx;
 import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsType;
 import sqltoregex.visitor.StatementVisitorJoinToWhere;
 import sqltoregex.visitor.StatementVisitorKeyPlacement;
+import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
 
 import java.util.*;
 
@@ -27,6 +28,7 @@ import java.util.*;
 public class ConverterManagement {
     private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SettingsManager settingsManager;
+    private static final String NOT_QUOTATION_MARK_REGEX = "[^" + QUOTATION_MARK_REGEX.substring(1);
 
     /**
      * Constructor of converter management.
@@ -84,12 +86,12 @@ public class ConverterManagement {
      * @return generated regex
      * @throws JSQLParserException if parsing goes wrong
      */
-    private String deParseExpression(String sqlstatement) throws JSQLParserException {
+    private String deParseExpression(String sqlstatement, SettingsType settingsType) throws JSQLParserException {
         Expression expression;
         expression = this.parseExpression(sqlstatement);
-        ExpressionVisitor expressionVisitor = new ExpressionVisitorAdapter();
-        expression.accept(expressionVisitor);
-        ExpressionDeParser expressionDeParser = new ExpressionDeParser();
+        SettingsContainer settings = SettingsContainer.builder().with(settingsManager, settingsType);
+        ExpressionDeParser expressionDeParser = new ExpressionDeParserForRegEx(new SelectDeParserForRegEx(
+                settings), new StringBuilder(), settings);
         expression.accept(expressionDeParser);
         return this.buildOutputRegex(expressionDeParser.getBuffer().toString());
     }
@@ -97,20 +99,18 @@ public class ConverterManagement {
     /**
      * Deparses statements.
      * @param sqlStatement current sql statement
-     * @param buffer StringBuilder {@link StringBuilder}
      * @param settingsType {@link sqltoregex.settings.UserSettings} or presets
      * @return  generated regex
      * @throws JSQLParserException if parsing goes wrong
      */
-    private String deParseStatement(String sqlStatement, StringBuilder buffer, SettingsType settingsType) throws JSQLParserException {
+    private String deParseStatement(String sqlStatement, SettingsType settingsType) throws JSQLParserException {
         if(checkIfStatementTypeOfCreateDatabase(sqlStatement)) return new CreateDatabaseDeParserForRegEx(SettingsContainer.builder().with(settingsManager, settingsType)).deParse(sqlStatement);
 
         Statement statement;
         statement = this.parseStatement(sqlStatement);
         List<String> regExList = new LinkedList<>();
 
-        StatementDeParserForRegEx defaultStatementDeParser = new StatementDeParserForRegEx(buffer, SettingsContainer.builder().with(settingsManager, settingsType));
-
+        StatementDeParserForRegEx defaultStatementDeParser = new StatementDeParserForRegEx(new StringBuilder(), SettingsContainer.builder().with(settingsManager, settingsType));
         statement.accept(defaultStatementDeParser);
         regExList.add(defaultStatementDeParser.getBuffer().toString());
 
@@ -138,8 +138,7 @@ public class ConverterManagement {
      * @throws JSQLParserException if parsing goes wrong
      */
     public String deparse(String sqlStatement) throws JSQLParserException {
-        StringBuilder buffer = new StringBuilder();
-        return this.deParseStatement(sqlStatement, buffer, SettingsType.USER);
+        return this.deParseStatement(sqlStatement, SettingsType.USER);
     }
 
     /**
@@ -150,7 +149,7 @@ public class ConverterManagement {
      * @throws JSQLParserException if parsing goes wrong
      */
     public String deparse(String sqlStatement, boolean isOnlyExpression) throws JSQLParserException {
-        return deparse(sqlStatement, isOnlyExpression, SettingsType.USER);
+        return this.deparse(sqlStatement, isOnlyExpression, SettingsType.USER);
     }
 
     /**
@@ -162,12 +161,53 @@ public class ConverterManagement {
      * @throws JSQLParserException if parsing goes wrong
      */
     public String deparse(String sqlStatement, boolean isOnlyExpression, SettingsType settingsType) throws JSQLParserException {
+        Set<String> statementSet = new HashSet<>(extractStatements(sqlStatement));
         StringBuilder buffer = new StringBuilder();
-        if (isOnlyExpression) {
-            return this.deParseExpression(sqlStatement);
-        } else {
-            return this.deParseStatement(sqlStatement, buffer, settingsType);
+        Iterator<String> iterator = statementSet.iterator();
+        while (iterator.hasNext()){
+            if (isOnlyExpression) {
+                buffer.append(this.deParseExpression(iterator.next(), settingsType));
+            } else {
+                buffer.append(this.deParseStatement(iterator.next(), settingsType));
+            }
+            if (iterator.hasNext()){
+                buffer.append('|');
+            }
         }
+        return buffer.toString();
+    }
+
+    /**
+     * Searches for ";" in the provided String and splits the Statements on ";" which are not enclosed in QuotationMarks
+     * @param multStmtString
+     * @see StatementDeParserForRegEx#QUOTATION_MARK_REGEX
+     * @return
+     */
+    public Collection<String> extractStatements(String multStmtString){
+        Collection<String> stmtList = new LinkedList<>();
+        int firstPos = 0;
+        int secondPos = 0;
+        String subBetweenSemis = "";
+
+        while ((secondPos = multStmtString.indexOf(';', secondPos)) != -1) {
+            subBetweenSemis = multStmtString.substring(firstPos, secondPos);
+            //RegEx searches for even (incl. 0) number of QuotationMarks "(([^']*'[^']*'[^']*)|[^'])*"
+            if (!subBetweenSemis.matches("((" + NOT_QUOTATION_MARK_REGEX +"*"
+                                                 + QUOTATION_MARK_REGEX + NOT_QUOTATION_MARK_REGEX +"*"
+                                                 + QUOTATION_MARK_REGEX + NOT_QUOTATION_MARK_REGEX +"*)|"
+                                                 + NOT_QUOTATION_MARK_REGEX +")*")){
+                secondPos++;
+                continue;
+            }
+
+            firstPos = ++secondPos;
+            stmtList.add(subBetweenSemis);
+        }
+
+        if (!multStmtString.endsWith(";")){
+            stmtList.add(multStmtString.substring(firstPos));
+        }
+        return stmtList;
     }
 
     /**
