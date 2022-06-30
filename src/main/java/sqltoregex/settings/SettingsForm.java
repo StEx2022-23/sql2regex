@@ -3,6 +3,8 @@ package sqltoregex.settings;
 import net.sf.jsqlparser.util.validation.Validation;
 import net.sf.jsqlparser.util.validation.ValidationError;
 import net.sf.jsqlparser.util.validation.feature.DatabaseType;
+import sqltoregex.settings.regexgenerator.OrderRotation;
+import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.validations.AssertMethodAsTrue;
 
 import javax.validation.constraints.NotEmpty;
@@ -31,8 +33,8 @@ public class SettingsForm {
                                                                    Collections.emptySet(),
                                                                    Collections.emptySet(),
                                                                    "EMPTY");
-    Set<SettingsOption> spellings;
-    Set<SettingsOption> orders;
+    Set<SpellingMistake> spellings;
+    Set<OrderRotation> orders;
     Set<SimpleDateFormat> dateFormats;
     Set<SimpleDateFormat> timeFormats;
     Set<SimpleDateFormat> dateTimeFormats;
@@ -43,8 +45,8 @@ public class SettingsForm {
 
     /**
      * Constructor for the SettingsForm.
-     * @param spellings all spelling settings as Set of {@link SettingsOption}
-     * @param orders all orders settings as Set of {@link SettingsOption}
+     * @param spellings all spelling settings as Set of {@link SpellingMistake}
+     * @param orders all orders settings as Set of {@link OrderRotation}
      * @param dateFormats all dateFormats settings as Set of {@link SimpleDateFormat}
      * @param timeFormats all timeFormats settings as Set of {@link SimpleDateFormat}
      * @param dateTimeFormats all dateTimeFormats settings as Set of {@link SimpleDateFormat}
@@ -53,8 +55,8 @@ public class SettingsForm {
      * @param otherSynonyms all otherSynonyms settings as String-Set
      * @param sql the given SQL-Statement as String
      */
-    public SettingsForm(Set<SettingsOption> spellings,
-                        Set<SettingsOption> orders,
+    public SettingsForm(Set<SpellingMistake> spellings,
+                        Set<OrderRotation> orders,
                         Set<SimpleDateFormat> dateFormats,
                         Set<SimpleDateFormat> timeFormats,
                         Set<SimpleDateFormat> dateTimeFormats,
@@ -97,11 +99,11 @@ public class SettingsForm {
         return this.dateTimeFormats;
     }
 
-    public Set<SettingsOption> getOrders() {
+    public Set<OrderRotation> getOrders() {
         return this.orders;
     }
 
-    public Set<SettingsOption> getSpellings() {
+    public Set<SpellingMistake> getSpellings() {
         return this.spellings;
     }
 
