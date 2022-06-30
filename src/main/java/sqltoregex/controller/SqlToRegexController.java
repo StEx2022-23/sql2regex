@@ -51,7 +51,7 @@ public class SqlToRegexController {
      * @return about page
      */
     @GetMapping("/about")
-    public String aboutus(Model model) {
+    public String aboutUs(Model model) {
         model.addAttribute(TITLE, "sql2regex - about us");
         model.addAttribute("activeAbout", true);
         return "about";
@@ -63,16 +63,16 @@ public class SqlToRegexController {
      * @return SettingsForm, html asset
      */
     private SettingsForm addSettingsFormFields(Model model) {
-        model.addAttribute("spellings", this.getSpellings(SettingsType.ALL));
-        model.addAttribute("orders", this.getOrders(SettingsType.ALL));
+        model.addAttribute("spellings", settingsManager.getSettingByClass(SpellingMistake.class, SettingsType.ALL));
+        model.addAttribute("orders", settingsManager.getSettingByClass(OrderRotation.class, SettingsType.ALL));
         model.addAttribute("dateFormats",
-                getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class, SettingsOption.DATESYNONYMS,
-                        SettingsType.ALL));
+                           getSynonymSetOf(DateAndTimeFormatSynonymGenerator.class, SettingsOption.DATESYNONYMS,
+                                           SettingsType.ALL));
         model.addAttribute("timeFormats",
-                getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class, SettingsOption.TIMESYNONYMS,
-                        SettingsType.ALL));
-        model.addAttribute("dateTimeFormats", getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class,
-                SettingsOption.DATETIMESYNONYMS, SettingsType.ALL));
+                           getSynonymSetOf(DateAndTimeFormatSynonymGenerator.class, SettingsOption.TIMESYNONYMS,
+                                           SettingsType.ALL));
+        model.addAttribute("dateTimeFormats", getSynonymSetOf(DateAndTimeFormatSynonymGenerator.class,
+                                                              SettingsOption.DATETIMESYNONYMS, SettingsType.ALL));
         //special preprocessing to render comfortably on frontend
         Map<String, Set<String>> aggregateFunctionSynonymsMap = settingsManager.getSettingBySettingsOption(
                         SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class, SettingsType.ALL)
@@ -95,14 +95,14 @@ public class SqlToRegexController {
 
         //the SettingsType could be later read in by a RequestParameter to provide several predefined default settings
         return new SettingsForm(
-                this.getSpellings(SettingsType.DEFAULT_SCHOOL),
-                this.getOrders(SettingsType.DEFAULT_SCHOOL),
-                getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class, SettingsOption.DATESYNONYMS,
-                        SettingsType.DEFAULT_SCHOOL),
-                getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class, SettingsOption.TIMESYNONYMS,
-                        SettingsType.DEFAULT_SCHOOL),
-                getSynonymGenerators(DateAndTimeFormatSynonymGenerator.class, SettingsOption.DATETIMESYNONYMS,
-                                     SettingsType.DEFAULT_SCHOOL),
+                settingsManager.getSettingByClass(SpellingMistake.class, SettingsType.DEFAULT_SCHOOL),
+                settingsManager.getSettingByClass(OrderRotation.class, SettingsType.DEFAULT_SCHOOL),
+                getSynonymSetOf(DateAndTimeFormatSynonymGenerator.class, SettingsOption.DATESYNONYMS,
+                                SettingsType.DEFAULT_SCHOOL),
+                getSynonymSetOf(DateAndTimeFormatSynonymGenerator.class, SettingsOption.TIMESYNONYMS,
+                                SettingsType.DEFAULT_SCHOOL),
+                getSynonymSetOf(DateAndTimeFormatSynonymGenerator.class, SettingsOption.DATETIMESYNONYMS,
+                                SettingsType.DEFAULT_SCHOOL),
                 //special preprocessing to render comfortably on frontend
                 settingsManager.getSettingBySettingsOption(
                                 SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class, SettingsType.ALL)
@@ -167,59 +167,15 @@ public class SqlToRegexController {
     }
 
     /**
-     * Helper function to return all order settings.
-     * @param settingsType SettingsType defines presets.
-     * @return Set of SettingsOption
-     */
-    private Set<SettingsOption> getOrders(SettingsType settingsType) {
-        Set<SettingsOption> orders = new HashSet<>();
-        settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMEORDER, OrderRotation.class, settingsType)
-                .ifPresent(tableNameOrder -> orders.add(tableNameOrder.getSettingsOption()));
-        settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMEORDER, OrderRotation.class, settingsType)
-                .ifPresent(columnNameOrder -> orders.add(columnNameOrder.getSettingsOption()));
-        settingsManager.getSettingBySettingsOption(SettingsOption.GROUPBYELEMENTORDER, OrderRotation.class,
-                        settingsType)
-                .ifPresent(expressionOrder -> orders.add(expressionOrder.getSettingsOption()));
-        settingsManager.getSettingBySettingsOption(SettingsOption.INSERTINTOVALUESORDER, OrderRotation.class,
-                        settingsType)
-                .ifPresent(expressionOrder -> orders.add(expressionOrder.getSettingsOption()));
-        return orders;
-    }
-
-    /**
-     * Helper function to return all spelling settings.
-     * @param settingsType SettingsType defines presets.
-     * @return Set of SettingsOption
-     */
-    private Set<SettingsOption> getSpellings(SettingsType settingsType) {
-        Set<SettingsOption> spellings = new HashSet<>();
-        settingsManager.getSettingBySettingsOption(SettingsOption.KEYWORDSPELLING, SpellingMistake.class, settingsType)
-                .ifPresent(keywordSpelling -> spellings.add(keywordSpelling.getSettingsOption()));
-        settingsManager.getSettingBySettingsOption(SettingsOption.COLUMNNAMESPELLING, SpellingMistake.class,
-                        settingsType)
-                .ifPresent(columnNameSpelling -> spellings.add(columnNameSpelling.getSettingsOption()));
-        settingsManager.getSettingBySettingsOption(SettingsOption.TABLENAMESPELLING, SpellingMistake.class,
-                        settingsType)
-                .ifPresent(tableNameSpelling -> spellings.add(tableNameSpelling.getSettingsOption()));
-        settingsManager.getSettingBySettingsOption(SettingsOption.INDEXCOLUMNNAMESPELLING, SpellingMistake.class,
-                        settingsType)
-                .ifPresent(tableNameSpelling -> spellings.add(tableNameSpelling.getSettingsOption()));
-        settingsManager.getSettingBySettingsOption(SettingsOption.STRINGVALUESPELLING, SpellingMistake.class,
-                        settingsType)
-                .ifPresent(tableNameSpelling -> spellings.add(tableNameSpelling.getSettingsOption()));
-        return spellings;
-    }
-
-    /**
      * Helper function to return all synonym generators.
-     * @param synonymGenerator Defines class of the specific synonym generator.
+     * @param clazz Defines class of the specific synonym generator.
      * @param settingsOption SettingsOption to define a specific synonym generator.
      * @param settingsType SettingsType defines presets.
      * @return Set of synonym generators
      */
-    private <T, S> Set<T> getSynonymGenerators(Class<? extends SynonymGenerator<T, S>> synonymGenerator,
-                                               SettingsOption settingsOption, SettingsType settingsType) {
-        return settingsManager.getSettingBySettingsOption(settingsOption, synonymGenerator, settingsType)
+    private <T, S> Set<T> getSynonymSetOf(Class<? extends SynonymGenerator<T, S>> clazz,
+                                          SettingsOption settingsOption, SettingsType settingsType) {
+        return settingsManager.getSettingBySettingsOption(settingsOption, clazz, settingsType)
                 .map(generator -> GraphPreProcessor.getSynonymSet(generator.getGraph()))
                 .orElse(new LinkedHashSet<>());
     }

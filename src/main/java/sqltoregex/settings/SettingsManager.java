@@ -178,8 +178,8 @@ public class SettingsManager {
         SettingsContainer.Builder settingsContainerBuilder = SettingsContainer.builder();
 
         SettingsContainer settingsContainer = settingsContainerBuilder
-                .withSettingsOptionSet(form.getSpellings())
-                .withSettingsOptionSet(form.getOrders())
+                .withRegExGeneratorSet(new HashSet<>(form.getSpellings()))
+                .withRegExGeneratorSet(new HashSet<>(form.getOrders()))
                 .withSimpleDateFormatSet(form.getDateFormats(), SettingsOption.DATESYNONYMS)
                 .withSimpleDateFormatSet(form.getTimeFormats(), SettingsOption.TIMESYNONYMS)
                 .withSimpleDateFormatSet(form.getDateTimeFormats(), SettingsOption.DATETIMESYNONYMS)

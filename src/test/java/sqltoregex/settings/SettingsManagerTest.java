@@ -79,7 +79,7 @@ class SettingsManagerTest {
 
     @Test
     void usesUserSettings() {
-        settingsManager.parseUserSettingsInput(new SettingsForm(new HashSet<>(List.of(SettingsOption.KEYWORDSPELLING)),
+        settingsManager.parseUserSettingsInput(new SettingsForm(new HashSet<>(List.of(new SpellingMistake(SettingsOption.KEYWORDSPELLING))),
                                                                 Collections.emptySet(),
                                                                 Collections.emptySet(),
                                                                 Collections.emptySet(),

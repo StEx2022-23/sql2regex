@@ -5,6 +5,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import sqltoregex.settings.regexgenerator.IRegExGenerator;
 import sqltoregex.settings.regexgenerator.OrderRotation;
+import sqltoregex.settings.regexgenerator.RegExGenerator;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
@@ -262,6 +263,20 @@ public class SettingsContainer {
         public SettingsContainer build(){
             this.unModifiableMap = Collections.unmodifiableMap(this.modifiableMap);
             return new SettingsContainer(this);
+        }
+
+
+        /**
+         * Pushes all provided {@link IRegExGenerator} into the {@link SettingsOption}s map.
+         * @param generatorSet Set of {@link IRegExGenerator}s which will be added.
+         * @return this {@link Builder} for method chaining
+         */
+        public Builder withRegExGeneratorSet(Set<? extends IRegExGenerator<?>> generatorSet) {
+            Assert.notNull(generatorSet, "Set of generators must not be null");
+            for (IRegExGenerator<?> generator : generatorSet) {
+                this.modifiableMap.put(generator.getSettingsOption(), generator);
+            }
+            return this;
         }
 
     }
