@@ -91,10 +91,6 @@ public class SettingsForm {
         return this.dateFormats;
     }
 
-    public void setDateFormats(Set<SimpleDateFormat> dateFormats) {
-        dateFormats.forEach(format -> format.setLenient(false));
-    }
-
     public Set<SimpleDateFormat> getDateTimeFormats() {
         return this.dateTimeFormats;
     }
