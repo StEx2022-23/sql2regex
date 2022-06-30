@@ -64,20 +64,6 @@ public class ApiConvertObject {
     }
 
     /**
-     * Sets {@link SettingsType} for the converting process from a input {@link String}.
-     * @param settingsType {@link String} represent the {@link SettingsType}
-     */
-    public void setSettingsType(String settingsType) {
-        if(settingsType.isEmpty()){
-            Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-            logger.log(Level.INFO, "No settings type given. Uses default settings.");
-            this.settingsType = SettingsType.ALL;
-        } else {
-            this.settingsType = SettingsType.valueOf(settingsType);
-        }
-    }
-
-    /**
      * Gets current set {@link SettingsType}.
      * @return {@link SettingsType}
      */

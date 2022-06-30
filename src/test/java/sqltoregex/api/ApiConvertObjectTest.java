@@ -39,9 +39,6 @@ class ApiConvertObjectTest {
         ApiConvertObject apiConvertObject = new ApiConvertObject();
         apiConvertObject.setSettingsType(SettingsType.DEFAULT_SCHOOL);
         Assertions.assertEquals(SettingsType.DEFAULT_SCHOOL, apiConvertObject.getSettingsType());
-
-        apiConvertObject.setSettingsType("DEFAULT_SCHOOL");
-        Assertions.assertEquals(SettingsType.DEFAULT_SCHOOL, apiConvertObject.getSettingsType());
     }
 
     @Test
