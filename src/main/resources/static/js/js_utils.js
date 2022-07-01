@@ -425,6 +425,12 @@ function loadUserFormSettings(formElement){
                 setCheckboxState(checkbox, slaveSelectionState(savings, checkbox.id.split("_")[0]))
             }
         })
+    } else {
+        let settingsDict = {};
+        allCheckboxes.forEach(el => {
+            settingsDict[el.id] = el.checked;
+        })
+        localStorage.setItem("savedUserSettings", JSON.stringify(settingsDict));
     }
 }
 
@@ -450,19 +456,23 @@ function updateSingleUserSetting(inputElement){
 
 function setCheckboxState(checkbox, state){
     if (state === 0){
+        checkbox.indeterminate = false
         checkbox.checked = false
-        checkbox.indeterminate = false
-    }else if (state === 1){
+    } else if (state === 1){
         checkbox.indeterminate = true
-    }else if (state === 2){
-        checkbox.checked = true
+    } else if (state === 2){
         checkbox.indeterminate = false
+        checkbox.checked = true
     }
 }
 
 function slaveSelectionState(checkboxDict, groupName){
+    console.log(checkboxDict);
+    console.log(groupName);
     const elOfNameOfEvent = Object.entries(checkboxDict).filter(([k,_v]) => k.includes(groupName) && !k.includes("master"))
     const elListOfActivated = elOfNameOfEvent.filter(([k,v]) => v === true && !k.includes("master"))
+    console.log(elOfNameOfEvent);
+    console.log(elListOfActivated);
     if (elOfNameOfEvent.length === elListOfActivated.length){
         //all elements are activated
         return 2
