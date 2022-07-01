@@ -585,7 +585,7 @@ function performDateAndTimeConversion(sqlInputEl, selectEl){
     for (let i = 0, iLen = options.length; i < iLen; i++) {
         opt = options[i];
 
-        if (!opt.selected) {
+        if (!opt.selected && opt.value !== 'NONE') {
             let endSubstring = parseInt(opt.value) + parseInt(opt.text.length);
             let afterDateTime = sqlInputEl.value.substring(endSubstring);
 
@@ -613,13 +613,14 @@ function dateOrTimeStringToLiteral(dateString) {
     let regexDateTime = new RegExp(/(?=\d\d\d\d-\d\d-\d\d \d\d:\d\d(?::\d\d)?)/gi);
     let regexTime = new RegExp(/(?=\d\d:\d\d(?::\d\d)?)/gi);
 
-    if(dateString.match(regexDate).length >= 1){
+    if(dateString.match(regexDate)?.length >= 1){
         return dateString.replace(dateString, "{d'$&'}");
-    } else if (dateString.match(regexDateTime).length >= 1) {
+    } else if (dateString.match(regexDateTime)?.length >= 1) {
         return dateString.replace(dateString, "{ts'$&'}");
-    } else if (dateString.match(regexTime).length >= 1) {
+    } else if (dateString.match(regexTime)?.length >= 1) {
         return dateString.replace(dateString, "{t'$&'}");
     }
+    return "";
 }
 
 function showDateValueHint(){
