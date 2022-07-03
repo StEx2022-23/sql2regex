@@ -21,15 +21,16 @@ import java.util.List;
  * Implements an own statement deparser to generate regular expressions.
  */
 public class StatementDeParserForRegEx extends StatementDeParser {
-    private static final String REQUIRED_WHITE_SPACE = "\\s+";
+    public static final String REQUIRED_WHITE_SPACE = "\\s+";
+    public static final String OPTIONAL_WHITE_SPACE = "\\s*";
     public static final String QUOTATION_MARK_REGEX = "[`´'\"]";
     public static final String QUOTATION_MARK_REGEX_ZERO_ONE = QUOTATION_MARK_REGEX + "?";
     public static final String QUOTATION_MARK_REGEX_ZERO_INFINITE = QUOTATION_MARK_REGEX + "*";
     public static final String QUOTATION_MARK_REGEX_ONE_INFINITE = QUOTATION_MARK_REGEX + "+";
     private final SpellingMistake keywordSpellingMistake;
-    ExpressionDeParserForRegEx expressionDeParserForRegEx;
-    SelectDeParserForRegEx selectDeParserForRegEx;
-    SettingsContainer settings;
+    private final ExpressionDeParserForRegEx expressionDeParserForRegEx;
+    private final SelectDeParserForRegEx selectDeParserForRegEx;
+    private final SettingsContainer settings;
 
     /**
      * Short constructor for StatementDeParserForRegEx. Inits the expanded constructor.

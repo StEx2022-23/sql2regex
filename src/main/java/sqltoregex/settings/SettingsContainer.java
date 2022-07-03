@@ -86,7 +86,7 @@ public class SettingsContainer {
         private static final String UNSUPPORTED_BUILD_WITH = "Unsupported build with:";
         private static final String STRING_SYNONYM_DELIMITER = ";";
         private final Map<SettingsOption,IRegExGenerator<?>> modifiableMap = new EnumMap<>(SettingsOption.class);
-        Map<SettingsOption,IRegExGenerator<?>> unModifiableMap;
+        private Map<SettingsOption,IRegExGenerator<?>> unModifiableMap;
 
         /**
          * Append an entry to the builder map, which holds {@link SettingsOption} and related setting objects. In this case, by passing an object instanceof {@link IRegExGenerator}.

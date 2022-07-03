@@ -59,18 +59,18 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
 
     /**
      * Parses expression to a {@link SimpleDateFormat}.
-     * @param wordToFindSynonyms expression to parse
+     * @param expr expression to parse
      * @return parsed SimpleDateFormat
      * @throws NoSuchElementException if there are no synonym formats
      */
     @Override
-    protected SimpleDateFormat prepareSynonymForSearch(Expression wordToFindSynonyms) {
-        Assert.notNull(wordToFindSynonyms, SYNONYM_MUST_NOT_BE_NULL);
-        if (!(wordToFindSynonyms instanceof DateValue) && !(wordToFindSynonyms instanceof TimeValue) && !(wordToFindSynonyms instanceof TimestampValue)) {
+    protected SimpleDateFormat prepareSynonymForSearch(Expression expr) {
+        Assert.notNull(expr, SYNONYM_MUST_NOT_BE_NULL);
+        if (!(expr instanceof DateValue) && !(expr instanceof TimeValue) && !(expr instanceof TimestampValue)) {
             throw new IllegalArgumentException(MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE);
         }
 
-        String stringToCheck = DateAndTimeFormatSynonymGenerator.expressionToString(wordToFindSynonyms);
+        String stringToCheck = DateAndTimeFormatSynonymGenerator.expressionToString(expr);
 
         for (SimpleDateFormat vertexSyn : this.synonymsGraph.vertexSet()) {
             try {
@@ -87,20 +87,20 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
      * Prepares vertex by passing a {@link SimpleDateFormat} and a {@link Expression} with the item to find synonyms for.
      * If the provided Expression is parsable by any format in the graph it is further formatted by the provided SimpleDateFormat.
      * @param syn the specified {@link SimpleDateFormat}
-     * @param wordToFindSynonyms the item to find synonyms for as {@link Expression}
+     * @param expr the item to find synonyms for as {@link Expression}
      * @return Expression formated by provided SimpleDateFormat
      * @throws NoSuchElementException if there are no synonym formats
      */
     @Override
-    protected String prepareVertexForRegEx(SimpleDateFormat syn, Expression wordToFindSynonyms) {
+    protected String prepareVertexForRegEx(SimpleDateFormat syn, Expression expr) {
         Assert.notNull(syn, "Format must not be null");
-        Assert.notNull(wordToFindSynonyms, SYNONYM_MUST_NOT_BE_NULL);
+        Assert.notNull(expr, SYNONYM_MUST_NOT_BE_NULL);
 
         Date date;
         //O(n^2) is okay, cause elements will be <<100 for dateFormats
         for (DateFormat vertexSyn : this.synonymsGraph.vertexSet()) {
             try {
-                date = vertexSyn.parse(DateAndTimeFormatSynonymGenerator.expressionToString(wordToFindSynonyms));
+                date = vertexSyn.parse(DateAndTimeFormatSynonymGenerator.expressionToString(expr));
                 return syn.format(date);
             } catch (ParseException e) {
                 //continue to search for other possible patterns without throwing error.
@@ -111,39 +111,39 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
 
     /**
      * Finds a Synonym for a passed {@link Expression} with the item to find synonyms for.
-     * @param wordToFindSynonyms the item to find synonyms for as {@link Expression}
+     * @param expr the item to find synonyms for as {@link Expression}
      * @return found synonym as string
      * @throws IllegalArgumentException if the {@link Expression} isn't instanceof {@link DateValue}, {@link TimeValue} or {@link TimestampValue}
      */
     @Override
-    public String searchSynonymToString(Expression wordToFindSynonyms) {
-        Assert.notNull(wordToFindSynonyms, SYNONYM_MUST_NOT_BE_NULL);
-        if (!(wordToFindSynonyms instanceof DateValue) && !(wordToFindSynonyms instanceof TimeValue) && !(wordToFindSynonyms instanceof TimestampValue)) {
+    public String searchSynonymToString(Expression expr) {
+        Assert.notNull(expr, SYNONYM_MUST_NOT_BE_NULL);
+        if (!(expr instanceof DateValue) && !(expr instanceof TimeValue) && !(expr instanceof TimestampValue)) {
             throw new IllegalArgumentException(MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE);
         }
-        return DateAndTimeFormatSynonymGenerator.expressionToString(wordToFindSynonyms);
+        return DateAndTimeFormatSynonymGenerator.expressionToString(expr);
     }
 
     /**
      * Converts an expression to the string equivalent.
-     * @param wordToFindSynonyms to parsed expression
+     * @param expr to parsed expression
      * @return expression as string
      * @throws IllegalArgumentException if the {@link Expression} isn't instanceof {@link DateValue}, {@link TimeValue} or {@link TimestampValue}
      */
-    public static String expressionToString(Expression wordToFindSynonyms) {
-        Assert.notNull(wordToFindSynonyms, SYNONYM_MUST_NOT_BE_NULL);
-        if (!(wordToFindSynonyms instanceof DateValue) && !(wordToFindSynonyms instanceof TimeValue) && !(wordToFindSynonyms instanceof TimestampValue)) {
+    public static String expressionToString(Expression expr) {
+        Assert.notNull(expr, SYNONYM_MUST_NOT_BE_NULL);
+        if (!(expr instanceof DateValue) && !(expr instanceof TimeValue) && !(expr instanceof TimestampValue)) {
             throw new IllegalArgumentException(MUST_BE_OF_TYPE_DATE_TIME_TIMESTAMP_VALUE);
         }
 
-        if (wordToFindSynonyms instanceof  DateValue dateValue){
+        if (expr instanceof  DateValue dateValue){
             return dateValue.getRawValue();
-        }else if(wordToFindSynonyms instanceof TimeValue timeValue){
+        }else if(expr instanceof TimeValue timeValue){
             return timeValue.getValue().toString();
-        }else if(wordToFindSynonyms instanceof TimestampValue timestampValue){
+        }else if(expr instanceof TimestampValue timestampValue){
             return timestampValue.getRawValue();
         }else{
-            return wordToFindSynonyms.toString();
+            return expr.toString();
         }
     }
 
@@ -161,11 +161,11 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
     /**
      * Generates a list of strings with all possible synonyms, if the param synonymGenerator isn't null.
      * @param synonymGenerator {@link DateAndTimeFormatSynonymGenerator} object
-     * @param expression input expression
+     * @param expr input expr
      * @return generated list of synonyms as string or given string as one entry in the string list
      */
-    public static List<String> generateAsListOrDefault(DateAndTimeFormatSynonymGenerator synonymGenerator, Expression expression){
-        if (null != synonymGenerator) return synonymGenerator.generateAsList(expression);
-        return new LinkedList<>(List.of(DateAndTimeFormatSynonymGenerator.expressionToString(expression)));
+    public static List<String> generateAsListOrDefault(DateAndTimeFormatSynonymGenerator synonymGenerator, Expression expr){
+        if (null != synonymGenerator) return synonymGenerator.generateAsList(expr);
+        return new LinkedList<>(List.of(DateAndTimeFormatSynonymGenerator.expressionToString(expr)));
     }
 }

@@ -2,6 +2,7 @@ package sqltoregex.settings.regexgenerator;
 
 import org.springframework.util.Assert;
 import sqltoregex.settings.SettingsOption;
+import static sqltoregex.deparser.StatementDeParserForRegEx.OPTIONAL_WHITE_SPACE;
 
 import java.util.*;
 
