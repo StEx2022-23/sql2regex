@@ -18,9 +18,15 @@ import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
+import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static sqltoregex.deparser.StatementDeParserForRegEx.*;
 
@@ -36,6 +42,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     private final OrderRotation columnNameOrder;
     private final OrderRotation tableNameOrder;
     private final StringSynonymGenerator aggregateFunctionLang;
+    private final DateAndTimeFormatSynonymGenerator dateFormatSynonymGenerator;
     private final SettingsContainer settingsContainer;
     private ExpressionDeParserForRegEx expressionDeParserForRegEx;
 
@@ -53,6 +60,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         this.columnNameOrder = settingsContainer.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
         this.tableNameOrder = settingsContainer.get(OrderRotation.class).get(SettingsOption.TABLENAMEORDER);
         this.tableNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
+        this.dateFormatSynonymGenerator = settingsContainer.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.DATESYNONYMS);
     }
 
     /**
@@ -229,65 +237,183 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     }
 
     /**
+     * Recursive function top destroy chained function into function and arguments.
+     * @param str given statement
+     * @param aggregateFunctions map to store function names based on a depth
+     * @param arguments map to store arguments based on a depth
+     * @param depth amount of chained functions
+     */
+    private void splitChainedStatements(String str, Map<Integer, String> aggregateFunctions, Map<Integer, String> arguments, int depth) {
+        Pattern pattern = Pattern.compile("(.*?)(\\(.*\\))(.*)");
+        Matcher matcher = pattern.matcher(str);
+        if((!str.contains("(") && !str.contains(")")) || !matcher.matches()) {
+            arguments.put(depth, str);
+        } else {
+            String test = matcher.group(2).substring(1, matcher.group(2).length()-1);
+            if(matcher.group(3) != null) {
+                aggregateFunctions.put(depth, matcher.group(1));
+                arguments.put(depth, matcher.group(3));
+            }
+            splitChainedStatements(test, aggregateFunctions, arguments, depth - 1);
+        }
+    }
+
+    /**
      * Generates regex for alias and aggregate functions.
      * @param o Object instanceof {@link net.sf.jsqlparser.statement.Statement}
      * @return generated regex
      */
     private String handleAliasAndAggregateFunction(Object o) {
         StringBuilder temp = new StringBuilder();
+        Map<Integer, String> aggregateFunctions = new LinkedHashMap<>();
+        Map<Integer, String> arguments = new LinkedHashMap<>();
+        int depth = o.toString().split("\\(").length;
+        splitChainedStatements(o.toString().replaceAll("\\s*AS\\s+(.*)", ""), aggregateFunctions, arguments, depth);
+        String alias = o.toString().contains("AS") ? o.toString().replaceAll("(.*)\\s*AS\\s+", "").replaceAll(QUOTATION_MARK_REGEX, "") : "";
+        String chainedAggregateFunctions = "";
+        for(int i = 1; i<=depth; i++){
+            if(aggregateFunctions.get(i) != null){
+                String aggregateFunction = aggregateFunctions.get(i);
+                StringBuilder tempStringBuilder = new StringBuilder();
+                if(StringSynonymGenerator.generateAsListOrDefault(this.aggregateFunctionLang, aggregateFunction) != null){
+                    Iterator<String> stringIterator = StringSynonymGenerator.generateAsListOrDefault(this.aggregateFunctionLang, aggregateFunction).iterator();
 
-        if (o.toString().contains("(") && o.toString().contains(")")) {
-            temp.append(StringSynonymGenerator.useOrDefault(this.aggregateFunctionLang,
-                                                                 o.toString().replaceAll(QUOTATION_MARK_REGEX, "").replaceAll("\\(.*", "")));
-            temp.append(OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE);
+                    //todo setting for aggretefunction lang spelling mistake
+                    tempStringBuilder.append("(?:");
+                    while(stringIterator.hasNext()){
+                        tempStringBuilder.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, stringIterator.next()));
+                        if(stringIterator.hasNext()) tempStringBuilder.append("|");
+                    }
+                    tempStringBuilder.append(")");
+                } else {
+                    tempStringBuilder.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, aggregateFunction));
+                }
 
-            String aggregateFunctionInput = o.toString()
-                                            .replaceAll(QUOTATION_MARK_REGEX, "")
-                                            .split("\\(")[1]
-                                            .split("\\)")[0];
-            if (aggregateFunctionInput.equals("*")){
-                temp.append("\\*");
-            } else {
-                temp.append(
-                        StatementDeParserForRegEx.addQuotationMarks(
-                                SpellingMistake.useOrDefault(
-                                        this.columnNameSpellingMistake,
-                                        checkIfTableNameIsGivenAndHandleIt(aggregateFunctionInput, temp)
-                                )
-                        )
-                );
+                chainedAggregateFunctions = tempStringBuilder.toString()
+                        + OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE
+                        + chainedAggregateFunctions
+                        + OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE;
             }
-            temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
+
+            if(arguments.get(i) != null){
+                String[] argumentList = arguments.get(i).split(",");
+                Iterator<String> stringIterator = Arrays.stream(argumentList).iterator();
+                if(aggregateFunctions.get(i) != null && !aggregateFunctions.get(i).isEmpty() && arguments.get(i) != null && !arguments.get(i).isEmpty()) chainedAggregateFunctions += "\\s*,\\s*";
+                while(stringIterator.hasNext()){
+                    //todo tablename and alias
+                    //todo handle date and time value new DateTimeLiteralExpression()
+                    //numbers without spelling mistake
+                    String it = stringIterator.next().replaceAll(" ", "");
+                    if (it.isEmpty()) continue;
+                    Pattern patternForDigitInArg = Pattern.compile("\\d");
+                    Matcher matcherForDigitInArg = patternForDigitInArg.matcher(it);
+
+                    Pattern patternForDateValue = Pattern.compile("\\{d'.*?'}");
+                    Matcher matcherForDateValue = patternForDateValue.matcher(it);
+
+                    Pattern patternForTimeValue = Pattern.compile("\\{t'.*?'}");
+                    Matcher matcherForTimeValue = patternForTimeValue.matcher(it);
+
+                    Pattern patternForDateTimeValue = Pattern.compile("\\{ts'.*?'}");
+                    Matcher matcherForDateTimeValue = patternForDateTimeValue.matcher(it);
+
+                    if (matcherForDigitInArg.matches()) {
+                        chainedAggregateFunctions = chainedAggregateFunctions + SpellingMistake.useOrDefault(this.columnNameSpellingMistake, it);
+                    } else if (matcherForDateValue.matches()) {
+
+                    } else if (matcherForTimeValue.matches()) {
+
+                    } else if (matcherForDateTimeValue.matches()) {
+
+                    } else {
+                        if (it.equals("*")){
+                            chainedAggregateFunctions = chainedAggregateFunctions + "\\*";
+                        } else {
+                            StringBuilder stringBuilderForTableNames = new StringBuilder();
+                            checkIfTableNameIsGivenAndHandleIt(it, stringBuilderForTableNames);
+                            chainedAggregateFunctions = chainedAggregateFunctions + stringBuilderForTableNames;
+
+                            chainedAggregateFunctions = chainedAggregateFunctions +
+                                    StatementDeParserForRegEx.addQuotationMarks(
+                                            SpellingMistake.useOrDefault(
+                                                    this.columnNameSpellingMistake,
+                                                    it.split("\\.")[it.split("\\.").length - 1].replace("*", "\\*")
+                                            )
+                                    );
+                        }
+                    }
+
+                    if (stringIterator.hasNext()) chainedAggregateFunctions += "\\s*,\\s*";
+                }
+            }
         }
 
-        if (!o.toString().contains("AS") && !o.toString().contains("(") && !o.toString().contains(")")) {
-            o = checkIfTableNameIsGivenAndHandleIt(o.toString(), temp);
-            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
-            temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, o.toString().replaceAll(QUOTATION_MARK_REGEX, "")));
-            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
-        }
+        temp.append(chainedAggregateFunctions);
 
-        if (o.toString().contains("AS") && o.toString().contains("(") && o.toString().contains(")")) {
-            temp.append(this.addOptionalAliasKeywords(false));
-            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
-            temp.append(o.toString().replaceAll(QUOTATION_MARK_REGEX, "").split("AS")[1].replace(" ", ""));
-            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
-        }
-
-        if (o.toString().contains("AS") && !o.toString().contains("(") && !o.toString().contains(")")) {
-            temp.append(o.toString().replaceAll(QUOTATION_MARK_REGEX, "").split("AS")[0].replace(" ", ""));
-            temp.append(this.addOptionalAliasKeywords(false));
-            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
-            temp.append(o.toString().replaceAll(QUOTATION_MARK_REGEX, "").split("AS")[1].replace(" ", ""));
-            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
-        }
-
-        if (!o.toString().contains("AS")) {
+        if(alias.isEmpty()){
             temp.append(OPTIONAL_WHITE_SPACE);
             temp.append("(");
             temp.append(this.addOptionalAliasKeywords(false));
             temp.append(".*)?");
+        } else {
+            temp.append(this.addOptionalAliasKeywords(false));
+            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
+            temp.append(alias);
+            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
         }
+
+//        if (o.toString().contains("(") && o.toString().contains(")")) {
+//            temp.append(StringSynonymGenerator.useOrDefault(this.aggregateFunctionLang,
+//                                                                 o.toString().replaceAll(QUOTATION_MARK_REGEX, "").replaceAll("\\(.*", "")));
+//            temp.append(OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE);
+//
+//            String aggregateFunctionInput = o.toString()
+//                                            .replaceAll(QUOTATION_MARK_REGEX, "")
+//                                            .split("\\(")[1]
+//                                            .split("\\)")[0];
+//            if (aggregateFunctionInput.equals("*")){
+//                temp.append("\\*");
+//            } else {
+//                temp.append(
+//                        StatementDeParserForRegEx.addQuotationMarks(
+//                                SpellingMistake.useOrDefault(
+//                                        this.columnNameSpellingMistake,
+//                                        checkIfTableNameIsGivenAndHandleIt(aggregateFunctionInput, temp)
+//                                )
+//                        )
+//                );
+//            }
+//            temp.append(OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
+//        }
+//
+//        if (!o.toString().contains("AS") && !o.toString().contains("(") && !o.toString().contains(")")) {
+//            o = checkIfTableNameIsGivenAndHandleIt(o.toString(), temp);
+//            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
+//            temp.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, o.toString().replaceAll(QUOTATION_MARK_REGEX, "")));
+//            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
+//        }
+//
+//        if (o.toString().contains("AS") && o.toString().contains("(") && o.toString().contains(")")) {
+//            temp.append(this.addOptionalAliasKeywords(false));
+//            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
+//            temp.append(o.toString().replaceAll(QUOTATION_MARK_REGEX, "").split("AS")[1].replace(" ", ""));
+//            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
+//        }
+//
+//        if (o.toString().contains("AS") && !o.toString().contains("(") && !o.toString().contains(")")) {
+//            temp.append(o.toString().replaceAll(QUOTATION_MARK_REGEX, "").split("AS")[0].replace(" ", ""));
+//            temp.append(this.addOptionalAliasKeywords(false));
+//            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
+//            temp.append(o.toString().replaceAll(QUOTATION_MARK_REGEX, "").split("AS")[1].replace(" ", ""));
+//            temp.append(QUOTATION_MARK_REGEX_ZERO_ONE);
+//        }
+//
+//        if (!o.toString().contains("AS")) {
+//            temp.append(OPTIONAL_WHITE_SPACE);
+//            temp.append("(");
+//            temp.append(this.addOptionalAliasKeywords(false));
+//            temp.append(".*)?");
+//        }
         return temp.toString();
     }
 
