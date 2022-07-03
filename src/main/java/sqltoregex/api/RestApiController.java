@@ -20,8 +20,8 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api")
 public class RestApiController {
-    public static final String LISTSTYLE = "   - ";
-    public static final String LINEBREAK = "\n";
+    private static final String LIST_STYLE = "   - ";
+    private static final String LINE_BREAK = "\n";
 
     /**
      * Print all available endpoints from {@link RestApiController}.
@@ -30,11 +30,11 @@ public class RestApiController {
     @PostMapping("/docs")
     public String getAllEndpoints(){
         StringBuilder endpoints = new StringBuilder();
-        endpoints.append("Available endpoints:").append(LINEBREAK);
-        endpoints.append(LISTSTYLE).append("/convert").append(LINEBREAK);
-        endpoints.append(LISTSTYLE).append("/settingstypes").append(LINEBREAK);
-        endpoints.append(LISTSTYLE).append("/settingsoptions").append(LINEBREAK);
-        endpoints.append(LISTSTYLE).append("/specificsettingsoption").append(LINEBREAK);
+        endpoints.append("Available endpoints:").append(LINE_BREAK);
+        endpoints.append(LIST_STYLE).append("/convert").append(LINE_BREAK);
+        endpoints.append(LIST_STYLE).append("/settingstypes").append(LINE_BREAK);
+        endpoints.append(LIST_STYLE).append("/settingsoptions").append(LINE_BREAK);
+        endpoints.append(LIST_STYLE).append("/specificsettingsoption").append(LINE_BREAK);
         return endpoints.toString();
     }
 

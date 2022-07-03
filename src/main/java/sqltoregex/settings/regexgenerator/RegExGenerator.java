@@ -13,7 +13,6 @@ import java.util.logging.Logger;
  * @param <T> String, List of String or SimpleDateFormat
  */
 public abstract class RegExGenerator<T> implements IRegExGenerator<T> {
-    protected static final String OPTIONAL_WHITE_SPACE = "\\s*";
     protected static final String ELEMENT_DELIMITER = "|";
     protected boolean isNonCapturingGroup = true;
     private final SettingsOption settingsOption;

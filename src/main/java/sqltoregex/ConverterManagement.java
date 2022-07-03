@@ -18,6 +18,7 @@ import sqltoregex.settings.SettingsType;
 import sqltoregex.visitor.StatementVisitorJoinToWhere;
 import sqltoregex.visitor.StatementVisitorKeyPlacement;
 import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
+import static sqltoregex.deparser.StatementDeParserForRegEx.OPTIONAL_WHITE_SPACE;
 
 import java.util.*;
 
@@ -26,7 +27,6 @@ import java.util.*;
  */
 @Service
 public class ConverterManagement {
-    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SettingsManager settingsManager;
     private static final String NOT_QUOTATION_MARK_REGEX = "[^" + QUOTATION_MARK_REGEX.substring(1);
 
@@ -82,13 +82,13 @@ public class ConverterManagement {
 
     /**
      * Deparses expressions.
-     * @param sqlstatement current sql statement
+     * @param sqlStatement current sql statement
      * @return generated regex
      * @throws JSQLParserException if parsing goes wrong
      */
-    private String deParseExpression(String sqlstatement, SettingsType settingsType) throws JSQLParserException {
+    private String deParseExpression(String sqlStatement, SettingsType settingsType) throws JSQLParserException {
         Expression expression;
-        expression = this.parseExpression(sqlstatement);
+        expression = CCJSqlParserUtil.parseExpression(sqlStatement);
         SettingsContainer settings = SettingsContainer.builder().with(settingsManager, settingsType);
         ExpressionDeParser expressionDeParser = new ExpressionDeParserForRegEx(new SelectDeParserForRegEx(
                 settings), new StringBuilder(), settings);
@@ -104,10 +104,10 @@ public class ConverterManagement {
      * @throws JSQLParserException if parsing goes wrong
      */
     private String deParseStatement(String sqlStatement, SettingsType settingsType) throws JSQLParserException {
-        if(checkIfStatementTypeOfCreateDatabase(sqlStatement)) return new CreateDatabaseDeParserForRegEx(SettingsContainer.builder().with(settingsManager, settingsType)).deParse(sqlStatement);
+        if(isCreateDatabase(sqlStatement)) return new CreateDatabaseDeParserForRegEx(SettingsContainer.builder().with(settingsManager, settingsType)).deParse(sqlStatement);
 
         Statement statement;
-        statement = this.parseStatement(sqlStatement);
+        statement = CCJSqlParserUtil.parse(sqlStatement);
         List<String> regExList = new LinkedList<>();
 
         StatementDeParserForRegEx defaultStatementDeParser = new StatementDeParserForRegEx(new StringBuilder(), SettingsContainer.builder().with(settingsManager, settingsType));
@@ -210,27 +210,7 @@ public class ConverterManagement {
         return stmtList;
     }
 
-    /**
-     * Parses an expression.
-     * @param sqlstatement current sql-statement
-     * @return Expression object
-     * @throws JSQLParserException if parsing goes wrong
-     */
-    private Expression parseExpression(String sqlstatement) throws JSQLParserException {
-        return CCJSqlParserUtil.parseExpression(sqlstatement);
-    }
-
-    /**
-     * Parses a statement.
-     * @param sqlstatement current sql-statement
-     * @return Statement object
-     * @throws JSQLParserException if parsing goes wrong
-     */
-    private Statement parseStatement(String sqlstatement) throws JSQLParserException {
-        return CCJSqlParserUtil.parse(sqlstatement);
-    }
-
-    private boolean checkIfStatementTypeOfCreateDatabase(String sqlStatement) {
+    private boolean isCreateDatabase(String sqlStatement) {
         return sqlStatement.contains("CREATE") && sqlStatement.contains("DATABASE");
     }
 }

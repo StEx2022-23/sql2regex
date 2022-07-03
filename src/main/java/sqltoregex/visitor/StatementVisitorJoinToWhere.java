@@ -14,7 +14,7 @@ import java.util.List;
  * @author Maximilian Förster
  */
 public class StatementVisitorJoinToWhere extends StatementVisitorAdapter {
-    SelectVisitor selectVisitorJoinToWhere = new SelectVisitorJoinToWhere();
+    private final SelectVisitor selectVisitorJoinToWhere = new SelectVisitorJoinToWhere();
 
     /**
      * Overrides the default visit(Select select) method to accept these new Visitor.
