@@ -5,9 +5,8 @@ import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 class SelectDeParserForRegExTest{
     StringSynonymGenerator stringSynonymGenerator = new StringSynonymGenerator(SettingsOption.AGGREGATEFUNCTIONLANG);
@@ -557,6 +556,75 @@ class SelectDeParserForRegExTest{
         TestUtils.validateStatementAgainstRegEx(
                 SettingsContainer.builder().build(),
                 "SELECT col1, col2 FROM table1",
+                matchingMap,
+                true
+        );
+    }
+
+    @Test
+    void chainedAggregateFunctions() {
+        final String sampleSolution = "SELECT ROUND(AVG(col), 2)";
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT ROUND(AVG(col), 2)",
+                "SELECT ROUND( AVG ( col ), 2 )",
+                "SELECT ROUND( AVG ( 'col' ), 2 )"
+        ));
+        matchingMap.put(SettingsOption.FUNCTIONLANG, List.of(
+                "SELECT ROUND(AVG(col), 2)",
+                "SELECT RUNDEN(AVG(col), 2)"
+        ));
+        matchingMap.put(SettingsOption.AGGREGATEFUNCTIONLANG, List.of(
+                "SELECT ROUND(AVG(col), 2)",
+                "SELECT RUNDEN(MITTELWERT(col), 2)"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().withStringSet(new HashSet<>(List.of("ROUND","RUNDEN")), SettingsOption.OTHERSYNONYMS).build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().withStringSet(new HashSet<>(List.of("AVG","MITTELWERT")), SettingsOption.OTHERSYNONYMS).build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+    }
+
+    @Test
+    void chainedAggregateFunctionsWithDateTimeFormats() {
+        final String sampleSolution = "SELECT FUN({d'2020-12-12'})";
+        Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
+        matchingMap.put(SettingsOption.DEFAULT, List.of(
+                "SELECT FUN(2020-12-12)",
+                "SELECT FUN({d'2020-12-12'})"
+        ));
+        matchingMap.put(SettingsOption.DATESYNONYMS, List.of(
+                "SELECT FUN(2020-12-12)",
+                "SELECT FUN({d'2020-12-12'})",
+                "SELECT FUN(20201212)",
+                "SELECT FUN(#2020-12-12#)"
+        ));
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder().build(),
+                sampleSolution,
+                matchingMap,
+                true
+        );
+        TestUtils.validateStatementAgainstRegEx(
+                SettingsContainer.builder()
+                        .withSimpleDateFormatSet(new LinkedHashSet<>(
+                                        List.of(new SimpleDateFormat("yyyy-MM-dd"),
+                                                new SimpleDateFormat("yyyyMMdd"))),
+                                SettingsOption.DATESYNONYMS).build(),
+                sampleSolution,
                 matchingMap,
                 true
         );

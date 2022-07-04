@@ -32,6 +32,7 @@ public class SettingsForm {
                                                                    Collections.emptySet(),
                                                                    Collections.emptySet(),
                                                                    Collections.emptySet(),
+                                                                   Collections.emptySet(),
                                                                    "EMPTY");
     Set<SpellingMistake> spellings;
     Set<OrderRotation> orders;
@@ -39,6 +40,7 @@ public class SettingsForm {
     Set<SimpleDateFormat> timeFormats;
     Set<SimpleDateFormat> dateTimeFormats;
     Set<String> aggregateFunctionLang;
+    Set<String> functionLang;
     Set<String> datatypeSynonyms;
     Set<String> otherSynonyms;
     @NotEmpty(message = "{settingsform.sql.notEmpty}") String sql;
@@ -61,6 +63,7 @@ public class SettingsForm {
                         Set<SimpleDateFormat> timeFormats,
                         Set<SimpleDateFormat> dateTimeFormats,
                         Set<String> aggregateFunctionLang,
+                        Set<String> functionLang,
                         Set<String> datatypeSynonyms,
                         Set<String> otherSynonyms,
                         @NotEmpty(message = "{settingsform.sql.NotEmpty}") String sql) {
@@ -70,6 +73,7 @@ public class SettingsForm {
         this.timeFormats = timeFormats == null ? Collections.emptySet() : setAllNonLenient(timeFormats);
         this.dateTimeFormats = dateTimeFormats == null ? Collections.emptySet() : setAllNonLenient(dateTimeFormats);
         this.aggregateFunctionLang = aggregateFunctionLang == null ? Collections.emptySet() : aggregateFunctionLang;
+        this.functionLang = functionLang == null ? Collections.emptySet() : aggregateFunctionLang;
         this.datatypeSynonyms= datatypeSynonyms == null ? Collections.emptySet() : datatypeSynonyms;
         this.otherSynonyms = otherSynonyms == null ? Collections.emptySet() : otherSynonyms;
         this.sql = sql;
@@ -77,6 +81,10 @@ public class SettingsForm {
 
     public Set<String> getAggregateFunctionLang() {
         return this.aggregateFunctionLang;
+    }
+
+    public Set<String> getFunctionLang() {
+        return this.functionLang;
     }
 
     public Set<String> getDatatypeSynonyms() {

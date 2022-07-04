@@ -131,7 +131,7 @@ public class SettingsContainer {
             }
 
             switch (settingsOption) {
-                case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING, STRINGVALUESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, GROUPBYELEMENTORDER, INDEXCOLUMNNAMEORDER, INSERTINTOVALUESORDER -> this.with(
+                case AGGREGATEFUNCTIONSPELLING, FUNCTIONNAMESPELLING, KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING, STRINGVALUESPELLING, TABLENAMEORDER, COLUMNNAMEORDER, GROUPBYELEMENTORDER, INDEXCOLUMNNAMEORDER, INSERTINTOVALUESORDER -> this.with(
                         settingsOption);
                 case DATESYNONYMS, TIMESYNONYMS, DATETIMESYNONYMS -> {
                     Set<String> valueList = new HashSet<>();
@@ -141,7 +141,7 @@ public class SettingsContainer {
                     }
                     this.withStringSet(valueList, settingsOption);
                 }
-                case AGGREGATEFUNCTIONLANG, DATATYPESYNONYMS, OTHERSYNONYMS -> {
+                case AGGREGATEFUNCTIONLANG, FUNCTIONLANG, DATATYPESYNONYMS, OTHERSYNONYMS -> {
                     List<Node> valuePairsForSynonyms = new LinkedList<>();
                     SettingsNodeListIterator valueTagIterator = new SettingsNodeListIterator(nodeList);
                     for (Node node : valueTagIterator) {
@@ -169,7 +169,7 @@ public class SettingsContainer {
          */
         public Builder with(SettingsOption settingsOption) {
             switch (settingsOption) {
-                case KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING, STRINGVALUESPELLING -> {
+                case AGGREGATEFUNCTIONSPELLING, FUNCTIONNAMESPELLING, KEYWORDSPELLING, TABLENAMESPELLING, COLUMNNAMESPELLING, INDEXCOLUMNNAMESPELLING, STRINGVALUESPELLING -> {
                     SpellingMistake spellingMistake = new SpellingMistake(settingsOption);
                     this.modifiableMap.put(settingsOption, spellingMistake);
                 }
@@ -236,7 +236,7 @@ public class SettingsContainer {
                     }
                     this.modifiableMap.put(settingsOption, synonymGenerator);
                 }
-                case AGGREGATEFUNCTIONLANG, DATATYPESYNONYMS, OTHERSYNONYMS -> {
+                case AGGREGATEFUNCTIONLANG, FUNCTIONLANG, DATATYPESYNONYMS, OTHERSYNONYMS -> {
                     if (synonyms != null && !synonyms.isEmpty()) {
                         StringSynonymGenerator aggregateFunctionSynonymGenerator = new StringSynonymGenerator(
                                 settingsOption);

@@ -20,6 +20,14 @@
           <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
           <value>true</value>
       </stringvaluespelling>
+      <aggregatefunctionspelling>
+          <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
+          <value>true</value>
+      </aggregatefunctionspelling>
+      <functionnamespelling>
+          <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
+          <value>true</value>
+      </functionnamespelling>
   </spelling>
   <order>
       <tablenameorder>
@@ -69,6 +77,14 @@
           <value>MIN;MINIMUM</value>
           <value>MAX;MAXIMUM</value>
       </aggregatefunctionlang>
+      <functionlang>
+          <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
+          <value>ROUND;RUNDEN</value>
+          <value>YEAR;JAHR</value>
+          <value>MONTH;MONAT</value>
+          <value>DAY;TAG</value>
+          <value>DATEDIFF;DATDIFF</value>
+      </functionlang>
       <datatypesynonyms>
           <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
           <value>INTEGER;INT</value>
@@ -81,7 +97,9 @@
       <othersynonyms>
           <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
           <value>ASC;aufsteigend</value>
+          <value>ASC;ascending</value>
           <value>DESC;absteigend</value>
+          <value>DESC;descending</value>
           <value>NOT;!</value>
           <value>NOT;NICHT</value>
           <value>AND;&amp;&amp;</value>

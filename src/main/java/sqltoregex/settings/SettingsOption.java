@@ -6,7 +6,10 @@ package sqltoregex.settings;
  * @author Maximilian Förster
  */
 public enum SettingsOption {
+    AGGREGATEFUNCTIONSPELLING,
     COLUMNNAMESPELLING,
+    FUNCTIONLANG,
+    FUNCTIONNAMESPELLING,
     INDEXCOLUMNNAMESPELLING,
     KEYWORDSPELLING,
     STRINGVALUESPELLING,

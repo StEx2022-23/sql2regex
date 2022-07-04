@@ -61,9 +61,9 @@ class SettingsManagerTest {
 
     @Test
     void testGetSettingByClazz() {
-        Assertions.assertEquals(5, settingsManager.getSettingByClass(SpellingMistake.class, SettingsType.ALL).size());
+        Assertions.assertEquals(7, settingsManager.getSettingByClass(SpellingMistake.class, SettingsType.ALL).size());
         Assertions.assertEquals(5, settingsManager.getSettingByClass(OrderRotation.class, SettingsType.ALL).size());
-        Assertions.assertEquals(3, settingsManager.getSettingByClass(StringSynonymGenerator.class, SettingsType.ALL)
+        Assertions.assertEquals(4, settingsManager.getSettingByClass(StringSynonymGenerator.class, SettingsType.ALL)
                 .size());
     }
 
@@ -80,6 +80,7 @@ class SettingsManagerTest {
     @Test
     void usesUserSettings() {
         settingsManager.parseUserSettingsInput(new SettingsForm(new HashSet<>(List.of(new SpellingMistake(SettingsOption.KEYWORDSPELLING))),
+                                                                Collections.emptySet(),
                                                                 Collections.emptySet(),
                                                                 Collections.emptySet(),
                                                                 Collections.emptySet(),
