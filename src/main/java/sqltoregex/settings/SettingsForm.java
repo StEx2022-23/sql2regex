@@ -74,7 +74,7 @@ public class SettingsForm {
         this.timeFormats = timeFormats == null ? Collections.emptySet() : setAllNonLenient(timeFormats);
         this.dateTimeFormats = dateTimeFormats == null ? Collections.emptySet() : setAllNonLenient(dateTimeFormats);
         this.aggregateFunctionLang = aggregateFunctionLang == null ? Collections.emptySet() : aggregateFunctionLang;
-        this.functionLang = functionLang == null ? Collections.emptySet() : aggregateFunctionLang;
+        this.functionLang = functionLang == null ? Collections.emptySet() : functionLang;
         this.datatypeSynonyms= datatypeSynonyms == null ? Collections.emptySet() : datatypeSynonyms;
         this.otherSynonyms = otherSynonyms == null ? Collections.emptySet() : otherSynonyms;
         this.sql = sql;
