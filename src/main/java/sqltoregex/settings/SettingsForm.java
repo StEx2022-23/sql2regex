@@ -35,16 +35,17 @@ public class SettingsForm {
                                                                    Collections.emptySet(),
                                                                    Collections.emptySet(),
                                                                    "EMPTY");
-    Set<SpellingMistake> spellings;
-    Set<OrderRotation> orders;
-    Set<SimpleDateFormat> dateFormats;
-    Set<SimpleDateFormat> timeFormats;
-    Set<SimpleDateFormat> dateTimeFormats;
-    Set<String> aggregateFunctionLang;
-    Set<String> functionLang;
-    Set<String> datatypeSynonyms;
-    Set<String> otherSynonyms;
-    @NotEmpty(message = "{settingsform.sql.notEmpty}") String sql;
+    private final Set<SpellingMistake> spellings;
+    private final Set<OrderRotation> orders;
+    private final Set<SimpleDateFormat> dateFormats;
+    private final Set<SimpleDateFormat> timeFormats;
+    private final Set<SimpleDateFormat> dateTimeFormats;
+    private final Set<String> aggregateFunctionLang;
+    private final Set<String> functionLang;
+    private final Set<String> datatypeSynonyms;
+    private final Set<String> otherSynonyms;
+    @NotEmpty(message = "{settingsform.sql.notEmpty}")
+    private final String sql;
 
     /**
      * Constructor for the SettingsForm.
