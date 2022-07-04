@@ -38,7 +38,7 @@
                         <div class="col-sm"
                              th:each="setting : ${spellings}">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'spellingMistake_' + ${setting}" th:name="spellings"  th:value="${setting}" th:field="*{spellings}">
+                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'spellingMistake_' + ${setting}" th:name="spellings"  th:value="${setting.getSettingsOption()}" th:field="*{spellings}">
                                 <label class="form-check-label" th:for="'spellingMistake_' + ${setting}" th:text="#{settingsform. + ${setting.getSettingsOption()}}">SpellingMistakeSTATIC</label>
                             </div>
                         </div>
@@ -59,7 +59,7 @@
                         <div class="col-sm"
                              th:each="setting : ${orders}">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'orderRotation_' + ${setting}" th:name="orders" th:value="${setting}" th:field="*{orders}">
+                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'orderRotation_' + ${setting}" th:name="orders" th:value="${setting.getSettingsOption()}" th:field="*{orders}">
                                 <label class="form-check-label" th:for="'orderRotation_' + ${setting}" th:text="#{settingsform. + ${setting.getSettingsOption()}}">orderRotationSTATIC</label>
                             </div>
                         </div>
