@@ -118,7 +118,7 @@
                     <div class="row">
                         <div class="col-sm" th:each="setting : ${aggregateFunctionLang}">
                             <div class="row">
-                                <div th:text="#{settingsform.synonymsFor} + ':' + ${setting.getKey}"></div>
+                                <div th:text="#{settingsform.synonymsFor} + ': ' + ${setting.getKey}"></div>
                                 <div class="row" th:each="synonym, iter : ${setting.getValue()}">
                                     <div class="col-sm">
                                         <div class="form-check form-switch">
@@ -146,7 +146,7 @@
                     <div class="row">
                         <div class="col-sm" th:each="setting : ${functionLang}">
                             <div class="row">
-                                <div th:text="#{settingsform.synonymsFor} + ':' + ${setting.getKey}"></div>
+                                <div th:text="#{settingsform.synonymsFor} + ': ' + ${setting.getKey}"></div>
                                 <div class="row" th:each="synonym, iter : ${setting.getValue()}">
                                     <div class="col-sm">
                                         <div class="form-check form-switch">
@@ -174,7 +174,7 @@
                     <div class="row">
                         <div class="col-sm" th:each="setting, iterList : ${datatypeSynonyms}">
                             <div class="row">
-                                <div th:text="#{settingsform.synonymsFor} + ':' + ${setting.getKey}"></div>
+                                <div th:text="#{settingsform.synonymsFor} + ': ' + ${setting.getKey}"></div>
                                 <div class="row" th:each="synonym, iter : ${setting.getValue()}">
                                     <div class="col-sm">
                                         <div class="form-check form-switch">
@@ -201,7 +201,7 @@
                     <div class="row">
                         <div class="col-sm" th:each="setting : ${otherSynonyms}">
                             <div class="row">
-                                <div th:text="#{settingsform.synonymsFor} + ':' + ${setting.getKey}"></div>
+                                <div th:text="#{settingsform.synonymsFor} + ': ' + ${setting.getKey}"></div>
                                 <div class="row" th:each="synonym, iter : ${setting.getValue()}">
                                     <div class="col-sm">
                                         <div class="form-check form-switch">

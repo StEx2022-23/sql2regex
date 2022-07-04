@@ -18,7 +18,6 @@ import sqltoregex.settings.SettingsContainer;
 import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
-import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
 import java.util.*;
@@ -206,7 +205,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         this.expressionDeParserForRegEx = (ExpressionDeParserForRegEx) visitor;
     }
 
-    private String checkIfTableNameIsGivenAndHandleIt(String str, StringBuilder temp){
+    private void checkIfTableNameIsGivenAndHandleIt(String str, StringBuilder temp){
         if(str.contains(".")){
             String extractedTable = str.split("\\.")[0];
             temp.append("(");
@@ -232,9 +231,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
             temp.append("\\.");
             temp.append(")?");
-            return str.split("\\.")[1].replace("*", "\\*");
         }
-        return str;
     }
 
     /**
