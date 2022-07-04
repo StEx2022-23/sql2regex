@@ -3,6 +3,7 @@ package sqltoregex.settings;
 import net.sf.jsqlparser.util.validation.Validation;
 import net.sf.jsqlparser.util.validation.ValidationError;
 import net.sf.jsqlparser.util.validation.feature.DatabaseType;
+import sqltoregex.ConverterManagement;
 import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.validations.AssertMethodAsTrue;
@@ -124,30 +125,36 @@ public class SettingsForm {
      * @return boolean if the statement is valid
      */
     public boolean validateSQL() {
-        Map<Validation, Boolean> validationList = new HashMap<>();
-        validationList.put(new Validation(List.of(DatabaseType.ORACLE), this.sql), false);
-        validationList.put(new Validation(List.of(DatabaseType.MYSQL), this.sql), false);
-        validationList.put(new Validation(List.of(DatabaseType.SQLSERVER), this.sql), false);
-        validationList.put(new Validation(List.of(DatabaseType.MARIADB), this.sql), false);
+        Map<String, Boolean> statementsValidMap = new HashMap<>();
+        Collection<String> extractedStatementCollection = ConverterManagement.extractStatements(this.sql);
+        for(String str : extractedStatementCollection) {
+            List<Validation> validationList = new LinkedList<>();
+            validationList.add(new Validation(List.of(DatabaseType.ORACLE), str));
+            validationList.add(new Validation(List.of(DatabaseType.MYSQL), str));
+            validationList.add(new Validation(List.of(DatabaseType.SQLSERVER), str));
+            validationList.add(new Validation(List.of(DatabaseType.MARIADB), str));
 
-        for(Validation validation : validationList.keySet()){
-            List<ValidationError> validationErrors = validation.validate();
-            if (!validationErrors.isEmpty()) {
-                for (ValidationError va : validationErrors) {
-                    Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-                    logger.log(Level.WARNING, "Error while validating the statement: {0}", va);
+            for(Validation validation : validationList){
+                List<ValidationError> validationErrors = validation.validate();
+                if (!validationErrors.isEmpty()) {
+                    for (ValidationError va : validationErrors) {
+                        Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+                        logger.log(Level.WARNING, "Error while validating the statement: {0}", va);
+                    }
+                } else {
+                    statementsValidMap.put(str, true);
                 }
-            } else {
-                validationList.put(validation, true);
             }
         }
 
-        for (Map.Entry<Validation, Boolean> entry : validationList.entrySet()) {
-            if(entry.getValue().equals(Boolean.TRUE)) {
-                return true;
+        if(statementsValidMap.size() == extractedStatementCollection.size()) return true;
+
+        for(Map.Entry<String, Boolean> entry : statementsValidMap.entrySet()){
+            if (entry.getValue().equals(Boolean.FALSE)){
+                statementsValidMap.put(entry.getKey(), entry.getKey().contains("CREATE") && entry.getKey().contains("DATABASE"));
             }
         }
-        return this.sql.contains("CREATE") && this.sql.contains("DATABASE");
+        return statementsValidMap.size() == extractedStatementCollection.size();
     }
 
     /**

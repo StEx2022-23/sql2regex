@@ -138,7 +138,7 @@ public class ConverterManagement {
      * @throws JSQLParserException if parsing goes wrong
      */
     public String deparse(String sqlStatement) throws JSQLParserException {
-        return this.deParseStatement(sqlStatement, SettingsType.USER);
+        return this.deparse(sqlStatement, false, SettingsType.USER);
     }
 
     /**
@@ -183,7 +183,7 @@ public class ConverterManagement {
      * @see StatementDeParserForRegEx#QUOTATION_MARK_REGEX
      * @return
      */
-    public Collection<String> extractStatements(String multStmtString){
+    public static Collection<String> extractStatements(String multStmtString){
         Collection<String> stmtList = new LinkedList<>();
         int firstPos = 0;
         int secondPos = 0;
@@ -201,10 +201,11 @@ public class ConverterManagement {
             }
 
             firstPos = ++secondPos;
-            stmtList.add(subBetweenSemis);
+            subBetweenSemis = subBetweenSemis.replace("\r", "").replace("\n", "").trim();
+            if(!subBetweenSemis.isEmpty()) stmtList.add(subBetweenSemis);
         }
 
-        if (!multStmtString.endsWith(";")){
+        if (!multStmtString.endsWith(";") && !multStmtString.substring(firstPos).replace("\r", "").replace("\n", "").trim().isEmpty()){
             stmtList.add(multStmtString.substring(firstPos));
         }
         return stmtList;
