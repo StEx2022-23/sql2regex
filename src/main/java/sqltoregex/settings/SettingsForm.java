@@ -128,25 +128,7 @@ public class SettingsForm {
     public boolean validateSQL() {
         Map<String, Boolean> statementsValidMap = new HashMap<>();
         Collection<String> extractedStatementCollection = ConverterManagement.extractStatements(this.sql);
-        for(String str : extractedStatementCollection) {
-            List<Validation> validationList = new LinkedList<>();
-            validationList.add(new Validation(List.of(DatabaseType.ORACLE), str));
-            validationList.add(new Validation(List.of(DatabaseType.MYSQL), str));
-            validationList.add(new Validation(List.of(DatabaseType.SQLSERVER), str));
-            validationList.add(new Validation(List.of(DatabaseType.MARIADB), str));
-
-            for(Validation validation : validationList){
-                List<ValidationError> validationErrors = validation.validate();
-                if (!validationErrors.isEmpty()) {
-                    for (ValidationError va : validationErrors) {
-                        Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-                        logger.log(Level.WARNING, "Error while validating the statement: {0}", va);
-                    }
-                } else {
-                    statementsValidMap.put(str, true);
-                }
-            }
-        }
+        for(String str : extractedStatementCollection) {validationStep(str, statementsValidMap);}
 
         if(statementsValidMap.size() == extractedStatementCollection.size()) return true;
 
@@ -166,5 +148,25 @@ public class SettingsForm {
     private Set<SimpleDateFormat> setAllNonLenient(Set<SimpleDateFormat> formats){
         formats.forEach(format -> format.setLenient(false));
         return formats;
+    }
+
+    private void validationStep(String str, Map<String, Boolean> statementsValidMap){
+        List<Validation> validationList = new LinkedList<>();
+        validationList.add(new Validation(List.of(DatabaseType.ORACLE), str));
+        validationList.add(new Validation(List.of(DatabaseType.MYSQL), str));
+        validationList.add(new Validation(List.of(DatabaseType.SQLSERVER), str));
+        validationList.add(new Validation(List.of(DatabaseType.MARIADB), str));
+
+        for(Validation validation : validationList){
+            List<ValidationError> validationErrors = validation.validate();
+            if (!validationErrors.isEmpty()) {
+                for (ValidationError va : validationErrors) {
+                    Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+                    logger.log(Level.WARNING, "Error while validating the statement: {0}", va);
+                }
+            } else {
+                statementsValidMap.put(str, true);
+            }
+        }
     }
 }
