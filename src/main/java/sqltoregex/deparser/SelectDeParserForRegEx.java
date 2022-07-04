@@ -306,7 +306,7 @@ public class SelectDeParserForRegEx extends SelectDeParser {
                 Iterator<String> functionArgumentIterator = Arrays.stream(argumentList).iterator();
                 if(aggregateFunctions.get(i) != null && !aggregateFunctions.get(i).isEmpty() && arguments.get(i) != null && !arguments.get(i).isEmpty()) reBuildFunctionsAndArguments.append("\\s*,\\s*");
                 while(functionArgumentIterator.hasNext()){
-                    String singleArgument = functionArgumentIterator.next().replaceAll(" ", "");
+                    String singleArgument = functionArgumentIterator.next().replace(" ", "");
                     if (singleArgument.isEmpty()) continue;
                     Pattern patternForDigitInArg = Pattern.compile("^\\d+$");
                     Matcher matcherForDigitInArg = patternForDigitInArg.matcher(singleArgument);
@@ -320,23 +320,23 @@ public class SelectDeParserForRegEx extends SelectDeParser {
                     Pattern patternForDateTimeValue = Pattern.compile("\\{ts'.*?'}");
                     Matcher matcherForDateTimeValue = patternForDateTimeValue.matcher(singleArgument);
 
-                    ExpressionDeParserForRegEx expressionDeParserForRegEx = new ExpressionDeParserForRegEx(this.settingsContainer);
+                    ExpressionDeParserForRegEx expressionDeParserForRegExForDateTimeValues = new ExpressionDeParserForRegEx(this.settingsContainer);
                     StringBuilder stringBuilder = new StringBuilder();
-                    expressionDeParserForRegEx.setBuffer(stringBuilder);
+                    expressionDeParserForRegExForDateTimeValues.setBuffer(stringBuilder);
 
                     if (matcherForDigitInArg.matches()) {
                         reBuildFunctionsAndArguments.append(singleArgument);
                     } else if (matcherForDateValue.matches()) {
-                        DateValue dateValue = new DateValue("'" + singleArgument.replaceAll("\\{d'", "").replaceAll("'}", "") + "'");
-                        dateValue.accept(expressionDeParserForRegEx);
+                        DateValue dateValue = new DateValue("'" + singleArgument.replace("\\{d'", "").replace("'}", "") + "'");
+                        dateValue.accept(expressionDeParserForRegExForDateTimeValues);
                         reBuildFunctionsAndArguments.append(stringBuilder);
                     } else if (matcherForTimeValue.matches()) {
-                        TimeValue timeValue = new TimeValue("'" + singleArgument.replaceAll("\\{t'", "").replaceAll("'}", "") + "'");
-                        timeValue.accept(expressionDeParserForRegEx);
+                        TimeValue timeValue = new TimeValue("'" + singleArgument.replace("\\{t'", "").replace("'}", "") + "'");
+                        timeValue.accept(expressionDeParserForRegExForDateTimeValues);
                         reBuildFunctionsAndArguments.append(stringBuilder);
                     } else if (matcherForDateTimeValue.matches()) {
-                        TimestampValue timestampValue = new TimestampValue("'" + singleArgument.replaceAll("\\{ts'", "").replaceAll("'}", "") + "'");
-                        timestampValue.accept(expressionDeParserForRegEx);
+                        TimestampValue timestampValue = new TimestampValue("'" + singleArgument.replace("\\{ts'", "").replace("'}", "") + "'");
+                        timestampValue.accept(expressionDeParserForRegExForDateTimeValues);
                         reBuildFunctionsAndArguments.append(stringBuilder);
                     } else {
                         if (singleArgument.equals("*")){
