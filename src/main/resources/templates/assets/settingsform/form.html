@@ -133,6 +133,35 @@
                 </div>
             </div>
         </div>
+
+        <div class="accordion-item">
+            <div class="accordion-header" id="headingFunctionLang">
+                <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseFunctionLang" aria-controls="collapseFunctionLang">
+                    <input class="form-check-input me-2 master_toggle" type="checkbox" id="functionLang_master" data-bs-toggle="collapse" data-bs-target onchange="toggleSlaveCheckboxes(this, 'functionLang'); updateSingleUserSetting(this, document.getElementById('converterForm'))" th:checked="${settingsForm.functionLang.size() > 0}">
+                    <span th:text="#{settingsform.functionLang.heading}"></span>
+                </button>
+            </div>
+            <div id="collapseFunctionLang" class="collapse" aria-labelledby="headingFunctionLang" data-parent="#accordion">
+                <div class="accordion-body">
+                    <div class="row">
+                        <div class="col-sm" th:each="setting : ${functionLang}">
+                            <div class="row">
+                                <div th:text="#{settingsform.synonymsFor} + ':' + ${setting.getKey}"></div>
+                                <div class="row" th:each="synonym, iter : ${setting.getValue()}">
+                                    <div class="col-sm">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'functionLang_' + ${setting.getKey()} + '==' + ${synonym}" th:value="${setting.getKey()} + ';' + ${synonym}" th:name="functionLang" th:checked="${settingsForm.functionLang.contains(setting.getKey() + ';' + synonym)}">
+                                            <label class="form-check-label" th:for="'functionLang_' + ${setting.getKey()} + '==' + ${synonym}" th:text="${synonym}">Enable format: "yyyy-MM-dd"</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="accordion-item">
             <div class="accordion-header" id="headingDatatypeSynonyms">
                 <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" aria-expanded="true" data-bs-target="#collapseDatatypeSynonyms" aria-controls="collapseDatatypeSynonyms">

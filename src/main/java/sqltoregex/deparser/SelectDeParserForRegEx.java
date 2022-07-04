@@ -36,10 +36,12 @@ public class SelectDeParserForRegEx extends SelectDeParser {
     private final SpellingMistake keywordSpellingMistake;
     private final SpellingMistake columnNameSpellingMistake;
     private final SpellingMistake tableNameSpellingMistake;
+    private final SpellingMistake aggregateFunctionSpellingMistake;
+    private final SpellingMistake functionNameSpellingMistake;
     private final OrderRotation columnNameOrder;
     private final OrderRotation tableNameOrder;
     private final StringSynonymGenerator aggregateFunctionLang;
-    private final DateAndTimeFormatSynonymGenerator dateFormatSynonymGenerator;
+    private final StringSynonymGenerator functionLang;
     private final SettingsContainer settingsContainer;
     private ExpressionDeParserForRegEx expressionDeParserForRegEx;
 
@@ -54,10 +56,12 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         this.keywordSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
         this.columnNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
         this.aggregateFunctionLang = settingsContainer.get(StringSynonymGenerator.class).get(SettingsOption.AGGREGATEFUNCTIONLANG);
+        this.functionLang = settingsContainer.get(StringSynonymGenerator.class).get(SettingsOption.FUNCTIONLANG);
         this.columnNameOrder = settingsContainer.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
         this.tableNameOrder = settingsContainer.get(OrderRotation.class).get(SettingsOption.TABLENAMEORDER);
         this.tableNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
-        this.dateFormatSynonymGenerator = settingsContainer.get(DateAndTimeFormatSynonymGenerator.class).get(SettingsOption.DATESYNONYMS);
+        this.aggregateFunctionSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.AGGREGATEFUNCTIONSPELLING);
+        this.functionNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.FUNCTIONNAMESPELLING);
     }
 
     /**
@@ -270,20 +274,26 @@ public class SelectDeParserForRegEx extends SelectDeParser {
         String alias = o.toString().contains("AS") ? o.toString().replaceAll("(.*)\\s*AS\\s+", "").replaceAll(QUOTATION_MARK_REGEX, "") : "";
         for(int i = 1; i<=depth; i++){
             if(aggregateFunctions.get(i) != null){
-                String aggregateFunction = aggregateFunctions.get(i);
+                String extractedSingleFunction = aggregateFunctions.get(i);
                 StringBuilder singleFunction = new StringBuilder();
-                if(StringSynonymGenerator.generateAsListOrDefault(this.aggregateFunctionLang, aggregateFunction) != null){
-                    Iterator<String> functionIterator = StringSynonymGenerator.generateAsListOrDefault(this.aggregateFunctionLang, aggregateFunction).iterator();
-
-                    //todo setting for aggretefunction lang spelling mistake
+                if(StringSynonymGenerator.generateAsListOrDefault(this.aggregateFunctionLang, extractedSingleFunction) != null){
+                    Iterator<String> functionIterator = StringSynonymGenerator.generateAsListOrDefault(this.aggregateFunctionLang, extractedSingleFunction).iterator();
                     singleFunction.append("(?:");
                     while(functionIterator.hasNext()){
-                        singleFunction.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, functionIterator.next()));
+                        singleFunction.append(SpellingMistake.useOrDefault(this.aggregateFunctionSpellingMistake, functionIterator.next()));
+                        if(functionIterator.hasNext()) singleFunction.append("|");
+                    }
+                    singleFunction.append(")");
+                } else if(StringSynonymGenerator.generateAsListOrDefault(this.functionLang, extractedSingleFunction) != null){
+                    Iterator<String> functionIterator = StringSynonymGenerator.generateAsListOrDefault(this.functionLang, extractedSingleFunction).iterator();
+                    singleFunction.append("(?:");
+                    while(functionIterator.hasNext()){
+                        singleFunction.append(SpellingMistake.useOrDefault(this.functionNameSpellingMistake, functionIterator.next()));
                         if(functionIterator.hasNext()) singleFunction.append("|");
                     }
                     singleFunction.append(")");
                 } else {
-                    singleFunction.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, aggregateFunction));
+                    singleFunction.append(SpellingMistake.useOrDefault(this.columnNameSpellingMistake, extractedSingleFunction));
                 }
 
                 reBuildFunctionsAndArguments.replace(0, reBuildFunctionsAndArguments.length(),
