@@ -38,7 +38,7 @@
                         <div class="col-sm"
                              th:each="setting : ${spellings}">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'spellingMistake_' + ${setting.getSettingsOption()}" th:name="spellings"  th:value="${setting.getSettingsOption()}" th:checked="setting neq null">
+                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'spellingMistake_' + ${setting.getSettingsOption()}" th:name="spellings"  th:value="${setting.getSettingsOption()}" th:checked="${#sets.contains(settingsForm.getSpellings(), setting)}">
                                 <label class="form-check-label" th:for="'spellingMistake_' + ${setting.getSettingsOption()}" th:text="#{settingsform. + ${setting.getSettingsOption()}}">SpellingMistakeSTATIC</label>
                             </div>
                         </div>
@@ -59,7 +59,7 @@
                         <div class="col-sm"
                              th:each="setting : ${orders}">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'orderRotation_' + ${setting.getSettingsOption()}" th:name="orders" th:value="${setting.getSettingsOption()}"  th:checked="setting neq null">
+                                <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'orderRotation_' + ${setting.getSettingsOption()}" th:name="orders" th:value="${setting.getSettingsOption()}"  th:checked="${#sets.contains(settingsForm.getOrders(), setting)}">
                                 <label class="form-check-label" th:for="'orderRotation_' + ${setting.getSettingsOption()}" th:text="#{settingsform. + ${setting.getSettingsOption()}}">orderRotationSTATIC</label>
                             </div>
                         </div>
