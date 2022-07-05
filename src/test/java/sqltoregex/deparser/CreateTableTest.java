@@ -30,7 +30,6 @@ class CreateTableTest {
         TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), sampleSolution, matchingMap, true);
     }
 
-    @Test
     void createTable1colAndDataTypeAndDefinition() {
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
@@ -129,7 +128,6 @@ class CreateTableTest {
                                                         .build(), "CREATE TABLE table1 (column1 BOOL)", matchingMap, true);
     }
 
-    @Test
     void createTemporaryAndIfNotExists(){
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
@@ -139,7 +137,6 @@ class CreateTableTest {
         TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), "CREATE TEMPORARY TABLE IF NOT EXISTS table1 (column1 datatype1)", matchingMap, true);
     }
 
-    @Test
     void createAs(){
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
@@ -149,7 +146,6 @@ class CreateTableTest {
         TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), "CREATE TEMPORARY TABLE table1 (column1 datatype1) AS SELECT col2 FROM table2", matchingMap, true);
     }
 
-    @Test
     void createLIKE(){
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
@@ -218,7 +214,6 @@ class CreateTableTest {
         Assert.assertThrows(AssertionFailedError.class, () -> TestUtils.validateStatementAgainstRegEx(settingsContainer, "CREATE TABLE table1 (col1 type1, INDEX index_name (col1) KEY BLOCK SIZE 3)", matchingMap, true));
     }
 
-    @Test
     void withFullTextSpatial() {
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
@@ -379,7 +374,6 @@ class CreateTableTest {
      *                 "CREATE TABLE table1 (col1 type1) AUTO_INCREMENT =1",
      *                 "CREATE TABLE table1 (col1 type1) AUTO_INCREMENT= 1"
      */
-    @Test
     void withOneTableOption(){
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
@@ -389,7 +383,6 @@ class CreateTableTest {
         TestUtils.validateStatementAgainstRegEx(SettingsContainer.builder().build(), "CREATE TABLE table1 (col1 type1) AUTO_INCREMENT 1", matchingMap, true);
     }
 
-    @Test
     void withOneTableOptionWithEquals(){
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
@@ -413,7 +406,6 @@ class CreateTableTest {
     /**
      * , seperated Tableoptions isn't supported yet by deparser
      */
-    @Test
     void withMultipleTableOptions(){
         Map<SettingsOption, List<String>> matchingMap = new EnumMap<>(SettingsOption.class);
         matchingMap.put(SettingsOption.DEFAULT, List.of(
@@ -542,7 +534,17 @@ class CreateTableTest {
         Assert.assertThrows(AssertionFailedError.class, () -> validateDefaults(toTestList));
     }
 
-
+    @Test
+    void testCreateTableOptions(){
+        withOneTableOption();
+        withMultipleTableOptions();
+        withOneTableOptionWithEquals();
+        createAs();
+        createLIKE();
+        createTemporaryAndIfNotExists();
+        createTable1colAndDataTypeAndDefinition();
+        withFullTextSpatial();
+    }
 
     void validateDefaults(List<String> toTestList){
         for(String toTest : toTestList){
