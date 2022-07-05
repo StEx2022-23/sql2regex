@@ -5,3 +5,6 @@ CREATE DATABASE "Wetterdaten";
 CREAT DATABAS Wetterdatn
 #####
 CREATE TABLE wetterstation (id integer NOT NULL, name varchar(255), ortid integer NOT NULL, PRIMARY KEY (id), FOREIGN KEY (ortid) REFERENCES ort(ortid));
+CREATE TABLE wetterstation (ortid integer NOT NULL, id integer NOT NULL, name varchar(255), PRIMARY KEY (id), FOREIGN KEY (ortid) REFERENCES ort(ortid));
+CREATE TABLE wetterstation (id integer NOT NULL, ortid integer NOT NULL, name varchar(255), PRIMARY KEY (id), FOREIGN KEY (ortid) REFERENCES ort(ortid));
+CREATE TABLE wetterstation (id integer NOT NULL, ortid integer NOT NULL, name varchar(255), FOREIGN KEY (ortid) REFERENCES ort(ortid), PRIMARY KEY (id));
