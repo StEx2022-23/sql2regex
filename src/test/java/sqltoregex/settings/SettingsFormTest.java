@@ -14,10 +14,18 @@ class SettingsFormTest {
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
 
-    void assertTrueForSettingsForm(Set<ConstraintViolation<SettingsForm>> set){
-        Assertions.assertTrue(set.isEmpty(), "Form constraint validation should be empty");
-    }
     @Test
+    void checkValidation(){
+        emptySql();
+        invalidSql();
+        validFormCreation();
+        multipleSqlStatementsFormCreation();
+        emptyMultipleSql();
+        sqlStatementWithLinebreaks();
+        validFormCreationAllBoxesUnchecked();
+    }
+
+
     void emptySql() {
         Set<ConstraintViolation<SettingsForm>> constraintViolations = validator.validate(new SettingsForm(
                 Collections.emptySet(),
@@ -38,7 +46,6 @@ class SettingsFormTest {
                                 "Property with constraint violation must be sql");
     }
 
-    @Test
     void invalidSql() {
         Set<ConstraintViolation<SettingsForm>> constraintViolations = validator.validate(new SettingsForm(
                 Collections.emptySet(),
@@ -57,7 +64,6 @@ class SettingsFormTest {
                                 "Form constraint validation should contain 1 violation");
     }
 
-    @Test
     void validFormCreation() {
         Set<ConstraintViolation<SettingsForm>> constraintViolations = validator.validate(new SettingsForm(
                 Collections.emptySet(),
@@ -72,10 +78,9 @@ class SettingsFormTest {
                 "SELECT * FROM table1"
         ));
 
-        this.assertTrueForSettingsForm(constraintViolations);
+        Assertions.assertTrue(constraintViolations.isEmpty(), "Form constraint validation should be empty");
     }
 
-    @Test
     void multipleSqlStatementsFormCreation() {
         Set<ConstraintViolation<SettingsForm>> constraintViolations = validator.validate(new SettingsForm(
                 Collections.emptySet(),
@@ -90,10 +95,9 @@ class SettingsFormTest {
                 "SELECT * FROM table1; \r\n SELECT * FROM table2 \r\n"
         ));
 
-        this.assertTrueForSettingsForm(constraintViolations);
+        Assertions.assertTrue(constraintViolations.isEmpty(), "Form constraint validation should be empty");
     }
 
-    @Test
     void emptyMultipleSql() {
         Set<ConstraintViolation<SettingsForm>> constraintViolations = validator.validate(new SettingsForm(
                 Collections.emptySet(),
@@ -108,10 +112,9 @@ class SettingsFormTest {
                 "SELECT * FROM table1; \r\n SELECT * FROM table2; \r\n"
         ));
 
-        this.assertTrueForSettingsForm(constraintViolations);
+        Assertions.assertTrue(constraintViolations.isEmpty(), "Form constraint validation should be empty");
     }
 
-    @Test
     void sqlStatementWithLinebreaks() {
         Set<ConstraintViolation<SettingsForm>> constraintViolations = validator.validate(new SettingsForm(
                 Collections.emptySet(),
@@ -126,10 +129,9 @@ class SettingsFormTest {
                 "SELECT * FROM table1; \r\n SELECT * FROM table2 \r\n"
         ));
 
-        this.assertTrueForSettingsForm(constraintViolations);
+        Assertions.assertTrue(constraintViolations.isEmpty(), "Form constraint validation should be empty");
     }
 
-    @Test
     void validFormCreationAllBoxesUnchecked() {
         Set<ConstraintViolation<SettingsForm>> constraintViolations = validator.validate(new SettingsForm(
                 null,
@@ -144,6 +146,6 @@ class SettingsFormTest {
                 "SELECT * FROM table1"
         ));
 
-        this.assertTrueForSettingsForm(constraintViolations);
+        Assertions.assertTrue(constraintViolations.isEmpty(), "Form constraint validation should be empty");
     }
 }
