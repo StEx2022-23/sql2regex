@@ -1,6 +1,4 @@
-<h1 align="center">
-    sqltoregex
-</h1>
+[![LICENCE](documentation/logo_sgl2regex_large.png)](https://sql2regex.herokuapp.com)
 
 <div align="center">
   
