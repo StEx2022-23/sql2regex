@@ -81,12 +81,7 @@ class EquivalentStatementTest extends UserSettingsPreparer {
             Pattern pattern = Pattern.compile(this.converterManagement.deparse(key, false, SettingsType.ALL), Pattern.CASE_INSENSITIVE);
             for (String toValidateStatements : this.equivalentStatements.get(key)) {
                 Matcher matcher = pattern.matcher(toValidateStatements);
-                if(!matcher.matches()) {
-                    System.out.println(pattern);
-                    System.out.println(toValidateStatements);
-                } else {
-                    Assertions.assertTrue(matcher.matches());
-                }
+                Assertions.assertTrue(matcher.matches(), "\n\rpattern: " + pattern + "\n\rtoValidateStatement: " + toValidateStatements);
             }
         }
     }
