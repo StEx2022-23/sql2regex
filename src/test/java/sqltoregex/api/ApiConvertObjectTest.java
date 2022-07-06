@@ -3,7 +3,11 @@ package sqltoregex.api;
 import net.sf.jsqlparser.JSQLParserException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.xml.sax.SAXException;
+import sqltoregex.ConverterManagement;
 import sqltoregex.settings.SettingsType;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -13,7 +17,16 @@ import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 
+@SpringBootTest
+@AutoConfigureMockMvc
 class ApiConvertObjectTest {
+    ConverterManagement converterManagement;
+
+    @Autowired
+    ApiConvertObjectTest(ConverterManagement converterManagement){
+        this.converterManagement = converterManagement;
+    }
+
     @Test
     void testConstructor() {
         Assertions.assertDoesNotThrow(ApiConvertObject::new);

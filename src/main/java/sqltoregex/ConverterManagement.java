@@ -179,9 +179,9 @@ public class ConverterManagement {
 
     /**
      * Searches for ";" in the provided String and splits the Statements on ";" which are not enclosed in QuotationMarks
-     * @param multStmtString
+     * @param multStmtString string with multiple sql statements, delimited by ;
      * @see StatementDeParserForRegEx#QUOTATION_MARK_REGEX
-     * @return
+     * @return collection with single statements
      */
     public static Collection<String> extractStatements(String multStmtString){
         Collection<String> stmtList = new LinkedList<>();
@@ -211,6 +211,11 @@ public class ConverterManagement {
         return stmtList;
     }
 
+    /**
+     * Check if the given statement is a special case like create database.
+     * @param sqlStatement given sql statement
+     * @return is create database (true) or not (false)
+     */
     private boolean isCreateDatabase(String sqlStatement) {
         return sqlStatement.contains("CREATE") && sqlStatement.contains("DATABASE");
     }
