@@ -282,7 +282,12 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
                 }
                 synsWithSpellingMistake.add(tempColumnDefinition.toString());
             } else {
-                synsWithSpellingMistake.add(StringSynonymGenerator.useOrDefault(this.datatypeSynonymGenerator, keywordSyn));
+                synsWithSpellingMistake.add(
+                        SpellingMistake.useOrDefault(
+                                this.keywordSpellingMistake,
+                                keywordSyn
+                        )
+                );
             }
         }
 
@@ -324,7 +329,16 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
             );
             tempColumnDefinition.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
         } else {
-            tempColumnDefinition.append(StringSynonymGenerator.useOrDefault(this.datatypeSynonymGenerator, splitElement));
+            List<String> synonymList = StringSynonymGenerator.generateAsListOrDefault(this.datatypeSynonymGenerator, splitElement);
+            Iterator<String> synonymIterator = synonymList.iterator();
+            tempColumnDefinition.append("(?:");
+            while(synonymIterator.hasNext()){
+                tempColumnDefinition.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, synonymIterator.next()));
+                if(synonymIterator.hasNext()){
+                    tempColumnDefinition.append("|");
+                }
+            }
+            tempColumnDefinition.append(")");
         }
         if(stringIterator.hasNext()) tempColumnDefinition.append(OPTIONAL_WHITE_SPACE);
     }
