@@ -47,7 +47,7 @@ compile changes on runtime:
 ### example request over command line
 
 ```cmd
-curl -X POST http://localhost:8080/api/convert -H "Content-Type: application/json" -d "{\"sql\":[\"SELECT * FROM table\"],\"settingsType\":\"ALL\"}"
+curl -X POST [domain]/api/convert -H "Content-Type: application/json" -d "{\"sql\":[\"SELECT * FROM table\"],\"settingsType\":\"ALL\"}"
 ```
 
 ### requests with python and examples
@@ -57,7 +57,7 @@ import requests
 
 headers = {'Content-Type': 'application/json'}
 
-r = requests.post('http://localhost:8080/api/docs', headers=headers)
+r = requests.post('[domain]/api/docs', headers=headers)
 print(r.text)
 # Available endpoints:
 #    - /convert
@@ -65,7 +65,7 @@ print(r.text)
 #    - /settingsoptions
 #    - /specificsettingsoption
 
-r = requests.post('http://localhost:8080/api/convert', headers=headers, json={"sql":["SELECT col1, col2 FROM table", "INSERT INTO tab1 VALUES ('col1', 'col2')"], "settingsType":"ALL"})
+r = requests.post([domain]/api/convert', headers=headers, json={"sql":["SELECT col1, col2 FROM table", "INSERT INTO tab1 VALUES ('col1', 'col2')"], "settingsType":"ALL"})
 print(r.text)
 # {
 #    "sql":[
@@ -79,15 +79,15 @@ print(r.text)
 #    ]
 # }
 
-r = requests.post('http://localhost:8080/api/settingstypes', headers=headers)
+r = requests.post('[domain]/api/settingstypes', headers=headers)
 print(r.text)
 # ["ALL","DEFAULT_SCHOOL","USER"]
 
-r = requests.post('http://localhost:8080/api/settingsoptions', headers=headers)
+r = requests.post('[domain]/api/settingsoptions', headers=headers)
 print(r.text)
 # ["COLUMNNAMESPELLING","KEYWORDSPELLING","TABLENAMESPELLING","COLUMNNAMEORDER","TABLENAMEORDER","INDEXCOLUMNNAMEORDER","INDEXCOLUMNNAMESPELLING","DATESYNONYMS","DATETIMESYNONYMS","TIMESYNONYMS","AGGREGATEFUNCTIONLANG","DATATYPESYNONYMS","GROUPBYELEMENTORDER","INSERTINTOVALUESORDER","OTHERSYNONYMS","DEFAULT"]
 
-r = requests.post('http://localhost:8080/api/specificsettingsoption', headers=headers, data="ALL")
+r = requests.post('[domain]/api/specificsettingsoption', headers=headers, data="ALL")
 print(r.text)
 # ["COLUMNNAMESPELLING","KEYWORDSPELLING","TABLENAMESPELLING","COLUMNNAMEORDER","TABLENAMEORDER","INDEXCOLUMNNAMEORDER","INDEXCOLUMNNAMESPELLING","DATESYNONYMS","DATETIMESYNONYMS","TIMESYNONYMS","AGGREGATEFUNCTIONLANG","DATATYPESYNONYMS","GROUPBYELEMENTORDER","INSERTINTOVALUESORDER","OTHERSYNONYMS"]
 
