@@ -9,12 +9,13 @@ import sqltoregex.settings.SettingsOption;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
+import static sqltoregex.deparser.StatementDeParserForRegEx.REQUIRED_WHITE_SPACE;
+import static sqltoregex.deparser.StatementDeParserForRegEx.OPTIONAL_WHITE_SPACE;
+
 /**
  * Implements own {@link LimitDeparser} to generate regex.
  */
 public class LimitDeParserForRegEx extends LimitDeparser {
-    private static final String REQUIRED_WHITE_SPACE = "\\s+";
-    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private SpellingMistake keywordSpellingMistake;
 
     /**

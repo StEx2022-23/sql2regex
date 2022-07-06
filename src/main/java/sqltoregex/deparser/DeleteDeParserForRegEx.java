@@ -13,12 +13,13 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
 import java.util.*;
 
 import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
+import static sqltoregex.deparser.StatementDeParserForRegEx.REQUIRED_WHITE_SPACE;
+
 /**
  * Implements an own delete statement deparser to generate regular expressions.
  */
 public class DeleteDeParserForRegEx extends DeleteDeParser {
     public static final String ALIAS_AS = "(?:ALIAS|AS)";
-    private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private ExpressionDeParserForRegEx expressionDeParserForRegEx;
     private final SelectDeParserForRegEx selectDeParserForRegEx;
     private final SettingsContainer settingsContainer;

@@ -20,12 +20,13 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static sqltoregex.deparser.StatementDeParserForRegEx.REQUIRED_WHITE_SPACE;
+import static sqltoregex.deparser.StatementDeParserForRegEx.OPTIONAL_WHITE_SPACE;
+
 /**
  * Implements an own {@link CreateTableDeParser} to generate regular expressions.
  */
 public class CreateTableDeParserForRegEx extends CreateTableDeParser {
-    private static final String REQUIRED_WHITE_SPACE = "\\s+";
-    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SettingsContainer settings;
     private final StatementDeParser statementDeParser;
     private final OrderRotation indexColumnNameOrder;

@@ -14,13 +14,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
+import static sqltoregex.deparser.StatementDeParserForRegEx.REQUIRED_WHITE_SPACE;
+import static sqltoregex.deparser.StatementDeParserForRegEx.OPTIONAL_WHITE_SPACE;
 
 /**
  * Implements own {@link OrderByDeParser} to generate regex.
  */
 public class OrderByDeParserForRegEx extends OrderByDeParser {
-    private static final String REQUIRED_WHITE_SPACE = "\\s+";
-    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final StringSynonymGenerator aggregateFunctionLang;
     private final OrderRotation columnNameOrder;
     private final SpellingMistake columnNameSpellingMistake;
