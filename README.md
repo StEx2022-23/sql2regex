@@ -16,7 +16,6 @@
   [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=StEx2022-23_sql2regex&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=StEx2022-23_sql2regex)
   [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=StEx2022-23_sql2regex&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=StEx2022-23_sql2regex)
   [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=StEx2022-23_sql2regex&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=StEx2022-23_sql2regex)
-
 </div>
 
 # installation notes
