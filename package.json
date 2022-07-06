@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "scss": "node-sass --output-style compressed src/main/resources/static/styles -o src/main/resources/static/styles",
-    "watch": "node-sass --watch --output-style compressed src/main/resources/static/styles -o src/main/resources/static/styles && node-sass --watch --output-style compressed src/main/resources/static/styles -o target/classes/static/styles/",
+    "watch": "node-sass --watch --output-style compressed src/main/resources/static/styles -o src/main/resources/static/styles && node-sass --watch --output-style compressed src/main/resources/static/styles -o target/classes/static/styles/"
   },
   "author": "Patrick Binkert",
   "repository": {
