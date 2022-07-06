@@ -1,10 +1,11 @@
 package sqltoregex.api;
 
 import net.sf.jsqlparser.JSQLParserException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.xml.sax.SAXException;
 import sqltoregex.ConverterManagement;
-import sqltoregex.settings.SettingsManager;
 import sqltoregex.settings.SettingsType;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,6 +20,7 @@ import java.util.logging.Logger;
 /**
  * Holds values from post api requests.
  */
+
 public class ApiConvertObject {
     private List<String> sql;
     private SettingsType settingsType;
@@ -27,7 +29,7 @@ public class ApiConvertObject {
     /**
      * Default constructor.
      */
-    public ApiConvertObject() {
+    ApiConvertObject() {
         this.regex = new LinkedList<>();
     }
 
@@ -83,8 +85,36 @@ public class ApiConvertObject {
      */
     public List<String> getRegex() throws XPathExpressionException, ParserConfigurationException, IOException, URISyntaxException, SAXException, JSQLParserException {
         for(String str : this.sql){
-            this.regex.add(new ConverterManagement(new SettingsManager()).deparse(str, false, this.settingsType));
+            this.regex.add(ApiConverter.convert(str, this.settingsType));
         }
         return this.regex;
+    }
+
+    /**
+     * Helper class to realize the converting process with an autowired ConverterManagement.
+     */
+    @Service
+    private static class ApiConverter {
+        private static ConverterManagement converterManagement;
+
+        /**
+         * Default constructor to inject the ConverterManagement
+         * @param converterManagement {@link ConverterManagement}
+         */
+        @Autowired
+        ApiConverter(ConverterManagement converterManagement){
+            ApiConverter.converterManagement = converterManagement;
+        }
+
+        /**
+         * Converts given sql to regex.
+         * @param sql given sql statement
+         * @param settingsType one of {@link SettingsType}
+         * @return generated regex
+         * @throws JSQLParserException if parsing goes wrong
+         */
+        public static String convert(String sql, SettingsType settingsType) throws JSQLParserException {
+            return converterManagement.deparse(sql,false, settingsType);
+        }
     }
 }
