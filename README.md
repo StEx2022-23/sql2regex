@@ -43,55 +43,9 @@ compile changes on runtime:
 </a>
 
 ## REST-Api
+### requests with python and over command line (with examples)
 
-### example request over command line
-
-```cmd
-curl -X POST [domain]/api/convert -H "Content-Type: application/json" -d "{\"sql\":[\"SELECT * FROM table\"],\"settingsType\":\"ALL\"}"
-```
-
-### requests with python and examples
-
-```python
-import requests
-
-headers = {'Content-Type': 'application/json'}
-
-r = requests.post('[domain]/api/docs', headers=headers)
-print(r.text)
-# Available endpoints:
-#    - /convert
-#    - /settingstypes
-#    - /settingsoptions
-#    - /specificsettingsoption
-
-r = requests.post([domain]/api/convert', headers=headers, json={"sql":["SELECT col1, col2 FROM table", "INSERT INTO tab1 VALUES ('col1', 'col2')"], "settingsType":"ALL"})
-print(r.text)
-# {
-#    "sql":[
-#       "SELECT col1, col2 FROM table",
-#       "INSERT INTO tab1 VALUES ('col1', 'col2')"
-#    ],
-#    "settingsType":"ALL",
-#    "regex":[
-#       "^(?:SELECT|ELECT|SLECT|SEECT|SELCT|SELET|SELEC)\\s+(?:(?:col1|ol1|cl1|co1|col)\\s*(\\s*(?:(?:ALIAS|LIAS|AIAS|ALAS|ALIS|ALIA)|(?:AS|S|A))\\s+.*)?\\s*,\\s*(?:col2|ol2|cl2|co2|col)\\s*(\\s*(?:(?:ALIAS|LIAS|AIAS|ALAS|ALIS|ALIA)|(?:AS|S|A))\\s+.*)?|(?:col2|ol2|cl2|co2|col)\\s*(\\s*(?:(?:ALIAS|LIAS|AIAS|ALAS|ALIS|ALIA)|(?:AS|S|A))\\s+.*)?\\s*,\\s*(?:col1|ol1|cl1|co1|col)\\s*(\\s*(?:(?:ALIAS|LIAS|AIAS|ALAS|ALIS|ALIA)|(?:AS|S|A))\\s+.*)?)\\s+(?:FROM|ROM|FOM|FRM|FRO)\\s+(?:table|able|tble|tale|tabe|tabl)(\\s*(?:(?:ALIAS|LIAS|AIAS|ALAS|ALIS|ALIA)|(?:AS|S|A))?\\s+.*)?$",
-#       "^(?:INSERT|NSERT|ISERT|INERT|INSRT|INSET|INSER)\\s+(?:INTO|NTO|ITO|INO|INT)\\s+(?:tab1|ab1|tb1|ta1|tab)\\s+(?:VALUE|ALUE|VLUE|VAUE|VALE|VALU)S?\\s+\\(\\s*(?:['`\"]?(?:col1|ol1|cl1|co1|col)['`\"]?\\s*,\\s*['`\"]?(?:col2|ol2|cl2|co2|col)['`\"]?|['`\"]?(?:col2|ol2|cl2|co2|col)['`\"]?\\s*,\\s*['`\"]?(?:col1|ol1|cl1|co1|col)['`\"]?)\\s*\\)\\s*$"
-#    ]
-# }
-
-r = requests.post('[domain]/api/settingstypes', headers=headers)
-print(r.text)
-# ["ALL","DEFAULT_SCHOOL","USER"]
-
-r = requests.post('[domain]/api/settingsoptions', headers=headers)
-print(r.text)
-# ["COLUMNNAMESPELLING","KEYWORDSPELLING","TABLENAMESPELLING","COLUMNNAMEORDER","TABLENAMEORDER","INDEXCOLUMNNAMEORDER","INDEXCOLUMNNAMESPELLING","DATESYNONYMS","DATETIMESYNONYMS","TIMESYNONYMS","AGGREGATEFUNCTIONLANG","DATATYPESYNONYMS","GROUPBYELEMENTORDER","INSERTINTOVALUESORDER","OTHERSYNONYMS","DEFAULT"]
-
-r = requests.post('[domain]/api/specificsettingsoption', headers=headers, data="ALL")
-print(r.text)
-# ["COLUMNNAMESPELLING","KEYWORDSPELLING","TABLENAMESPELLING","COLUMNNAMEORDER","TABLENAMEORDER","INDEXCOLUMNNAMEORDER","INDEXCOLUMNNAMESPELLING","DATESYNONYMS","DATETIMESYNONYMS","TIMESYNONYMS","AGGREGATEFUNCTIONLANG","DATATYPESYNONYMS","GROUPBYELEMENTORDER","INSERTINTOVALUESORDER","OTHERSYNONYMS"]
-
-```
+[some api converting code snippets](https://github.com/StEx2022-23/sql2regex/tree/main/apirequestsnippets)
 
 ## documentation
 
