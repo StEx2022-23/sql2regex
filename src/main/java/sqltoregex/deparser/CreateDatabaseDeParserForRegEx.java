@@ -7,11 +7,12 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static sqltoregex.deparser.StatementDeParserForRegEx.REQUIRED_WHITE_SPACE;
+
 /**
  * Implements an own create database statement deparser to generate regular expressions.
  */
 public class CreateDatabaseDeParserForRegEx {
-    private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private final StringBuilder buffer;
     SpellingMistake keywordSpellingMistake;
 

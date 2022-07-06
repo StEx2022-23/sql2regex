@@ -13,13 +13,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static sqltoregex.deparser.StatementDeParserForRegEx.REQUIRED_WHITE_SPACE;
+import static sqltoregex.deparser.StatementDeParserForRegEx.OPTIONAL_WHITE_SPACE;
+
 /**
  * Implements own {@link GroupByDeParser} to generate regex.
  */
 public class GroupByDeParserForRegEx extends GroupByDeParser {
     Map<String, String> tableNameAliasMap = new HashMap<>();
-    private static final String REQUIRED_WHITE_SPACE = "\\s+";
-    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SpellingMistake keywordSpellingMistake;
     private final OrderRotation groupByOrderRotation;
     private final ExpressionDeParserForRegEx expressionDeParserForRegEx;

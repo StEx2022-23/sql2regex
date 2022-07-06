@@ -8,11 +8,11 @@ import sqltoregex.settings.regexgenerator.OrderRotation;
 import sqltoregex.settings.regexgenerator.SpellingMistake;
 
 import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
+import static sqltoregex.deparser.StatementDeParserForRegEx.REQUIRED_WHITE_SPACE;
 /**
  * Implements an own create drop statement deparser to generate regular expressions.
  */
 public class DropDeParserForRegEx extends DropDeParser {
-    private static final String REQUIRED_WHITE_SPACE = "\\s+";
     private final SpellingMistake keywordSpellingMistake;
     private final SpellingMistake tableNameSpellingMistake;
     private final OrderRotation tableNameOrderRotation;

@@ -30,8 +30,6 @@ import static sqltoregex.deparser.StatementDeParserForRegEx.*;
  * Implements own {@link SelectDeParser} to generate regex.
  */
 public class SelectDeParserForRegEx extends SelectDeParser {
-    private static final String REQUIRED_WHITE_SPACE = "\\s+";
-    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SpellingMistake keywordSpellingMistake;
     private final SpellingMistake columnNameSpellingMistake;
     private final SpellingMistake tableNameSpellingMistake;

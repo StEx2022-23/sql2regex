@@ -17,12 +17,14 @@ import sqltoregex.settings.regexgenerator.SpellingMistake;
 import sqltoregex.settings.regexgenerator.synonymgenerator.DateAndTimeFormatSynonymGenerator;
 import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerator;
 
-import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import static sqltoregex.deparser.StatementDeParserForRegEx.QUOTATION_MARK_REGEX;
+import static sqltoregex.deparser.StatementDeParserForRegEx.REQUIRED_WHITE_SPACE;
+import static sqltoregex.deparser.StatementDeParserForRegEx.OPTIONAL_WHITE_SPACE;
 
 /**
  * Implements an own {@link ExpressionDeParser} for generating RegEx.
@@ -31,8 +33,6 @@ import java.util.Map;
 public class ExpressionDeParserForRegEx extends ExpressionDeParser {
     public static final String NOT = "NOT";
     public static final String OLD_ORACLE_JOIN = "\\(\\+\\)";
-    private static final String REQUIRED_WHITE_SPACE = "\\s+";
-    private static final String OPTIONAL_WHITE_SPACE = "\\s*";
     private final SpellingMistake columnNameSpellingMistake;
     private final SpellingMistake tableNameSpellingMistake;
     private final SpellingMistake stringValueSpellingMistake;
