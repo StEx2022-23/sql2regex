@@ -133,11 +133,11 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
             String tableOption = iterator.next();
             if (tableOption.contains("(")){
                 tmpBuffer.append(tableOption, 0, tableOption.indexOf('('));
-                tmpBuffer.append("\\(");
+                tmpBuffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
                 String columnsString = tableOption.substring(tableOption.indexOf('(') + 1, tableOption.lastIndexOf(')'));
                 List<String> columns = new LinkedList<>(List.of(columnsString.split(",")));
                 tmpBuffer.append(OrderRotation.useOrDefault(this.indexColumnNameOrder, columns));
-                tmpBuffer.append("\\)");
+                tmpBuffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
             }else if (tableOption.equals("=")) {
                 tmpBuffer.delete(tmpBuffer.length() - REQUIRED_WHITE_SPACE.length(), tmpBuffer.length());
                 tmpBuffer.append("(?:")
@@ -164,9 +164,9 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
      */
     private String deParseIndexColumns(Index index){
         List<String> indexStringList = getStringList(index.getColumns());
-        return "\\(" + OPTIONAL_WHITE_SPACE
+        return  OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE
                 + OrderRotation.useOrDefault(this.indexColumnNameOrder, StatementDeParserForRegEx.addQuotationMarks(indexStringList))
-                + OPTIONAL_WHITE_SPACE + "\\)";
+                + OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE;
     }
 
 
@@ -212,13 +212,13 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         buffer.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, createTable.getTable().getFullyQualifiedName()));
 
         if (createTable.getColumns() != null && !createTable.getColumns().isEmpty()) {
-            buffer.append(OPTIONAL_WHITE_SPACE).append("\\(");
+            buffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
             buffer.append(settings.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER)
                     .generateRegExFor(createTable.getColumns().stream().map(col -> SpellingMistake.useOrDefault(this.columnNameSpellingMistake, col)).toList()));
-            buffer.append("\\)");
+            buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
         }
         if (createTable.getColumnDefinitions() != null) {
-            buffer.append(OPTIONAL_WHITE_SPACE).append("\\(");
+            buffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
 
             List<String> colAndIndexList = new LinkedList<>();
 
@@ -227,7 +227,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
 
             buffer.append(OrderRotation.useOrDefault(this.columnNameOrder , colAndIndexList));
 
-            buffer.append("\\)");
+            buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
         }
 
         params = deParseTableOptions(createTable);
@@ -245,20 +245,20 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         if (createTable.getSelect() != null) {
             buffer.append(REQUIRED_WHITE_SPACE).append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "AS")).append(REQUIRED_WHITE_SPACE);
             if (createTable.isSelectParenthesis()) {
-                buffer.append("\\(");
+                buffer.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
             }
             Select sel = createTable.getSelect();
             sel.accept(this.statementDeParser);
             if (createTable.isSelectParenthesis()) {
-                buffer.append("\\)");
+                buffer.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
             }
         }
         if (createTable.getLikeTable() != null) {
-            buffer.append("(?:\\(").append(OPTIONAL_WHITE_SPACE).append(")?");
+            buffer.append("(?:").append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE).append(")?");
             buffer.append(REQUIRED_WHITE_SPACE).append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "LIKE")).append(REQUIRED_WHITE_SPACE);
             Table table = createTable.getLikeTable();
             buffer.append(SpellingMistake.useOrDefault(this.tableNameSpellingMistake, table.getFullyQualifiedName()));
-            buffer.append("(?:").append(OPTIONAL_WHITE_SPACE).append("\\))?");
+            buffer.append("(?:").append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE).append(")?");
         }
     }
 
@@ -282,7 +282,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
                 }
                 synsWithSpellingMistake.add(tempColumnDefinition.toString());
             } else {
-                synsWithSpellingMistake.add(StringSynonymGenerator.useOrDefault(this.datatypeSynonymGenerator, keywordSyn.toUpperCase(Locale.ROOT)));
+                synsWithSpellingMistake.add(StringSynonymGenerator.useOrDefault(this.datatypeSynonymGenerator, keywordSyn));
             }
         }
 
@@ -291,8 +291,8 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
             StringBuilder stringBuilder = new StringBuilder();
             for (String s : columnDefinition.getColumnSpecs()) {
                 if (s.contains("(") && s.contains(")")){
-                   s = s.replace("(", "\\(");
-                   s = s.replace(")", "\\)");
+                   s = s.replace("(", OPTIONAL_WHITE_SPACE + "\\(" + OPTIONAL_WHITE_SPACE);
+                   s = s.replace(")", OPTIONAL_WHITE_SPACE + "\\)" + OPTIONAL_WHITE_SPACE);
                 }
                 stringBuilder.append(REQUIRED_WHITE_SPACE);
                 stringBuilder.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, s));
@@ -315,14 +315,14 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
     private void handleColumnDefinitionWithClipsAndWhitespaces(StringBuilder tempColumnDefinition, Iterator<String> stringIterator) {
         String splitElement = stringIterator.next();
         if(splitElement.contains("(") && splitElement.contains(")")){
-            tempColumnDefinition.append("\\(").append(OPTIONAL_WHITE_SPACE);
+            tempColumnDefinition.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
             tempColumnDefinition.append(
                     SpellingMistake.useOrDefault(
                             this.keywordSpellingMistake,
                             splitElement.replace("(", "").replace(")","")
                     )
             );
-            tempColumnDefinition.append(OPTIONAL_WHITE_SPACE).append("\\)");
+            tempColumnDefinition.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
         } else {
             tempColumnDefinition.append(StringSynonymGenerator.useOrDefault(this.datatypeSynonymGenerator, splitElement));
         }
@@ -342,10 +342,10 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         )
         ){
             tmpBuffer.append("(?:").append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, "CONSTRAINT"));
-            tmpBuffer.append(OPTIONAL_WHITE_SPACE);
+            tmpBuffer.append(REQUIRED_WHITE_SPACE);
             tmpBuffer.append(")?");
             //constraint name optional
-            tmpBuffer.append("(?:").append(REQUIRED_WHITE_SPACE).append(".*?)");
+            tmpBuffer.append("(?:").append(".*?)");
         }
 
         List<String> typeSynonymList = StringSynonymGenerator.generateAsListOrDefault(this.otherSynonymsGenerator, index.getType());
@@ -367,7 +367,8 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
                     .append(OPTIONAL_WHITE_SPACE)
                     .append(OrderRotation.useOrDefault(this.indexColumnNameOrder, StatementDeParserForRegEx.addQuotationMarks(foreignKeyIndex.getReferencedColumnNames())))
                     .append(OPTIONAL_WHITE_SPACE)
-                    .append("\\)");
+                    .append("\\)")
+                    .append(OPTIONAL_WHITE_SPACE);
             tmpBuffer.append(deParseReferentialActions(foreignKeyIndex));
         }
         return tmpBuffer.toString();
