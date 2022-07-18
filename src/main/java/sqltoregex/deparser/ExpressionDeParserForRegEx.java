@@ -46,21 +46,21 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
 
     /**
      * Short constructor.
-     * @param settingsContainer containing all deparse Settings
+     * @param settings containing all deparse Settings
      */
-    public ExpressionDeParserForRegEx(SettingsContainer settingsContainer) {
-        this(new SelectDeParserForRegEx(settingsContainer), new StringBuilder(), settingsContainer);
+    public ExpressionDeParserForRegEx(SettingsContainer settings) {
+        this(new SelectDeParserForRegEx(settings), new StringBuilder(), settings);
     }
 
     /**
      * Extended constructor.
      * @param selectVisitor visitor used for deparsing sub selects
      * @param buffer used for string building
-     * @param settingsContainer containing all deparse Settings
+     * @param settings containing all deparse Settings
      */
     public ExpressionDeParserForRegEx(SelectVisitor selectVisitor, StringBuilder buffer,
-                                      SettingsContainer settingsContainer) {
-        this(selectVisitor, buffer, new OrderByDeParserForRegEx(settingsContainer), settingsContainer);
+                                      SettingsContainer settings) {
+        this(selectVisitor, buffer, new OrderByDeParserForRegEx(settings), settings);
     }
 
     /**
@@ -70,7 +70,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
      * @param orderByDeParser visitor for deparsing order by statements
      * @param settings containing all deparse Settings
      */
-    ExpressionDeParserForRegEx(SelectVisitor selectVisitor, StringBuilder buffer,
+    public ExpressionDeParserForRegEx(SelectVisitor selectVisitor, StringBuilder buffer,
                                OrderByDeParserForRegEx orderByDeParser, SettingsContainer settings) {
         super(selectVisitor, buffer);
         this.orderByDeParser = orderByDeParser;
@@ -1128,7 +1128,7 @@ public class ExpressionDeParserForRegEx extends ExpressionDeParser {
      * @param binaryExpression to deparse
      * @param operator between the the expressions of the binary
      */
-    protected void visitCommutativeBinaryExpression(BinaryExpression binaryExpression, String operator) {
+    private void visitCommutativeBinaryExpression(BinaryExpression binaryExpression, String operator) {
         buffer.append("(?:");
         buffer.append(OPTIONAL_WHITE_SPACE);
         binaryExpression.getLeftExpression().accept(this);

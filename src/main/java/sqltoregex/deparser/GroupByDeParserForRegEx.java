@@ -20,7 +20,7 @@ import static sqltoregex.deparser.StatementDeParserForRegEx.OPTIONAL_WHITE_SPACE
  * Implements own {@link GroupByDeParser} to generate regex.
  */
 public class GroupByDeParserForRegEx extends GroupByDeParser {
-    Map<String, String> tableNameAliasMap = new HashMap<>();
+    private Map<String, String> tableNameAliasMap = new HashMap<>();
     private final SpellingMistake keywordSpellingMistake;
     private final OrderRotation groupByOrderRotation;
     private final ExpressionDeParserForRegEx expressionDeParserForRegEx;

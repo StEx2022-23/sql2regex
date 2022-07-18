@@ -28,7 +28,7 @@ import static sqltoregex.deparser.StatementDeParserForRegEx.OPTIONAL_WHITE_SPACE
  */
 public class CreateTableDeParserForRegEx extends CreateTableDeParser {
     private final SettingsContainer settings;
-    private final StatementDeParser statementDeParser;
+    private final StatementDeParserForRegEx statementDeParser;
     private final OrderRotation indexColumnNameOrder;
     private final OrderRotation columnNameOrder;
     private final SpellingMistake keywordSpellingMistake;
@@ -52,7 +52,7 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
      * @param buffer {@link StringBuilder}
      * @param settingsContainer {@link SettingsContainer}
      */
-    public CreateTableDeParserForRegEx(StatementDeParser statementDeParser,
+    public CreateTableDeParserForRegEx(StatementDeParserForRegEx statementDeParser,
                                        StringBuilder buffer, SettingsContainer settingsContainer) {
         super(statementDeParser, buffer);
         this.statementDeParser = statementDeParser;
@@ -317,30 +317,30 @@ public class CreateTableDeParserForRegEx extends CreateTableDeParser {
         return tmpBuffer.toString();
     }
 
-    private void handleColumnDefinitionWithClipsAndWhitespaces(StringBuilder tempColumnDefinition, Iterator<String> stringIterator) {
+    private void handleColumnDefinitionWithClipsAndWhitespaces(StringBuilder tmpColDef, Iterator<String> stringIterator) {
         String splitElement = stringIterator.next();
         if(splitElement.contains("(") && splitElement.contains(")")){
-            tempColumnDefinition.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
-            tempColumnDefinition.append(
+            tmpColDef.append(OPTIONAL_WHITE_SPACE).append("\\(").append(OPTIONAL_WHITE_SPACE);
+            tmpColDef.append(
                     SpellingMistake.useOrDefault(
                             this.keywordSpellingMistake,
                             splitElement.replace("(", "").replace(")","")
                     )
             );
-            tempColumnDefinition.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
+            tmpColDef.append(OPTIONAL_WHITE_SPACE).append("\\)").append(OPTIONAL_WHITE_SPACE);
         } else {
             List<String> synonymList = StringSynonymGenerator.generateAsListOrDefault(this.datatypeSynonymGenerator, splitElement);
             Iterator<String> synonymIterator = synonymList.iterator();
-            tempColumnDefinition.append("(?:");
+            tmpColDef.append("(?:");
             while(synonymIterator.hasNext()){
-                tempColumnDefinition.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, synonymIterator.next()));
+                tmpColDef.append(SpellingMistake.useOrDefault(this.keywordSpellingMistake, synonymIterator.next()));
                 if(synonymIterator.hasNext()){
-                    tempColumnDefinition.append("|");
+                    tmpColDef.append("|");
                 }
             }
-            tempColumnDefinition.append(")");
+            tmpColDef.append(")");
         }
-        if(stringIterator.hasNext()) tempColumnDefinition.append(OPTIONAL_WHITE_SPACE);
+        if(stringIterator.hasNext()) tmpColDef.append(OPTIONAL_WHITE_SPACE);
     }
 
     /**

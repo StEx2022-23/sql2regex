@@ -29,17 +29,17 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
     private final SpellingMistake tableNameSpellingMistake;
     private final OrderRotation columnNameOrderRotation;
     private final OrderRotation tableNameOrderRotation;
-    ExpressionDeParserForRegEx expressionDeParserForRegEx;
-    SelectDeParserForRegEx selectDeParserForRegEx;
+    private ExpressionDeParserForRegEx expressionDeParserForRegEx;
+    private final SelectDeParserForRegEx selectDeParserForRegEx;
     private final SettingsContainer settingsContainer;
 
     /**
      * Short constructor for UpdateDeParserForRegEx. Inits the expanded constructor.
-     * @param settingsContainer {@link SettingsContainer}
+     * @param settings {@link SettingsContainer}
      * @param buffer {@link StringBuilder}
      */
-    public UpdateDeParserForRegEx(SettingsContainer settingsContainer, StringBuilder buffer) {
-        this(new ExpressionDeParserForRegEx(settingsContainer), new SelectDeParserForRegEx(settingsContainer), buffer, settingsContainer);
+    public UpdateDeParserForRegEx(SettingsContainer settings, StringBuilder buffer) {
+        this(new ExpressionDeParserForRegEx(settings), new SelectDeParserForRegEx(settings), buffer, settings);
     }
 
     /**
@@ -47,18 +47,18 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
      * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
      * @param selectDeParserForRegEx {@link SelectDeParserForRegEx}
      * @param buffer {@link StringBuilder}
-     * @param settingsManager {@link sqltoregex.settings.SettingsManager}
+     * @param settings {@link sqltoregex.settings.SettingsManager}
      */
-    public UpdateDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx, SelectDeParserForRegEx selectDeParserForRegEx, StringBuilder buffer, SettingsContainer settingsManager) {
+    public UpdateDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx, SelectDeParserForRegEx selectDeParserForRegEx, StringBuilder buffer, SettingsContainer settings) {
         super(expressionDeParserForRegEx, buffer);
-        this.settingsContainer = settingsManager;
+        this.settingsContainer = settings;
         this.expressionDeParserForRegEx = expressionDeParserForRegEx;
         this.selectDeParserForRegEx = selectDeParserForRegEx;
-        this.keywordSpellingMistake = settingsManager.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
-        this.columnNameSpellingMistake = settingsManager.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
-        this.tableNameSpellingMistake = settingsManager.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
-        this.columnNameOrderRotation = settingsManager.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
-        this.tableNameOrderRotation = settingsManager.get(OrderRotation.class).get(SettingsOption.TABLENAMEORDER);
+        this.keywordSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
+        this.columnNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
+        this.tableNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
+        this.columnNameOrderRotation = settings.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
+        this.tableNameOrderRotation = settings.get(OrderRotation.class).get(SettingsOption.TABLENAMEORDER);
     }
 
     /**
@@ -115,7 +115,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
             singleSet.append(OPTIONAL_WHITE_SPACE + "\\(?" + OPTIONAL_WHITE_SPACE);
             Iterator<Column> columnIterator = updateSet.getColumns().iterator();
             while(columnIterator.hasNext()){
-                singleSet.append(this.checkOfExistingTableNameAndAlias(columnIterator.next().toString()));
+                singleSet.append(this.checkForExistingTableNameAndAlias(columnIterator.next().toString()));
                 if(columnIterator.hasNext()) singleSet.append(OPTIONAL_WHITE_SPACE + "," + OPTIONAL_WHITE_SPACE);
             }
             singleSet.append(OPTIONAL_WHITE_SPACE + "\\)?" + OPTIONAL_WHITE_SPACE);
@@ -278,7 +278,7 @@ public class UpdateDeParserForRegEx extends UpdateDeParser {
      * @param column to handle column
      * @return generated regex
      */
-    private String checkOfExistingTableNameAndAlias(String column){
+    private String checkForExistingTableNameAndAlias(String column){
         StringBuilder temp = new StringBuilder();
         if(column.contains(".")){
             String tab = column.split("\\.")[0].replaceAll(QUOTATION_MARK_REGEX, "");

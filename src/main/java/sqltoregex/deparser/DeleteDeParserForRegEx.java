@@ -31,28 +31,28 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
 
     /**
      * Short constructor for DeleteDeParserForRegEx.
-     * @param settingsContainer {@link SettingsContainer}
+     * @param settings {@link SettingsContainer}
      */
-    public DeleteDeParserForRegEx(SettingsContainer settingsContainer) {
-        this(settingsContainer, new ExpressionDeParserForRegEx(settingsContainer), new StringBuilder());
+    public DeleteDeParserForRegEx(SettingsContainer settings) {
+        this(settings, new ExpressionDeParserForRegEx(settings), new StringBuilder());
     }
 
     /**
      * Extended constructor for DeleteDeParserForRegEx.
-     * @param settingsContainer {@link SettingsContainer}
-     * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
+     * @param settings {@link SettingsContainer}
+     * @param expressionDeParser {@link ExpressionDeParserForRegEx}
      * @param buffer {@link StringBuilder}
      */
-    public DeleteDeParserForRegEx(SettingsContainer settingsContainer, ExpressionDeParserForRegEx expressionDeParserForRegEx, StringBuilder buffer) {
-        super(expressionDeParserForRegEx, buffer);
-        this.expressionDeParserForRegEx = expressionDeParserForRegEx;
-        this.settingsContainer = settingsContainer;
-        this.keywordSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
-        this.tableNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
-        this.columnNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
-        this.columnNameOrderRotation = settingsContainer.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
-        this.tableNameOrderRotation = settingsContainer.get(OrderRotation.class).get(SettingsOption.TABLENAMEORDER);
-        this.selectDeParserForRegEx = new SelectDeParserForRegEx(settingsContainer);
+    public DeleteDeParserForRegEx(SettingsContainer settings, ExpressionDeParserForRegEx expressionDeParser, StringBuilder buffer) {
+        super(expressionDeParser, buffer);
+        this.expressionDeParserForRegEx = expressionDeParser;
+        this.settingsContainer = settings;
+        this.keywordSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
+        this.tableNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);
+        this.columnNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
+        this.columnNameOrderRotation = settings.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
+        this.tableNameOrderRotation = settings.get(OrderRotation.class).get(SettingsOption.TABLENAMEORDER);
+        this.selectDeParserForRegEx = new SelectDeParserForRegEx(settings);
     }
 
     /**
@@ -225,10 +225,10 @@ public class DeleteDeParserForRegEx extends DeleteDeParser {
 
     /**
      * Set {@link ExpressionDeParserForRegEx}.
-     * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
+     * @param expressionDeParser {@link ExpressionDeParserForRegEx}
      */
-    public void setExpressionDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx) {
-        this.expressionDeParserForRegEx = expressionDeParserForRegEx;
+    public void setExpressionDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser) {
+        this.expressionDeParserForRegEx = expressionDeParser;
     }
 
     /**

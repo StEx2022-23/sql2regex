@@ -14,7 +14,7 @@ import static sqltoregex.deparser.StatementDeParserForRegEx.REQUIRED_WHITE_SPACE
  */
 public class CreateDatabaseDeParserForRegEx {
     private final StringBuilder buffer;
-    SpellingMistake keywordSpellingMistake;
+    private final SpellingMistake keywordSpellingMistake;
 
     /**
      * Short constructor for CreateDatabaseDeParserForRegEx.

@@ -25,6 +25,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static sqltoregex.deparser.StatementDeParserForRegEx.*;
+import static sqltoregex.deparser.StatementDeParserForRegEx.REQUIRED_WHITE_SPACE;
+import static sqltoregex.deparser.StatementDeParserForRegEx.OPTIONAL_WHITE_SPACE;
 
 /**
  * Implements own {@link SelectDeParser} to generate regex.
@@ -44,11 +46,11 @@ public class SelectDeParserForRegEx extends SelectDeParser {
 
     /**
      * Constructor for SelectDeParserForRegEx. Needs a {@link SettingsContainer}.
-     * @param settingsContainer holds all actual settings
+     * @param settings holds all actual settings
      */
-    public SelectDeParserForRegEx(SettingsContainer settingsContainer) {
+    public SelectDeParserForRegEx(SettingsContainer settings) {
         super();
-        this.settingsContainer = settingsContainer;
+        this.settingsContainer = settings;
         this.expressionDeParserForRegEx = new ExpressionDeParserForRegEx(this, buffer, settingsContainer);
         this.keywordSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
         this.columnNameSpellingMistake = settingsContainer.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
