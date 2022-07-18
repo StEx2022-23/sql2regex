@@ -32,9 +32,9 @@ public class InsertDeParserForRegEx extends InsertDeParser {
     private final OrderRotation columnNameOrder;
     private final OrderRotation tableNameOrder;
     private final OrderRotation insertIntoValuesOrder;
-    ExpressionDeParserForRegEx expressionDeParserForRegEx;
-    SelectDeParserForRegEx selectDeParserForRegEx;
-    SettingsContainer settings;
+    private final ExpressionDeParserForRegEx expressionDeParserForRegEx;
+    private final SelectDeParserForRegEx selectDeParserForRegEx;
+    private final SettingsContainer settings;
 
     /**
      * Short constructor for InsertDeParserForRegEx. Init the expanded constructor.
@@ -46,16 +46,16 @@ public class InsertDeParserForRegEx extends InsertDeParser {
 
     /**
      * Extended constructor for InsertDeParserForRegEx.
-     * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
-     * @param selectDeParserForRegEx {@link SelectDeParserForRegEx}
+     * @param expressionDeParser {@link ExpressionDeParserForRegEx}
+     * @param selectDeParserFor {@link SelectDeParserForRegEx}
      * @param buffer {@link StringBuilder}
      * @param settings {@link SettingsContainer}
      */
-    public InsertDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx, SelectDeParserForRegEx selectDeParserForRegEx, StringBuilder buffer, SettingsContainer settings) {
-        super(expressionDeParserForRegEx, selectDeParserForRegEx, buffer);
+    public InsertDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, SelectDeParserForRegEx selectDeParserFor, StringBuilder buffer, SettingsContainer settings) {
+        super(expressionDeParser, selectDeParserFor, buffer);
         this.settings = settings;
-        this.expressionDeParserForRegEx = expressionDeParserForRegEx;
-        this.selectDeParserForRegEx = selectDeParserForRegEx;
+        this.expressionDeParserForRegEx = expressionDeParser;
+        this.selectDeParserForRegEx = selectDeParserFor;
         this.keywordSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
         this.columnNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
         this.tableNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.TABLENAMESPELLING);

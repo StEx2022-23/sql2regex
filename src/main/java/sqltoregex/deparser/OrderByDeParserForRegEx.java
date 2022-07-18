@@ -38,14 +38,14 @@ public class OrderByDeParserForRegEx extends OrderByDeParser {
 
     /**
      * Extended constructor for OrderByDeParserForRegEx.
-     * @param expressionDeParserForRegEx {@link ExpressionDeParserForRegEx}
+     * @param expressionDeParser {@link ExpressionDeParserForRegEx}
      * @param buffer {@link StringBuilder}
      * @param settings {@link SettingsContainer}
      */
-    public OrderByDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParserForRegEx, StringBuilder buffer,
+    public OrderByDeParserForRegEx(ExpressionDeParserForRegEx expressionDeParser, StringBuilder buffer,
                                    SettingsContainer settings) {
-        super(expressionDeParserForRegEx, buffer);
-        this.expressionDeParserForRegEx = expressionDeParserForRegEx;
+        super(expressionDeParser, buffer);
+        this.expressionDeParserForRegEx = expressionDeParser;
         this.columnNameSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.COLUMNNAMESPELLING);
         this.keywordSpellingMistake = settings.get(SpellingMistake.class).get(SettingsOption.KEYWORDSPELLING);
         this.columnNameOrder = settings.get(OrderRotation.class).get(SettingsOption.COLUMNNAMEORDER);
