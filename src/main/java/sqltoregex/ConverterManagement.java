@@ -217,6 +217,6 @@ public class ConverterManagement {
      * @return is create database (true) or not (false)
      */
     private boolean isCreateDatabase(String sqlStatement) {
-        return sqlStatement.contains("CREATE") && sqlStatement.contains("DATABASE");
+        return sqlStatement.toUpperCase().contains("CREATE") && sqlStatement.toUpperCase().contains("DATABASE");
     }
 }

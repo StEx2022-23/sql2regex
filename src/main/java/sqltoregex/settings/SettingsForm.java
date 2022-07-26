@@ -13,6 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * SettingsForm is the connection between front- and backend. In this class is the sent form data's stored.
@@ -130,13 +132,6 @@ public class SettingsForm {
         Collection<String> extractedStatementCollection = ConverterManagement.extractStatements(this.sql);
         for(String str : extractedStatementCollection) {validationStep(str, statementsValidMap);}
 
-        if(statementsValidMap.size() == extractedStatementCollection.size()) return true;
-
-        for(Map.Entry<String, Boolean> entry : statementsValidMap.entrySet()){
-            if (entry.getValue().equals(Boolean.FALSE)){
-                statementsValidMap.put(entry.getKey(), entry.getKey().contains("CREATE") && entry.getKey().contains("DATABASE"));
-            }
-        }
         return statementsValidMap.size() == extractedStatementCollection.size();
     }
 
@@ -160,6 +155,13 @@ public class SettingsForm {
         for(Validation validation : validationList){
             List<ValidationError> validationErrors = validation.validate();
             if (!validationErrors.isEmpty()) {
+                Pattern pattern = Pattern.compile("CREATE DATABASE [`´'\"]?(\\w*)[`´'\"]?( .*)*", Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(str);
+                if (matcher.matches()){
+                    statementsValidMap.put(str, true);
+                    return;
+                }
+
                 for (ValidationError va : validationErrors) {
                     Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
                     logger.log(Level.WARNING, "Error while validating the statement: {0}", va);

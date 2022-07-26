@@ -41,7 +41,7 @@ public class CreateDatabaseDeParserForRegEx {
      * @return generated regex
      */
     public String deParse(String createDatabase){
-        Pattern pattern = Pattern.compile("CREATE DATABASE [`´'\"]?(\\w*)[`´'\"]?( .*)*");
+        Pattern pattern = Pattern.compile("CREATE DATABASE [`´'\"]?(\\w*)[`´'\"]?( .*)*", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(createDatabase);
         StringBuilder databasename = new StringBuilder();
         StringBuilder statementAfterDatabaseName = new StringBuilder();
