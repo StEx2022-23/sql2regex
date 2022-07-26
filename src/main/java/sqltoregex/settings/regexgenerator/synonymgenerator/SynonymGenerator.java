@@ -30,7 +30,6 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
     public static final long DEFAULT_WEIGHT = 1L;
     //due to: Edges undirected (synonyms apply in both directions); Self-loops: no; Multiple edges: no; weighted: yes
     protected SimpleWeightedGraph<A, DefaultWeightedEdge> synonymsGraph;
-    protected boolean graphForSynonymsOfTwoWords = false;
     private String prefix = "";
     private String suffix = "";
 
@@ -119,7 +118,6 @@ public abstract class SynonymGenerator<A, S> extends RegExGenerator<S> {
      * @return boolean for add operation success
      */
     public boolean addSynonymFor(A syn, A synFor, Long weight) {
-        this.graphForSynonymsOfTwoWords = true;
         boolean addResult = false;
         if (!synonymsGraph.containsVertex(syn)) {
             addResult = synonymsGraph.addVertex(this.prepareSynonymForAdd(syn));
