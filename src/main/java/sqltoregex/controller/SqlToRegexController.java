@@ -204,14 +204,14 @@ public class SqlToRegexController {
     }
 
     /**
-     * Prepares and returns the impressum page when requesting "/impressum".
+     * Prepares and returns the legal notice page when requesting "/legal".
      * @param model Model, autowired, no action required.
-     * @return impressum page
+     * @return legal notice page
      */
-    @GetMapping("/impressum")
-    public String impressum(Model model) {
-        model.addAttribute(TITLE, "sql2regex - impressum");
-        return "impressum";
+    @GetMapping("/legal")
+    public String legal(Model model) {
+        model.addAttribute(TITLE, "sql2regex - legal notice");
+        return "legalNotice";
     }
 
     /**
