@@ -19,10 +19,7 @@ function topFunction() {
 
 function handleAlerts(id){
     if(document.getElementById(id) !== null && !document.getElementById(id).classList.contains("show")){
-        new bootstrap.Collapse(document.getElementById(id));
-        setTimeout(function(){
-            new bootstrap.Collapse(document.getElementById(id));
-        }, 5000);
+        new bootstrap.Toast(document.getElementById(id)).show()
     }
 }
 
@@ -30,9 +27,10 @@ function copy2clipbord(id, showAlert) {
     let copyText = document.getElementById(id);
 
     navigator.clipboard.writeText(copyText.value).then(function() {
-        if(showAlert === true) handleAlerts("alert-success-copy");
+        if(showAlert === true) new bootstrap.Toast(document.getElementById("alert-success-copy")).show()
     }, function() {
-        if(showAlert === true) handleAlerts("alert-success-copy");
+        if(showAlert === true)
+            new bootstrap.Toast(document.getElementById("alert-warning-copy")).show()
     }).catch(function () {
         let copyElement = document.createElement("input");
         copyElement.setAttribute("value", copyText.value);
@@ -335,6 +333,7 @@ class SqlRegExHistory {
             this.sql = [];
             this.regex = [];
             this.writeToLocalStorage(this);
+            new bootstrap.Toast(document.getElementById("clear-local-storage-success"))
         } catch (e) {
             console.log(e);
             handleAlerts("clear-local-storage-warning");
@@ -364,10 +363,10 @@ class SqlRegExHistory {
             document.body.appendChild(element);
             element.click();
             document.body.removeChild(element);
-            handleAlerts("json-history-success-export");
+            handleAlerts("json-success-export");
         } catch (e) {
             console.log(e);
-            handleAlerts("json-history-warning-export");
+            handleAlerts("json-warning-export");
         }
 
     }

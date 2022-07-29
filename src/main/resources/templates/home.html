@@ -20,36 +20,97 @@
                 </div>
             </div>
         </div>
+        <div class="toast-container position-fixed m-3 top-0 end-0" style="z-index:1100">
+            <div th:replace="assets/toastTemplate :: toastTemplate (
+                id='toast-loaded-user-settings',
+                title=#{toast.information},
+                subTitle=#{toast.localStorage},
+                text=#{toast.userSettingsLoaded},
+                color='#a3be8c',
+                isPermanent=false,
+                delay=8000
+            )"></div>
 
-        <div lang="en" th:replace="assets/toastTemplate :: toastTemplate (
-            id='toast-loaded-user-settings',
-            title=#{toast.information},
-            subTitle=#{toast.localStorage},
-            text=#{toast.userSettingsLoaded},
-            color='#a3be8c',
-            isPermanent=false,
-            delay=8000
-        )"></div>
+            <div th:replace="assets/toastTemplate :: toastTemplate (
+                id='toast-date-and-time-value',
+                title=#{toast.information},
+                subTitle=#{toast.processing},
+                text=#{toast.dateAndTimeValue(#{settingsform.convertingHints}, 'convertingHints')},
+                color='#a3be8c',
+                isPermanent=false,
+                delay=8000
+            )"></div>
 
-        <div lang="en" th:replace="assets/toastTemplate :: toastTemplate (
-            id='toast-date-and-time-value',
-            title=#{toast.information},
-            subTitle=#{toast.processing},
-            text=#{toast.dateAndTimeValue(#{settingsform.convertingHints}, 'convertingHints')},
-            color='#a3be8c',
-            isPermanent=false,
-            delay=8000
-        )"></div>
+            <div th:replace="assets/toastTemplate :: toastTemplate (
+                id='toast-too-long-url-for-visualization',
+                title=#{toast.notAvailable},
+                subTitle=#{toast.visualization},
+                text=#{toast.oneClickVisualization},
+                color='darkred',
+                isPermanent=true,
+                delay=0
+            )"></div>
 
-        <div lang="en" th:replace="assets/toastTemplate :: toastTemplate (
-            id='toast-too-long-url-for-visualization',
-            title=#{toast.notAvailable},
-            subTitle=#{toast.visualization},
-            text=#{toast.oneClickVisualization},
-            color='darkred',
-            isPermanent=true,
-            delay=0
-        )"></div>
+            <div th:replace="assets/toastTemplate :: toastTemplate (
+                id='alert-success-copy',
+                title=#{toast.information},
+                subTitle=#{success},
+                text=#{copyAlertSuccess},
+                color='#a3be8c',
+                isPermanent=false,
+                delay=5000
+            )"></div>
+
+            <div th:replace="assets/toastTemplate :: toastTemplate (
+                id='alert-warning-copy',
+                title=#{warning},
+                subTitle=#{toast.processing},
+                text=#{defaultWarning},
+                color='darkred',
+                isPermanent=true,
+                delay=0
+            )"></div>
+
+            <div th:replace="assets/toastTemplate :: toastTemplate (
+                id='json-success-export',
+                title=#{toast.information},
+                subTitle=#{success},
+                text=#{jsonAlertSuccess},
+                color='#a3be8c',
+                isPermanent=false,
+                delay=5000
+            )"></div>
+
+            <div th:replace="assets/toastTemplate :: toastTemplate (
+                id='json-warning-export',
+                title=#{warning},
+                subTitle=#{toast.processing},
+                text=#{defaultWarning},
+                color='darkred',
+                isPermanent=true,
+                delay=0
+            )"></div>
+
+            <div th:replace="assets/toastTemplate :: toastTemplate (
+                id='clear-local-storage-success',
+                title=#{toast.information},
+                subTitle=#{toast.localStorage},
+                text=#{localStorageSuccess},
+                color='darkred',
+                isPermanent=true,
+                delay=0
+            )"></div>
+
+            <div th:replace="assets/toastTemplate :: toastTemplate (
+                id='clear-local-storage-warning',
+                title=#{warning},
+                subTitle=#{toast.localStorage},
+                text=#{defaultWarning},
+                color='darkred',
+                isPermanent=true,
+                delay=0
+            )"></div>
+        </div>
 
         <div class="container mt-3">
             <div class="card">
@@ -67,34 +128,6 @@
                             no buttons inserted
                         </div>
                     </div>
-
-                    <div lang="en" th:replace="assets/alertTemplate :: alertTemplate (
-                        id='alert-success-copy',
-                        boldText=#{success},
-                        lightText=#{copyAlertSuccess},
-                        type='success'
-                    )"></div>
-
-                    <div lang="en" th:replace="assets/alertTemplate :: alertTemplate (
-                        id='alert-warning-copy',
-                        boldText=#{warning},
-                        lightText=#{copyAlertWarning},
-                        type='warning'
-                    )"></div>
-
-                    <div lang="en" th:replace="assets/alertTemplate :: alertTemplate (
-                        id='json-success-export',
-                        boldText=#{success},
-                        lightText=#{jsonAlertSuccess},
-                        type='success'
-                    )"></div>
-
-                    <div lang="en" th:replace="assets/alertTemplate :: alertTemplate (
-                        id='json-warning-export',
-                        boldText=#{warning},
-                        lightText=#{jsonAlertWarning},
-                        type='warning'
-                    )"></div>
                 </div>
             </div>
         </div>
@@ -125,28 +158,6 @@
                             <span th:text="#{convertingHistory.clear}">clear local storage</span>
                         </button>
                     </div>
-
-                    <div lang="en" th:replace="assets/alertTemplate :: alertTemplate (
-                        id='json-history-success-export',
-                        boldText=#{success},
-                        lightText=#{jsonAlertSuccess},
-                        type='success'
-                    )"></div>
-
-                    <div lang="en" th:replace="assets/alertTemplate :: alertTemplate (
-                        id='json-history-warning-export',
-                        boldText=#{warning},
-                        lightText=#{jsonAlertWarning},
-                        type='warning'
-                    )"></div>
-
-                    <div lang="en" th:replace="assets/alertTemplate :: alertTemplate (
-                        id='clear-local-storage-warning',
-                        boldText=#{warning},
-                        lightText=#{localStorageWarning},
-                        type='warning'
-                    )"></div>
-
                 </div>
             </div>
         </div>
