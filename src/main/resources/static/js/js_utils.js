@@ -566,9 +566,8 @@ function handleDateValue(sqlInputEl) {
 
     const selectEl = document.getElementById("dateAndTimeSelect")
 
-    if (matches.length > 0){
-        selectEl.innerHTML = "";
-    }
+    selectEl.innerHTML = "";
+
 
     matches.forEach(singleMatch => {
         selectEl.appendChild(renderOption(singleMatch))
