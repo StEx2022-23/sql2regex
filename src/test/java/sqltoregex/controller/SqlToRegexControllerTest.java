@@ -81,7 +81,7 @@ class SqlToRegexControllerTest {
 
     @Test
     void testImpressumSite() throws Exception {
-        mvc.perform(get("/impressum").contentType(MediaType.TEXT_HTML)).andExpect(status().isOk());
+        mvc.perform(get("/legal").contentType(MediaType.TEXT_HTML)).andExpect(status().isOk());
     }
 
     @Test
