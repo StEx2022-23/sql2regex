@@ -155,7 +155,7 @@ public class SettingsForm {
         for(Validation validation : validationList){
             List<ValidationError> validationErrors = validation.validate();
             if (!validationErrors.isEmpty()) {
-                Pattern pattern = Pattern.compile("CREATE DATABASE [`´'\"]?(\\w*)[`´'\"]?( .*)*", Pattern.CASE_INSENSITIVE);
+                Pattern pattern = Pattern.compile("CREATE DATABASE [`´'\"]?(\\w*)[`´'\"]? .{0,255}", Pattern.CASE_INSENSITIVE);
                 Matcher matcher = pattern.matcher(str);
                 if (matcher.matches()){
                     statementsValidMap.put(str, true);
