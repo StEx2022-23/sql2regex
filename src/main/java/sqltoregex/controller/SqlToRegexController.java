@@ -224,7 +224,8 @@ public class SqlToRegexController {
      */
     @GetMapping("/howto")
     public String howTo(Model model) {
-        model.addAttribute(TITLE, "sql2regex - how To");
+        model.addAttribute(TITLE, "sql2regex - How-To");
+        model.addAttribute("activeHowTo", true);
         return "howTo";
     }
 
