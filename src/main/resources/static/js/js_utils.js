@@ -466,12 +466,8 @@ function setCheckboxState(checkbox, state){
 }
 
 function slaveSelectionState(checkboxDict, groupName){
-    console.log(checkboxDict);
-    console.log(groupName);
     const elOfNameOfEvent = Object.entries(checkboxDict).filter(([k,_v]) => k.includes(groupName) && !k.includes("master"))
     const elListOfActivated = elOfNameOfEvent.filter(([k,v]) => v === true && !k.includes("master"))
-    console.log(elOfNameOfEvent);
-    console.log(elListOfActivated);
     if (elOfNameOfEvent.length === elListOfActivated.length){
         //all elements are activated
         return 2
