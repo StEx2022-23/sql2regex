@@ -26,6 +26,9 @@ public class ResourceConfig implements WebMvcConfigurer {
             registry.addResourceHandler("/robots.txt")
                     .addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS)
                     .setCachePeriod(3000);
+            registry.addResourceHandler("/vids/**")
+                    .addResourceLocations("file:/static/vids/")
+                    .setCachePeriod(3000);
         }
     }
 }
