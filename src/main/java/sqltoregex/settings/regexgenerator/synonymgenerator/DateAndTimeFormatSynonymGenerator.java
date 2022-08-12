@@ -10,7 +10,6 @@ import sqltoregex.settings.SettingsOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * SynonymGenerator for dateformats, timeformats and datetimeformats. Needs SimpleDateFormat and Expression as type.
