@@ -21,7 +21,6 @@ import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerato
 import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
 import javax.validation.Valid;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
