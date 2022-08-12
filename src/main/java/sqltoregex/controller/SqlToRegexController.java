@@ -204,6 +204,17 @@ public class SqlToRegexController {
     }
 
     /**
+     * Prepares and returns the landing page when requesting "/".
+     * @param model Model, autowired, no action required.
+     * @return landing page
+     */
+    @GetMapping("/howto")
+    public String howTo(Model model) {
+        model.addAttribute(TITLE, "sql2regex - how To");
+        return "howTo";
+    }
+
+    /**
      * Prepares and returns the legal notice page when requesting "/legal".
      * @param model Model, autowired, no action required.
      * @return legal notice page
