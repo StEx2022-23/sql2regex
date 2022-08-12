@@ -10,10 +10,8 @@ import sqltoregex.settings.SettingsOption;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * SynonymGenerator for dateformats, timeformats and datetimeformats. Needs SimpleDateFormat and Expression as type.
@@ -71,8 +69,9 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
         }
 
         String stringToCheck = DateAndTimeFormatSynonymGenerator.expressionToString(expr);
+        List<SimpleDateFormat> sortedFormats = this.synonymsGraph.vertexSet().stream().sorted((v1, v2) -> v2.toPattern().length() - v1.toPattern().length()).collect(Collectors.toList());
 
-        for (SimpleDateFormat vertexSyn : this.synonymsGraph.vertexSet()) {
+        for (SimpleDateFormat vertexSyn : sortedFormats) {
             try {
                 vertexSyn.parse(stringToCheck);
                 return vertexSyn;
@@ -96,17 +95,13 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
         Assert.notNull(syn, "Format must not be null");
         Assert.notNull(expr, SYNONYM_MUST_NOT_BE_NULL);
 
-        Date date;
-        //O(n^2) is okay, cause elements will be <<100 for dateFormats
-        for (DateFormat vertexSyn : this.synonymsGraph.vertexSet()) {
-            try {
-                date = vertexSyn.parse(DateAndTimeFormatSynonymGenerator.expressionToString(expr));
-                return syn.format(date);
-            } catch (ParseException e) {
-                //continue to search for other possible patterns without throwing error.
-            }
+        try {
+            //O(n^2) is okay, cause elements will be <<100 for dateFormats
+            Date date = this.prepareSynonymForSearch(expr).parse(DateAndTimeFormatSynonymGenerator.expressionToString(expr));
+            return syn.format(date);
+        } catch (ParseException e) {
+            throw new UnsupportedOperationException("prepareVertexForRegEx called outside of SynonymGenerator.generateAsList()");
         }
-        throw new NoSuchElementException("There are no synonym formats for the entered date format");
     }
 
     /**

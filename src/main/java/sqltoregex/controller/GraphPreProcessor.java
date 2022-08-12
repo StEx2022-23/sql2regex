@@ -7,6 +7,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * They prepare graphs for displaying on the frontend.
@@ -28,7 +31,7 @@ public class GraphPreProcessor {
      * @return set of synonyms
      */
     static <T> Set<T> getSynonymSet(Graph<T, DefaultWeightedEdge> graph) {
-        return new LinkedHashSet<>(graph.vertexSet());
+        return graph.vertexSet();
     }
 
     /**
@@ -107,5 +110,24 @@ public class GraphPreProcessor {
             logger.log(Level.WARNING, COULD_NOT_CAST, e);
             return Collections.emptyMap();
         }
+    }
+
+    static <T> LinkedHashSet<T> sortSet(Set<T> unsortedSet){
+        if (!unsortedSet.isEmpty() && unsortedSet.toArray()[0] instanceof SimpleDateFormat){
+            return new LinkedHashSet<T>(unsortedSet.stream().collect(Collectors.groupingBy(el -> {
+                String patternString = ((SimpleDateFormat) el).toPattern();
+                Pattern pattern = Pattern.compile("[^a-zA-Z]");
+                Matcher matcher = pattern.matcher(patternString);
+
+                if (matcher.find()) {
+                    return patternString.charAt(matcher.start()) + "";
+                } else {
+                    return " ";
+                }
+            })).values().stream().flatMap(List::stream).collect(Collectors.toList()));
+        }else{
+            return new LinkedHashSet<T>(unsortedSet.stream().sorted((v1, v2) -> v2.toString().length() - v1.toString().length()).collect(Collectors.toList()));
+        }
+
     }
 }

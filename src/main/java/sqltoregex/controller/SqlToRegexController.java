@@ -21,7 +21,11 @@ import sqltoregex.settings.regexgenerator.synonymgenerator.StringSynonymGenerato
 import sqltoregex.settings.regexgenerator.synonymgenerator.SynonymGenerator;
 
 import javax.validation.Valid;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Provides frontend pages for this application.
@@ -65,9 +69,19 @@ public class SqlToRegexController {
     private SettingsForm addSettingsFormFields(Model model) {
         model.addAttribute("spellings", settingsManager.getSettingByClass(SpellingMistake.class, SettingsType.ALL));
         model.addAttribute("orders", settingsManager.getSettingByClass(OrderRotation.class, SettingsType.ALL));
-        model.addAttribute("dateFormats",
-                           getSynonymSetOf(DateAndTimeFormatSynonymGenerator.class, SettingsOption.DATESYNONYMS,
-                                           SettingsType.ALL));
+        //Grouping all elements by the delimiter of the parts of the format for frontend convenience
+        model.addAttribute("dateFormats",getSynonymSetOf(DateAndTimeFormatSynonymGenerator.class, SettingsOption.DATESYNONYMS,
+                                                         SettingsType.ALL).stream().collect(Collectors.groupingBy(el -> {
+            String patternString = ((SimpleDateFormat) el).toPattern();
+            Pattern pattern = Pattern.compile("[^a-zA-Z]");
+            Matcher matcher = pattern.matcher(patternString);
+
+            if (matcher.find()) {
+                return patternString.charAt(matcher.start());
+            } else {
+                return " ";
+            }
+        })));
         model.addAttribute("timeFormats",
                            getSynonymSetOf(DateAndTimeFormatSynonymGenerator.class, SettingsOption.TIMESYNONYMS,
                                            SettingsType.ALL));
@@ -186,7 +200,7 @@ public class SqlToRegexController {
     private <T, S> Set<T> getSynonymSetOf(Class<? extends SynonymGenerator<T, S>> clazz,
                                           SettingsOption settingsOption, SettingsType settingsType) {
         return settingsManager.getSettingBySettingsOption(settingsOption, clazz, settingsType)
-                .map(generator -> GraphPreProcessor.getSynonymSet(generator.getGraph()))
+                .map(generator -> GraphPreProcessor.sortSet(GraphPreProcessor.getSynonymSet(generator.getGraph())))
                 .orElse(new LinkedHashSet<>());
     }
 
