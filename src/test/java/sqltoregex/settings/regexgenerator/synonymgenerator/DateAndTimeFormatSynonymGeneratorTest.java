@@ -102,4 +102,21 @@ class DateAndTimeFormatSynonymGeneratorTest {
         regex = DateAndTimeFormatSynonymGenerator.useOrDefault(null, new DateValue("'2022-05-03'"));
         Assertions.assertEquals("2022-05-03", regex);
     }
+
+    @Test
+    void useMostDescriptiveFormatFirst(){
+        DateAndTimeFormatSynonymGenerator timeFormatSynonymGenerator = new DateAndTimeFormatSynonymGenerator(
+                SettingsOption.DEFAULT);
+        SimpleDateFormat format1 = new SimpleDateFormat("ss");
+        SimpleDateFormat format2 = new SimpleDateFormat("mm/ss");
+        SimpleDateFormat format3 = new SimpleDateFormat("HH:mm:ss");
+
+        timeFormatSynonymGenerator.addSynonym(format1);
+        timeFormatSynonymGenerator.addSynonym(format2);
+        timeFormatSynonymGenerator.addSynonym(format3);
+        String regex = DateAndTimeFormatSynonymGenerator.useOrDefault(timeFormatSynonymGenerator,
+                                                                      new TimeValue("'15:35:50'"));
+        Assertions.assertTrue(regex.contains("15:35:50"), "Must contain the full time");
+        Assertions.assertFalse(regex.contains("15:35:00"), "Is not allowed to cut the time");
+    }
 }
