@@ -15,12 +15,16 @@
                     <div class="accordion" id="howToAccordion">
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headingOne">
-                                <button class="accordion-button collapsed fs-3 text-break" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne" th:utext="#{howTo.introduction}"></button>
+                                <button class="accordion-button fs-3 text-break" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" th:utext="#{howTo.introduction}"></button>
                             </h2>
-                            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#howToAccordion">
-                                <video class="w-100" controls controlsList="nodownload">
-                                    <source src="/vids/part1.webm" type="video/webm">
-                                </video>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#howToAccordion">
+                                <figure class="figure">
+                                    <video class="w-100" controls controlsList="nodownload">
+                                        <source src="/vids/part1.webm" type="video/webm">
+                                        <p th:utext="#{howTo.video1error}"></p>
+                                    </video>
+                                    <figcaption class="figure-caption text-end mx-2 mt-1" th:utext="#{howTo.cap1}">Caption1</figcaption>
+                                </figure>
                             </div>
                         </div>
                         <div class="accordion-item">
@@ -28,9 +32,13 @@
                                 <button class="accordion-button collapsed fs-3 text-break" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" th:utext="#{howTo.eAssessment}"></button>
                             </h2>
                             <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#howToAccordion">
-                                <video class="w-100" controls controlsList="nodownload">
-                                    <source src="/vids/part2.webm" type="video/webm">
-                                </video>
+                                <figure class="figure">
+                                    <video class="w-100" controls controlsList="nodownload">
+                                        <source src="/vids/part2.webm" type="video/webm">
+                                        <p th:utext="#{howTo.video2error}"></p>
+                                    </video>
+                                    <figcaption class="figure-caption text-end mx-2 mt-1" th:utext="#{howTo.cap2}">Caption2</figcaption>
+                                </figure>
                             </div>
                         </div>
                         <div class="accordion-item">
@@ -38,9 +46,13 @@
                                 <button class="accordion-button collapsed fs-3 text-break" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree" th:utext="#{howTo.specialHints}"></button>
                             </h2>
                             <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#howToAccordion">
-                                <video class="w-100" controls controlsList="nodownload">
-                                    <source src="/vids/part2.webm" type="video/webm">
-                                </video>
+                                <figure class="figure">
+                                    <video class="w-100" controls controlsList="nodownload">
+                                        <source src="/vids/part2.webm" type="video/webm">
+                                        <p th:utext="#{howTo.video3error}"></p>
+                                    </video>
+                                    <figcaption class="figure-caption text-end mx-2 mt-1" th:utext="#{howTo.cap3}">Caption3</figcaption>
+                                </figure>
                             </div>
                         </div>
                     </div>
