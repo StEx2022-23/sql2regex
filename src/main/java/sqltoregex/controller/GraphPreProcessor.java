@@ -114,7 +114,7 @@ public class GraphPreProcessor {
 
     static <T> LinkedHashSet<T> sortSet(Set<T> unsortedSet){
         if (!unsortedSet.isEmpty() && unsortedSet.toArray()[0] instanceof SimpleDateFormat){
-            return new LinkedHashSet<T>(unsortedSet.stream().collect(Collectors.groupingBy(el -> {
+            return new LinkedHashSet<>(unsortedSet.stream().collect(Collectors.groupingBy(el -> {
                 String patternString = ((SimpleDateFormat) el).toPattern();
                 Pattern pattern = Pattern.compile("[^a-zA-Z]");
                 Matcher matcher = pattern.matcher(patternString);
@@ -124,9 +124,9 @@ public class GraphPreProcessor {
                 } else {
                     return " ";
                 }
-            })).values().stream().flatMap(List::stream).collect(Collectors.toList()));
+            })).values().stream().flatMap(List::stream).toList());
         }else{
-            return new LinkedHashSet<T>(unsortedSet.stream().sorted((v1, v2) -> v2.toString().length() - v1.toString().length()).collect(Collectors.toList()));
+            return new LinkedHashSet<>(unsortedSet.stream().sorted((v1, v2) -> v2.toString().length() - v1.toString().length()).toList());
         }
 
     }

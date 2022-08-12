@@ -7,7 +7,6 @@ import net.sf.jsqlparser.expression.TimestampValue;
 import org.springframework.util.Assert;
 import sqltoregex.settings.SettingsOption;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -69,7 +68,7 @@ public class DateAndTimeFormatSynonymGenerator extends SynonymGenerator<SimpleDa
         }
 
         String stringToCheck = DateAndTimeFormatSynonymGenerator.expressionToString(expr);
-        List<SimpleDateFormat> sortedFormats = this.synonymsGraph.vertexSet().stream().sorted((v1, v2) -> v2.toPattern().length() - v1.toPattern().length()).collect(Collectors.toList());
+        List<SimpleDateFormat> sortedFormats = this.synonymsGraph.vertexSet().stream().sorted((v1, v2) -> v2.toPattern().length() - v1.toPattern().length()).toList();
 
         for (SimpleDateFormat vertexSyn : sortedFormats) {
             try {

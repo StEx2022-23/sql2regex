@@ -72,7 +72,7 @@ public class SqlToRegexController {
         //Grouping all elements by the delimiter of the parts of the format for frontend convenience
         model.addAttribute("dateFormats",getSynonymSetOf(DateAndTimeFormatSynonymGenerator.class, SettingsOption.DATESYNONYMS,
                                                          SettingsType.ALL).stream().collect(Collectors.groupingBy(el -> {
-            String patternString = ((SimpleDateFormat) el).toPattern();
+            String patternString = el.toPattern();
             Pattern pattern = Pattern.compile("[^a-zA-Z]");
             Matcher matcher = pattern.matcher(patternString);
 
