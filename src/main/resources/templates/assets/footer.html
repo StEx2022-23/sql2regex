@@ -16,10 +16,10 @@
         </p>
       </div>
       <div class="col-md-3 text-center m-auto">
-          <img th:src="@{/img/logo_sql2regex_large.svg}" onclick="location.href='/'" class="rounded d-block mx-auto mt-2 mb-2 w-75 p-3"  alt="Logo">
+          <img th:src="@{/img/logo_sql2regex_large.svg}" onclick="location.href='/?'+location.href.split('?')[1]" class="rounded d-block mx-auto mt-2 mb-2 w-100 p-3"  alt="Logo - SQL to RegEx">
       </div>
       <div class="col-md-3 text-center m-auto">
-        <img th:src="@{/img/oer.png}" class="rounded d-block mx-auto mt-2 mb-2 w-75 p-3"  alt="Logo">
+        <img th:src="@{/img/oer.png}" onclick="location.href='https://open-educational-resources.de/'" class="rounded d-block mx-auto mt-2 mb-2 w-75 p-3"  alt="Logo - Open Educational Resources">
       </div>
       <div class="col-md-3 text-center m-auto">
         <a href="legal" class="link-light fw-bolder text-decoration-none" th:text="#{footer.impressum}">impressum</a> <br>
