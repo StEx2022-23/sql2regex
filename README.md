@@ -51,16 +51,22 @@ compile changes on runtime:
 The current javadoc is available here: https://stex2022-23.github.io/index.html
 
 ### top-level-architecture
-coming soon
+<div align="center">
+  <img src="https://raw.githubusercontent.com/StEx2022-23/sql2regex/main/documentation/uml/Top-Level-Architecture.jpg"></img>
+</div>
 
 ## contributers
 - Patrick Binkert, Technische Universität Dresden, student of teaching, 10th semester (physics and computer science)
 - Maximilian Förster, Technische Universität Dresden, student of teaching, 10th semester (physics and computer science)
 
-<br> 
+<div align="center">
+
+  [![Open Source Love](https://badges.frapsoft.com/os/v3/open-source-175x29.png?v=103)](https://github.com/ellerbrock/open-source-badges/)
+
+</div>
 
 <div align="center">
-  
-  [![Open Source Love](https://badges.frapsoft.com/os/v3/open-source-175x29.png?v=103)](https://github.com/ellerbrock/open-source-badges/)
+
+  <img style='width: 300px' src="src/main/resources/static/img/oer.png" alt="OER"/></img>
 
 </div>
