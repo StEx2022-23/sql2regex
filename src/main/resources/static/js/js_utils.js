@@ -647,7 +647,7 @@ document.onreadystatechange = function () {
             document.addEventListener("submit",  (e) => {
                 const sqlInputEl = document.getElementById("sqlinput")
                 const selectEl = document.getElementById("dateAndTimeSelect")
-                cacheInput = sqlInputEl.value;
+                cachedOriginalInput = sqlInputEl.value;
                 performDateAndTimeConversion(sqlInputEl, selectEl)
                 const form = e.target;
                 form.parentNode.parentNode.style.minHeight = form.clientHeight
@@ -666,7 +666,7 @@ document.onreadystatechange = function () {
                     .then(() => SqlRegExHis.checkUpdatedConverting())
                     .then(() => copy2clipbord("regexoutput", false))
                     .then(() => scrollToInValidInput(document.getElementById("isInValid")))
-                    .then(() => document.getElementById("sqlinput").value = cacheInput)
+                    .then(() => document.getElementById("sqlinput").value = cachedOriginalInput)
                     .then(() => handleDateValue(sqlInputEl));
                 e.preventDefault();
                 form.parentNode.parentNode.style.removeProperty("minHeight");
