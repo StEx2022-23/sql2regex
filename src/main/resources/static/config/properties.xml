@@ -81,12 +81,36 @@
           <value>H:m:s</value>
           <value>H/m/s</value>
           <value>H|m|s</value>
+          <value>HH:mm</value>
+          <value>HH/mm</value>
+          <value>HH|mm</value>
+          <value>HH-mm</value>
+          <value>H:m</value>
+          <value>H/m</value>
+          <value>H|m</value>
       </timesynonyms>
       <datetimesynonyms>
           <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
           <value>yyyy-MM-dd hh:mm:ss</value>
+          <value>yyyy.MM.dd hh:mm:ss</value>
+          <value>yyyy|MM|dd hh|mm|ss</value>
+          <value>yyyy/MM/dd hh/mm/ss</value>
           <value>yy-MM-dd hh:mm:ss</value>
+          <value>yy.MM.dd hh:mm:ss</value>
+          <value>yy|MM|dd hh|mm|ss</value>
+          <value>yy/MM/dd hh/mm/ss</value>
           <value>yyyy-MM-dd'T'hh:mm:ss</value>
+          <value>yyyy.MM.dd'T'hh:mm:ss</value>
+          <value>yyyy|MM|dd'T'hh|mm|ss</value>
+          <value>yyyy/MM/dd'T'hh/mm/ss</value>
+          <value>yy-M-d h:m:s</value>
+          <value>yy.M.d h:m:s</value>
+          <value>yy|M|d h|m|s</value>
+          <value>yy/M/d h/m/s</value>
+          <value>yy-M-d'T'h:m:s</value>
+          <value>yy.M.d'T'h:m:s</value>
+          <value>yy|M|d'T'h|m|s</value>
+          <value>yy/M/d'T'h/m/s</value>
       </datetimesynonyms>
       <aggregatefunctionlang>
           <settingstype>ALL;DEFAULT_SCHOOL</settingstype>

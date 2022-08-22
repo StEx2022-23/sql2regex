@@ -85,13 +85,14 @@
                             </div>
                         </div>
                     </div>
+
                     <hr>
                     <div class="row">
                         <div class="col-sm"
                              th:each="setting : ${timeFormats}">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'dateAndTime_' + ${setting.toPattern()}" th:value="${setting.toPattern()}" th:name="timeFormats" th:checked="${settingsForm.timeFormats.contains(setting)}">
-                                <label class="form-check-label" th:for="'timeFormats_' + ${setting.toPattern()}" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
+                                <label class="form-check-label" style="min-width: 100px" th:for="'timeFormats_' + ${setting.toPattern()}" th:text="${setting.toPattern()}">Enable format: "hh:MM:ss"</label>
                             </div>
                         </div>
                     </div>
@@ -101,7 +102,7 @@
                              th:each="setting : ${dateTimeFormats}">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" onchange="updateSingleUserSetting(this, document.getElementById('converterForm'))" th:id="'dateAndTime_' + ${setting.toPattern()}" th:value="${setting.toPattern()}" th:name="dateTimeFormats" th:checked="${settingsForm.dateTimeFormats.contains(setting)}">
-                                <label class="form-check-label" th:for="'dateTimeFormats_' + ${setting.toPattern()}" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
+                                <label class="form-check-label" style="min-width: 200px" th:for="'dateTimeFormats_' + ${setting.toPattern()}" th:text="${setting.toPattern()}">Enable format: "yyyy-MM-dd"</label>
                             </div>
                         </div>
                     </div>
