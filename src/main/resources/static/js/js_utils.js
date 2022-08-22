@@ -561,9 +561,7 @@ function handleDateValue(sqlInputEl) {
     }
 
     const selectEl = document.getElementById("dateAndTimeSelect")
-
     selectEl.innerHTML = "";
-
 
     matches.forEach(singleMatch => {
         selectEl.appendChild(renderOption(singleMatch))
@@ -579,7 +577,6 @@ function renderOption(information){
     let element = document.createElement("option")
     element.setAttribute("value", information.start)
     element.innerHTML = information.value
-
     return element
 }
 
@@ -588,11 +585,9 @@ function performDateAndTimeConversion(sqlInputEl, selectEl){
     let opt;
     for (let i = 0, iLen = options.length; i < iLen; i++) {
         opt = options[i];
-
         if (!opt.selected && opt.value !== 'NONE') {
             let endSubstring = parseInt(opt.value) + parseInt(opt.text.length);
             let afterDateTime = sqlInputEl.value.substring(endSubstring);
-
             sqlInputEl.value = sqlInputEl.value.replaceAt(
                 opt.value,
                 opt.text,
@@ -608,7 +603,6 @@ function performDateAndTimeConversion(sqlInputEl, selectEl){
         }
         opt.parentElement.removeChild(opt)
     }
-
     selectEl.setAttribute("size", 1)
 }
 
@@ -642,12 +636,11 @@ document.onreadystatechange = function () {
         handleAlerts();
         let currentDomain = window.location.href.split("/");
         let actualPath = currentDomain[currentDomain.length - 1].split("?")[0];
-
         if(actualPath === ""){
             document.addEventListener("submit",  (e) => {
                 const sqlInputEl = document.getElementById("sqlinput")
                 const selectEl = document.getElementById("dateAndTimeSelect")
-                cachedOriginalInput = sqlInputEl.value;
+                const cachedOriginalInput = sqlInputEl.value;
                 performDateAndTimeConversion(sqlInputEl, selectEl)
                 const form = e.target;
                 form.parentNode.parentNode.style.minHeight = form.clientHeight
