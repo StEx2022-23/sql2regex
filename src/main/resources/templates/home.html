@@ -3,9 +3,7 @@
     <head lang="en" th:replace="assets/header :: header">
         <title>sqltoregex</title>
     </head>
-
     <div lang="en" th:replace="assets/offcanvasElement :: offcanvasElement"></div>
-
     <body class="bg-dark">
         <button lang="en" th:replace="assets/scrolltotop :: scrolltotop"></button>
         <nav lang="en" th:replace="assets/navbar :: navbar"></nav>
@@ -20,6 +18,7 @@
                 </div>
             </div>
         </div>
+
         <div class="toast-container position-fixed m-3 top-0 end-0" style="z-index:1100">
             <div th:replace="assets/toastTemplate :: toastTemplate (
                 id='toast-loaded-user-settings',

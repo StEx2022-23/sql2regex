@@ -1,25 +1,24 @@
 <!DOCTYPE HTML>
 <html lang="en" xml:lang="en" xmlns:th="http://www.thymeleaf.org">
-<head lang="en" th:replace="assets/header :: header">
-    <title>sqltoregex</title>
-</head>
-<body class="bg-dark">
-<button lang="en" th:replace="assets/scrolltotop :: scrolltotop"></button>
-<nav lang="en" th:replace="assets/navbar :: navbar"></nav>
-<div lang="en" th:replace="assets/userwarning :: userwarning"></div>
-
-<div class="container mt-3">
-    <div class="card">
-        <div class="card-body">
-            <h1 class="pb-2 border-bottom">Ooooooooops! An error occurred!</h1>
-            <img th:src="${imgsrc}" class="rounded mx-auto d-block" alt="Errorimage">
-            <div class="d-grid gap-2">
-                <button onclick="location.href='/';" id="backToStartPage" class="btn btn-primary btn-lg mb-2 mt-2 display-6">back to start</button>
+    <head lang="en" th:replace="assets/header :: header">
+        <title>sqltoregex</title>
+    </head>
+    <body class="bg-dark">
+        <button lang="en" th:replace="assets/scrolltotop :: scrolltotop"></button>
+        <nav lang="en" th:replace="assets/navbar :: navbar"></nav>
+        <div lang="en" th:replace="assets/userwarning :: userwarning"></div>
+        <div class="container mt-3">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="pb-2 border-bottom">Ooooooooops! An error occurred!</h1>
+                    <img th:src="${imgsrc}" class="rounded mx-auto d-block" alt="Errorimage">
+                    <div class="d-grid gap-2">
+                        <button onclick="location.href='/';" id="backToStartPage" class="btn btn-primary btn-lg mb-2 mt-2 display-6">back to start</button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-</body>
-<footer lang="en" th:replace="assets/footer :: footer"></footer>
-<div lang="en" th:replace="assets/jsscripts :: jsscripts"></div>
+    </body>
+    <footer lang="en" th:replace="assets/footer :: footer"></footer>
+    <div lang="en" th:replace="assets/jsscripts :: jsscripts"></div>
 </html>
