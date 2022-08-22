@@ -224,23 +224,23 @@
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:160px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none"
        x="6.2135921"
-       y="324.96875"
+       y="316.96875"
        id="text2526"><tspan
          sodipodi:role="line"
          id="tspan2524"
          x="6.2135921"
-         y="324.96875"
+         y="316.96875"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:160px;font-family:Arial;-inkscape-font-specification:'Arial Bold'">SQL</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:160px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';fill:#000000;fill-opacity:1;stroke:none"
        x="694.06329"
-       y="316.46875"
+       y="304.46875"
        id="text2526-9"><tspan
          sodipodi:role="line"
          id="tspan2524-1"
          x="694.06329"
-         y="316.46875"
+         y="304.46875"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:160px;font-family:Arial;-inkscape-font-specification:'Arial Bold'">RegEx</tspan></text>
   </g>
 </svg>
