@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 @Controller
 public class SqlToRegexController {
     private static final String TITLE = "title";
+    public static final String NONE_ALPHABET = "[^a-zA-Z]";
     private final SettingsManager settingsManager;
     private final ConverterManagement converterManagement;
 
@@ -72,7 +73,7 @@ public class SqlToRegexController {
         model.addAttribute("dateFormats",getSynonymSetOf(DateAndTimeFormatSynonymGenerator.class, SettingsOption.DATESYNONYMS,
                                                          SettingsType.ALL).stream().collect(Collectors.groupingBy(el -> {
             String patternString = el.toPattern();
-            Pattern pattern = Pattern.compile("[^a-zA-Z]");
+            Pattern pattern = Pattern.compile(NONE_ALPHABET);
             Matcher matcher = pattern.matcher(patternString);
 
             if (matcher.find()) {
@@ -85,7 +86,7 @@ public class SqlToRegexController {
                            getSynonymSetOf(DateAndTimeFormatSynonymGenerator.class, SettingsOption.TIMESYNONYMS,
                                            SettingsType.ALL).stream().collect(Collectors.groupingBy(el -> {
                                String patternString = el.toPattern();
-                               Pattern pattern = Pattern.compile("[^a-zA-Z]");
+                               Pattern pattern = Pattern.compile(NONE_ALPHABET);
                                Matcher matcher = pattern.matcher(patternString);
 
                                if (matcher.find()) {
@@ -97,7 +98,7 @@ public class SqlToRegexController {
         model.addAttribute("dateTimeFormats", getSynonymSetOf(DateAndTimeFormatSynonymGenerator.class,
                                                               SettingsOption.DATETIMESYNONYMS, SettingsType.ALL).stream().collect(Collectors.groupingBy(el -> {
             String patternString = el.toPattern();
-            Pattern pattern = Pattern.compile("[^a-zA-Z]");
+            Pattern pattern = Pattern.compile(NONE_ALPHABET);
             Matcher matcher = pattern.matcher(patternString);
 
             if (matcher.find()) {
