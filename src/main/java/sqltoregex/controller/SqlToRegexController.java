@@ -83,9 +83,29 @@ public class SqlToRegexController {
         })));
         model.addAttribute("timeFormats",
                            getSynonymSetOf(DateAndTimeFormatSynonymGenerator.class, SettingsOption.TIMESYNONYMS,
-                                           SettingsType.ALL));
+                                           SettingsType.ALL).stream().collect(Collectors.groupingBy(el -> {
+                               String patternString = el.toPattern();
+                               Pattern pattern = Pattern.compile("[^a-zA-Z]");
+                               Matcher matcher = pattern.matcher(patternString);
+
+                               if (matcher.find()) {
+                                   return patternString.charAt(matcher.start());
+                               } else {
+                                   return " ";
+                               }
+                           })));
         model.addAttribute("dateTimeFormats", getSynonymSetOf(DateAndTimeFormatSynonymGenerator.class,
-                                                              SettingsOption.DATETIMESYNONYMS, SettingsType.ALL));
+                                                              SettingsOption.DATETIMESYNONYMS, SettingsType.ALL).stream().collect(Collectors.groupingBy(el -> {
+            String patternString = el.toPattern();
+            Pattern pattern = Pattern.compile("[^a-zA-Z]");
+            Matcher matcher = pattern.matcher(patternString);
+
+            if (matcher.find()) {
+                return patternString.charAt(matcher.start());
+            } else {
+                return " ";
+            }
+        })));
         //special preprocessing to render comfortably on frontend
         Map<String, Set<String>> aggregateFunctionSynonymsMap = settingsManager.getSettingBySettingsOption(
                         SettingsOption.AGGREGATEFUNCTIONLANG, StringSynonymGenerator.class, SettingsType.ALL)

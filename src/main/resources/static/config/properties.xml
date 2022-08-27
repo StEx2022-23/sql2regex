@@ -71,6 +71,7 @@
           <value>yy/M/d</value>
           <value>yy|M|d</value>
           <value>yyyyMMdd</value>
+          <value>yyMMdd</value>
       </datesynonyms>
       <timesynonyms>
           <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
@@ -81,6 +82,7 @@
           <value>H:m:s</value>
           <value>H/m/s</value>
           <value>H|m|s</value>
+          <value>H-m-s</value>
           <value>HH:mm</value>
           <value>HH/mm</value>
           <value>HH|mm</value>
@@ -88,9 +90,11 @@
           <value>H:m</value>
           <value>H/m</value>
           <value>H|m</value>
+          <value>H-m</value>
       </timesynonyms>
       <datetimesynonyms>
           <settingstype>ALL;DEFAULT_SCHOOL</settingstype>
+          <value>yyyyMMddhhmmss</value>
           <value>yyyy-MM-dd hh:mm:ss</value>
           <value>yyyy.MM.dd hh:mm:ss</value>
           <value>yyyy|MM|dd hh|mm|ss</value>
