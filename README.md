@@ -55,6 +55,9 @@ The current javadoc is available here: https://stex2022-23.github.io/index.html
   <img src="https://raw.githubusercontent.com/StEx2022-23/sql2regex/main/documentation/uml/Top-Level-Architecture.jpg"></img>
 </div>
 
+## releases
+[version 1.0 - sql2regex](https://github.com/StEx2022-23/sql2regex/releases/tag/v1.0)
+
 ## contributers
 - Patrick Binkert, Technische Universität Dresden, student of teaching, 10th semester (physics and computer science)
 - Maximilian Förster, Technische Universität Dresden, student of teaching, 10th semester (physics and computer science)
